@@ -1,0 +1,93 @@
+@import url('https://fonts.googleapis.com/css?family=Bungee|Ubuntu');
+
+@font-face {
+    font-family: 'NanumBarunGothic';
+    font-style: normal;
+    font-weight: 400;
+    src: url('./fonts/nanum/NanumBarunGothic.ttf');
+}
+
+@font-face {
+    font-family: 'NanumGothic';
+    font-style: normal;
+    font-weight: 400;
+    src: url('./fonts/nanum/NanumGothic.ttf');
+}
+
+@font-face {
+    font-family: 'NanumSquareL';
+    font-style: normal;
+    font-weight: 400;
+    src: url('./fonts/nanum/NanumSquareL.ttf');
+}
+
+@font-face {
+    font-family: 'NanumGothic';
+    font-style: normal;
+    font-weight: 400;
+    src: url('./fonts/nanum/NanumGothic.ttf');
+}
+
+@font-face {
+    font-family: 'tmon';
+    font-style: normal;
+    font-weight: 400;
+    src: url('./fonts/tmon/TmonMonsori.ttf.ttf');
+}
+
+@font-face {
+    font-family: 'bm';
+    font-style: normal;
+    font-weight: 400;
+    src: url('./fonts/bm/BMHANNA_11yrs_ttf.ttf');
+}
+
+@font-face {
+    font-family: 'daum';
+    font-style: normal;
+    font-weight: 400;
+    src: url('./fonts/daum/Daum_SemiBold.ttf');
+}
+
+
+
+html, body, div, span, applet, object, iframe, h1, h2, h3, h4, h5, h6, p, blockquote, pre, a, abbr, acronym, address, big, cite, code, del, dfn, em, img, ins, kbd, q, s, samp, small, strike, strong, sub, sup, tt, var, b, u, i, center, dl, dt, dd, ol, ul, li, fieldset, form, label, legend, table, caption, tbody, tfoot, thead, tr, th, td, article, aside, canvas, details, embed, figure, figcaption, footer, header, hgroup, menu, nav, output, ruby, section, summary, time, mark, audio, video {
+    border: 0;
+    font-size: 100%;
+    font: inherit;
+    vertical-align: baseline;
+    margin: 0;
+    padding: 0;
+}
+
+body {
+    margin: 0;
+    padding: 0;
+    font-family: 'Ubuntu', 'Bungee', 'NanumBarunGothic', sans-serif;
+    background: #207ce5;
+    background: -moz-linear-gradient(top, #207ce5 0%, #499bea 100%);
+    background: -webkit-linear-gradient(top, #207ce5 0%, #499bea 100%);
+    background: linear-gradient(to bottom, #207ce5 0%, #499bea 100%);
+    filter: progid:DXImageTransform.Microsoft.gradient(startColorstr='#207ce5', endColorstr='#499bea', GradientType=0);
+}
+
+.btn {
+    border: none;
+    _background-color: #c6463d;
+    _background-color: #3B6AA0;
+    _color: white;
+    padding: 5px 10px 7px;
+    margin-left: 5px;
+    font-size: 12px;
+    border-radius: 2px;
+    display: inline-block;
+    outline: none;
+    cursor: pointer;
+    background-color: white;
+    border : 1px solid #BBB;
+}
+
+.btn:hover {
+    _background-color: #26466D;
+    font-weight: bold;
+}

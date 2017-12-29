@@ -1,0 +1,7 @@
+.xlog-viewer {
+    border : 1px solid #AAA;
+    box-sizing: border-box;
+    height: 300px;
+    position: relative;
+    overflow: hidden;
+}

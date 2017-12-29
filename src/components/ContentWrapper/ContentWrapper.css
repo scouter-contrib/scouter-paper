@@ -1,0 +1,31 @@
+div#root {
+    height: 100%;
+    padding: 0;
+    margin: 0;
+}
+
+article.content-wrapper {
+    height: calc(100% - 50px);
+}
+
+.content-wrapper > div {
+    height: 100%;
+}
+
+.content-wrapper-enter {
+    opacity: 0.01;
+    transition: opacity 0.1s ease-in;
+}
+
+.content-wrapper-enter.content-wrapper-enter-active {
+    opacity: 1;
+}
+
+.content-wrapper-leave {
+    opacity: 1;
+    transition: opacity 0.1s ease-in;
+}
+
+.content-wrapper-leave.content-wrapper-leave-active {
+    opacity: 0.01;
+}

@@ -1,0 +1,17 @@
+.realtime {
+    background-color: white;
+    text-align: center;
+}
+
+.realtime .xlog-viewer-wrapper {
+    display: inline-block;
+    width: calc(100% - 100px);
+}
+
+.realtime .xlog-mover-wrapper {
+    display: inline-block;
+    width: 100px;
+}
+.realtime .xlog-pipe-wrapper {
+
+}

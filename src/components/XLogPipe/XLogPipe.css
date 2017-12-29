@@ -1,0 +1,23 @@
+.xlog-pipe {
+    border : 1px solid #AAA;
+    margin: 10px;
+    box-sizing: border-box;
+    height: 50px;
+    position: relative;
+    overflow: hidden;
+}
+
+.xlog-pipe > div {
+    display: inline-block;
+    width: 20px;
+    height: 100%;
+    position: absolute;
+    right : -20px;
+    top : 0;
+    background-color: #499DF5;
+    opacity: 0.3;
+}
+
+.xlog-pipe > div.has-error {
+    background-color: #CC1100;
+}

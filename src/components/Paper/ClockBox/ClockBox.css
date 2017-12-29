@@ -1,0 +1,10 @@
+.clock-box {
+    line-height: 100%;
+}
+
+.clock-box > div {
+    line-height: 100%;
+}
+.clock-box .timezone {
+    padding: 10px;
+}

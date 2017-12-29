@@ -1,0 +1,155 @@
+li.target-host {
+    display: table;
+    table-layout: fixed;
+    width: 100%;
+    border: 1px solid #DDD;
+    cursor: pointer;
+    background-color: white;
+}
+
+li.target-host:hover {
+    outline: 1px solid rgba(0, 0, 0, 0.3);
+}
+
+li.target-host.active {
+    _outline: 1px solid rgba(0, 0, 0, 0.3);
+}
+
+li.target-host > div {
+    display: table-cell;
+    vertical-align: middle;
+    box-sizing: border-box;
+}
+
+li.target-host > div.status {
+    width: 50px;
+    text-align: center;
+    position: relative;
+    box-sizing: border-box;
+}
+
+li.target-host div.selected-count {
+    position: absolute;
+    top: 19px;
+    right: 0px;
+    text-align: center;
+    display: inline-block;
+}
+
+li.target-host div.selected-count > span {
+    width: 17px;
+    height: 17px;
+    display: inline-block;
+    background-color: #62B1F6;
+    border-radius: 3px;
+    border-radius: 50%;
+    padding-top: 3px;
+    box-sizing: border-box;
+    font-size: 10px;
+    color: white;
+    text-align: center;
+    font-weight: bold;
+}
+
+li.target-host div.selected-count > span:empty {
+    display: none;
+}
+
+li.target-host > div.status > span.icon {
+    font-size: 18px;
+    width: 30px;
+    height: 30px;
+    display: none;
+    border-radius: 50%;
+    padding-top: 4px;
+    box-sizing: border-box;
+}
+
+li.target-host > div.status > span.text {
+    font-size: 8px;
+    display: inline-block;
+    padding: 2px;
+    position: absolute;
+    background-color: #0BB5FF;
+    color: white;
+    display: none;
+    font-family: Arial;
+    font-weight: bold;
+    width: 30px;
+    left: 10px;
+    bottom: 8px;
+    box-sizing: border-box;
+
+}
+
+li.target-host > div.status.true > span.true {
+    display: inline-block;
+}
+
+li.target-host > div.status.false > span.false {
+    display: inline-block;
+}
+
+li.target-host > div.status.true > span.icon.true {
+    background-color: #FCD116;
+}
+
+li.target-host > div.status.false > span.icon.false {
+    background-color: #666;
+    color: white;
+}
+
+li.target-host > div.host-info {
+    padding: 10px 10px 10px 0;
+    position: relative;
+}
+
+li.target-host > div.host-info .name {
+    padding: 1px 0 5px 0;
+    font-weight: bold;
+    font-size: 12px;
+}
+
+li.target-host > div.host-info .hash,
+li.target-host > div.host-info .host-id {
+    font-size: 9px;
+    border: 1px solid #CCC;
+    display: inline-block;
+    padding: 3px 5px 2px;
+    background-color: white;
+}
+
+li.target-host > div.host-info .hash {
+    border-radius: 5px 0 0 5px;
+}
+
+li.target-host > div.host-info .host-id {
+    border-left: none;
+    border-radius: 0 5px 5px 0;
+}
+
+li.target-host > div.control {
+    width: 30px;
+    text-align: center;
+}
+
+li.target-host > div.control {
+    _border-left: 1px solid rgba(0, 0, 0, 0.1);
+}
+
+li.target-host > div.control > span {
+    display: inline-block;
+    padding: 4px 4px 2px;
+    border-radius: 3px;
+}
+
+li.target-host > div.control > span:hover {
+    background-color: white;
+    color: #4981CE;
+}
+
+li.target-host > div.control > span:active {
+    background-color: rgba(0, 0, 0, 0.2);
+}
+
+
