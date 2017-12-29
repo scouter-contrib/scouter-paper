@@ -29,8 +29,9 @@ class Box extends Component {
             }
         }
 
+
         return (
-            <Droppable types={['metric']} onDrop={this.onDrop.bind(this)}>
+            <Droppable className="box-droppable" types={['metric']} onDrop={this.onDrop.bind(this)}>
                 <div className="box">
                     <div className="title">{this.props.box.title}</div>
                     <div className="content-wrapper">
