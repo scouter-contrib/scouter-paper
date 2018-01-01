@@ -1,4 +1,8 @@
 /* box */
+.box-droppable {
+    height: 100%;
+}
+
 .box {
     color: white;
     font-family: 'Bungee';

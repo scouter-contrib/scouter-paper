@@ -7,8 +7,7 @@ class ClockBox extends Component {
     constructor(props) {
         super(props);
         this.state = {
-            fontSize: 30,
-            timeZone: 'Asia/Seoul'
+            fontSize: 30
         };
     }
 
@@ -41,12 +40,14 @@ class ClockBox extends Component {
     }
 
     render() {
+
+        console.log(this.props.box);
         return (
             <div className="clock-box" ref="clockBox">
                 <div className="clock" style={{fontSize: this.state.fontSize + "px"}}>
-                    <Clock format={'HH:mm:ss'} ticking={true} timezone={this.state.timeZone}/>
+                    <Clock format={this.props.box.values.format} ticking={true} timezone={this.props.box.values.timezone}/>
                 </div>
-                <div className="timezone">{this.state.timeZone}</div>
+                <div className="timezone">{this.props.box.values.timezone}</div>
             </div>
         );
     }

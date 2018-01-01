@@ -8,17 +8,20 @@ import ClockBox from "../Paper/ClockBox/ClockBox";
 class Box extends Component {
 
     onDrop(data) {
-        let infos = data.metric.split(",");
-        let mode = infos[0];
-        let type = infos[1];
-        let title = infos[2];
-        this.props.setMetric(this.props.box.key, mode, type, title);
+        if (data) {
+            let option = JSON.parse(data.metric);
+            this.props.setOption(this.props.box.key, option);
+        }
+
     }
 
     render() {
 
         let type = null;
-        if (this.props.box && this.props.box.metric && this.props.box.metric.length > 0) {
+        if (this.props.box && this.props.box.option && typeof(this.props.box.option) === "object") {
+            type = this.props.box.option.type;
+        } else if (this.props.box && this.props.box.option && this.props.box.option.length > 0) {
+            // TODO check this option
             for (let i=0; i<this.props.box.metric.length; i++) {
                 let metric = this.props.box.metric[i];
                 if (metric.mode === "exclusive") {
@@ -29,7 +32,6 @@ class Box extends Component {
             }
         }
 
-
         return (
             <Droppable className="box-droppable" types={['metric']} onDrop={this.onDrop.bind(this)}>
                 <div className="box">
@@ -37,7 +39,7 @@ class Box extends Component {
                     <div className="content-wrapper">
                         <div className="content">
                             {!type && <EmptyBox/>}
-                            {type === "clock" && <ClockBox/>}
+                            {type === "clock" && <ClockBox box={this.props.box} />}
                         </div>
                     </div>
                 </div>

@@ -1,0 +1,87 @@
+.box-config {
+    position: absolute;
+    height: 100%;
+    width: 100%;
+    background-color: rgba(0, 0, 0, 0.8);
+    top: 0;
+    padding: 10px 0;
+    font-family: 'Bungee';
+    line-height: 0;
+    font-size: 9px;
+    display: table;
+}
+
+.box-config .box-config-content {
+    display: table-cell;
+    vertical-align: middle;
+}
+
+.box-config .box-config-item {
+    padding: 5px 0 10px;
+    width: 50%;
+    display: inline-block;
+    position: relative;
+}
+
+.box-config.single-row .box-config-item {
+    width: 100%;
+}
+
+.box-config .box-config-item label {
+    color: white;
+    font-family: 'Bungee';
+    line-height: 100%;
+    width: 100px;
+    display: inline-block;
+    text-align: center;
+}
+
+.box-config .box-config-item input,
+.box-config .box-config-item select {
+    width: calc(100% - 110px);
+    padding: 0 5px;
+    outline: none;
+    border-radius: 3px;
+    border: none;
+}
+
+.box-config .box-config-buttons {
+    padding: 15px 10px 0;
+    text-align: center;
+}
+
+.box-config .box-config-buttons button {
+    padding: 12px 15px;
+    border: none;
+    background-color: white;
+    margin: 0 2px;
+    outline: none;
+}
+
+.box-config .box-config-buttons button:hover {
+    background-color: #EEE;
+}
+
+.box-config .config-tooltip {
+    color: white;
+    width: 100%;
+    line-height: 100%;
+    text-align: right;
+    height: 18px;
+    position: absolute;
+    bottom : -10px;
+    right : 10px;
+    font-size: 8px;
+    _font-family: 'NanumBarunGothic', sans-serif;
+}
+
+
+
+
+
+
+
+
+
+
+
