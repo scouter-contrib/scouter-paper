@@ -1,20 +1,21 @@
-import {ADD_REQUEST, SET_URL, SET_USER_ID, SET_INSTANCES, PUSH_MESSAGE, SET_CONTROL_VISIBILITY, CLEAR_ALL_MESSAGE, SET_BG_COLOR} from '../actions';
+import {ADD_REQUEST, SET_CONFIG, SET_USER_ID, SET_INSTANCES, PUSH_MESSAGE, SET_CONTROL_VISIBILITY, CLEAR_ALL_MESSAGE, SET_BG_COLOR} from '../actions';
 import {combineReducers} from 'redux';
 
 const configState = {
     protocol: "http",
     address : "127.0.0.1",
-    port : 6188
+    port : 6188,
+    interval : 1000,
+    numberFormat : "999,999.00",
+    dateFormat : "YYYY-MM-DD",
+    timeFormat : "HH:MM:SS",
+    minuteFormat : "HH:MM"
 };
 
 const config = (state = configState, action) => {
     switch (action.type) {
-        case SET_URL:
-            return Object.assign({}, state, {
-                protocol: action.protocol,
-                address : action.address,
-                port : action.port
-            });
+        case SET_CONFIG:
+            return Object.assign({}, state, action.config);
         default:
             return state;
     }

@@ -10,8 +10,22 @@ import Menu from "./components/Menu/Menu";
 import RequestBar from "./components/RequestBar/RequestBar";
 import Loading from "./components/Loading/Loading";
 import Paper from "./components/Paper/Paper";
+import Settings from "./components/Settings/Settings";
+import {setConfig} from './actions';
 
 class App extends Component {
+
+    constructor(props){
+        super(props);
+
+        let str = localStorage.getItem("config");
+        if (str) {
+            let config = JSON.parse(str);
+            this.props.setConfig(config)
+
+        }
+
+    }
 
     componentDidMount() {
     }
@@ -21,6 +35,7 @@ class App extends Component {
     }
 
     render() {
+        console.log(this.props.config);
 
         return (
             <ContentWrapper>
@@ -32,6 +47,7 @@ class App extends Component {
                 <Switch>
                     <Route exact path='/login' component={Login}/>
                     <Route exact path='/paper' component={Paper}/>
+                    <Route exact path='/settings' component={Settings}/>
                     <Route exact path='/realtime' component={Realtime}/>
                 </Switch>
                 { false &&
@@ -56,13 +72,14 @@ let mapStateToProps = (state) => {
         control: state.control,
         instances: state.target.instances,
         messages: state.message.messages,
-        bgColor: state.style.bgColor
+        bgColor: state.style.bgColor,
+        config: state.config
     };
 };
 
 let mapDispatchToProps = (dispatch) => {
     return {
-        // setLogin: (login) => dispatch(setLogin(login))
+        setConfig: (config) => dispatch(setConfig(config))
     };
 };
 

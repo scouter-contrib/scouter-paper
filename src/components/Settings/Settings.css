@@ -1,0 +1,126 @@
+.settings {
+    text-align: left;
+    font-family: 'Bungee';
+    padding: 10px;
+    line-height: 0;
+    max-width: 1600px;
+    margin: 0 auto;
+}
+
+.settings * {
+    box-sizing: border-box;
+}
+
+.settings .category {
+    color: white;
+    padding: 0 10px 0;
+    margin: 20px 0 0;
+}
+
+.settings .category > div {
+    display: inline-block;
+    background-color: rgba(0, 0, 0, 0.3);
+    padding: 10px 8px;
+    margin: 0;
+}
+
+.settings .forms {
+    padding: 10px;
+    margin: 0 200px 0;
+}
+
+@media screen and (max-width: 1400px) {
+    .settings .forms {
+        padding: 10px;
+        margin: 0 100px 0;
+    }
+}
+
+@media screen and (max-width: 1200px) {
+    .settings .forms {
+        padding: 10px;
+        margin: 0 50px 0;
+    }
+}
+
+@media screen and (max-width: 1000px) {
+    .settings .forms {
+        padding: 10px;
+        margin: 0 20px 0;
+    }
+}
+
+@media screen and (max-width: 600px) {
+    .settings .forms {
+        padding: 0;
+        margin: 0;
+
+    }
+}
+
+.settings .forms .row {
+    margin: 0;
+    display: inline-block;
+    width: 50%;
+    padding: 5px 10px 0 10px;
+}
+
+@media screen and (max-width: 800px) {
+    .settings .forms .row {
+        margin: 0;
+        display: block;
+        width: 100%;
+        padding: 5px 10px 0 10px;
+    }
+}
+
+.settings .forms .row.last {
+    margin-bottom: 0;
+}
+
+.settings .forms .row > div {
+
+}
+
+.settings .forms .row > div.label {
+    text-align: left;
+    display: inline-block;
+    padding: 6px 2px;
+}
+
+.settings .forms input {
+    font-size: 10px;
+    padding: 0 5px;
+    border-radius: 3px;
+    border: none;
+    outline: none;
+    width: 100%;
+    box-sizing: border-box;
+    border : 1px solid transparent;
+}
+
+.settings .forms input[readonly] {
+    background-color: transparent;
+    background-color: rgba(0,0,0,0.3);
+    color: white;
+    border : 1px solid rgba(0,0,0,0.3);
+}
+
+
+
+.settings .buttons {
+    padding: 15px 10px 0;
+    text-align: center;
+}
+
+.settings .buttons button {
+    padding: 12px 15px;
+    border: none;
+    background-color: white;
+    margin: 0 2px;
+    outline: none;
+}
+
+.settings .buttons button:hover {
+    background-color: #EEE;
+}

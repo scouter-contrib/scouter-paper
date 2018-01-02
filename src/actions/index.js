@@ -3,16 +3,14 @@ export const SET_CONTROL_VISIBILITY = 'SET_CONTROL_VISIBILITY';
 export const PUSH_MESSAGE = 'PUSH_MESSAGE';
 export const CLEAR_ALL_MESSAGE = 'CLEAR_ALL_MESSAGE';
 export const SET_BG_COLOR = 'SET_BG_COLOR';
-export const SET_URL = 'SET_URL';
+export const SET_CONFIG = 'SET_CONFIG';
 export const SET_USER_ID = 'SET_USER_ID';
 export const ADD_REQUEST = 'ADD_REQUEST';
 
-export function setUrl(protocol, address, port) {
+export function setConfig(config) {
     return {
-        type: SET_URL,
-        protocol : protocol,
-        protocol : protocol,
-        port : port
+        type: SET_CONFIG,
+        config : config
     };
 }
 

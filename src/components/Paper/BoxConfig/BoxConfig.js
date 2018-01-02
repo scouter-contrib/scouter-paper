@@ -15,7 +15,6 @@ class BoxConfig extends Component {
     resize = () => {
         if (this.refs.boxConfig) {
             let width = this.refs.boxConfig.offsetWidth;
-            console.log(width);
             if (width < 600) {
                 if (!this.state.singleRow) {
                     this.setState({
