@@ -22,7 +22,6 @@ class App extends Component {
         if (str) {
             let config = JSON.parse(str);
             this.props.setConfig(config)
-
         }
 
     }
@@ -35,8 +34,6 @@ class App extends Component {
     }
 
     render() {
-        console.log(this.props.config);
-
         return (
             <ContentWrapper>
                 <RequestBar/>

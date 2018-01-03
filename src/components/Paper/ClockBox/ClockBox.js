@@ -40,8 +40,6 @@ class ClockBox extends Component {
     }
 
     render() {
-
-        console.log(this.props.box);
         return (
             <div className="clock-box" ref="clockBox">
                 <div className="clock" style={{fontSize: this.state.fontSize + "px"}}>

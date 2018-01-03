@@ -1,8 +1,23 @@
 import React, {Component} from 'react';
 import {NavLink} from 'react-router-dom'
 import './Menu.css';
+import InstanceInfo from "./InstanceInfo/InstanceInfo";
+import InstanceSelector from "./InstanceSelector/InstanceSelector";
 
 class Menu extends Component {
+
+    constructor(props) {
+        super(props);
+        this.state = {
+            selector : false
+        };
+    }
+
+    toggleSelectorVisible = () => {
+        this.setState({
+            selector : !this.state.selector
+        });
+    };
 
     render() {
         return (
@@ -41,7 +56,9 @@ class Menu extends Component {
                             <div className="text">LOGIN</div>
                         </div>
                     </NavLink>
+                    <InstanceInfo className="menu-instance-selector" toggleSelectorVisible={this.toggleSelectorVisible} />
                 </div>
+                <InstanceSelector visible={this.state.selector} toggleSelectorVisible={this.toggleSelectorVisible} />
             </div>
         );
     }

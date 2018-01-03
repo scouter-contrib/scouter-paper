@@ -141,3 +141,10 @@
     color: white;
     transition: border-bottom-color, color 0.3s;
 }
+
+.menu-instance-selector {
+    display: inline-block;
+    padding-top: 9px;
+    font-size: 10px;
+    float: right;
+}

@@ -3,7 +3,6 @@ import ContentWrapper from './ContentWrapper/ContentWrapper';
 import TargetSelector from './TargetSelector/TargetSelector';
 import TargetHost from './TargetSelector/TargetHost/TargetHost';
 import TargetInstance from './TargetSelector/TargetInstance/TargetInstance';
-import InstanceSelector from './InstanceSelector/InstanceSelector';
 import Message from './Message/Message';
 import TargetInfo from './TargetInfo/TargetInfo';
 import Realtime from './Realtime/Realtime';
@@ -19,7 +18,6 @@ export {
     Header,
     ContentWrapper,
     TargetSelector,
-    InstanceSelector,
     TargetHost,
     TargetInstance,
     Message,

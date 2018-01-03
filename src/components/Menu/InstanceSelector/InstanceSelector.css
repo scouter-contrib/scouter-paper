@@ -1,0 +1,139 @@
+.instance-selector {
+    background-color: rgba(0, 0, 0, 0.2);
+    background-color: #207ce5;
+    border: 1px solid rgba(0, 0, 0, 0.3);
+    color: white;
+    width: 500px;
+    height: 300px;
+    position: absolute;
+    top: 45px;
+    right: 24px;
+    _border-radius: 5px;
+    z-index: 2;
+    padding: 0;
+    -webkit-touch-callout: none;
+    -webkit-user-select: none;
+    -khtml-user-select: none;
+    -moz-user-select: none;
+    -ms-user-select: none;
+    user-select: none;
+    font-family: 'Bungee';
+}
+
+.instance-selector > div {
+    -webkit-touch-callout: none;
+    -webkit-user-select: none;
+    -khtml-user-select: none;
+    -moz-user-select: none;
+    -ms-user-select: none;
+    user-select: none;
+}
+
+.instance-selector .instance-selector-content {
+    display: table;
+    width: 100%;
+    height: calc(100% - 40px);
+    table-layout: fixed;
+}
+
+.instance-selector .instance-selector-content > div {
+    display: table-cell;
+    vertical-align: top;
+    line-height: 100%;
+    height: 100%;
+}
+
+.instance-selector .instance-selector-content .title {
+    text-align: center;
+}
+
+
+
+
+.instance-selector .instance-selector-content .title > div {
+    display: inline-block;
+    padding: 8px 8px;
+    background-color: rgba(0, 0, 0, 0.2);
+    margin: 0;
+    line-height: 0;
+    font-size: 10px;
+}
+
+.instance-selector .host-list {
+    display: table-cell;
+    width: 40%;
+    border-right: 1px solid rgba(0, 0, 0, 0.3);
+    font-size: 10px;
+}
+
+.instance-selector .host-list > div.host {
+    padding: 12px 8px;
+    cursor: pointer;
+    border-bottom: 1px solid rgba(0, 0, 0, 0.2);
+}
+
+.instance-selector .host-list > div.host .host-selected-count {
+    float: right;
+}
+
+.instance-selector .host-list > div.host:hover {
+    background-color: rgba(0, 0, 0, 0.1);
+}
+
+.instance-selector .host-list > div.host.active {
+    background-color: rgba(0, 0, 0, 0.3);
+}
+
+.instance-selector .host-list > div.host.first {
+    border-top: 1px solid rgba(0, 0, 0, 0.2);
+    margin-top: 10px;
+}
+
+.instance-selector .instance-list {
+    font-size: 10px;
+}
+
+.instance-selector .instance-list > div.instance {
+    padding: 12px 8px;
+    cursor: pointer;
+    border-bottom: 1px solid rgba(0, 0, 0, 0.2);
+}
+
+.instance-selector .instance-list > div.instance.first {
+    border-top: 1px solid rgba(0, 0, 0, 0.2);
+    margin-top: 10px;
+}
+
+.instance-selector .instance-list > div.instance:hover {
+    background-color: rgba(0, 0, 0, 0.1);
+}
+
+.instance-selector .instance-list > div.instance.selected {
+    background-color: rgba(0, 0, 0, 0.3);
+}
+
+.instance-selector .buttons {
+    _border-top: 1px solid rgba(0, 0, 0, 0.2);
+    background-color: rgba(0,0,0,0.1);
+    padding: 9px 10px 0;
+    text-align: right;
+    line-height: 100%;
+    font-size: 10px;
+    height: 40px;
+
+}
+
+.instance-selector .buttons button {
+    padding: 12px 15px;
+    border: none;
+    background-color: white;
+    margin: 0 2px;
+    outline: none;
+    color : #333;
+    line-height: 0;
+}
+
+.instance-selector .buttons button:hover {
+    background-color: #EEE;
+}
+

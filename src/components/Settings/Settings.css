@@ -19,8 +19,8 @@
 
 .settings .category > div {
     display: inline-block;
-    background-color: rgba(0, 0, 0, 0.3);
-    padding: 10px 8px;
+    _background-color: rgba(0, 0, 0, 0.3);
+    padding: 10px 0;
     margin: 0;
 }
 
@@ -96,17 +96,15 @@
     outline: none;
     width: 100%;
     box-sizing: border-box;
-    border : 1px solid transparent;
+    border: 1px solid transparent;
 }
 
 .settings .forms input[readonly] {
     background-color: transparent;
-    background-color: rgba(0,0,0,0.3);
+    background-color: rgba(0, 0, 0, 0.3);
     color: white;
-    border : 1px solid rgba(0,0,0,0.3);
+    border: 1px solid rgba(0, 0, 0, 0.3);
 }
-
-
 
 .settings .buttons {
     padding: 15px 10px 0;

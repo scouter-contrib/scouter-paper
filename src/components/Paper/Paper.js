@@ -36,6 +36,8 @@ class Paper extends Component {
         };
     }
 
+
+
     onLayoutChange(layout, layouts) {
         let boxes = this.state.boxes;
         boxes.forEach((box) => {
@@ -209,6 +211,8 @@ class Paper extends Component {
     };
 
     render() {
+
+
         return (
             <div className="papers">
                 <div className="papers-controls">
@@ -219,7 +223,6 @@ class Paper extends Component {
                         <div key={i} className="paper-control"><Draggable type="metric" className="draggable" data={JSON.stringify(this.options[name])}><i className={"fa " + this.options[name].icon} aria-hidden="true"></i></Draggable></div>
                         ))
                     }
-                    <div className="paper-control"><Draggable type="metric" className="draggable" data="exclusive,clock,CLOCK"><i className="fa fa-clock-o" aria-hidden="true"></i></Draggable></div>
                     <div className="paper-control paper-right" onClick={this.clearLayout}><i className="fa fa-trash-o" aria-hidden="true"></i></div>
                 </div>
                 <ResponsiveReactGridLayout className="layout" cols={{lg: 12, md: 10, sm: 6, xs: 4, xxs: 2}} layouts={this.state.layouts} rowHeight={30} onLayoutChange={(layout, layouts) => this.onLayoutChange(layout, layouts)}>
