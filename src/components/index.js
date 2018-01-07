@@ -1,30 +1,42 @@
 import Header from './Header/Header';
 import ContentWrapper from './ContentWrapper/ContentWrapper';
-import TargetSelector from './TargetSelector/TargetSelector';
-import TargetHost from './TargetSelector/TargetHost/TargetHost';
-import TargetInstance from './TargetSelector/TargetInstance/TargetInstance';
 import Message from './Message/Message';
-import TargetInfo from './TargetInfo/TargetInfo';
 import Realtime from './Realtime/Realtime';
 import Overlay from './Overlay/Overlay';
 import XLogViewer from './XLogViewer/XLogViewer';
 import XLogPipe from './XLogPipe/XLogPipe';
-import XLogMover from './XLogMover/XLogMover';
-
-
-
+import XLogMover from './XLogMover/XLogMover'
+import Loading from './Loading/Loading';
+import RequestBar from './RequestBar/RequestBar';
+import Menu from './Menu/Menu';
+import Login from './Login/Login';
+import Box from './Box/Box';
+import Paper from './Paper/Paper';
+import BoxConfig from './Paper/BoxConfig/BoxConfig';
+import ClockBox from './Paper/ClockBox/ClockBox';
+import EmptyBox from './Paper/EmptyBox/EmptyBox';
+import PaperControl from './Paper/PaperControl/PaperControl';
+import Settings from './Settings/Settings';
 
 export {
     Header,
     ContentWrapper,
-    TargetSelector,
-    TargetHost,
-    TargetInstance,
     Message,
-    TargetInfo,
     Realtime,
     Overlay,
     XLogViewer,
     XLogPipe,
-    XLogMover
+    XLogMover,
+
+    Loading,
+    RequestBar,
+    Menu,
+    Login,
+    Box,
+    Paper,
+    BoxConfig,
+    ClockBox,
+    EmptyBox,
+    PaperControl,
+    Settings
 };

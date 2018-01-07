@@ -5,10 +5,8 @@ import {connect} from 'react-redux';
 import {addRequest} from '../../actions';
 import {withRouter} from 'react-router-dom';
 import {Responsive, WidthProvider} from "react-grid-layout";
-import Box from "../Box/Box";
-import BoxConfig from "./BoxConfig/BoxConfig";
+import {Box, BoxConfig, PaperControl} from "../../components";
 import jQuery from "jquery";
-import PaperControl from "./PaperControl/PaperControl";
 import {getData, setData, getHttpProtocol} from '../../common/common';
 const ResponsiveReactGridLayout = WidthProvider(Responsive);
 

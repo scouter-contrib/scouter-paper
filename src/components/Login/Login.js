@@ -1,16 +1,13 @@
 import React, {Component} from 'react';
 import './Login.css';
 import {connect} from 'react-redux';
-import {addRequest, clearAllMessage, setControlVisibility, setBgColor, setUserId} from '../../actions';
+import {addRequest, clearAllMessage, setControlVisibility, setUserId} from '../../actions';
 import jQuery from "jquery";
 import {withRouter} from 'react-router-dom';
 import building from './building.png';
-import light from './6.svg';
-import Time from 'react-time-format'
 import TimeAgo from 'react-timeago'
 
 class Login extends Component {
-
 
     constructor(props) {
         super(props);
@@ -19,7 +16,7 @@ class Login extends Component {
             control: {
                 id: "admin",
                 password: "admin",
-                message : null
+                message: null
             }
         };
 
@@ -64,7 +61,7 @@ class Login extends Component {
                 if (msg.status === "200" && msg.resultCode === "0" && msg.result) {
                     this.props.setUserId(msg.result.id);
                     this.setState({
-                        message : null
+                        message: null
                     });
                 }
             }
@@ -105,7 +102,7 @@ class Login extends Component {
             this.info();
         }).fail((jqXHR, textStatus) => {
             this.setState({
-                message : "LOGIN FAILED"
+                message: "LOGIN FAILED"
             });
             console.log(jqXHR, textStatus);
         }).always(() => {
@@ -115,14 +112,9 @@ class Login extends Component {
     };
 
     componentDidMount() {
-        //this.props.setBgColor("red");
         if (!this.props.user || !this.props.user.id) {
             this.info();
         }
-    }
-
-    componentWillUnmount() {
-
     }
 
     render() {
@@ -174,7 +166,6 @@ let mapDispatchToProps = (dispatch) => {
     return {
         setControlVisibility: (name, value) => dispatch(setControlVisibility(name, value)),
         clearAllMessage: () => dispatch(clearAllMessage()),
-        setBgColor: (color) => dispatch(setBgColor(color)),
         setUserId: (id) => dispatch(setUserId(id)),
         addRequest: () => dispatch(addRequest()),
     };

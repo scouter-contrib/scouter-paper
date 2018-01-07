@@ -1,21 +1,25 @@
 import React, {Component} from 'react';
 import './App.css';
-import {Overlay, Message, Realtime, ContentWrapper, TargetSelector} from './components';
+import {
+    Settings,
+    Paper,
+    Loading,
+    RequestBar,
+    Menu,
+    Login,
+    Overlay,
+    Message,
+    Realtime,
+    ContentWrapper
+} from './components';
 import {Route, Switch} from 'react-router-dom';
 import {connect} from 'react-redux';
 import {withRouter} from 'react-router-dom';
-import TargetInfo from "./components/TargetInfo/TargetInfo";
-import Login from "./components/Login/Login";
-import Menu from "./components/Menu/Menu";
-import RequestBar from "./components/RequestBar/RequestBar";
-import Loading from "./components/Loading/Loading";
-import Paper from "./components/Paper/Paper";
-import Settings from "./components/Settings/Settings";
 import {setConfig} from './actions';
 
 class App extends Component {
 
-    constructor(props){
+    constructor(props) {
         super(props);
 
         let str = localStorage.getItem("config");
@@ -29,7 +33,7 @@ class App extends Component {
     componentDidMount() {
     }
 
-    componentDidUpdate(prevProps, prevState){
+    componentDidUpdate(prevProps, prevState) {
         document.querySelector("body").style.backgroundColor = this.props.bgColor;
     }
 
@@ -38,20 +42,12 @@ class App extends Component {
             <ContentWrapper>
                 <RequestBar/>
                 <Menu/>
-                { false &&
-                <TargetInfo/>
-                }
                 <Switch>
                     <Route exact path='/login' component={Login}/>
                     <Route exact path='/paper' component={Paper}/>
                     <Route exact path='/settings' component={Settings}/>
                     <Route exact path='/realtime' component={Realtime}/>
                 </Switch>
-                { false &&
-                    <Overlay visible={this.props.control.TargetSelector}>
-                        <TargetSelector/>
-                    </Overlay>
-                }
                 {this.props.control.Message &&
                 <Overlay>
                     <Message messages={this.props.messages}/>

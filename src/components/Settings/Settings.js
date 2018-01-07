@@ -1,8 +1,7 @@
 import React, {Component} from 'react';
 import './Settings.css';
 import {connect} from 'react-redux';
-import {setConfig, clearAllMessage, setControlVisibility} from '../../actions';
-
+import {setConfig} from '../../actions';
 
 class Settings extends Component {
 
@@ -169,8 +168,6 @@ let mapStateToProps = (state) => {
 
 let mapDispatchToProps = (dispatch) => {
     return {
-        setControlVisibility: (name, value) => dispatch(setControlVisibility(name, value)),
-        clearAllMessage: () => dispatch(clearAllMessage()),
         setConfig: (config) => dispatch(setConfig(config))
     };
 };
