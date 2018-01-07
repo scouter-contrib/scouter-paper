@@ -1,9 +1,7 @@
 import React, {Component} from 'react';
 import './Box.css';
-import {Draggable, Droppable} from 'react-drag-and-drop'
-import Clock from 'react-live-clock';
-import EmptyBox from "../Paper/EmptyBox/EmptyBox";
-import ClockBox from "../Paper/ClockBox/ClockBox";
+import {Droppable} from 'react-drag-and-drop'
+import {EmptyBox, ClockBox} from "../../components";
 
 class Box extends Component {
 
@@ -12,7 +10,6 @@ class Box extends Component {
             let option = JSON.parse(data.metric);
             this.props.setOption(this.props.box.key, option);
         }
-
     }
 
     render() {
@@ -22,7 +19,7 @@ class Box extends Component {
             type = this.props.box.option.type;
         } else if (this.props.box && this.props.box.option && this.props.box.option.length > 0) {
             // TODO check this option
-            for (let i=0; i<this.props.box.metric.length; i++) {
+            for (let i = 0; i < this.props.box.metric.length; i++) {
                 let metric = this.props.box.metric[i];
                 if (metric.mode === "exclusive") {
                     type = metric.type;
@@ -39,7 +36,7 @@ class Box extends Component {
                     <div className="content-wrapper">
                         <div className="content">
                             {!type && <EmptyBox/>}
-                            {type === "clock" && <ClockBox box={this.props.box} />}
+                            {type === "clock" && <ClockBox box={this.props.box}/>}
                         </div>
                     </div>
                 </div>

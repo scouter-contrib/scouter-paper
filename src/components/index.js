@@ -1,4 +1,3 @@
-import Header from './Header/Header';
 import ContentWrapper from './ContentWrapper/ContentWrapper';
 import Message from './Message/Message';
 import Realtime from './Realtime/Realtime';
@@ -18,8 +17,11 @@ import EmptyBox from './Paper/EmptyBox/EmptyBox';
 import PaperControl from './Paper/PaperControl/PaperControl';
 import Settings from './Settings/Settings';
 
+import InstanceInfo from './Menu/InstanceInfo/InstanceInfo';
+import InstanceSelector from './Menu/InstanceSelector/InstanceSelector';
+
+
 export {
-    Header,
     ContentWrapper,
     Message,
     Realtime,
@@ -38,5 +40,8 @@ export {
     ClockBox,
     EmptyBox,
     PaperControl,
-    Settings
+    Settings,
+
+    InstanceInfo,
+    InstanceSelector
 };
