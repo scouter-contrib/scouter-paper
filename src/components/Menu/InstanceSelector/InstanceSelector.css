@@ -47,9 +47,6 @@
     text-align: center;
 }
 
-
-
-
 .instance-selector .instance-selector-content .title > div {
     display: inline-block;
     padding: 8px 8px;
@@ -114,7 +111,7 @@
 
 .instance-selector .buttons {
     _border-top: 1px solid rgba(0, 0, 0, 0.2);
-    background-color: rgba(0,0,0,0.1);
+    background-color: rgba(0, 0, 0, 0.1);
     padding: 9px 10px 0;
     text-align: right;
     line-height: 100%;
@@ -129,11 +126,26 @@
     background-color: white;
     margin: 0 2px;
     outline: none;
-    color : #333;
+    color: #333;
     line-height: 0;
 }
 
 .instance-selector .buttons button:hover {
     background-color: #EEE;
+}
+
+@media screen and (max-width: 700px) {
+    .instance-selector {
+        width: calc(100% - 20px);
+        height: 300px;
+        position: absolute;
+        top: 45px;
+        right: 10px;
+        left: 10px;
+        z-index: 2;
+        padding: 0;
+
+    }
+
 }
 

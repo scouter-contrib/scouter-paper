@@ -2,23 +2,24 @@ import React, {Component} from 'react';
 import './Paper.css';
 import './Resizable.css';
 import {connect} from 'react-redux';
-import {addRequest, clearAllMessage, setControlVisibility, setBgColor, setUserId} from '../../actions';
+import {addRequest} from '../../actions';
 import {withRouter} from 'react-router-dom';
 import {Responsive, WidthProvider} from "react-grid-layout";
 import Box from "../Box/Box";
-import * as Options from './Options';
-import {Draggable, Droppable} from 'react-drag-and-drop'
 import BoxConfig from "./BoxConfig/BoxConfig";
-
+import jQuery from "jquery";
+import PaperControl from "./PaperControl/PaperControl";
+import {getData, setData, getHttpProtocol} from '../../common/common';
 const ResponsiveReactGridLayout = WidthProvider(Responsive);
 
 class Paper extends Component {
-
-    options = null;
+    dataRefreshTimer = null;
+    tickInterval = 1000;
+    tickTimer = null;
     constructor(props) {
         super(props);
-        let layouts = getFromLS("layouts");
-        let boxes = getFromLS("boxes");
+        let layouts = getData("layouts");
+        let boxes = getData("boxes");
 
         if (!(layouts)) {
             layouts = {};
@@ -28,15 +29,166 @@ class Paper extends Component {
             boxes = [];
         }
 
-        this.options = Options.options();
+        let range = 1000 * 60 * 10;
+        let endTime = (new Date()).getTime();
+        let startTime = endTime - range;
 
         this.state = {
             layouts: layouts,
-            boxes: boxes
+            boxes: boxes,
+
+
+            tempXlogs: [],
+            firstStepXlogs: [],
+            firstStepTimestamp: null,
+            secondStepXlogs: [],
+            secondStepTimestamp: null,
+            xlogs: [],
+            newXLogs: [],
+            offset1: 0,
+            offset2: 0,
+            startTime: startTime,
+            endTime: endTime,
+            range: range,
+            maxElapsed: 2000
         };
     }
 
+    componentDidMount() {
+        this.dataRefreshTimer = setInterval(() => {
+            this.getXLog();
+        }, this.props.config.interval);
 
+        this.tickTimer = setInterval(() => {
+            this.tick();
+        }, this.tickInterval);
+    }
+
+    componentWillUnmount() {
+        clearInterval(this.dataRefreshTimer);
+        this.dataRefreshTimer = null;
+
+        clearInterval(this.tickTimer);
+        this.tickTimer = null;
+    }
+
+    getXLog = () => {
+        if (this.props.instances && this.props.instances.length > 0) {
+            this.props.addRequest();
+            jQuery.ajax({
+                method: "GET",
+                async: true,
+                url: getHttpProtocol(this.props.config) + '/scouter/v1/xlog/realTime/' + this.state.offset1 + '/' + this.state.offset2 + '?objHashes=' + JSON.stringify(this.props.instances.map((instance) => {
+                    return Number(instance.objHash);
+                }))
+            }).done((msg) => {
+                if (msg.result.xlogs) {
+                    console.log(msg.result.xlogs.length);
+                }
+
+
+                let datas = msg.result.xlogs.map((d) => {
+                    d["_custom"] = {
+                        p: false
+                    };
+                    return d;
+                });
+
+                let tempXlogs = this.state.tempXlogs.concat(datas);
+
+                this.setState({
+                    offset1: msg.result.offset1,
+                    offset2: msg.result.offset2,
+                    tempXlogs: tempXlogs
+
+                });
+
+            }).fail((jqXHR, textStatus) => {
+                console.log(jqXHR, textStatus);
+            });
+        }
+    };
+
+    tick = () => {
+
+        let endTime = (new Date()).getTime();
+        let startTime = endTime - this.state.range;
+
+        let firstStepStartTime = endTime - 1000;
+        let secondStepStartTime = firstStepStartTime - 5000;
+
+        let xlogs = this.state.xlogs;
+        let newXLogs = this.state.newXLogs;
+        let tempXlogs = this.state.tempXlogs;
+        let firstStepXlogs = this.state.firstStepXlogs;
+        let secondStepXlogs = this.state.secondStepXlogs;
+        let lastStepXlogs = [];
+
+        for (let i = 0; i < secondStepXlogs.length; i++) {
+            let d = secondStepXlogs[i];
+            if (d.endTime >= firstStepStartTime) {
+                firstStepXlogs.push(secondStepXlogs.splice(i, 1)[0]);
+            } else if (d.endTime >= secondStepStartTime && d.endTime < firstStepStartTime) {
+
+            } else {
+                lastStepXlogs.push(secondStepXlogs.splice(i, 1)[0]);
+            }
+        }
+
+
+        for (let i = 0; i < firstStepXlogs.length; i++) {
+            let d = firstStepXlogs[i];
+            if (d.endTime >= firstStepStartTime) {
+
+            } else if (d.endTime >= secondStepStartTime && d.endTime < firstStepStartTime) {
+                secondStepXlogs.push(firstStepXlogs.splice(i, 1)[0]);
+            } else {
+                lastStepXlogs.push(firstStepXlogs.splice(i, 1)[0]);
+            }
+        }
+
+        for (let i = 0; i < tempXlogs.length; i++) {
+            let d = tempXlogs[i];
+            if (d.endTime >= firstStepStartTime) {
+                firstStepXlogs.push(d);
+            } else if (d.endTime >= secondStepStartTime && d.endTime < firstStepStartTime) {
+                secondStepXlogs.push(d);
+            } else {
+                lastStepXlogs.push(d);
+            }
+        }
+
+        xlogs = xlogs.concat(newXLogs);
+        newXLogs = lastStepXlogs;
+
+
+        let outOfRangeIndex = -1;
+        for (let i = 0; i < xlogs.length; i++) {
+            let d = xlogs[i];
+            if (startTime < d.endTime) {
+                break;
+            }
+            outOfRangeIndex = i;
+        }
+
+        if (outOfRangeIndex > -1) {
+            xlogs.splice(0, outOfRangeIndex + 1);
+        }
+
+
+        let now = (new Date()).getTime();
+        this.setState({
+            tempXlogs: [],
+            firstStepXlogs: firstStepXlogs,
+            firstStepTimestamp: now,
+            secondStepXlogs: secondStepXlogs,
+            secondStepTimestamp: now,
+            xlogs: xlogs,
+            newXLogs: newXLogs,
+            startTime: startTime,
+            endTime: endTime
+        });
+    };
 
     onLayoutChange(layout, layouts) {
         let boxes = this.state.boxes;
@@ -48,8 +200,8 @@ class Paper extends Component {
                 }
             });
         });
-        saveToLS("layouts", layouts);
-        saveToLS("boxes", this.state.boxes);
+        setData("layouts", layouts);
+        setData("boxes", this.state.boxes);
         this.setState({layouts});
     }
 
@@ -82,7 +234,7 @@ class Paper extends Component {
             boxes: boxes
         });
 
-        saveToLS("boxes", boxes);
+        setData("boxes", boxes);
     };
 
     removePaper = (key) => {
@@ -155,7 +307,7 @@ class Paper extends Component {
             boxes: boxes
         });
 
-        saveToLS("boxes", boxes);
+        setData("boxes", boxes);
     };
 
     setOptionValues = (key, values) => {
@@ -175,7 +327,7 @@ class Paper extends Component {
             boxes: boxes
         });
 
-        saveToLS("boxes", boxes);
+        setData("boxes", boxes);
     };
 
     setOptionClose= (key) => {
@@ -191,7 +343,7 @@ class Paper extends Component {
             boxes: boxes
         });
 
-        saveToLS("boxes", boxes);
+        setData("boxes", boxes);
     };
 
 
@@ -211,20 +363,9 @@ class Paper extends Component {
     };
 
     render() {
-
-
         return (
             <div className="papers">
-                <div className="papers-controls">
-                    <div className="paper-control" onClick={this.addPaper}><i className="fa fa-plus-circle" aria-hidden="true"></i></div>
-                    <div className="paper-control-separator"></div>
-                    <div className="label">METRICS</div>
-                    {Object.keys(this.options).map((name, i) => (
-                        <div key={i} className="paper-control"><Draggable type="metric" className="draggable" data={JSON.stringify(this.options[name])}><i className={"fa " + this.options[name].icon} aria-hidden="true"></i></Draggable></div>
-                        ))
-                    }
-                    <div className="paper-control paper-right" onClick={this.clearLayout}><i className="fa fa-trash-o" aria-hidden="true"></i></div>
-                </div>
+                <PaperControl addPaper={this.addPaper} clearLayout={this.clearLayout} />
                 <ResponsiveReactGridLayout className="layout" cols={{lg: 12, md: 10, sm: 6, xs: 4, xxs: 2}} layouts={this.state.layouts} rowHeight={30} onLayoutChange={(layout, layouts) => this.onLayoutChange(layout, layouts)}>
                     {this.state.boxes.map((box, i) => {
                         return <div className="box-layout" key={box.key} data-grid={box.layout}>
@@ -242,6 +383,7 @@ class Paper extends Component {
 
 let mapStateToProps = (state) => {
     return {
+        instances: state.target.instances,
         config: state.config,
         user: state.user
     };
@@ -249,32 +391,9 @@ let mapStateToProps = (state) => {
 
 let mapDispatchToProps = (dispatch) => {
     return {
-        setControlVisibility: (name, value) => dispatch(setControlVisibility(name, value)),
-        clearAllMessage: () => dispatch(clearAllMessage()),
-        setBgColor: (color) => dispatch(setBgColor(color)),
-        setUserId: (id) => dispatch(setUserId(id)),
-        addRequest: () => dispatch(addRequest()),
+        addRequest: () => dispatch(addRequest())
     };
 };
 
 Paper = connect(mapStateToProps, mapDispatchToProps)(Paper);
-
 export default withRouter(Paper);
-
-function getFromLS(key) {
-    let ls = null;
-    if (global.localStorage) {
-        try {
-            ls = JSON.parse(global.localStorage.getItem(key));
-        } catch (e) {
-            /*Ignore*/
-        }
-    }
-    return ls;
-}
-
-function saveToLS(key, value) {
-    if (global.localStorage) {
-        global.localStorage.setItem(key, JSON.stringify(value));
-    }
-}

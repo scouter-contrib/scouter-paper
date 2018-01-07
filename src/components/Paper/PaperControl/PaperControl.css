@@ -1,0 +1,52 @@
+.papers-controls {
+    padding: 6px;
+    margin: 10px 10px 0;
+    font-size: 14px;
+    color: white;
+    background-color: rgba(0, 0, 0, 0.1);
+    border-radius: 5px;
+    height: 32px;
+}
+
+.papers-controls .paper-control-separator {
+    width: 2px;
+    height: 14px;
+    background-color: rgba(0, 0, 0, 0.2);
+    display: inline-block;
+    margin: 0 10px 0;
+    border-radius: 1px;
+    position: relative;
+    top: 3px;
+}
+
+.papers-controls .paper-control {
+    display: inline-block;
+    margin: 0 2px;
+    padding: 3px 5px;
+    background-color: rgba(0, 0, 0, 0.1);
+    border-radius: 3px;
+    line-height: 100%;
+    cursor: pointer;
+}
+
+.papers-controls .paper-control .draggable {
+    cursor: move;
+}
+
+.papers-controls .paper-right {
+    float: right;
+}
+
+.papers-controls .paper-control:hover {
+    background-color: rgba(0, 0, 0, 0.4);
+}
+
+.papers-controls .label {
+    font-size: 8px;
+    background-color: rgba(0, 0, 0, 0.1);
+    padding: 5px 4px;
+    display: inline-block;
+    position: relative;
+    top: -2px;
+    margin-right: 5px;
+}

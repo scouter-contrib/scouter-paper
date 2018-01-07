@@ -92,7 +92,7 @@
     background-color: rgba(0, 0, 0, 0.04);
     _background-color: #EEF3F6;
     _border-radius: 5px;
-    _border : 1px solid #DDD;
+    _border: 1px solid #DDD;
 }
 
 .target-selector .target-box div.target-box-instance {
@@ -101,7 +101,7 @@
     _background-color: #EEF6F1;
     _background-color: #EEF3F6;
     _border-radius: 5px;
-    _border : 1px solid #DDD;
+    _border: 1px solid #DDD;
 }
 
 .target-selector .target-box ul {

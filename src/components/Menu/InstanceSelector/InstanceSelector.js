@@ -1,9 +1,10 @@
 import React, {Component} from 'react';
 import './InstanceSelector.css';
-import {pushMessage, setInstances, clearAllMessage, setControlVisibility} from '../../../actions';
+import {addRequest, pushMessage, setInstances, clearAllMessage, setControlVisibility} from '../../../actions';
 import {connect} from 'react-redux';
 import jQuery from "jquery";
 import {withRouter} from 'react-router-dom';
+import {getHttpProtocol} from '../../../common/common';
 
 class InstanceSelector extends Component {
 
@@ -17,16 +18,13 @@ class InstanceSelector extends Component {
         };
     }
 
-    getHttpProtocol() {
-        return this.props.config.protocol + "://" + this.props.config.address + ":" + this.props.config.port;
-    }
-
     componentDidMount() {
 
+        this.props.addRequest();
         jQuery.ajax({
             method: "GET",
             async: true,
-            url: this.getHttpProtocol() + '/scouter/v1/info/server'
+            url: getHttpProtocol(this.props.config) + '/scouter/v1/info/server'
         }).done((msg) => {
             if (msg && msg.result) {
                 let hosts = msg.result;
@@ -49,7 +47,7 @@ class InstanceSelector extends Component {
                         jQuery.ajax({
                             method: "GET",
                             async: false,
-                            url: this.getHttpProtocol() + '/scouter/v1/object?serverId=' + host.id
+                            url: getHttpProtocol(this.props.config) + '/scouter/v1/object?serverId=' + host.id
                         }).done(function(msg) {
                             instances = msg.result;
                             if (instances && instances.length > 0) {
@@ -112,11 +110,11 @@ class InstanceSelector extends Component {
     }
 
     getHosts = () => {
-
+        this.props.addRequest();
         jQuery.ajax({
             method: "GET",
             async: true,
-            url: this.getHttpProtocol() + '/scouter/v1/info/server'
+            url: getHttpProtocol(this.props.config) + '/scouter/v1/info/server'
         }).done((msg) => {
             this.setState({
                 hosts: msg.result
@@ -126,7 +124,6 @@ class InstanceSelector extends Component {
         });
 
     };
-
 
     componentDidUpdate(prevProps, prevState) {
         if (this.props.visible && prevProps.visible !== this.props.visible) {
@@ -143,10 +140,11 @@ class InstanceSelector extends Component {
             activeHostId: hostId
         });
 
+        this.props.addRequest();
         jQuery.ajax({
             method: "GET",
             async: true,
-            url: this.getHttpProtocol() + '/scouter/v1/object?serverId=' + hostId
+            url: getHttpProtocol(this.props.config) + '/scouter/v1/object?serverId=' + hostId
         }).done((msg) => {
             console.log(msg.result);
             this.setState({
@@ -212,6 +210,10 @@ class InstanceSelector extends Component {
         this.props.toggleSelectorVisible();
     };
 
+    cancelClick = () => {
+        this.props.toggleSelectorVisible();
+    };
+
     render() {
         return (
             <div className={"instance-selector " + (this.props.visible ? "" : "hidden")}>
@@ -221,9 +223,7 @@ class InstanceSelector extends Component {
                             <div>HOSTS</div>
                         </div>
                         {this.state.hosts && this.state.hosts.map((host, i) => {
-                                return (<div
-                                    className={'host ' + (i === 0 ? 'first ' : ' ') + (host.id === this.state.activeHostId ? 'active ' : ' ')}
-                                    key={i} onClick={this.onHostClick.bind(this, host.id)}>{host.name}{host.selectedInstanceCount > 0 && <span className="host-selected-count">{host.selectedInstanceCount}</span>}</div>)
+                                return (<div className={'host ' + (i === 0 ? 'first ' : ' ') + (host.id === this.state.activeHostId ? 'active ' : ' ')} key={i} onClick={this.onHostClick.bind(this, host.id)}>{host.name}{host.selectedInstanceCount > 0 && <span className="host-selected-count">{host.selectedInstanceCount}</span>}</div>)
                             }
                         )}
                     </div>
@@ -235,13 +235,12 @@ class InstanceSelector extends Component {
                             return true;
                             return instance.objType === 'tomcat';
                         }).map((instance, i) => {
-                            return (<div key={i} className={"instance " +  (i === 0 ? 'first ' : ' ') + (!(!this.state.selectedInstances[instance.objHash]) ? "selected" : " ")}
-                                onClick={this.instanceClick.bind(this, instance)}>{instance.objName}</div>)
+                            return (<div key={i} className={"instance " +  (i === 0 ? 'first ' : ' ') + (!(!this.state.selectedInstances[instance.objHash]) ? "selected" : " ")} onClick={this.instanceClick.bind(this, instance)}>{instance.objName}</div>)
                         })}
                     </div>
                 </div>
                 <div className="buttons">
-                    <button>CANCEL</button><button onClick={this.setInstances}>APPLY</button>
+                    <button onClick={this.cancelClick}>CANCEL</button><button onClick={this.setInstances}>APPLY</button>
                 </div>
             </div>
         );
@@ -260,7 +259,8 @@ let mapDispatchToProps = (dispatch) => {
         setInstances: (instances) => dispatch(setInstances(instances)),
         setControlVisibility: (name, value) => dispatch(setControlVisibility(name, value)),
         clearAllMessage: () => dispatch(clearAllMessage()),
-        pushMessage: (category, title, content) => dispatch(pushMessage(category, title, content))
+        pushMessage: (category, title, content) => dispatch(pushMessage(category, title, content)),
+        addRequest: () => dispatch(addRequest()),
     };
 };
 

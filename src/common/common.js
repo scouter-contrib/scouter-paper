@@ -1,25 +1,21 @@
-import jQuery from "jquery";
-
-const get = (url, success, fail, always) => {
-    jQuery.ajax({
-        method: "GET",
-        async: true,
-        url: url,
-        xhrFields: {
-            withCredentials: true
-        },
-    }).done((msg) => {
-        if (msg) {
-            console.log(msg);
-            if (msg.status === "200" && msg.resultCode === "0" && msg.result) {
-                this.props.setUserId(msg.result.id);
-            }
+export function getData(key) {
+    let ls = null;
+    if (global.localStorage) {
+        try {
+            ls = JSON.parse(global.localStorage.getItem(key));
+        } catch (e) {
+            /*Ignore*/
         }
-    }).fail((jqXHR, textStatus) => {
-        console.log(jqXHR, textStatus);
-    }).always(() => {
-        this.props.setControlVisibility("Loading", false);
-    });
+    }
+    return ls;
 }
 
-export default AjaxHelper;
+export function setData(key, value) {
+    if (global.localStorage) {
+        global.localStorage.setItem(key, JSON.stringify(value));
+    }
+}
+
+export function getHttpProtocol(config) {
+    return config.protocol + "://" + config.address + ":" + config.port;
+}
