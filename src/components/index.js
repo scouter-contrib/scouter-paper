@@ -13,6 +13,7 @@ import Box from './Box/Box';
 import Paper from './Paper/Paper';
 import BoxConfig from './Paper/BoxConfig/BoxConfig';
 import ClockBox from './Paper/ClockBox/ClockBox';
+import XLogBar from './Paper/XLogBar/XLogBar';
 import EmptyBox from './Paper/EmptyBox/EmptyBox';
 import PaperControl from './Paper/PaperControl/PaperControl';
 import Settings from './Settings/Settings';
@@ -29,7 +30,6 @@ export {
     XLogViewer,
     XLogPipe,
     XLogMover,
-
     Loading,
     RequestBar,
     Menu,
@@ -38,6 +38,7 @@ export {
     Paper,
     BoxConfig,
     ClockBox,
+    XLogBar,
     EmptyBox,
     PaperControl,
     Settings,

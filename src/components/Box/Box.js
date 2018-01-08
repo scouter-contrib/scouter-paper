@@ -1,7 +1,7 @@
 import React, {Component} from 'react';
 import './Box.css';
 import {Droppable} from 'react-drag-and-drop'
-import {EmptyBox, ClockBox} from "../../components";
+import {EmptyBox, ClockBox, XLogBar} from "../../components";
 
 class Box extends Component {
 
@@ -36,7 +36,8 @@ class Box extends Component {
                     <div className="content-wrapper">
                         <div className="content">
                             {!type && <EmptyBox/>}
-                            {type === "clock" && <ClockBox box={this.props.box}/>}
+                            {type === "clock" && <ClockBox box={this.props.box} />}
+                            {type === "xlogBar" && <XLogBar box={this.props.box} data={this.props.data} />}
                         </div>
                     </div>
                 </div>

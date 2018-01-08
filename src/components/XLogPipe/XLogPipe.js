@@ -17,6 +17,7 @@ class XLogPipe extends Component {
     componentDidUpdate(prevProps, prevState) {
         let interval = 1000;
 
+
         let now = (new Date()).getTime();
         let divs = this.refs.xlogPipe.querySelectorAll("div");
         divs.forEach((div) => {

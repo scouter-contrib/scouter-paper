@@ -35,20 +35,22 @@ class Paper extends Component {
             layouts: layouts,
             boxes: boxes,
 
-
-            tempXlogs: [],
-            firstStepXlogs: [],
-            firstStepTimestamp: null,
-            secondStepXlogs: [],
-            secondStepTimestamp: null,
-            xlogs: [],
-            newXLogs: [],
-            offset1: 0,
-            offset2: 0,
-            startTime: startTime,
-            endTime: endTime,
-            range: range,
-            maxElapsed: 2000
+            data : {
+                tempXlogs: [],
+                firstStepXlogs: [],
+                firstStepTimestamp: null,
+                secondStepXlogs: [],
+                secondStepTimestamp: null,
+                xlogs: [],
+                newXLogs: [],
+                offset1: 0,
+                offset2: 0,
+                startTime: startTime,
+                endTime: endTime,
+                range: range,
+                maxElapsed: 2000,
+                lastRequestTime : null
+            }
         };
     }
 
@@ -57,9 +59,9 @@ class Paper extends Component {
             this.getXLog();
         }, this.props.config.interval);
 
-        this.tickTimer = setInterval(() => {
+        /*this.tickTimer = setInterval(() => {
             this.tick();
-        }, this.tickInterval);
+        }, this.tickInterval);*/
     }
 
     componentWillUnmount() {
@@ -76,10 +78,12 @@ class Paper extends Component {
             jQuery.ajax({
                 method: "GET",
                 async: true,
-                url: getHttpProtocol(this.props.config) + '/scouter/v1/xlog/realTime/' + this.state.offset1 + '/' + this.state.offset2 + '?objHashes=' + JSON.stringify(this.props.instances.map((instance) => {
+                url: getHttpProtocol(this.props.config) + '/scouter/v1/xlog/realTime/' + this.state.data.offset1 + '/' + this.state.data.offset2 + '?objHashes=' + JSON.stringify(this.props.instances.map((instance) => {
                     return Number(instance.objHash);
                 }))
             }).done((msg) => {
+
+                let now = (new Date()).getTime();
                 if (msg.result.xlogs) {
                     console.log(msg.result.xlogs.length);
                 }
@@ -92,14 +96,19 @@ class Paper extends Component {
                     return d;
                 });
 
-                let tempXlogs = this.state.tempXlogs.concat(datas);
+                let tempXlogs = this.state.data.tempXlogs.concat(datas);
+
+                let data = this.state.data;
+                data.offset1 = msg.result.offset1;
+                data.offset2 = msg.result.offset2;
+                data.tempXlogs = tempXlogs;
+                data.lastRequestTime = now;
 
                 this.setState({
-                    offset1: msg.result.offset1,
-                    offset2: msg.result.offset2,
-                    tempXlogs: tempXlogs
-
+                    data : data
                 });
+
+                this.tick();
 
             }).fail((jqXHR, textStatus) => {
                 console.log(jqXHR, textStatus);
@@ -110,16 +119,16 @@ class Paper extends Component {
     tick = () => {
 
         let endTime = (new Date()).getTime();
-        let startTime = endTime - this.state.range;
+        let startTime = endTime - this.state.data.range;
 
-        let firstStepStartTime = endTime - 1000;
+        let firstStepStartTime = this.state.data.lastRequestTime - 1000;
         let secondStepStartTime = firstStepStartTime - 5000;
 
-        let xlogs = this.state.xlogs;
-        let newXLogs = this.state.newXLogs;
-        let tempXlogs = this.state.tempXlogs;
-        let firstStepXlogs = this.state.firstStepXlogs;
-        let secondStepXlogs = this.state.secondStepXlogs;
+        let xlogs = this.state.data.xlogs;
+        let newXLogs = this.state.data.newXLogs;
+        let tempXlogs = this.state.data.tempXlogs;
+        let firstStepXlogs = this.state.data.firstStepXlogs;
+        let secondStepXlogs = this.state.data.secondStepXlogs;
         let lastStepXlogs = [];
 
         for (let i = 0; i < secondStepXlogs.length; i++) {
@@ -147,6 +156,7 @@ class Paper extends Component {
 
         for (let i = 0; i < tempXlogs.length; i++) {
             let d = tempXlogs[i];
+            console.log(d.endTime + "," + firstStepStartTime);
             if (d.endTime >= firstStepStartTime) {
                 firstStepXlogs.push(d);
             } else if (d.endTime >= secondStepStartTime && d.endTime < firstStepStartTime) {
@@ -175,16 +185,20 @@ class Paper extends Component {
 
 
         let now = (new Date()).getTime();
+
+        let data = this.state.data;
+        data.tempXlogs = [];
+        data.firstStepXlogs = firstStepXlogs;
+        data.firstStepTimestamp = now;
+        data.secondStepXlogs = secondStepXlogs;
+        data.secondStepTimestamp = now;
+        data.xlogs = xlogs;
+        data.newXLogs = newXLogs;
+        data.startTime = startTime;
+        data.endTime = endTime;
+
         this.setState({
-            tempXlogs: [],
-            firstStepXlogs: firstStepXlogs,
-            firstStepTimestamp: now,
-            secondStepXlogs: secondStepXlogs,
-            secondStepTimestamp: now,
-            xlogs: xlogs,
-            newXLogs: newXLogs,
-            startTime: startTime,
-            endTime: endTime
+            data : data
         });
     };
 
@@ -200,7 +214,9 @@ class Paper extends Component {
         });
         setData("layouts", layouts);
         setData("boxes", this.state.boxes);
-        this.setState({layouts});
+        this.setState({
+            layouts : layouts
+        });
     }
 
     getUniqueKey() {
@@ -368,9 +384,9 @@ class Paper extends Component {
                     {this.state.boxes.map((box, i) => {
                         return <div className="box-layout" key={box.key} data-grid={box.layout}>
                             <button className="box-control box-layout-remove-btn last" onClick={this.removePaper.bind(null, box.key)}><i className="fa fa-times-circle-o" aria-hidden="true"></i></button>
-                            <button className="box-control box-layout-config-btn" onClick={this.toggleConfig.bind(null, box.key)}><i className="fa fa-cog" aria-hidden="true"></i></button>
+                            {box.option && box.option.config && <button className="box-control box-layout-config-btn" onClick={this.toggleConfig.bind(null, box.key)}><i className="fa fa-cog" aria-hidden="true"></i></button>}
                             {box.config && <BoxConfig box={box} setOptionValues={this.setOptionValues} setOptionClose={this.setOptionClose} />}
-                            <Box setOption={this.setOption} box={box}/>
+                            <Box setOption={this.setOption} box={box} data={this.state.data}/>
                         </div>
                     })}
                 </ResponsiveReactGridLayout>

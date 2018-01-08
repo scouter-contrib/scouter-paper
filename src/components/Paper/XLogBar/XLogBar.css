@@ -1,0 +1,22 @@
+.xlog-bar {
+    padding: 10px;
+    box-sizing: border-box;
+    height: 100%;
+    position: relative;
+    overflow: hidden;
+}
+
+.xlog-bar > div {
+    display: inline-block;
+    width: 100px;
+    height: 100%;
+    position: absolute;
+    right : -100px;
+    top : 0;
+    background-color: #499DF5;
+    opacity: 0.6;
+}
+
+.xlog-bar > div.has-error {
+    background-color: #CC1100;
+}
