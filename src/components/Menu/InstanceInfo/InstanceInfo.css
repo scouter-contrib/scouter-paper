@@ -1,5 +1,5 @@
 .instance-info > div {
-    background-color: rgba(0,0,0,0.2);
+    background-color: rgba(0, 0, 0, 0.2);
     padding: 0 10px;
     border-radius: 5px;
     cursor: pointer;
@@ -12,4 +12,11 @@
     user-select: none;
 }
 
+@media screen and (max-width: 600px) {
 
+    .instance-info > div {
+        font-size: 8px;
+        padding: 0 5px;
+    }
+
+}
