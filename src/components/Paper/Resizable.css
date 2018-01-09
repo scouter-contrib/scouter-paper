@@ -68,7 +68,7 @@
     cursor: se-resize;
 }
 
-.react-grid-item > .react-resizable-handle::after {
+_.react-grid-item > .react-resizable-handle::after {
     content: '';
     border: none !important;
     width: 3px;

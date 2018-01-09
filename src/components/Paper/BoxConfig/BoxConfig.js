@@ -48,6 +48,14 @@ class BoxConfig extends Component {
         });
     };
 
+    onCheck = (attr, event) => {
+        let values = this.state.values;
+        values[attr] = event.target.checked;
+        this.setState({
+            values : values
+        });
+    };
+
     onApply = () => {
         this.props.setOptionValues(this.props.box.key, this.state.values);
     };
@@ -88,6 +96,17 @@ class BoxConfig extends Component {
                                         {this.props.box.option.config[attr].tooltip && this.props.box.option.config[attr].tooltip.type === "text" &&
                                         <div className="config-tooltip"><i className="fa fa-info-circle" aria-hidden="true"></i> {this.props.box.option.config[attr].tooltip.content}</div>}
                                     </div>
+                        } else if (this.props.box.option.config[attr].type === "checkbox") {
+                            return <div className="box-config-item" key={i}>
+                                <label>{this.props.box.option.config[attr].name}</label>
+                                <input type="checkbox" defaultChecked={this.state.values[attr]} onChange={this.onCheck.bind(this, attr)} />
+                                {this.props.box.option.config[attr].tooltip && this.props.box.option.config[attr].tooltip.type === "link" &&
+                                <div className="config-tooltip">
+                                    <a href={this.props.box.option.config[attr].tooltip.content} target="_blank"><i className="fa fa-info-circle" aria-hidden="true"></i> {this.props.box.option.config[attr].tooltip.content}</a>
+                                </div>}
+                                {this.props.box.option.config[attr].tooltip && this.props.box.option.config[attr].tooltip.type === "text" &&
+                                <div className="config-tooltip"><i className="fa fa-info-circle" aria-hidden="true"></i> {this.props.box.option.config[attr].tooltip.content}</div>}
+                            </div>
                         }
                     })}
                     </div>

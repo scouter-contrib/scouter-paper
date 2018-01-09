@@ -7,6 +7,23 @@ class XLogBar extends Component {
 
     constructor(props) {
         super(props);
+
+        let history = [];
+
+        if (this.props.box.values.count) {
+            if (this.props.box.values.history > 1) {
+                for (let i=0; i<this.props.box.values.history; i++) {
+                    history.push(0);
+                }
+            }
+        }
+
+        this.state = {
+            history : history,
+            fontSize: 30
+        };
+
+
     }
 
     shouldComponentUpdate(nextProps, nextState) {
@@ -19,7 +36,20 @@ class XLogBar extends Component {
         }
     }
 
+    getValue = (val)  => {
+        let result = val;
+        if (val > 1000000) {
+            result = Math.floor(result / 1000000) + "M";
+        } else if (val > 1000) {
+            result = Math.floor(result / 1000) + "k";
+        }
+
+        return result;
+    };
+
     componentDidUpdate() {
+
+        this.resize();
 
         let interval = 1000;
 
@@ -27,14 +57,35 @@ class XLogBar extends Component {
         let divs = this.refs.xlogBar.querySelectorAll("div");
         divs.forEach((div) => {
             let endTime = div.getAttribute("data-end-time");
-            if (now - endTime > interval * 3) {
-                div.remove();
+            if (endTime) {
+                if (now - endTime > interval * 3) {
+                    div.remove();
+                }
             }
         });
 
 
         let base = this.refs.xlogBar;
         if (this.props.data) {
+
+            if (this.props.box.values.count) {
+                let history = this.state.history.slice(0);
+                history.push(this.getValue(this.props.data.firstStepXlogs.length));
+
+                if (history.length > this.props.box.values.history) {
+
+                    let shiftCount = history.length - this.props.box.values.history;
+                    for (let i=0; i<shiftCount; i++) {
+                        history.shift();
+                    }
+                }
+
+                this.setState({
+                    history : history
+                });
+            }
+
+
             this.props.data.firstStepXlogs.forEach((xlog) => {
                 let exist = base.querySelector("[data-txid='" + xlog.txid + "']");
                 if (!exist) {
@@ -48,7 +99,6 @@ class XLogBar extends Component {
                     div.setAttribute("data-end-time", xlog.endTime);
 
                     if (xlog.error !== "0") {
-                        xlog.error
                         div.classList.add("has-error");
                     }
 
@@ -69,13 +119,40 @@ class XLogBar extends Component {
         }
     }
 
-    componentDidMount() {
+    resize = () => {
+        let fontSize = 30;
+        if (this.refs.xlogBar) {
+            let width = this.refs.xlogBar.offsetWidth;
+            if (width < 200) {
+                fontSize = 10;
+            } else if (width < 300) {
+                fontSize = 24;
+            }
 
-    }
+            if (this.state.fontSize !== fontSize) {
+                this.setState({
+                    fontSize: fontSize
+                });
+            }
+        }
+    };
 
     render() {
         return (
-            <div className="xlog-bar" ref="xlogBar"></div>
+            <div className="xlog-bar" ref="xlogBar">
+                {this.props.box.values.count &&
+                <div className="request-count">
+                    <div>
+                    {(Number(this.props.box.values.history) === 1) && this.getValue(this.props.data.firstStepXlogs.length)}
+                    {this.props.box.values.history > 1 &&
+                        <div className="request-history-count-list" ref="historyCount" style={{fontSize: this.state.fontSize + "px"}}>
+                        {this.state.history.map((d, i) => {
+                            return <div className={"request-history-count " + "step-" + (this.state.history.length - i)} key={i}>{d}</div>
+                        })}
+                        </div>}
+                    </div>
+                </div>}
+            </div>
         );
     }
 }

@@ -85,7 +85,7 @@ class Paper extends Component {
 
                 let now = (new Date()).getTime();
                 if (msg.result.xlogs) {
-                    console.log(msg.result.xlogs.length);
+                    //console.log(msg.result.xlogs.length);
                 }
 
 
@@ -156,7 +156,6 @@ class Paper extends Component {
 
         for (let i = 0; i < tempXlogs.length; i++) {
             let d = tempXlogs[i];
-            console.log(d.endTime + "," + firstStepStartTime);
             if (d.endTime >= firstStepStartTime) {
                 firstStepXlogs.push(d);
             } else if (d.endTime >= secondStepStartTime && d.endTime < firstStepStartTime) {
@@ -345,6 +344,7 @@ class Paper extends Component {
     };
 
     setOptionClose= (key) => {
+
 
         let boxes = this.state.boxes;
         boxes.forEach((box) => {

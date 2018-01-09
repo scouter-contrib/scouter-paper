@@ -9,6 +9,7 @@
     line-height: 0;
     font-size: 9px;
     display: table;
+    z-index: 3;
 }
 
 .box-config .box-config-content {
@@ -36,13 +37,22 @@
     text-align: center;
 }
 
-.box-config .box-config-item input,
+.box-config .box-config-item input[type=text],
 .box-config .box-config-item select {
     width: calc(100% - 110px);
     padding: 0 5px;
     outline: none;
     border-radius: 3px;
     border: none;
+}
+
+.box-config .box-config-item input[type=checkbox] {
+    margin-top: 0;
+    position: relative;
+    top: 4px;
+    border: none;
+    border-radius: 0;
+
 }
 
 .box-config .box-config-buttons {
@@ -69,8 +79,8 @@
     text-align: right;
     height: 18px;
     position: absolute;
-    bottom : -10px;
-    right : 10px;
+    bottom: -10px;
+    right: 10px;
     font-size: 8px;
     _font-family: 'NanumBarunGothic', sans-serif;
 }

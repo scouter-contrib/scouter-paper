@@ -29,6 +29,7 @@
     height: calc(100% - 27px);
     width: 100%;
     line-height: 100%;
+    border-radius: 0 0 4px 4px;
 }
 
 .box .content-wrapper .content {
@@ -38,6 +39,7 @@
     vertical-align: middle;
     text-align: center;
     line-height: 100%;
+    border-radius: 0 0 4px 4px;
 }
 
 
