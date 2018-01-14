@@ -17,11 +17,16 @@
     margin: 20px 0 0;
 }
 
+.settings .category.first {
+    margin-top: 0;
+}
+
 .settings .category > div {
     display: inline-block;
     _background-color: rgba(0, 0, 0, 0.3);
-    padding: 10px 0;
+    padding: 10px 0 7px;
     margin: 0;
+    border-bottom: 1px dashed rgba(0,0,0,0.5);
 }
 
 .settings .forms {
@@ -65,7 +70,7 @@
     padding: 5px 10px 0 10px;
 }
 
-@media screen and (max-width: 800px) {
+@media screen and (max-width: 1100px) {
     .settings .forms .row {
         margin: 0;
         display: block;
@@ -86,6 +91,7 @@
     text-align: left;
     display: inline-block;
     padding: 6px 2px;
+    font-size: 100%;
 }
 
 .settings .forms input {
@@ -97,6 +103,29 @@
     width: 100%;
     box-sizing: border-box;
     border: 1px solid transparent;
+}
+
+.settings .forms .xlog-size .xlog-label {
+    display: inline-block !important;
+    width: 70px;
+    color: white;
+    padding-left: 2px;
+}
+
+.settings .forms .xlog-size .xlog-label.second {
+    margin-left: 20px;
+}
+
+.settings .forms .xlog-size select {
+    padding: 0;
+    width: calc(50% - 80px);
+    border: none;
+}
+
+.settings .forms .xlog-size select[disabled] {
+    background-color: rgba(0,0,0,0.3);
+    color: white;
+    border: none;
 }
 
 .settings .forms input[readonly] {
@@ -122,3 +151,88 @@
 .settings .buttons button:hover {
     background-color: #EEE;
 }
+
+.settings .xlog-dot-config {
+    display: table;
+    width: 100%;
+    background-color: rgba(0, 0, 0, 0.3);
+    border-radius: 3px;
+    background-color: white;
+    table-layout: fixed;
+}
+
+.settings.editable .xlog-dot-config {
+    background-color: white;
+}
+
+.xlog-dot-config > div {
+    display: table-cell;
+    vertical-align: middle;
+    text-align: center;
+    padding: 10px;
+}
+
+.xlog-dot-config > div.xlog-dot-config-left {
+
+}
+
+.xlog-normal-dot {
+    display: inline-block;
+}
+
+.xlog-normal-dot .xlog-dot-rows .xlog-dot-columns {
+    width: 20px;
+    height: 20px;
+    background-color: rgba(0, 0, 0, 0.1);
+    display: inline-block;
+    border: 1px solid rgba(0, 0, 0, 0.2);
+    border-right: none;
+    border-bottom: none;
+}
+
+.settings.editable .xlog-normal-dot .xlog-dot-rows .xlog-dot-columns {
+    cursor: pointer;
+
+}
+
+.xlog-normal-dot .xlog-dot-rows .xlog-dot-columns.last {
+    border-right: 1px solid rgba(0, 0, 0, 0.2);
+}
+
+.xlog-normal-dot .xlog-dot-rows.last .xlog-dot-columns {
+    border-bottom: 1px solid rgba(0, 0, 0, 0.2);
+}
+
+.xlog-normal-dot .xlog-dot-rows .xlog-dot-columns.selected {
+    border: 1px solid black;
+}
+
+.settings .xlog-dot-config .xlog-config-controller {
+    position: relative;
+    overflow-x: hidden;
+}
+
+.settings.editable .xlog-dot-config .xlog-config-controller {
+    position: relative;
+    overflow-x: auto;
+}
+
+.settings .xlog-dot-config .xlog-config-controller .disabled-wrapper {
+    background-color: rgba(0, 0, 0, 0.3);
+    position: absolute;
+    top: 0;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    border-radius: 0 3px 3px 0;
+}
+
+.settings.editable .xlog-dot-config .xlog-config-controller .disabled-wrapper {
+    display: none;
+}
+
+.flexbox-fix input {
+    padding: 5px 0 0 5px !important;
+
+}
+

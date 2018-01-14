@@ -146,7 +146,6 @@ class InstanceSelector extends Component {
             async: true,
             url: getHttpProtocol(this.props.config) + '/scouter/v1/object?serverId=' + hostId
         }).done((msg) => {
-            console.log(msg.result);
             this.setState({
                 instances: msg.result
             });

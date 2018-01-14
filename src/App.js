@@ -25,7 +25,7 @@ class App extends Component {
         let str = localStorage.getItem("config");
         if (str) {
             let config = JSON.parse(str);
-            this.props.setConfig(config)
+            this.props.setConfig(config);
         }
 
     }
@@ -34,7 +34,7 @@ class App extends Component {
     }
 
     componentDidUpdate(prevProps, prevState) {
-        document.querySelector("body").style.backgroundColor = this.props.bgColor;
+        //document.querySelector("body").style.backgroundColor = this.props.bgColor;
     }
 
     render() {
