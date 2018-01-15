@@ -50,3 +50,15 @@
     top: -2px;
     margin-right: 5px;
 }
+
+.papers-controls .paper-control .text-icon {
+    font-size: 8px;
+    line-height: 0;
+    position: relative;
+    top : -3px;
+
+
+
+
+
+}

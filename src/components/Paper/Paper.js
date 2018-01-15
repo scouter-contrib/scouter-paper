@@ -83,32 +83,8 @@ class Paper extends Component {
                 }))
             }).done((msg) => {
 
-                let now = (new Date()).getTime();
-                if (msg.result.xlogs) {
-                    //console.log(msg.result.xlogs.length);
-                }
 
-
-                let datas = msg.result.xlogs.map((d) => {
-                    d["_custom"] = {
-                        p: false
-                    };
-                    return d;
-                });
-
-                let tempXlogs = this.state.data.tempXlogs.concat(datas);
-
-                let data = this.state.data;
-                data.offset1 = msg.result.offset1;
-                data.offset2 = msg.result.offset2;
-                data.tempXlogs = tempXlogs;
-                data.lastRequestTime = now;
-
-                this.setState({
-                    data : data
-                });
-
-                this.tick();
+                this.tick(msg.result);
 
             }).fail((jqXHR, textStatus) => {
                 console.log(jqXHR, textStatus);
@@ -116,7 +92,25 @@ class Paper extends Component {
         }
     };
 
-    tick = () => {
+    tick = (result) => {
+
+        let now = (new Date()).getTime();
+
+        let datas = result.xlogs.map((d) => {
+            d["_custom"] = {
+                p: false
+            };
+            return d;
+        });
+
+        let tempXlogs = this.state.data.tempXlogs.concat(datas);
+
+        let data = this.state.data;
+        data.offset1 = result.offset1;
+        data.offset2 = result.offset2;
+        data.tempXlogs = tempXlogs;
+        data.lastRequestTime = now;
+
 
         let endTime = (new Date()).getTime();
         let startTime = endTime - this.state.data.range;
@@ -126,7 +120,6 @@ class Paper extends Component {
 
         let xlogs = this.state.data.xlogs;
         let newXLogs = this.state.data.newXLogs;
-        let tempXlogs = this.state.data.tempXlogs;
         let firstStepXlogs = this.state.data.firstStepXlogs;
         let secondStepXlogs = this.state.data.secondStepXlogs;
         let lastStepXlogs = [];
@@ -183,9 +176,7 @@ class Paper extends Component {
         }
 
 
-        let now = (new Date()).getTime();
 
-        let data = this.state.data;
         data.tempXlogs = [];
         data.firstStepXlogs = firstStepXlogs;
         data.firstStepTimestamp = now;
@@ -376,7 +367,10 @@ class Paper extends Component {
 
     };
 
+
+
     render() {
+
         return (
             <div className="papers">
                 <PaperControl addPaper={this.addPaper} clearLayout={this.clearLayout} />
@@ -386,7 +380,7 @@ class Paper extends Component {
                             <button className="box-control box-layout-remove-btn last" onClick={this.removePaper.bind(null, box.key)}><i className="fa fa-times-circle-o" aria-hidden="true"></i></button>
                             {box.option && box.option.config && <button className="box-control box-layout-config-btn" onClick={this.toggleConfig.bind(null, box.key)}><i className="fa fa-cog" aria-hidden="true"></i></button>}
                             {box.config && <BoxConfig box={box} setOptionValues={this.setOptionValues} setOptionClose={this.setOptionClose} />}
-                            <Box setOption={this.setOption} box={box} data={this.state.data}/>
+                            <Box setOption={this.setOption} box={box} data={this.state.data} config={this.props.config}/>
                         </div>
                     })}
                 </ResponsiveReactGridLayout>

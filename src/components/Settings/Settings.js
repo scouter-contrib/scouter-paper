@@ -26,43 +26,43 @@ class Settings extends Component {
                         columns: 5,
                         fills: {
                             D_0_2: {
-                                color: "#0062B1"
+                                color: "#FCDC00"
                             },
                             D_1_1: {
-                                color: "#0062B1"
+                                color: "#FCDC00"
                             },
                             D_1_2: {
-                                color: "#0062B1"
+                                color: "#FCDC00"
                             },
                             D_1_3: {
-                                color: "#0062B1"
+                                color: "#FCDC00"
                             },
                             D_2_0: {
-                                color: "#0062B1"
+                                color: "#FCDC00"
                             },
                             D_2_1: {
-                                color: "#0062B1"
+                                color: "#FCDC00"
                             },
                             D_2_2: {
-                                color: "#0062B1"
+                                color: "#FCDC00"
                             },
                             D_2_3: {
-                                color: "#0062B1"
+                                color: "#FCDC00"
                             },
                             D_2_4: {
-                                color: "#0062B1"
+                                color: "#FCDC00"
                             },
                             D_3_1: {
-                                color: "#0062B1"
+                                color: "#FCDC00"
                             },
                             D_3_2: {
-                                color: "#0062B1"
+                                color: "#FCDC00"
                             },
                             D_3_3: {
-                                color: "#0062B1"
+                                color: "#FCDC00"
                             },
                             D_4_2: {
-                                color: "#0062B1"
+                                color: "#FCDC00"
                             }
                         }
                     },
@@ -266,6 +266,7 @@ class Settings extends Component {
         }
 
         let cellId = this.state.selected.normal.cellId;
+        let selected = this.state.selected;
         if (cellId) {
             let config = this.state.config;
             if (config.xlog.normal.fills[cellId]) {
@@ -274,14 +275,17 @@ class Settings extends Component {
                 } else {
                     config.xlog.normal.fills[cellId].color = color.hex;
                 }
-
             } else {
                 config.xlog.normal.fills[cellId] = {};
                 config.xlog.normal.fills[cellId].color = color.hex;
             }
 
+            selected.normal.color = color.hex;
+
+            console.log(selected);
             this.setState({
-                config : config
+                config : config,
+                selected : selected
             });
         }
     };
@@ -293,6 +297,8 @@ class Settings extends Component {
         }
 
         let cellId = this.state.selected.error.cellId;
+        let selected = this.state.selected;
+
         if (cellId) {
             let config = this.state.config;
             if (config.xlog.error.fills[cellId]) {
@@ -304,8 +310,11 @@ class Settings extends Component {
                 config.xlog.error.fills[cellId].color = color.hex;
             }
 
+            selected.error.color = color.hex;
+
             this.setState({
-                config : config
+                config : config,
+                selected : selected
             });
         }
     };

@@ -23,7 +23,8 @@ class PaperControl extends Component {
                 {Object.keys(this.options).map((name, i) => (
                     <div key={i} className="paper-control">
                         <Draggable type="metric" className="draggable" data={JSON.stringify(this.options[name])}>
-                            <i className={"fa " + this.options[name].icon} aria-hidden="true"></i>
+                            {this.options[name].icon && <i className={"fa " + this.options[name].icon} aria-hidden="true"></i>}
+                            {this.options[name].text && <span className="text-icon">{this.options[name].text}</span>}
                         </Draggable>
                     </div>
                 ))}

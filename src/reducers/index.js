@@ -18,43 +18,43 @@ const configState = {
             columns: 5,
             fills: {
                 D_0_2: {
-                    color: "#0062B1"
+                    color: "#FCDC00"
                 },
                 D_1_1: {
-                    color: "#0062B1"
+                    color: "#FCDC00"
                 },
                 D_1_2: {
-                    color: "#0062B1"
+                    color: "#FCDC00"
                 },
                 D_1_3: {
-                    color: "#0062B1"
+                    color: "#FCDC00"
                 },
                 D_2_0: {
-                    color: "#0062B1"
+                    color: "#FCDC00"
                 },
                 D_2_1: {
-                    color: "#0062B1"
+                    color: "#FCDC00"
                 },
                 D_2_2: {
-                    color: "#0062B1"
+                    color: "#FCDC00"
                 },
                 D_2_3: {
-                    color: "#0062B1"
+                    color: "#FCDC00"
                 },
                 D_2_4: {
-                    color: "#0062B1"
+                    color: "#FCDC00"
                 },
                 D_3_1: {
-                    color: "#0062B1"
+                    color: "#FCDC00"
                 },
                 D_3_2: {
-                    color: "#0062B1"
+                    color: "#FCDC00"
                 },
                 D_3_3: {
-                    color: "#0062B1"
+                    color: "#FCDC00"
                 },
                 D_4_2: {
-                    color: "#0062B1"
+                    color: "#FCDC00"
                 }
             }
         },

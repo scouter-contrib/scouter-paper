@@ -6,10 +6,6 @@ import * as d3 from "d3";
 
 class XLogViewer extends Component {
 
-    constructor(props) {
-        super(props);
-    }
-
     graph = {
         margin: {
             top: 20, right: 10, bottom: 30, left: 40
@@ -26,27 +22,45 @@ class XLogViewer extends Component {
         last: 0
     };
 
+
+
+
+
+    shouldComponentUpdate(nextProps, nextState) {
+        console.log(3333);
+        return true;
+    }
+
+    componentWillReceiveProps(nextProps){
+        console.log("componentWillReceiveProps: " + JSON.stringify(nextProps));
+    }
+
     componentDidMount() {
         this.graphInit();
     }
 
     componentDidUpdate(prevProps, prevState) {
 
+
+        console.log(1);
         // 시간이 변경되는 경우, 축 및 축 그리드 변경
-        if (this.props.startTime !== prevProps.startTime || this.props.endTime !== prevProps.endTime) {
+        if (this.props.data.startTime !== prevProps.data.startTime || this.props.data.endTime !== prevProps.data.endTime) {
             this.moveCanvas();
             this.updateXAxis();
         }
 
         // 최대 값이 변경되는 경우, 축 및 그리드 변경
-        if (this.props.maxElapsed !== prevProps.maxElapsed) {
+        if (this.props.data.maxElapsed !== prevProps.data.maxElapsed) {
             this.updateYAxis();
         }
 
-        this.draw(this.props.xlogs);
+        console.log(2);
+        this.draw(this.props.data.xlogs);
     }
 
     draw = (xlogs) => {
+
+        console.log(xlogs);
 
         if (this.refs.xlogViewer && xlogs) {
             let context = d3.select(this.refs.xlogViewer).select("canvas").node().getContext("2d");
@@ -144,6 +158,7 @@ class XLogViewer extends Component {
     };
 
     render() {
+        console.log(3);
         return (
             <div className="xlog-viewer" ref="xlogViewer"></div>
         );

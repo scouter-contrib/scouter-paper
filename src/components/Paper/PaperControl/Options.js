@@ -41,6 +41,26 @@ export function options() {
                     value: 1
                 }
             }
+        },
+        xlog: {
+            //text: "XLOG",
+            icon : "fa-bullseye",
+            mode: "exclusive",
+            type: "xlog",
+            title: "XLOG",
+            config: {
+                count: {
+                    name : 'SHOW COUNT',
+                    type: "checkbox",
+                    value: false
+                },
+                history: {
+                    name : 'HISTORY COUNT',
+                    type: "selector",
+                    data: [1,2,3,4,5],
+                    value: 1
+                }
+            }
         }
 
     }

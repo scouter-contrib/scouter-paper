@@ -1,0 +1,32 @@
+.xlog-viewer {
+    _border: 1px solid #AAA;
+    box-sizing: border-box;
+    position: relative;
+    overflow: hidden;
+    _background-color: white;
+}
+
+.xlog-viewer .axis-x path,
+.xlog-viewer .axis-x line,
+.xlog-viewer .axis-y path,
+.xlog-viewer .axis-y line,
+.xlog-viewer .grid-x path,
+.xlog-viewer .grid-x line,
+.xlog-viewer .grid-y path,
+.xlog-viewer .grid-y line {
+    stroke: white;
+}
+
+.xlog-viewer .axis-x text,
+.xlog-viewer .axis-y text {
+    fill: white;
+}
+
+.xlog-viewer canvas {
+    image-rendering: optimizeSpeed;             /* Older versions of FF          */
+    image-rendering: -moz-crisp-edges;          /* FF 6.0+                       */
+    image-rendering: -webkit-optimize-contrast; /* Safari                        */
+    image-rendering: -o-crisp-edges;            /* OS X & Windows Opera (12.02+) */
+    image-rendering: pixelated;                 /* Awesome future-browsers       */
+    -ms-interpolation-mode: nearest-neighbor;   /* IE                            */
+}
