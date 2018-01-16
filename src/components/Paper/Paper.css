@@ -29,3 +29,49 @@
 .papers .box-layout .box-control:hover {
     background-color: rgba(0,0,0,0.1);
 }
+
+.papers .select-instance {
+    position: fixed;
+    top : 55px;
+    left : 0;
+    right : 0;
+    bottom : 0;
+    background-color: rgba(0,0,0,0.4);
+    text-align: center;
+    display: table;
+    width: 100%;
+    height: 100%;
+}
+
+.papers .select-instance > div {
+    display: table-cell;
+    width: 100%;
+    height: 100%;
+    vertical-align: middle;
+    font-family: 'Bungee';
+    color: white;
+}
+
+.papers .select-instance > div > div.icon {
+    font-size: 30px;
+    line-height: 0;
+}
+
+.papers .select-instance > div > div.icon > div {
+    background-color: rgba(0,0,0,0.4);
+    display: inline-block;
+    box-sizing: border-box;
+    width: 40px;
+    height: 40px;
+    border-radius: 50%;
+    padding-top: 5px;
+    position: relative;
+    top : 10px;
+}
+
+.papers .select-instance > div > div.msg {
+    display: inline-block;
+    padding: 4px 15px;
+    background-color: rgba(0,0,0,0.4);
+    border-radius: 10px;
+}

@@ -498,7 +498,7 @@ class Settings extends Component {
                                     </div>
                                 </div>
                                 <div className="xlog-config-controller">
-                                    <CompactPicker color={ this.state.selected.error.color } onChange={this.errorColorChange}/>
+                                    <CompactPicker colors={colors} color={ this.state.selected.error.color } onChange={this.errorColorChange}/>
                                     <div className="disabled-wrapper"></div>
                                 </div>
                             </div>

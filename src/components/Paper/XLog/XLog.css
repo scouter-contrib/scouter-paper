@@ -30,3 +30,28 @@
     image-rendering: pixelated;                 /* Awesome future-browsers       */
     -ms-interpolation-mode: nearest-neighbor;   /* IE                            */
 }
+
+.xlog-viewer .axis-button {
+    position: absolute;
+    left : 15px;
+    display: inline-block;
+    padding: 1px 3px 0;
+    border-radius: 3px;
+    cursor: pointer;
+}
+
+.xlog-viewer .axis-button:hover {
+    background-color: rgba(0,0,0,0.4);
+}
+
+.xlog-viewer .axis-button.axis-up {
+    top : 4px;
+}
+
+.xlog-viewer .axis-button.axis-down {
+    bottom: 4px;
+}
+
+
+
+

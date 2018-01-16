@@ -12,8 +12,7 @@ const ResponsiveReactGridLayout = WidthProvider(Responsive);
 
 class Paper extends Component {
     dataRefreshTimer = null;
-    tickInterval = 1000;
-    tickTimer = null;
+
     constructor(props) {
         super(props);
         let layouts = getData("layouts");
@@ -59,17 +58,14 @@ class Paper extends Component {
             this.getXLog();
         }, this.props.config.interval);
 
-        /*this.tickTimer = setInterval(() => {
-            this.tick();
-        }, this.tickInterval);*/
+        setTimeout(() => {
+            window.dispatchEvent(new Event('resize'));
+        }, 1000);
     }
 
     componentWillUnmount() {
         clearInterval(this.dataRefreshTimer);
         this.dataRefreshTimer = null;
-
-        clearInterval(this.tickTimer);
-        this.tickTimer = null;
     }
 
     getXLog = () => {
@@ -161,7 +157,6 @@ class Paper extends Component {
         xlogs = xlogs.concat(newXLogs);
         newXLogs = lastStepXlogs;
 
-
         let outOfRangeIndex = -1;
         for (let i = 0; i < xlogs.length; i++) {
             let d = xlogs[i];
@@ -174,8 +169,6 @@ class Paper extends Component {
         if (outOfRangeIndex > -1) {
             xlogs.splice(0, outOfRangeIndex + 1);
         }
-
-
 
         data.tempXlogs = [];
         data.firstStepXlogs = firstStepXlogs;
@@ -315,7 +308,6 @@ class Paper extends Component {
     };
 
     setOptionValues = (key, values) => {
-
         let boxes = this.state.boxes;
         boxes.forEach((box) => {
             if (box.key === key) {
@@ -335,8 +327,6 @@ class Paper extends Component {
     };
 
     setOptionClose= (key) => {
-
-
         let boxes = this.state.boxes;
         boxes.forEach((box) => {
             if (box.key === key) {
@@ -367,10 +357,14 @@ class Paper extends Component {
 
     };
 
-
-
     render() {
+        let instanceSelected = this.props.instances.length > 0 ? true : false;
 
+        if (instanceSelected) {
+            document.querySelector("body").style.overflow = "auto";
+        } else {
+            document.querySelector("body").style.overflow = "hidden";
+        }
         return (
             <div className="papers">
                 <PaperControl addPaper={this.addPaper} clearLayout={this.clearLayout} />
@@ -384,6 +378,14 @@ class Paper extends Component {
                         </div>
                     })}
                 </ResponsiveReactGridLayout>
+                {!instanceSelected &&
+                <div className="select-instance">
+                    <div>
+                        <div className="icon"><div><i className="fa fa-info-circle" aria-hidden="true"></i></div></div>
+                        <div className="msg">NO INSTANCE SELECTED</div>
+                    </div>
+                </div>
+                }
             </div>
         );
     }
