@@ -200,6 +200,11 @@ class Paper extends Component {
         this.setState({
             layouts : layouts
         });
+
+        setTimeout(() => {
+            window.dispatchEvent(new Event('resize'));
+        }, 500);
+
     }
 
     getUniqueKey() {

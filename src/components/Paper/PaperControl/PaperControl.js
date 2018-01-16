@@ -14,7 +14,7 @@ class PaperControl extends Component {
 
     render() {
         return (
-            <div className="papers-controls">
+            <div className="papers-controls noselect">
                 <div className="paper-control" onClick={this.props.addPaper}>
                     <i className="fa fa-plus-circle" aria-hidden="true"></i>
                 </div>
