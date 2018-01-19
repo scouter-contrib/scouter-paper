@@ -78,10 +78,7 @@ class Paper extends Component {
                     return Number(instance.objHash);
                 }))
             }).done((msg) => {
-
-
                 this.tick(msg.result);
-
             }).fail((jqXHR, textStatus) => {
                 console.log(jqXHR, textStatus);
             });
@@ -102,8 +99,8 @@ class Paper extends Component {
         let tempXlogs = this.state.data.tempXlogs.concat(datas);
 
         let data = this.state.data;
-        data.offset1 = result.offset1;
-        data.offset2 = result.offset2;
+        data.offset1 = result.xlogLoop;
+        data.offset2 = result.xlogIndex;
         data.tempXlogs = tempXlogs;
         data.lastRequestTime = now;
 
@@ -210,27 +207,36 @@ class Paper extends Component {
     getUniqueKey() {
         let dup = false;
         let key = null;
+        let i = 1;
         do {
-            key = String(this.state.boxes.length + 1);
+            dup = false;
+            key = String(this.state.boxes.length + i);
             this.state.boxes.forEach((box) => {
                 if (box.key === key) {
                     dup = true;
                     return false;
                 }
             });
+            i++;
         } while (dup);
 
         return key;
     }
 
     addPaper = () => {
+
+
+
+
         let boxes = this.state.boxes;
         let key = this.getUniqueKey();
+
         boxes.push({
             key: key,
             title: "NO TITLE ",
             layout: {w: 6, h: 4, x: 0, y: 0, minW: 1, minH: 3, i: key},
         });
+
 
         this.setState({
             boxes: boxes
@@ -305,6 +311,9 @@ class Paper extends Component {
             }
         });
 
+
+
+
         this.setState({
             boxes: boxes
         });
@@ -368,7 +377,7 @@ class Paper extends Component {
         if (instanceSelected) {
             document.querySelector("body").style.overflow = "auto";
         } else {
-            document.querySelector("body").style.overflow = "hidden";
+            //document.querySelector("body").style.overflow = "hidden";
         }
         return (
             <div className="papers">

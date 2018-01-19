@@ -1,0 +1,102 @@
+.xlog-profiler {
+    position: absolute;
+    background-color: rgba(0, 0, 0, 0.5);
+    background-color: white;
+    color: #333;
+    top: 10px;
+    left: 10px;
+    right: 10px;
+    bottom: 10px;
+    width: calc(100% - 20px);
+    height: calc(100% - 20px);
+    z-index: 5;
+    border-radius: 3px;
+    font-size: 8px;
+}
+
+.xlog-profiler .close-btn {
+    position: absolute;
+    top: 3px;
+    right: 3px;
+    display: inline-block;
+    position: absolute;
+    width: 12px;
+    height: 12px;
+    cursor: pointer;
+    box-sizing: border-box;
+    top: 5px;
+    right: 5px;
+
+}
+
+.xlog-profiler .close-btn:before,
+.xlog-profiler .close-btn:after {
+    content: '';
+    position: absolute;
+    height: 1px;
+    width: 90%;
+    top: 50%;
+    left: 0;
+    margin-top: -1px;
+    background: #666;
+    box-sizing: border-box;
+}
+
+.xlog-profiler .close-btn:hover:before,
+.xlog-profiler .close-btn:hover:after {
+    background: #000;
+}
+
+.xlog-profiler .close-btn:before {
+    transform: rotate(45deg);
+}
+
+.xlog-profiler .close-btn:after {
+    transform: rotate(-45deg);
+}
+
+.xlog-profiler .profile-content {
+    width: 50%;
+    height: 100%;
+    overflow-y: scroll;
+    padding: 10px;
+}
+
+.xlog-profiler .profile-content .xlog-list {
+    width: 100%;
+    height: 100%;
+    display: table;
+    text-align: left;
+}
+
+.xlog-profiler .profile-content .xlog-list > div.row {
+    display: table-row;
+    cursor: pointer;
+}
+
+.xlog-profiler .profile-content .xlog-list > div.row.active {
+    background-color: #1b6d85;
+    background-color: #26466d;
+    color: white;
+}
+
+.xlog-profiler .profile-content .xlog-list > div:hover {
+    background-color: rgba(0, 0, 0, 0.1);
+}
+
+.xlog-profiler .profile-content .xlog-list > div.header.row {
+    background-color: transparent;
+}
+
+.xlog-profiler .profile-content .xlog-list > div:first-child > span {
+    border-top: 1px solid #CCC;
+}
+
+.xlog-profiler .profile-content .xlog-list > div > span {
+    display: table-cell;
+    line-height: 100%;
+    vertical-align: middle;
+    white-space: nowrap;
+    padding: 4px;
+    border-bottom: 1px solid #CCC;
+}

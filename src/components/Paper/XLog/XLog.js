@@ -1,6 +1,7 @@
 import React, {Component} from 'react';
 import './XLog.css';
 import * as d3 from "d3";
+import Profiler from "./Profiler/Profiler";
 
 
 class XLog extends Component {
@@ -17,7 +18,9 @@ class XLog extends Component {
         timeFormat: "%H:%M",
         elapsedTicks: 5,
         last: 0,
-        xAxisWidth : 70
+        xAxisWidth: 70,
+        originX: null,
+        originY: null
     };
 
     lastStartTime = null;
@@ -27,8 +30,14 @@ class XLog extends Component {
         super(props);
 
         this.state = {
-            elapsed : 2000,
-            xlog : []
+            elapsed: 2000,
+            xlog: [],
+            selection : {
+                x1 : null,
+                x2 : null,
+                y1 : null,
+                y2 : null
+            }
         }
     }
 
@@ -83,7 +92,7 @@ class XLog extends Component {
 
                 if (x > 0) {
                     console.log("d");
-                    if (d.error > 0) {
+                    if (Number(d.error)) {
                         context.drawImage(this.graph.errorBrush, x - gabX, y - gabY, this.graph.errorBrush.width, this.graph.errorBrush.height);
                     } else {
                         context.drawImage(this.graph.normalBrush, x - gabX, y - gabY, this.graph.normalBrush.width, this.graph.normalBrush.height);
@@ -99,7 +108,7 @@ class XLog extends Component {
         this.graph.x.domain([this.props.data.startTime, this.props.data.endTime]);
         let xAxisCount = Math.floor(this.graph.width / this.graph.xAxisWidth);
         if (xAxisCount < 1) {
-            xAxisCount =  1;
+            xAxisCount = 1;
         }
         svg.select(".axis-x").call(d3.axisBottom(this.graph.x).tickFormat(d3.timeFormat(this.graph.timeFormat)).ticks(xAxisCount));
         svg.select(".grid-x").call(d3.axisBottom(this.graph.x).tickSize(-this.graph.height).tickFormat("").ticks(xAxisCount));
@@ -167,7 +176,7 @@ class XLog extends Component {
 
         tempContext.clearRect(0, 0, canvas.width, canvas.height);
         tempContext.drawImage(canvas, 0, 0, canvas.width, canvas.height);
-        
+
         context.clearRect(0, 0, canvas.width, canvas.height);
         context.drawImage(this.graph._tempCanvas, -pixel, 0, canvas.width, canvas.height);
     };
@@ -190,7 +199,7 @@ class XLog extends Component {
         // X축 단위 그리기
         let xAxisCount = Math.floor(this.graph.width / this.graph.xAxisWidth);
         if (xAxisCount < 1) {
-            xAxisCount =  1;
+            xAxisCount = 1;
         }
         svg.append("g").attr("class", "axis-x").attr("transform", "translate(0," + this.graph.height + ")").call(d3.axisBottom(this.graph.x).tickFormat(d3.timeFormat(this.graph.timeFormat)).ticks(xAxisCount));
         // Y축 단위 그리기
@@ -215,8 +224,78 @@ class XLog extends Component {
             canvasDiv.remove();
         }
         canvasDiv = d3.select(this.refs.xlogViewer).append("div").attr("class", "canvas-div").style('position', 'absolute').style('top', '0px').style('left', '0px');
-        canvasDiv.append('canvas').attr('height', this.graph.height).attr('width', this.graph.width + 20).style('position', 'absolute').style('top', this.graph.margin.top + 'px').style('left', this.graph.margin.left + 'px');
+        let canvas = canvasDiv.append('canvas').attr('height', this.graph.height).attr('width', this.graph.width + 20).style('position', 'absolute').style('top', this.graph.margin.top + 'px').style('left', this.graph.margin.left + 'px');
 
+
+        // 드래그 셀렉트
+        svg.append("g").append("rect").attr("class", "selection").attr("opacity", 0.2);
+        let that = this;
+        var dragBehavior = d3.drag()
+            .on("drag", function () {
+                var p = d3.mouse(this);
+                var x = p[0] < that.graph.originX ? p[0] : that.graph.originX;
+                var y = p[1] < that.graph.originY ? p[1] : that.graph.originY;
+
+                // 가로가 그래프 범위 안에 있도록
+                x = x > 0 ? x : 0;
+                var width = 0;
+                if (p[0] > that.graph.originX) {
+                    width = Math.abs(p[0] - that.graph.originX);
+                } else {
+                    width = Math.abs(x - that.graph.originX);
+                }
+
+                if (x + width > that.graph.width) {
+                    width = that.graph.width - x;
+                }
+
+                // 세로가 그래프 범위 안에 있도록
+                y = y > 0 ? y : 0;
+                var height = 0;
+                if (p[1] > that.graph.originY) {
+                    height = Math.abs(p[1] - that.graph.originY);
+                } else {
+                    height = Math.abs(y - that.graph.originY);
+                }
+
+                if ((y + height) > that.graph.height) {
+                    height = that.graph.height - y;
+                }
+
+                d3.select(".selection").attr("x", x).attr("y", y).attr("width", width).attr("height", height);
+            })
+            .on("start", function () {
+                var p = d3.mouse(this);
+                that.graph.originX = p[0];
+                that.graph.originY = p[1];
+                d3.select(".selection").attr("x", that.graph.originX).attr("y", that.graph.originY).attr("width", 0).attr("height", 0);
+            })
+            .on("end", function () {
+
+                let startTime = that.graph.x.invert(Number(d3.select(".selection").attr("x")));
+                let endTime = that.graph.x.invert(Number(d3.select(".selection").attr("x")) + Number(d3.select(".selection").attr("width")));
+                let minTime = that.graph.y.invert(Number(d3.select(".selection").attr("y")) + Number(d3.select(".selection").attr("height")));
+                let maxTime = that.graph.y.invert(Number(d3.select(".selection").attr("y")));
+
+                if (maxTime >= that.state.elapsed) {
+                    maxTime = Infinity;
+                }
+
+                that.setState({
+                    selection : {
+                        x1 : startTime.getTime(),
+                        x2 : endTime.getTime(),
+                        y1 : minTime,
+                        y2 : maxTime
+                    }
+                });
+
+                setTimeout(() => {
+                    d3.select(".selection").attr("x", 0).attr("y", 0).attr("width", 0).attr("height", 0);
+                }, 100)
+            });
+
+        canvas.call(dragBehavior);
 
         // 브러쉬 (XLOG)
         this.graph.normalBrush = document.createElement("canvas");
@@ -225,8 +304,8 @@ class XLog extends Component {
         let normalContext = this.graph.normalBrush.getContext("2d");
 
         normalContext.globalAlpha = 0.6;
-        for (let i=0; i<this.props.config.xlog.normal.rows; i++) {
-            for (let j=0; j<this.props.config.xlog.normal.columns; j++) {
+        for (let i = 0; i < this.props.config.xlog.normal.rows; i++) {
+            for (let j = 0; j < this.props.config.xlog.normal.columns; j++) {
                 if (this.props.config.xlog.normal.fills["D_" + i + "_" + j] && this.props.config.xlog.normal.fills["D_" + i + "_" + j].color !== "transparent") {
                     normalContext.fillStyle = this.props.config.xlog.normal.fills["D_" + i + "_" + j].color;
                     normalContext.fillRect(i, j, 1, 1);
@@ -240,8 +319,8 @@ class XLog extends Component {
         let errorContext = this.graph.errorBrush.getContext("2d");
 
         errorContext.globalAlpha = 0.6;
-        for (let i=0; i<this.props.config.xlog.error.rows; i++) {
-            for (let j=0; j<this.props.config.xlog.error.columns; j++) {
+        for (let i = 0; i < this.props.config.xlog.error.rows; i++) {
+            for (let j = 0; j < this.props.config.xlog.error.columns; j++) {
                 if (this.props.config.xlog.error.fills["D_" + i + "_" + j] && this.props.config.xlog.error.fills["D_" + i + "_" + j].color !== "transparent") {
                     errorContext.fillStyle = this.props.config.xlog.error.fills["D_" + i + "_" + j].color;
                     errorContext.fillRect(i, j, 1, 1);
@@ -258,13 +337,13 @@ class XLog extends Component {
 
     axisUp = (e) => {
         this.setState({
-            elapsed : this.state.elapsed * 2
+            elapsed: this.state.elapsed * 2
         });
     };
 
     axisDown = () => {
         this.setState({
-            elapsed : this.state.elapsed / 2
+            elapsed: this.state.elapsed / 2
         });
     };
 
@@ -275,8 +354,10 @@ class XLog extends Component {
     render() {
         return (
             <div className="xlog-viewer" ref="xlogViewer" onMouseDown={this.stopProgation}>
+                <div></div>
                 <div className="axis-button axis-up" onClick={this.axisUp} onMouseDown={this.stopProgation}><i className="fa fa-angle-up" aria-hidden="true"></i></div>
                 <div className="axis-button axis-down" onClick={this.axisDown} onMouseDown={this.stopProgation}><i className="fa fa-angle-down" aria-hidden="true"></i></div>
+                <Profiler selection={this.state.selection} xlogs={this.props.data.xlogs} />
             </div>
         );
     }

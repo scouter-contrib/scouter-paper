@@ -105,3 +105,21 @@ body {
     -ms-user-select: none; /* Internet Explorer/Edge */
     user-select: none; /* Non-prefixed version, currently supported by Chrome and Opera */
 }
+
+
+.scrollbar::-webkit-scrollbar {
+    width: 7px;
+    height: 7px;
+}
+
+.scrollbar::-webkit-scrollbar-track {
+    -webkit-box-shadow: 0 0 6px rgba(0,0,0,0.4);
+}
+
+.scrollbar::-webkit-scrollbar-thumb {
+    background-color: rgba(0,0,0,0.4);
+
+
+
+
+}
