@@ -224,10 +224,6 @@ class Paper extends Component {
     }
 
     addPaper = () => {
-
-
-
-
         let boxes = this.state.boxes;
         let key = this.getUniqueKey();
 
@@ -243,6 +239,19 @@ class Paper extends Component {
         });
 
         setData("boxes", boxes);
+
+        return key;
+    };
+
+    addPaperAndAddMetic = (data) => {
+        let key = this.addPaper();
+
+        if (data) {
+            let option = JSON.parse(data);
+            this.setOption(key, option);
+        }
+
+        console.log(data);
     };
 
     removePaper = (key) => {
@@ -381,7 +390,7 @@ class Paper extends Component {
         }
         return (
             <div className="papers">
-                <PaperControl addPaper={this.addPaper} clearLayout={this.clearLayout} />
+                <PaperControl addPaper={this.addPaper} addPaperAndAddMetic={this.addPaperAndAddMetic} clearLayout={this.clearLayout} />
                 <ResponsiveReactGridLayout className="layout" cols={{lg: 12, md: 10, sm: 6, xs: 4, xxs: 2}} layouts={this.state.layouts} rowHeight={30} onLayoutChange={(layout, layouts) => this.onLayoutChange(layout, layouts)}>
                     {this.state.boxes.map((box, i) => {
                         return <div className="box-layout" key={box.key} data-grid={box.layout}>
