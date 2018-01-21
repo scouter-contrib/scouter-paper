@@ -64,6 +64,7 @@
 
 .message-content-layout > .message-content .center-message {
     vertical-align: top;
+    vertical-align: middle;
 }
 
 .message-content-layout > .message-content .center-message .message-title {
@@ -79,7 +80,7 @@
 }
 
 .message-content-layout > .message-content .center-message .center-message-content {
-    padding: 10px;
+    padding: 15px;
 }
 
 .message-btns {

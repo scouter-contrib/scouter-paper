@@ -5,12 +5,11 @@ class Overlay extends Component {
 
     render() {
         return (
-            <div className={"overlay " + this.props.visible}><div>{this.props.children}</div></div>
+            <div className={"overlay " + this.props.visible}>
+                <div>{this.props.children}</div>
+            </div>
         );
     }
-
-
 }
-
 
 export default Overlay;

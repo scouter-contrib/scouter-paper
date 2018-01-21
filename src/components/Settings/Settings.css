@@ -1,8 +1,6 @@
 .settings {
     text-align: left;
-    font-family: 'Bungee';
     padding: 10px;
-    line-height: 0;
     max-width: 1600px;
     margin: 0 auto;
 }
@@ -12,13 +10,12 @@
 }
 
 .settings .category {
-    color: white;
-    padding: 0 10px 0;
     margin: 20px 0 0;
+    color: white;
 }
 
 .settings .category.first {
-    margin-top: 0;
+    margin-top: 10px;
 }
 
 .settings .category > div {
@@ -26,40 +23,57 @@
     _background-color: rgba(0, 0, 0, 0.3);
     padding: 10px 0 7px;
     margin: 0;
-    border-bottom: 1px dashed rgba(0,0,0,0.5);
 }
 
 .settings .forms {
-    padding: 10px;
+    padding: 0;
     margin: 0 200px 0;
 }
 
 @media screen and (max-width: 1400px) {
     .settings .forms {
-        padding: 10px;
         margin: 0 100px 0;
     }
 }
 
 @media screen and (max-width: 1200px) {
     .settings .forms {
-        padding: 10px;
         margin: 0 50px 0;
     }
 }
 
 @media screen and (max-width: 1000px) {
     .settings .forms {
-        padding: 10px;
         margin: 0 20px 0;
     }
+}
+
+.settings .setting-box {
+    padding: 20px;
+    _border: 1px solid rgba(0, 0, 0, 0.4);
+    background-color: white;
+    border-radius: 2px;
+    box-shadow: 0 0 5px #666;
+
 }
 
 @media screen and (max-width: 600px) {
     .settings .forms {
         padding: 0;
         margin: 0;
+    }
 
+    .settings .category {
+        margin: 10px 0 0;
+        color: white;
+    }
+
+    .settings .category.first {
+        margin-top: 0;
+    }
+
+    .settings .setting-box {
+        padding: 10px;
     }
 }
 
@@ -67,7 +81,16 @@
     margin: 0;
     display: inline-block;
     width: 50%;
-    padding: 5px 10px 0 10px;
+    padding-right: 20px;
+}
+
+.settings .forms .row:nth-child(2n) {
+    padding-right: 0;
+}
+
+.settings .forms .row:nth-child(3n),
+.settings .forms .row:nth-child(4n) {
+    padding-top: 15px;
 }
 
 @media screen and (max-width: 1100px) {
@@ -75,7 +98,18 @@
         margin: 0;
         display: block;
         width: 100%;
-        padding: 5px 10px 0 10px;
+        padding-top: 10px;
+        padding-right: 0;
+    }
+
+    .settings .forms .row:nth-child(2n),
+    .settings .forms .row:nth-child(3n),
+    .settings .forms .row:nth-child(4n) {
+        padding-top: 10px;
+    }
+
+    .settings .forms .row:first-child {
+        padding-top: 0;
     }
 }
 
@@ -90,8 +124,8 @@
 .settings .forms .row > div.label {
     text-align: left;
     display: inline-block;
-    padding: 6px 2px;
-    font-size: 100%;
+    padding: 0 0 2px 0;
+    font-size: 10px;
 }
 
 .settings .forms input {
@@ -102,14 +136,15 @@
     outline: none;
     width: 100%;
     box-sizing: border-box;
-    border: 1px solid transparent;
+    border: 1px solid rgba(0, 0, 0, 0.3);
+    transition: background-color 0.3s;
 }
 
 .settings .forms .xlog-size .xlog-label {
     display: inline-block !important;
     width: 70px;
-    color: white;
     padding-left: 2px;
+    font-size: 10px;
 }
 
 .settings .forms .xlog-size .xlog-label.second {
@@ -119,37 +154,30 @@
 .settings .forms .xlog-size select {
     padding: 0;
     width: calc(50% - 80px);
-    border: none;
+    border: 1px solid rgba(0, 0, 0, 0.3);
 }
 
 .settings .forms .xlog-size select[disabled] {
-    background-color: rgba(0,0,0,0.3);
-    color: white;
-    border: none;
+    background-color: rgba(0, 0, 0, 0.1);
+    border: 1px solid transparent;
+    color: #333;
 }
 
 .settings .forms input[readonly] {
     background-color: transparent;
-    background-color: rgba(0, 0, 0, 0.3);
-    color: white;
-    border: 1px solid rgba(0, 0, 0, 0.3);
+    background-color: rgba(0, 0, 0, 0.1);
+    border: 1px solid transparent;
+    transition: background-color 0.3s;
 }
 
 .settings .buttons {
-    padding: 15px 10px 0;
     text-align: center;
+    padding: 20px 20px 10px;
+
 }
 
 .settings .buttons button {
-    padding: 12px 15px;
-    border: none;
-    background-color: white;
-    margin: 0 2px;
-    outline: none;
-}
-
-.settings .buttons button:hover {
-    background-color: #EEE;
+    font-size: 12px;
 }
 
 .settings .xlog-dot-config {
@@ -178,6 +206,7 @@
 
 .xlog-normal-dot {
     display: inline-block;
+    line-height: 0;
 }
 
 .xlog-normal-dot .xlog-dot-rows .xlog-dot-columns {

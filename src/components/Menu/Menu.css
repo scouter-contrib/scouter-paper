@@ -1,6 +1,7 @@
 .menu-div {
-    padding: 10px 0 0;
+    padding: 5px 0 0;
     position: relative;
+    background-color: #207ce5;
 }
 
 .menu-div .bar {
@@ -16,24 +17,18 @@
     color: white;
     max-width: 1600px;
     margin: 0 auto;
-    font-family: 'Bungee';
     font-weight: normal;
-    height: 45px;
     box-sizing: border-box;
-    padding: 0 10px;
 }
 
 .menu div.logo {
     font-size: 16px;
-    padding: 0 10px 0 0;
-    width: 80px;
+    padding: 0;
     text-align: center;
     position: relative;
-    height: 45px;
     box-sizing: border-box;
     color: white;
     display: inline-block;
-    float: left;
     cursor: pointer;
     -webkit-touch-callout: none;
     -webkit-user-select: none;
@@ -41,10 +36,15 @@
     -moz-user-select: none;
     -ms-user-select: none;
     user-select: none;
+    width: 80px;
+    text-align: center;
+
 }
 
 .menu div.logo a {
     color: white;
+    text-decoration: none;
+    display: inline-block;
 }
 
 .menu div.logo a:hover {
@@ -52,21 +52,16 @@
 }
 
 .menu div.logo .logo-icon {
-    position: absolute;
-    top: -14px;
-    left: 0;
     text-align: center;
     width: 100%;
-    padding-right: 10px;
     box-sizing: border-box;
     z-index: 2;
     font-size: 16px;
+    position: relative;
+    top: -10px;
 }
 
 .menu div.logo .logo-text-div {
-    position: absolute;
-    top: 5px;
-    left: 0;
     width: 100%;
     text-align: center;
     height: 0;
@@ -74,12 +69,21 @@
 }
 
 .menu div.logo .logo-text {
-    line-height: 10px;
     font-size: 10px;
-    letter-spacing: 0;
-    display: inline-block;
     padding: 0;
     border-radius: 5px;
+    text-decoration: none;
+    position: absolute;
+    left: 0;
+    width: 100%;
+}
+
+.menu div.logo .logo-text-1 {
+    top: 0;
+}
+
+.menu div.logo .logo-text-2 {
+    top: 10px;
 }
 
 .menu div.logo:hover {
@@ -89,14 +93,13 @@
 .menu a.menu-item {
     display: inline-block;
     color: #CCC;
-    padding: 5px 15px 2px;
+    padding: 15px 10px;
     cursor: pointer;
     border-bottom: 4px solid transparent;
     transition: border-bottom-colo, colorr 0.3s;
     height: 100%;
     box-sizing: border-box;
     position: relative;
-    float: left;
     text-decoration: none;
     -webkit-touch-callout: none;
     -webkit-user-select: none;
@@ -106,9 +109,10 @@
     user-select: none;
 }
 
+
 .menu .menu-item .icon {
     position: absolute;
-    top: -7px;
+    top: 0px;
     left: 0;
     width: 100%;
     text-align: center;
@@ -123,7 +127,7 @@
 
 .menu .menu-item:hover {
     color: white;
-    border-bottom: 4px solid rgba(255, 255, 255, 0.1);
+    border-bottom: 4px solid rgba(255, 255, 255, 0.6);
     transition: border-bottom-color, color 0.3s;
 }
 
@@ -137,62 +141,38 @@
 }
 
 .menu .menu-item.active {
-    border-bottom: 4px solid rgba(255, 255, 255, 0.5);
+    border-bottom: 4px solid rgba(255, 255, 255, 0.8);
     color: white;
     transition: border-bottom-color, color 0.3s;
 }
 
 .menu-instance-selector {
     display: inline-block;
-    padding-top: 9px;
+    padding-top : 10px;
     font-size: 10px;
     float: right;
 }
 
-@media screen and (max-width: 600px) {
 
-    .menu div.logo {
-        font-size: 14px;
-        padding: 0;
-        width: 70px;
-        height: 35px;
+
+@media screen and (max-width: 600px) {
+    .menu a.menu-item {
+        padding: 10px 5px;
+        font-size: 10px;
     }
 
     .menu div.logo .logo-icon {
-        top: -16px;
-    }
-
-    .menu div.logo .logo-text-div {
-        top: 7px;
-        left: 0;
-        width: 100%;
-        text-align: center;
-        height: auto;
-        padding-right: 0;
-        line-height: 0;
-    }
-
-    .menu {
-        height: 35px;
-        box-sizing: border-box;
-        padding: 0;
-    }
-
-    .menu a.menu-item {
-        padding: 1px 5px 2px;
-    }
-
-    .menu .menu-item .icon {
-        top: -12px;
-    }
-
-    .menu .menu-item .text {
-        font-size: 10px;
-
+        font-size: 16px;
+        position: relative;
+        top: -7px;
     }
 
     .menu-instance-selector {
-        padding-top: 4px;
+        padding-top : 6px;
     }
+
 }
+
+
+
 

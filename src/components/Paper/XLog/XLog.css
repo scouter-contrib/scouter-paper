@@ -21,12 +21,12 @@
 .xlog-viewer .grid-x line,
 .xlog-viewer .grid-y path,
 .xlog-viewer .grid-y line {
-    stroke: white;
+    stroke: #333;
 }
 
 .xlog-viewer .axis-x text,
 .xlog-viewer .axis-y text {
-    fill: white;
+    fill: #333;
 }
 
 .xlog-viewer canvas {

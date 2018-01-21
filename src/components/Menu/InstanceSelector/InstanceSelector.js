@@ -194,7 +194,7 @@ class InstanceSelector extends Component {
         }
 
         if (instances.length < 1) {
-            this.props.pushMessage("info", "선택된 모니터링 대상이 없습니다", "적어도 하나 이상의 인스턴스가 선택되어야 합니다");
+            this.props.pushMessage("info", "NO MONITORING TARGET", "At least one instance must be selected");
             this.props.setControlVisibility("Message", true);
         } else {
             this.props.setInstances(instances);
@@ -203,10 +203,12 @@ class InstanceSelector extends Component {
             this.props.history.push({
                 pathname: '/paper',
                 search: '?instances=' + instances.map((d) => {return d.objHash})
-            })
+            });
+
+            this.props.toggleSelectorVisible();
         }
 
-        this.props.toggleSelectorVisible();
+
     };
 
     cancelClick = () => {
@@ -215,7 +217,8 @@ class InstanceSelector extends Component {
 
     render() {
         return (
-            <div className={"instance-selector " + (this.props.visible ? "" : "hidden")}>
+            <div className={"instance-selector-bg " + (this.props.visible ? "" : "hidden")}>
+            <div className="instance-selector">
                 <div className="instance-selector-content">
                     <div className="host-list">
                         <div className="title">
@@ -241,6 +244,7 @@ class InstanceSelector extends Component {
                 <div className="buttons">
                     <button onClick={this.cancelClick}>CANCEL</button><button onClick={this.setInstances}>APPLY</button>
                 </div>
+            </div>
             </div>
         );
     }

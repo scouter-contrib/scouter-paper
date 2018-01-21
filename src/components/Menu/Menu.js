@@ -21,20 +21,20 @@ class Menu extends Component {
     render() {
         return (
             <div className="menu-div">
-                <div className="bar"></div>
                 <div className="menu">
                     <div className="logo">
                         <NavLink to="/" activeClassName="active">
                             <div className="logo-icon"><i className="fa fa-bolt" aria-hidden="true"></i></div>
                             <div className="logo-text-div">
-                                <div className="logo-text">SCOUTER PAPERS</div>
+                                <div className="logo-text logo-text-1">SCOUTER</div>
+                                <div className="logo-text logo-text-2">PAPERS</div>
                             </div>
                         </NavLink>
                     </div>
                     <NavLink className="menu-item" to="/paper" activeClassName="active">
                         <div>
                             <div className="icon"><i className="fa fa-newspaper-o" aria-hidden="true"></i></div>
-                            <div className="text">PAPER</div>
+                            <div className="text">PAPERS</div>
                         </div>
                     </NavLink>
                     <NavLink className="menu-item" to="/settings" activeClassName="active">
@@ -57,6 +57,7 @@ class Menu extends Component {
                     </NavLink>
                     <InstanceInfo className="menu-instance-selector" toggleSelectorVisible={this.toggleSelectorVisible}/>
                 </div>
+                <div className="bar"></div>
                 <InstanceSelector visible={this.state.selector} toggleSelectorVisible={this.toggleSelectorVisible}/>
             </div>
         );

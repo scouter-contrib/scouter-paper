@@ -1,15 +1,23 @@
+.instance-selector-bg {
+    position: fixed;
+    top : 0;
+    left : 0;
+    right: 0;
+    bottom: 0;
+    background-color: rgba(0,0,0,0.3);
+    z-index: 3;
+}
 .instance-selector {
-    background-color: rgba(0, 0, 0, 0.2);
     background-color: #207ce5;
-    border: 1px solid rgba(0, 0, 0, 0.3);
+    border: 1px solid rgba(0, 0, 0, 0.6);
     color: white;
     width: 500px;
     height: 300px;
     position: absolute;
-    top: 45px;
+    top: 47px;
     right: 24px;
     _border-radius: 5px;
-    z-index: 2;
+    z-index: 5;
     padding: 0;
     -webkit-touch-callout: none;
     -webkit-user-select: none;
@@ -17,7 +25,6 @@
     -moz-user-select: none;
     -ms-user-select: none;
     user-select: none;
-    font-family: 'Bungee';
 }
 
 .instance-selector > div {
@@ -32,7 +39,7 @@
 .instance-selector .instance-selector-content {
     display: table;
     width: 100%;
-    height: calc(100% - 40px);
+    height: calc(100% - 46px);
     table-layout: fixed;
 }
 
@@ -110,28 +117,10 @@
 }
 
 .instance-selector .buttons {
-    _border-top: 1px solid rgba(0, 0, 0, 0.2);
     background-color: rgba(0, 0, 0, 0.1);
-    padding: 9px 10px 0;
+    padding: 10px 10px 8px;
     text-align: right;
-    line-height: 100%;
     font-size: 10px;
-    height: 40px;
-
-}
-
-.instance-selector .buttons button {
-    padding: 12px 15px;
-    border: none;
-    background-color: white;
-    margin: 0 2px;
-    outline: none;
-    color: #333;
-    line-height: 0;
-}
-
-.instance-selector .buttons button:hover {
-    background-color: #EEE;
 }
 
 @media screen and (max-width: 700px) {

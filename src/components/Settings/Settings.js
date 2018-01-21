@@ -26,43 +26,31 @@ class Settings extends Component {
                         columns: 5,
                         fills: {
                             D_0_2: {
-                                color: "#FCDC00"
-                            },
-                            D_1_1: {
-                                color: "#FCDC00"
+                                color: "#0062B1"
                             },
                             D_1_2: {
-                                color: "#FCDC00"
-                            },
-                            D_1_3: {
-                                color: "#FCDC00"
+                                color: "#0062B1"
                             },
                             D_2_0: {
-                                color: "#FCDC00"
+                                color: "#0062B1"
                             },
                             D_2_1: {
-                                color: "#FCDC00"
+                                color: "#0062B1"
                             },
                             D_2_2: {
-                                color: "#FCDC00"
+                                color: "#0062B1"
                             },
                             D_2_3: {
-                                color: "#FCDC00"
+                                color: "#0062B1"
                             },
                             D_2_4: {
-                                color: "#FCDC00"
-                            },
-                            D_3_1: {
-                                color: "#FCDC00"
+                                color: "#0062B1"
                             },
                             D_3_2: {
-                                color: "#FCDC00"
-                            },
-                            D_3_3: {
-                                color: "#FCDC00"
+                                color: "#0062B1"
                             },
                             D_4_2: {
-                                color: "#FCDC00"
+                                color: "#0062B1"
                             }
                         }
                     },
@@ -73,13 +61,7 @@ class Settings extends Component {
                             D_0_2: {
                                 color: "#9F0500"
                             },
-                            D_1_1: {
-                                color: "#9F0500"
-                            },
                             D_1_2: {
-                                color: "#9F0500"
-                            },
-                            D_1_3: {
                                 color: "#9F0500"
                             },
                             D_2_0: {
@@ -97,13 +79,7 @@ class Settings extends Component {
                             D_2_4: {
                                 color: "#9F0500"
                             },
-                            D_3_1: {
-                                color: "#9F0500"
-                            },
                             D_3_2: {
-                                color: "#9F0500"
-                            },
-                            D_3_3: {
                                 color: "#9F0500"
                             },
                             D_4_2: {
@@ -328,181 +304,187 @@ class Settings extends Component {
             <div className={"settings " + (this.state.edit ? 'editable' : '')}>
                 <div className="forms">
                     <div className="category first">
-                        <div><i className="fa fa-star" aria-hidden="true"></i> SCOUTER SERVER INFO</div>
+                        <div>SCOUTER SERVER INFO</div>
                     </div>
-                    <div className="row">
-                        <div className="label">
-                            <div>PROTOCOL</div>
+                    <div className="setting-box">
+                        <div className="row">
+                            <div className="label">
+                                <div>PROTOCOL</div>
+                            </div>
+                            <div className="input">
+                                <input type="text" readOnly={!this.state.edit}
+                                       onChange={this.onChange.bind(this, "protocol")} value={this.state.config.protocol}/>
+                            </div>
                         </div>
-                        <div className="input">
-                            <input type="text" readOnly={!this.state.edit}
-                                   onChange={this.onChange.bind(this, "protocol")} value={this.state.config.protocol}/>
+                        <div className="row">
+                            <div className="label">
+                                <div>ADDRESS</div>
+                            </div>
+                            <div className="input">
+                                <input type="text" readOnly={!this.state.edit}
+                                       onChange={this.onChange.bind(this, "address")} value={this.state.config.address}/>
+                            </div>
                         </div>
-                    </div>
-                    <div className="row">
-                        <div className="label">
-                            <div>ADDRESS</div>
+                        <div className="row">
+                            <div className="label">
+                                <div>POST</div>
+                            </div>
+                            <div className="input">
+                                <input type="text" readOnly={!this.state.edit} onChange={this.onChange.bind(this, "port")}
+                                       value={this.state.config.port}/>
+                            </div>
                         </div>
-                        <div className="input">
-                            <input type="text" readOnly={!this.state.edit}
-                                   onChange={this.onChange.bind(this, "address")} value={this.state.config.address}/>
-                        </div>
-                    </div>
-                    <div className="row">
-                        <div className="label">
-                            <div>POST</div>
-                        </div>
-                        <div className="input">
-                            <input type="text" readOnly={!this.state.edit} onChange={this.onChange.bind(this, "port")}
-                                   value={this.state.config.port}/>
-                        </div>
-                    </div>
-                    <div className="row">
-                        <div className="label">
-                            <div>INTERVAL</div>
-                        </div>
-                        <div className="input">
-                            <input type="text" readOnly={!this.state.edit}
-                                   onChange={this.onChange.bind(this, "interval")} value={this.state.config.interval}/>
-                        </div>
-                    </div>
-                    <div className="category">
-                        <div><i className="fa fa-star" aria-hidden="true"></i> DATA FORMAT CONFIGURATION</div>
-                    </div>
-                    <div className="row">
-                        <div className="label">
-                            <div>NUMBER FORMAT</div>
-                        </div>
-                        <div className="input">
-                            <input type="text" readOnly={!this.state.edit}
-                                   onChange={this.onChange.bind(this, "numberFormat")}
-                                   value={this.state.config.numberFormat}/>
-                        </div>
-                    </div>
-                    <div className="row">
-                        <div className="label">
-                            <div>DATE FORMAT</div>
-                        </div>
-                        <div className="input">
-                            <input type="text" readOnly={!this.state.edit}
-                                   onChange={this.onChange.bind(this, "dateFormat")}
-                                   value={this.state.config.dateFormat}/>
-                        </div>
-                    </div>
-                    <div className="row ">
-                        <div className="label">
-                            <div>TIME FORMAT</div>
-                        </div>
-                        <div className="input">
-                            <input type="text" readOnly={!this.state.edit}
-                                   onChange={this.onChange.bind(this, "timeFormat")}
-                                   value={this.state.config.timeFormat}/>
-                        </div>
-                    </div>
-                    <div className="row last">
-                        <div className="label">
-                            <div>MINUTES FORMAT</div>
-                        </div>
-                        <div className="input">
-                            <input type="text" readOnly={!this.state.edit}
-                                   onChange={this.onChange.bind(this, "minuteFormat")}
-                                   value={this.state.config.minuteFormat}/>
-                        </div>
-                    </div>
-                    <div className="category">
-                        <div><i className="fa fa-star" aria-hidden="true"></i> XLOG CONFIGURATION</div>
-                    </div>
-                    <div className="row ">
-                        <div className="label">
-                            <div>DOT SIZE (NORMAL)</div>
-                        </div>
-                        <div className="input xlog-size">
-                            <div className="xlog-label">ROWS</div>
-                            <select value={this.state.config.xlog.normal.rows} onChange={this.onXLogSizeChange.bind(this, "normal", "rows")} disabled={!this.state.edit}>
-                                <option>3</option><option>4</option><option>5</option><option>6</option><option>7</option><option>8</option>
-                            </select>
-                            <div className="xlog-label second">COLUMNS</div>
-                            <select value={this.state.config.xlog.normal.columns} onChange={this.onXLogSizeChange.bind(this, "normal", "columns")} disabled={!this.state.edit}>
-                                <option>3</option><option>4</option><option>5</option><option>6</option><option>7</option><option>8</option>
-                            </select>
-                        </div>
-                    </div>
-                    <div className="row ">
-                        <div className="label">
-                            <div>DOT SIZE (ERROR)</div>
-                        </div>
-                        <div className="input xlog-size">
-                            <div className="xlog-label">ROWS</div>
-                            <select value={this.state.config.xlog.error.rows} onChange={this.onXLogSizeChange.bind(this, "error", "rows")} disabled={!this.state.edit}>
-                                <option>3</option><option>4</option><option>5</option><option>6</option><option>7</option><option>8</option>
-                            </select>
-                            <div className="xlog-label second">COLUMNS</div>
-                            <select value={this.state.config.xlog.error.columns} onChange={this.onXLogSizeChange.bind(this, "error", "columns")} disabled={!this.state.edit}>
-                                <option>3</option><option>4</option><option>5</option><option>6</option><option>7</option><option>8</option>
-                            </select>
-                        </div>
-                    </div>
-                    <div className="row">
-                        <div className="label">
-                            <div>XLOG DOT (NORMAL)</div>
-                        </div>
-                        <div className="input">
-                            <div className="xlog-dot-config">
-                                <div className="xlog-dot-config-left" style={{width : ((this.state.config.xlog.normal.columns * 20) + 20) + "px"}}>
-                                    <div className="xlog-normal-dot">
-                                        {normalDotSetting.map((d, i) => {
-                                            return <div key={i} className={"xlog-dot-rows " + ((normalDotSetting.length - 1) === i ? 'last' : '')}>
-                                                {d.columns.map((c, j) => {
-                                                    let cellId = "D_" + i + "_" + j;
-                                                    let fill = this.state.config.xlog.normal.fills[cellId];
-                                                    let color = "transparent";
-                                                    if (fill) {
-                                                        color = fill.color;
-                                                    }
-                                                    let selected = (this.state.selected["normal"].cellId === cellId);
-                                                    return <div key={j} onClick={this.selectXLogCell.bind(null, "normal", cellId)} className={"xlog-dot-columns " + (selected ? 'selected ' : ' ') + (((d.columns.length - 1) === j) ? 'last ' : ' ')} style={{backgroundColor: color}}></div>
-                                                })}
-                                            </div>
-                                        })}
-                                    </div>
-                                </div>
-                                <div className="xlog-config-controller">
-                                    <CompactPicker colors={colors} color={ this.state.selected.normal.color } onChange={this.normalColorChange}/>
-                                    <div className="disabled-wrapper"></div>
-                                </div>
+                        <div className="row">
+                            <div className="label">
+                                <div>INTERVAL</div>
+                            </div>
+                            <div className="input">
+                                <input type="text" readOnly={!this.state.edit}
+                                       onChange={this.onChange.bind(this, "interval")} value={this.state.config.interval}/>
                             </div>
                         </div>
                     </div>
-                    <div className="row">
-                        <div className="label">
-                            <div>XLOG DOT (ERROR)</div>
+                    <div className="category">
+                        <div>DATA FORMAT CONFIGURATION</div>
+                    </div>
+                    <div className="setting-box">
+                        <div className="row">
+                            <div className="label">
+                                <div>NUMBER FORMAT</div>
+                            </div>
+                            <div className="input">
+                                <input type="text" readOnly={!this.state.edit}
+                                       onChange={this.onChange.bind(this, "numberFormat")}
+                                       value={this.state.config.numberFormat}/>
+                            </div>
                         </div>
-                        <div className="input">
-                            <div className="xlog-dot-config">
-                                <div className="xlog-dot-config-left" style={{width : ((this.state.config.xlog.error.columns * 20) + 20) + "px"}}>
-                                    <div className="xlog-normal-dot">
-                                        {errorDotSetting.map((d, i) => {
-                                            return <div key={i} className={"xlog-dot-rows " + ((errorDotSetting.length - 1) === i ? 'last' : '')}>
-                                                {d.columns.map((c, j) => {
-                                                    let cellId = "D_" + i + "_" + j;
-                                                    let fill = this.state.config.xlog.error.fills[cellId];
-                                                    let color = "transparent";
-                                                    if (fill) {
-                                                        color = fill.color;
-                                                    }
-                                                    let selected = (this.state.selected["error"].cellId === cellId);
-                                                    return <div key={j} onClick={this.selectXLogCell.bind(null, "error", cellId)} className={"xlog-dot-columns " + (selected ? 'selected ' : ' ') + (((d.columns.length - 1) === j) ? 'last ' : ' ')} style={{backgroundColor: color}}></div>
-                                                })}
-                                            </div>
-                                        })}
+                        <div className="row">
+                            <div className="label">
+                                <div>DATE FORMAT</div>
+                            </div>
+                            <div className="input">
+                                <input type="text" readOnly={!this.state.edit}
+                                       onChange={this.onChange.bind(this, "dateFormat")}
+                                       value={this.state.config.dateFormat}/>
+                            </div>
+                        </div>
+                        <div className="row ">
+                            <div className="label">
+                                <div>TIME FORMAT</div>
+                            </div>
+                            <div className="input">
+                                <input type="text" readOnly={!this.state.edit}
+                                       onChange={this.onChange.bind(this, "timeFormat")}
+                                       value={this.state.config.timeFormat}/>
+                            </div>
+                        </div>
+                        <div className="row last">
+                            <div className="label">
+                                <div>MINUTES FORMAT</div>
+                            </div>
+                            <div className="input">
+                                <input type="text" readOnly={!this.state.edit}
+                                       onChange={this.onChange.bind(this, "minuteFormat")}
+                                       value={this.state.config.minuteFormat}/>
+                            </div>
+                        </div>
+                    </div>
+                    <div className="category">
+                        <div>XLOG CONFIGURATION</div>
+                    </div>
+                    <div className="setting-box">
+                        <div className="row ">
+                            <div className="label">
+                                <div>DOT SIZE (NORMAL)</div>
+                            </div>
+                            <div className="input xlog-size">
+                                <div className="xlog-label">ROWS</div>
+                                <select value={this.state.config.xlog.normal.rows} onChange={this.onXLogSizeChange.bind(this, "normal", "rows")} disabled={!this.state.edit}>
+                                    <option>3</option><option>4</option><option>5</option><option>6</option><option>7</option><option>8</option>
+                                </select>
+                                <div className="xlog-label second">COLUMNS</div>
+                                <select value={this.state.config.xlog.normal.columns} onChange={this.onXLogSizeChange.bind(this, "normal", "columns")} disabled={!this.state.edit}>
+                                    <option>3</option><option>4</option><option>5</option><option>6</option><option>7</option><option>8</option>
+                                </select>
+                            </div>
+                        </div>
+                        <div className="row ">
+                            <div className="label">
+                                <div>DOT SIZE (ERROR)</div>
+                            </div>
+                            <div className="input xlog-size">
+                                <div className="xlog-label">ROWS</div>
+                                <select value={this.state.config.xlog.error.rows} onChange={this.onXLogSizeChange.bind(this, "error", "rows")} disabled={!this.state.edit}>
+                                    <option>3</option><option>4</option><option>5</option><option>6</option><option>7</option><option>8</option>
+                                </select>
+                                <div className="xlog-label second">COLUMNS</div>
+                                <select value={this.state.config.xlog.error.columns} onChange={this.onXLogSizeChange.bind(this, "error", "columns")} disabled={!this.state.edit}>
+                                    <option>3</option><option>4</option><option>5</option><option>6</option><option>7</option><option>8</option>
+                                </select>
+                            </div>
+                        </div>
+                        <div className="row">
+                            <div className="label">
+                                <div>XLOG DOT (NORMAL)</div>
+                            </div>
+                            <div className="input">
+                                <div className="xlog-dot-config">
+                                    <div className="xlog-dot-config-left" style={{width : ((this.state.config.xlog.normal.columns * 20) + 20) + "px"}}>
+                                        <div className="xlog-normal-dot">
+                                            {normalDotSetting.map((d, i) => {
+                                                return <div key={i} className={"xlog-dot-rows " + ((normalDotSetting.length - 1) === i ? 'last' : '')}>
+                                                    {d.columns.map((c, j) => {
+                                                        let cellId = "D_" + i + "_" + j;
+                                                        let fill = this.state.config.xlog.normal.fills[cellId];
+                                                        let color = "transparent";
+                                                        if (fill) {
+                                                            color = fill.color;
+                                                        }
+                                                        let selected = (this.state.selected["normal"].cellId === cellId);
+                                                        return <div key={j} onClick={this.selectXLogCell.bind(null, "normal", cellId)} className={"xlog-dot-columns " + (selected ? 'selected ' : ' ') + (((d.columns.length - 1) === j) ? 'last ' : ' ')} style={{backgroundColor: color}}></div>
+                                                    })}
+                                                </div>
+                                            })}
+                                        </div>
+                                    </div>
+                                    <div className="xlog-config-controller">
+                                        <CompactPicker colors={colors} color={ this.state.selected.normal.color } onChange={this.normalColorChange}/>
+                                        <div className="disabled-wrapper"></div>
                                     </div>
                                 </div>
-                                <div className="xlog-config-controller">
-                                    <CompactPicker colors={colors} color={ this.state.selected.error.color } onChange={this.errorColorChange}/>
-                                    <div className="disabled-wrapper"></div>
-                                </div>
                             </div>
+                        </div>
+                        <div className="row">
+                            <div className="label">
+                                <div>XLOG DOT (ERROR)</div>
+                            </div>
+                            <div className="input">
+                                <div className="xlog-dot-config">
+                                    <div className="xlog-dot-config-left" style={{width : ((this.state.config.xlog.error.columns * 20) + 20) + "px"}}>
+                                        <div className="xlog-normal-dot">
+                                            {errorDotSetting.map((d, i) => {
+                                                return <div key={i} className={"xlog-dot-rows " + ((errorDotSetting.length - 1) === i ? 'last' : '')}>
+                                                    {d.columns.map((c, j) => {
+                                                        let cellId = "D_" + i + "_" + j;
+                                                        let fill = this.state.config.xlog.error.fills[cellId];
+                                                        let color = "transparent";
+                                                        if (fill) {
+                                                            color = fill.color;
+                                                        }
+                                                        let selected = (this.state.selected["error"].cellId === cellId);
+                                                        return <div key={j} onClick={this.selectXLogCell.bind(null, "error", cellId)} className={"xlog-dot-columns " + (selected ? 'selected ' : ' ') + (((d.columns.length - 1) === j) ? 'last ' : ' ')} style={{backgroundColor: color}}></div>
+                                                    })}
+                                                </div>
+                                            })}
+                                        </div>
+                                    </div>
+                                    <div className="xlog-config-controller">
+                                        <CompactPicker colors={colors} color={ this.state.selected.error.color } onChange={this.errorColorChange}/>
+                                        <div className="disabled-wrapper"></div>
+                                    </div>
+                                </div>
 
+                            </div>
                         </div>
                     </div>
                 </div>

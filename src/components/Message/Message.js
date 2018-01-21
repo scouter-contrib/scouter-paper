@@ -45,13 +45,11 @@ class Message extends Component {
 
     render() {
 
-
-        let category = "";
         let title = "";
         let content = "";
 
         if (this.props.messages && this.props.messages.length > 0) {
-            category = this.props.messages[this.state.index].category;
+
             title = this.props.messages[this.state.index].title;
             content = this.props.messages[this.state.index].content;
         }
@@ -60,7 +58,6 @@ class Message extends Component {
         return (
                 <div className="system-message">
                     <div className="message-content-layout the-thing">
-                        <div className={"message-category " + category}><span><i className="fa fa-info-circle" aria-hidden="true"></i></span></div>
                         {(this.props.messages && this.props.messages.length <= 1) && <div className={"message-indexer-holder"}></div>}
                         {(this.props.messages && this.props.messages.length > 1) && <div className={"message-indexer"}><span>{(this.state.index) + 1}/{this.props.messages.length}</span></div>}
                         <div className="message-content">
@@ -73,7 +70,7 @@ class Message extends Component {
                         </div>
                     </div>
                     <div className="message-btns">
-                        <button className="btn" onClick={this.done}>확인</button>
+                        <button onClick={this.done}>OK</button>
                     </div>
                 </div>
 

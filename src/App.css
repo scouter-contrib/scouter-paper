@@ -5,5 +5,40 @@ html, body {
     font-size: 12px;
     -webkit-transition: background-color 2s; /* Safari */
     transition: background-color 2s;
-    color : #333;
+    color: #333;
+    font-family: 'Bungee';
+    line-height: 100%;
+}
+
+.hidden {
+    display: none;
+}
+
+input,
+select,
+button {
+    font-family: 'Bungee';
+    font-size: 12px;
+}
+
+select {
+    border-radius: 3px;
+}
+
+button {
+    padding: 0;
+    line-height: 100%;
+    padding: 8px 10px;
+    background-color: #FFD700;
+    border : none;
+    color: #333;
+    cursor: pointer;
+    margin: 0 2px;
+    outline: none;
+    border-radius: 1px;
+}
+
+button:hover {
+    background-color: rgba(0,0,0,0.6);
+    background-color: #EEC900;
 }

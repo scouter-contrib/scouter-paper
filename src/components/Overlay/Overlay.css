@@ -9,6 +9,7 @@
     height: 100%;
     box-sizing: border-box;
     display: table;
+    z-index: 10;
 }
 
 .overlay.false {

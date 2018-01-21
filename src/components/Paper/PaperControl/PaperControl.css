@@ -6,6 +6,7 @@
     background-color: rgba(0, 0, 0, 0.1);
     border-radius: 5px;
     height: 32px;
+    box-sizing: border-box;
 }
 
 .papers-controls .paper-control-separator {
@@ -54,10 +55,6 @@
     font-size: 8px;
     line-height: 0;
     position: relative;
-    top : -3px;
-
-
-
-
+    top: -3px;
 
 }
