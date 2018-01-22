@@ -8,7 +8,7 @@ class XLog extends Component {
 
     graph = {
         margin: {
-            top: 24, right: 20, bottom: 24, left: 40
+            top: 24, right: 20, bottom: 30, left: 40
         },
         x: null,
         y: null,
@@ -353,7 +353,7 @@ class XLog extends Component {
 
     render() {
         return (
-            <div className="xlog-viewer" ref="xlogViewer" onMouseDown={this.stopProgation}>
+            <div className="xlog-viewer" ref="xlogViewer" onTouchStart={this.stopProgation} onMouseDown={this.stopProgation}>
                 <div></div>
                 <div className="axis-button axis-up" onClick={this.axisUp} onMouseDown={this.stopProgation}><i className="fa fa-angle-up" aria-hidden="true"></i></div>
                 <div className="axis-button axis-down" onClick={this.axisDown} onMouseDown={this.stopProgation}><i className="fa fa-angle-down" aria-hidden="true"></i></div>
