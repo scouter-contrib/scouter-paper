@@ -4,145 +4,9 @@ import {addRequest} from '../../../../actions';
 import {withRouter} from 'react-router-dom';
 import {connect} from 'react-redux';
 import jQuery from "jquery";
-import {getHttpProtocol} from '../../../../common/common';
-
-const layout = [
-    {
-        key: "objName",
-        name: "INSTANCE"
-    },
-    {
-        key: "service",
-        name: "SERVICE"
-    },
-    {
-        key: "endTime",
-        name: "END TIME",
-        type : "date"
-    },
-    {
-        key: "elapsed",
-        name: "ELAPSED",
-        type : "ms"
-    },
-
-    /*{
-        key: "txid",
-        name: "TXID"
-    },*/
-    {
-        key: "apicallCount",
-        name: "API CALL COUNT"
-    },
-    {
-        key: "apicallTime",
-        name: "API CALL TIME",
-        type : "ms"
-    },
-    /*{
-        key: "caller",
-        name: "CALLER"
-    },*/
-    /*{
-        key: "city",
-        name: "CITY"
-    },
-    {
-        key: "countryCode",
-        name: "COUNTRY"
-    },*/
-    {
-        key: "cpu",
-        name: "CPU",
-        type : "ms"
-    },
-    /*{
-        key: "desc",
-        name: "DESC"
-    },*/
-    /*{
-        key: "group",
-        name: "GROUP"
-    },*/
-    /*{
-        key: "gxid",
-        name: "GXID"
-    },*/
-    /*{
-        key: "hasDump",
-        name: "HAS DUMP"
-    },*/
-    {
-        key: "ipaddr",
-        name: "IP ADDRESS"
-    },
-    {
-        key: "kbytes",
-        name: "KBYTES"
-    },
-    {
-        key: "login",
-        name: "LOGIN"
-    },
-    /*{
-        key: "objHash",
-        name: "OBJHASH"
-    },*/
-    {
-        key: "queuingTime",
-        name: "QUEUING TIME",
-        type : "ms"
-    },
-    {
-        key: "referrer",
-        name: "REFERRER"
-    },
-    {
-        key: "sqlTime",
-        name: "SQL TIME",
-        type : "ms"
-    },
-    /*{
-        key: "text1",
-        name: "TEXT1"
-    },
-    {
-        key: "text2",
-        name: "TEXT2"
-    },
-    {
-        key: "text3",
-        name: "TEXT3"
-    },
-    {
-        key: "text4",
-        name: "TEXT4"
-    },
-    {
-        key: "text5",
-        name: "TEXT5"
-    },*/
-    /*{
-        key: "threadNameHash",
-        name: "THREAD NAME HASH"
-    },
-    {
-        key: "userAgent",
-        name: "USER AGENT"
-    },*/
-    /*{
-        key: "userid",
-        name: "USERID"
-    },
-    {
-        key: "xtype",
-        name: "XTYPE"
-    }*/
-    {
-        key: "error",
-        name: "ERROR"
-    },
-];
+import {getDate, getHttpProtocol} from '../../../../common/common';
+import SingleProfile from "./SingleProfile/SingleProfile";
+import ProfileList from "./ProfileList/ProfileList";
 
 class Profiler extends Component {
 
@@ -156,7 +20,11 @@ class Profiler extends Component {
             txid : null,
             enter : false,
             profile : null,
-            steps : null
+            steps : null,
+            summary : true,
+            bind : false,
+            wrap : true,
+            gap : true
         }
     }
 
@@ -185,6 +53,26 @@ class Profiler extends Component {
             return true;
         }
 
+        if (JSON.stringify(nextState.steps) !== JSON.stringify(this.state.steps)) {
+            return true;
+        }
+
+        if (nextState.summary !== this.state.summary) {
+            return true;
+        }
+
+        if (nextState.bind !== this.state.bind) {
+            return true;
+        }
+
+        if (nextState.wrap !== this.state.wrap) {
+            return true;
+        }
+
+        if (nextState.gap !== this.state.gap) {
+            return true;
+        }
+
         return false;
     }
 
@@ -205,33 +93,11 @@ class Profiler extends Component {
         }
     }
 
-    getYYYYMMDD (date) {
-        var mm = date.getMonth() + 1; // getMonth() is zero-based
-        var dd = date.getDate();
 
-        return [date.getFullYear(),
-            (mm>9 ? '' : '0') + mm,
-            (dd>9 ? '' : '0') + dd
-        ].join('');
-    }
-
-    getDate (date) {
-        var mm = date.getMonth() + 1; // getMonth() is zero-based
-        var dd = date.getDate();
-
-        let yyyymmdd = [date.getFullYear(),
-            (mm>9 ? '' : '0') + mm,
-            (dd>9 ? '' : '0') + dd
-        ].join('-');
-
-        let hhmmss  = [date.getHours(), date.getMinutes(), date.getSeconds()].join(':');
-
-        return yyyymmdd + ' ' + hhmmss + "." + (date.getMilliseconds() < 100 ? date.getMilliseconds() * 10 : date.getMilliseconds());
-    }
 
     getList = (x1, x2, y1, y2) => {
 
-        let date = this.getYYYYMMDD(new Date(x1));
+        let date = getDate(new Date(x1), 1);
 
         this.props.addRequest();
         jQuery.ajax({
@@ -274,29 +140,16 @@ class Profiler extends Component {
     close = () => {
         console.log(1);
         this.setState({
-            show: false
+            show: false,
+            xlogs: [],
+            last: null,
+            txid : null,
+            enter : false,
+            profile : null,
+            steps : null
         });
     };
 
-    getRow = (row, i) => {
-        return layout.map((meta, j) => {
-            let className = meta.key ;
-            if (meta.type === "ms") {
-                return <span className={className} key={j}>{row[meta.key]} ms</span>
-            } if (meta.type === "date") {
-                return <span className={className} key={j}>{this.getDate(new Date(Number(row[meta.key])))}</span>
-            }else {
-                return <span className={className} key={j}>{row[meta.key]}</span>
-            }
-
-        });
-    };
-
-    getHeader = () => {
-        return layout.map((meta, j) => {
-            return <span key={j}>{meta.name}</span>
-        });
-    };
 
     rowClick = (xlog) => {
         if (this.state.txid === xlog.txid) {
@@ -316,7 +169,7 @@ class Profiler extends Component {
         jQuery.ajax({
             method: "GET",
             async: true,
-            url: getHttpProtocol(this.props.config) + '/scouter/v1/xlog-data/' + this.getYYYYMMDD(new Date(Number(xlog.endTime))) + "/" + xlog.txid
+            url: getHttpProtocol(this.props.config) + '/scouter/v1/xlog-data/' + getDate(new Date(Number(xlog.endTime)), 1) + "/" + xlog.txid
         }).done((msg) => {
             this.setState({
                 profile : msg.result
@@ -330,7 +183,7 @@ class Profiler extends Component {
         jQuery.ajax({
             method: "GET",
             async: true,
-            url: getHttpProtocol(this.props.config) + '/scouter/v1/profile-data/' + this.getYYYYMMDD(new Date(Number(xlog.endTime))) + "/" + xlog.txid
+            url: getHttpProtocol(this.props.config) + '/scouter/v1/profile-data/' + getDate(new Date(Number(xlog.endTime)), 1) + "/" + xlog.txid
         }).done((msg) => {
             this.setState({
                 steps : msg.result
@@ -355,6 +208,32 @@ class Profiler extends Component {
         });
     };
 
+    toggleSummary = () => {
+        this.setState({
+            summary : !this.state.summary
+        });
+    };
+
+    toggleBind = () => {
+        this.setState({
+            bind : !this.state.bind
+        });
+    };
+
+
+    toggleWrap = () => {
+        this.setState({
+            wrap : !this.state.wrap
+        });
+    };
+
+    toggleGap = () => {
+        this.setState({
+            gap : !this.state.gap
+        });
+    };
+
+
 
 
     render() {
@@ -363,43 +242,22 @@ class Profiler extends Component {
             selectRow = false;
         }
 
-
-        var profiles = null;
-        if (this.state.profile) {
-            profiles = Object.keys(this.state.profile).map((key) => { return {key: key, value : this.state.profile[key]} });
-        }
-
-        console.log(this.state.steps);
         return (
             <div className={"xlog-profiler " + (this.state.show ? ' ' : 'hidden ' ) + (selectRow ? 'select-row' : '')}>
-                <div onClick={this.close} className="close-btn"></div>
                 <div className="profile-list scrollbar" onMouseEnter={this.mouseListEnter} onMouseLeave={this.mouseListLeave}>
-                    <div className="xlog-list">
-                        <div className="row header">{this.getHeader()}</div>
-                        {this.state.xlogs.map((xlog, i) => {
-                            let rowClass = (xlog.error ? 'error' : '');
-                            return <div onClick={this.rowClick.bind(this, xlog)} key={i} className={"row " + rowClass + ' ' + (this.state.txid === xlog.txid ? 'active' : '')}>{this.getRow(xlog, i)}</div>;
-                        })}
-                    </div>
+                    <ProfileList txid={this.state.txid} xlogs={this.state.xlogs} rowClick={this.rowClick} />
                 </div>
-                <div className={"profile-steps scrollbar "+ (selectRow ? 'select-row' : '')}>
-                    <div className="xlog-data">
-                    {profiles && profiles.map((data, i) => {
-                        return <div key={i}>
-                            <span className="label">{data.key}</span>
-                            <span className="data">{data.value}</span>
-                        </div>
-                    })}
+                <div className={"profile-steps "+ (selectRow ? 'select-row' : '')}>
+                    <div className="profile-steps-control">
+                        <div className={"profile-control-btn " + (this.state.summary ? 'active' : '')} onClick={this.toggleSummary}>SUMMARY</div>
+                        <div className={"profile-control-btn " + (this.state.bind ? 'active' : '')} onClick={this.toggleBind}>BIND</div>
+                        <div className={"profile-control-btn " + (this.state.wrap ? 'active' : '')} onClick={this.toggleWrap}>WRAP</div>
+                        <div className={"profile-control-btn " + (this.state.gap ? 'active' : '')} onClick={this.toggleGap}>GAP</div>
+                        <div onClick={this.close} className="close-btn"></div>
                     </div>
-                    <div className="line"></div>
-                    <div className="xlog-steps">
-                    {this.state.steps && this.state.steps.map((step, i) => {
-                        return <div key={i}>
-                            <span className="data">{step.mainValue}</span>
-                        </div>
-                    })}
+                    <div className="profile-steps-content scrollbar">
+                        <SingleProfile txid={this.state.txid} profile={this.state.profile} steps={this.state.steps} summary={this.state.summary} bind={this.state.bind} wrap={this.state.wrap} gap={this.state.gap} />
                     </div>
-
                 </div>
             </div>
         );

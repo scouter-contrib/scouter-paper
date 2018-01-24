@@ -1,0 +1,100 @@
+.single-profile {
+    padding: 10px;
+}
+
+.single-profile div.xlog-data > div {
+    white-space: nowrap;
+}
+
+.single-profile div.xlog-data span {
+    padding: 2px 4px;
+    display: inline-block;
+    box-sizing: border-box;
+    margin-bottom: 2px;
+}
+
+.single-profile div.xlog-data span.label {
+    width: 75px;
+    background-color: #EEE;
+}
+
+.single-profile .xlog-steps {
+
+}
+
+.single-profile .line {
+    height: 5px;
+    margin: 0;
+    width: 100%;
+}
+
+.xlog-steps .step-div {
+
+}
+
+.xlog-steps .step {
+    padding: 0;
+    _border-top: 1px solid #CCC;
+    _border-bottom: 1px solid #CCC;
+    margin: 5px 0;
+}
+
+.xlog-steps .general {
+    background-color: #EEE;
+    padding: 4px 0;
+}
+
+.xlog-steps .general span {
+    display: inline-block;
+    padding: 2px 4px;
+    box-sizing: border-box;
+    line-height: 100%;
+}
+
+.xlog-steps .general .index {
+    width: 40px;
+    padding: 2px 0 2px 2px;
+}
+
+.xlog-steps .general .elapsed {
+    width: 50px;
+    text-align: right;
+}
+
+.xlog-steps .general .type {
+
+}
+
+.xlog-steps .sql .sql-statement {
+    padding: 2px 0;
+}
+
+.xlog-steps .sql .sql-param {
+    margin-top: 5px;
+}
+
+.xlog-steps .hashed-message {
+    padding: 5px;
+}
+
+.xlog-steps .step {
+    white-space: nowrap;
+    text-align: justify;
+}
+
+.xlog-steps.wrap .step {
+    white-space: normal;
+    word-break: break-all;
+}
+
+.xlog-steps .others {
+
+}
+
+.xlog-steps .gap-time {
+    text-align: center;
+}
+
+.xlog-steps .gap-time .arrow {
+    font-size: 12px;
+}

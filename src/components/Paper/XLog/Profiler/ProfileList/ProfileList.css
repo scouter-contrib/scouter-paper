@@ -1,0 +1,56 @@
+.xlog-profile-list {
+    width: 100%;
+    display: table;
+    text-align: left;
+}
+
+.xlog-profile-list > div.row {
+    display: table-row;
+    cursor: pointer;
+}
+
+.xlog-profile-list > div.row.error {
+    color : #FF030D;
+}
+
+.xlog-profile-list > div.row.active {
+    background-color: #1b6d85;
+    background-color: #26466d;
+    color: white;
+}
+
+.xlog-profile-list > div.row.error.active {
+    color : #FF030D;
+}
+
+.xlog-profile-list > div:hover {
+    background-color: rgba(0, 0, 0, 0.1);
+}
+
+.xlog-profile-list > div.header.row {
+    background-color: #DDD;
+}
+
+.xlog-profile-list > div:first-child > span {
+    border-top: 1px solid #CCC;
+}
+
+.xlog-profile-list > div > span {
+    display: table-cell;
+    line-height: 100%;
+    vertical-align: middle;
+    white-space: nowrap;
+    padding: 4px;
+    border-bottom: 1px solid #CCC;
+}
+.xlog-profile-list > div > span.apicallCount,
+.xlog-profile-list > div > span.apicallTime,
+.xlog-profile-list > div > span.elapsed,
+.xlog-profile-list > div > span.cpu,
+.xlog-profile-list > div > span.queuingTime,
+.xlog-profile-list > div > span.sqlTime {
+    text-align: right;
+}
+
+
+
