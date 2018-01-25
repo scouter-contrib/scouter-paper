@@ -9,6 +9,30 @@
     box-sizing: border-box;
 }
 
+.papers-controls.fixed-control {
+    position: fixed;
+    top : 0;
+    width: 100%;
+    width: calc(100% + 7px);
+    z-index: 10;
+    background-color: #207ce5;
+    margin: 0;
+    border-radius: 0;
+    border-bottom: 1px solid rgba(0,0,0,0.4);
+
+
+
+
+
+
+
+
+
+
+
+
+}
+
 .papers-controls .paper-control-separator {
     width: 2px;
     height: 14px;

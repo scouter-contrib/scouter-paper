@@ -49,7 +49,8 @@ class Paper extends Component {
                 range: range,
                 maxElapsed: 2000,
                 lastRequestTime : null
-            }
+            },
+            fixedControl : false
         };
     }
 
@@ -61,12 +62,27 @@ class Paper extends Component {
         setTimeout(() => {
             window.dispatchEvent(new Event('resize'));
         }, 1000);
+
+        document.addEventListener("scroll", this.scroll.bind(this));
     }
 
     componentWillUnmount() {
         clearInterval(this.dataRefreshTimer);
         this.dataRefreshTimer = null;
+        document.removeEventListener("scroll", this.scroll.bind(this));
     }
+
+    scroll = (e) => {
+        if (document.documentElement.scrollTop > 60) {
+            this.setState({
+                fixedControl : true
+            });
+        } else {
+            this.setState({
+                fixedControl : false
+            });
+        }
+    };
 
     getXLog = () => {
         if (this.props.instances && this.props.instances.length > 0) {
@@ -227,10 +243,20 @@ class Paper extends Component {
         let boxes = this.state.boxes;
         let key = this.getUniqueKey();
 
+        let maxY = 0;
+        let height = 0;
+        for (let i=0; i<boxes.length; i++) {
+            console.log(boxes[i]);
+            if (maxY < boxes[i].layout.y)  {
+                maxY = boxes[i].layout.y;
+                height = boxes[i].layout.h;
+            }
+        }
+
         boxes.push({
             key: key,
             title: "NO TITLE ",
-            layout: {w: 6, h: 4, x: 0, y: 0, minW: 1, minH: 3, i: key},
+            layout: {w: 6, h: 4, x: 0, y: (maxY + height), minW: 1, minH: 3, i: key}
         });
 
 
@@ -390,7 +416,7 @@ class Paper extends Component {
         }
         return (
             <div className="papers">
-                <PaperControl addPaper={this.addPaper} addPaperAndAddMetic={this.addPaperAndAddMetic} clearLayout={this.clearLayout} />
+                <PaperControl addPaper={this.addPaper} addPaperAndAddMetic={this.addPaperAndAddMetic} clearLayout={this.clearLayout} fixedControl={this.state.fixedControl} />
                 <ResponsiveReactGridLayout className="layout" cols={{lg: 12, md: 10, sm: 6, xs: 4, xxs: 2}} layouts={this.state.layouts} rowHeight={30} onLayoutChange={(layout, layouts) => this.onLayoutChange(layout, layouts)}>
                     {this.state.boxes.map((box, i) => {
                         return <div className="box-layout" key={box.key} data-grid={box.layout}>

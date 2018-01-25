@@ -1,6 +1,7 @@
 import React, {Component} from 'react';
 import './SingleProfile.css';
 import {getDate, getHttpProtocol} from '../../../../../common/common';
+import sqlFormatter from "sql-formatter";
 
 const profileMetas = [
     {
@@ -228,8 +229,6 @@ class SingleProfile extends Component {
     }
 
     render() {
-        console.log(this.props.steps);
-
         let startTime;
         if (this.props.profile) {
             startTime = Number(this.props.profile.endTime - this.props.profile.elapsed);
@@ -238,7 +237,7 @@ class SingleProfile extends Component {
         let beforeEndTime;
         return (
             <div className='single-profile'>
-                <div className="xlog-data">
+                <div className={"xlog-data " + (this.props.wrap ? 'wrap' : '')}>
                     {this.props.profile && profileMetas && profileMetas.map((meta, i) => {
                         if (this.props.summary) {
                             if (meta.show) {
@@ -271,6 +270,27 @@ class SingleProfile extends Component {
                             gap = Number(stepStartTime) - Number(beforeEndTime);
                         }
                         beforeEndTime = stepEndTime;
+
+                        let sql = "";
+                        if (row.step.stepType === "16") {
+                            if (this.props.bind) {
+                                let params = row.step.param.split(",");
+                                for (let i=0; i<params.length; i++) {
+                                    params[i] = "<span class='param'>" + params[i] + "</span>";
+                                }
+                                sql = sqlFormatter.format(row.mainValue, {
+                                    params: params,
+                                    indent: "  "
+                                });
+                            } else {
+                                sql = sqlFormatter.format(row.mainValue, {
+                                    indent: "  "
+                                });
+                            }
+
+                            sql = '<span class="prefix">' + row.step.xtypePrefix + '</span>' + sql;
+                        }
+
                         return (
                             <div className="step-div" key={i}>
                                 {(this.props.gap && gap > 0) && <div className="gap-time">
@@ -280,17 +300,26 @@ class SingleProfile extends Component {
                                 </div>}
                                 {row.step.stepType === "9" &&
                                 <div className="step hashed-message">
-                                    {row.mainValue}
+                                    {row.step.time > -1 &&
+                                    <div className="general">
+                                        <span className="index">{this.zeroPadding(row.step.index, 5)}</span>
+                                        <span className="type">MSG</span>
+                                        <span className="start-time">{getDate(new Date(stepStartTime), 2)}</span>
+                                        <span className="elapsed">{row.step.time} ms</span>
+                                        <span className="value">#{row.step.value}</span>
+                                    </div>
+                                    }
+                                    <div className="message-content">{row.mainValue}</div>
                                 </div>}
                                 {row.step.stepType === "16" &&
                                 <div className="step sql">
                                     <div className="general">
                                         <span className="index">{this.zeroPadding(row.step.index, 5)}</span>
-                                        <span className="elapsed">{row.step.elapsed} ms</span>
-                                        <span className="start-time">{getDate(new Date(stepStartTime),2)}</span>
                                         <span className="type">SQL</span>
+                                        <span className="start-time">{getDate(new Date(stepStartTime),2)}</span>
+                                        <span className="elapsed">{row.step.elapsed} ms</span>
                                     </div>
-                                    <div className="sql-statement">{row.step.xtypePrefix} {row.mainValue}</div>
+                                    <div className={"sql-statement " + (this.props.formatter ? 'formatter' : '')} dangerouslySetInnerHTML={{__html: sql}}></div>
                                     <div className="sql-param">[{row.step.param}]</div>
                                 </div>}
                                 {!found &&

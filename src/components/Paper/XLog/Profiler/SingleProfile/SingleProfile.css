@@ -4,6 +4,9 @@
 
 .single-profile div.xlog-data > div {
     white-space: nowrap;
+    display: table;
+    table-layout: fixed;
+    width: 100%;
 }
 
 .single-profile div.xlog-data span {
@@ -11,11 +14,25 @@
     display: inline-block;
     box-sizing: border-box;
     margin-bottom: 2px;
+    display: table-cell;
+}
+
+.single-profile div.xlog-data > div {
+    margin-bottom: 2px;
 }
 
 .single-profile div.xlog-data span.label {
     width: 75px;
     background-color: #EEE;
+}
+
+.single-profile div.xlog-data span.data {
+    white-space: nowrap;
+}
+
+.single-profile div.xlog-data.wrap span.data {
+    white-space: normal;
+    word-break: break-all;
 }
 
 .single-profile .xlog-steps {
@@ -39,42 +56,78 @@
     margin: 5px 0;
 }
 
+/* GENERAL */
 .xlog-steps .general {
     background-color: #EEE;
-    padding: 4px 0;
+    padding: 0;
 }
 
-.xlog-steps .general span {
+.xlog-steps .general >  span {
     display: inline-block;
-    padding: 2px 4px;
+    padding: 4px 4px;
     box-sizing: border-box;
     line-height: 100%;
 }
 
 .xlog-steps .general .index {
-    width: 40px;
-    padding: 2px 0 2px 2px;
-}
-
-.xlog-steps .general .elapsed {
-    width: 50px;
-    text-align: right;
+    width: 60px;
+    padding: 2px 0;
+    text-align: center;
 }
 
 .xlog-steps .general .type {
+    text-align: center;
+    width: 60px;
+    background-color: #DDD;
+}
+
+.xlog-steps .general .start-time {
+    text-align: center;
+    width: 120px;
+}
+
+.xlog-steps .general .elapsed {
+    width: 60px;
+    text-align: right;
+    background-color: #DDD;
+}
+
+.xlog-steps .general .value {
+    width: 60px;
+    text-align: right;
+}
+
+/* SQL */
+.xlog-steps .sql .sql-statement {
+    padding: 5px;
+}
+
+.xlog-steps .sql .sql-statement .prefix {
+    color: darkgreen;
+}
+
+.xlog-steps .sql .sql-statement .param {
+    color: #207ce5;
+
+
 
 }
 
-.xlog-steps .sql .sql-statement {
-    padding: 2px 0;
+.xlog-steps .sql .sql-statement.formatter {
+    white-space: pre;
 }
 
 .xlog-steps .sql .sql-param {
-    margin-top: 5px;
+    padding: 0 5px 5px;
 }
 
+/* HASHED MESSAGE */
 .xlog-steps .hashed-message {
-    padding: 5px;
+    padding: 5px 0;
+}
+
+.xlog-steps .hashed-message .message-content {
+    padding: 5px 2px;
 }
 
 .xlog-steps .step {

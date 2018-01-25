@@ -128,7 +128,6 @@ class InstanceSelector extends Component {
     componentDidUpdate(prevProps, prevState) {
         if (this.props.visible && prevProps.visible !== this.props.visible) {
             if (!this.state.hosts || this.state.hosts.length < 1) {
-                console.log("get host");
                 this.getHosts();
             }
 

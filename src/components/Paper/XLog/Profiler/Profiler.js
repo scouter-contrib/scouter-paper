@@ -22,10 +22,28 @@ class Profiler extends Component {
             profile : null,
             steps : null,
             summary : true,
-            bind : false,
+            bind : true,
             wrap : true,
-            gap : true
+            gap : true,
+            formatter : true
         }
+    }
+
+    keyDown = (event) => {
+        if (event.keyCode === 27) {
+            this.setState({
+                show: false
+            });
+        }
+    };
+
+    componentWillMount() {
+        document.addEventListener("keydown", this.keyDown.bind(this));
+    }
+
+
+    componentWillUnmount() {
+        document.removeEventListener("keydown", this.keyDown.bind(this));
     }
 
     shouldComponentUpdate(nextProps, nextState) {
@@ -70,6 +88,10 @@ class Profiler extends Component {
         }
 
         if (nextState.gap !== this.state.gap) {
+            return true;
+        }
+
+        if (nextState.formatter !== this.state.formatter) {
             return true;
         }
 
@@ -125,11 +147,18 @@ class Profiler extends Component {
                     }
                 }
 
-                this.setState({
-                    show: true,
-                    xlogs: xlogs,
-                    last: (new Date()).getTime()
-                });
+                if (xlogs && xlogs.length > 0) {
+                    this.setState({
+                        show: true,
+                        xlogs: xlogs,
+                        last: (new Date()).getTime()
+                    });
+                } else {
+                    this.setState({
+                        show: false
+                    });
+                }
+
             }
 
         }).fail((jqXHR, textStatus) => {
@@ -138,7 +167,6 @@ class Profiler extends Component {
     };
 
     close = () => {
-        console.log(1);
         this.setState({
             show: false,
             xlogs: [],
@@ -233,8 +261,11 @@ class Profiler extends Component {
         });
     };
 
-
-
+    toggleFormatter = () => {
+        this.setState({
+            formatter : !this.state.formatter
+        });
+    };
 
     render() {
         let selectRow = (this.state.txid ? true : false);
@@ -253,10 +284,11 @@ class Profiler extends Component {
                         <div className={"profile-control-btn " + (this.state.bind ? 'active' : '')} onClick={this.toggleBind}>BIND</div>
                         <div className={"profile-control-btn " + (this.state.wrap ? 'active' : '')} onClick={this.toggleWrap}>WRAP</div>
                         <div className={"profile-control-btn " + (this.state.gap ? 'active' : '')} onClick={this.toggleGap}>GAP</div>
+                        <div className={"profile-control-btn " + (this.state.formatter ? 'active' : '')} onClick={this.toggleFormatter}>FORMATTER</div>
                         <div onClick={this.close} className="close-btn"></div>
                     </div>
                     <div className="profile-steps-content scrollbar">
-                        <SingleProfile txid={this.state.txid} profile={this.state.profile} steps={this.state.steps} summary={this.state.summary} bind={this.state.bind} wrap={this.state.wrap} gap={this.state.gap} />
+                        <SingleProfile txid={this.state.txid} profile={this.state.profile} steps={this.state.steps} summary={this.state.summary} bind={this.state.bind} wrap={this.state.wrap} gap={this.state.gap} formatter={this.state.formatter} />
                     </div>
                 </div>
             </div>
