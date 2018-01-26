@@ -39,7 +39,7 @@ class PaperControl extends Component {
                         </Draggable>
                         }
                         {this.touch &&
-                        <div onClick={this.props.addPaperAndAddMetic.bind(this, JSON.stringify(this.options[name]))}>
+                        <div onClick={this.props.addPaperAndAddMetric.bind(this, JSON.stringify(this.options[name]))}>
                             {this.options[name].icon && <i className={"fa " + this.options[name].icon} aria-hidden="true"></i>}
                             {this.options[name].text && <span className="text-icon">{this.options[name].text}</span>}
                         </div>

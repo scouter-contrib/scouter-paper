@@ -39,6 +39,7 @@
     "react": "^16.2.0",
     "react-addons-css-transition-group": "^15.6.2",
     "react-color": "^2.13.8",
+    "react-d3-basic": "^1.6.11",
     "react-dev-utils": "^4.2.1",
     "react-dnd": "^2.5.4",
     "react-dnd-html5-backend": "^2.5.4",

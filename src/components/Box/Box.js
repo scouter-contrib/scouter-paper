@@ -3,6 +3,7 @@ import './Box.css';
 import {Droppable} from 'react-drag-and-drop'
 import {EmptyBox, ClockBox, XLogBar} from "../../components";
 import XLog from "../Paper/XLog/XLog";
+import Visitor from "../Paper/Visitor/Visitor";
 
 class Box extends Component {
 
@@ -30,7 +31,6 @@ class Box extends Component {
             }
         }
 
-        //console.log(this.props.data);
         return (
             <Droppable className="box-droppable" types={['metric']} onDrop={this.onDrop.bind(this)}>
                 <div className="box">
@@ -41,6 +41,7 @@ class Box extends Component {
                             {type === "clock" && <ClockBox box={this.props.box} />}
                             {type === "xlogBar" && <XLogBar box={this.props.box} data={this.props.data} />}
                             {type === "xlog" && <XLog box={this.props.box} data={this.props.data} config={this.props.config} />}
+                            {type === "visitor" && <Visitor visitor={this.props.visitor} box={this.props.box} />}
                         </div>
                     </div>
                 </div>

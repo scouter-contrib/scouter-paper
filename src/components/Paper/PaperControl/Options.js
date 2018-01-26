@@ -47,21 +47,37 @@ export function options() {
             icon : "fa-bullseye",
             mode: "exclusive",
             type: "xlog",
-            title: "XLOG",
+            title: "XLOG"
+        },
+        visitor: {
+            icon: "fa-child",
+            mode: "exclusive",
+            type: "visitor",
+            title: "VISITOR",
             config: {
-                count: {
-                    name : 'SHOW COUNT',
+                showNumber: {
+                    name : 'SHOW NUMBER',
                     type: "checkbox",
                     value: false
                 },
-                history: {
-                    name : 'HISTORY COUNT',
-                    type: "selector",
-                    data: [1,2,3,4,5],
-                    value: 1
+                showGraph: {
+                    name : 'SHOW GRAPH',
+                    type: "checkbox",
+                    value: false
+                },
+                range: {
+                    name : 'Range',
+                    type: "input",
+                    value: "60",
+                    tooltip: {
+                        type : "text",
+                        content : "seconds"
+                    }
                 }
             }
         }
+
+
 
     }
 }

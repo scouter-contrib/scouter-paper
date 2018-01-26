@@ -48,7 +48,10 @@ class Paper extends Component {
                 endTime: endTime,
                 range: range,
                 maxElapsed: 2000,
-                lastRequestTime : null
+                lastRequestTime : null,
+                /* visitor */
+                visitor : {
+                }
             },
             fixedControl : false
         };
@@ -57,6 +60,7 @@ class Paper extends Component {
     componentDidMount() {
         this.dataRefreshTimer = setInterval(() => {
             this.getXLog();
+            this.getVisitor()
         }, this.props.config.interval);
 
         setTimeout(() => {
@@ -95,6 +99,29 @@ class Paper extends Component {
                 }))
             }).done((msg) => {
                 this.tick(msg.result);
+            }).fail((jqXHR, textStatus) => {
+                console.log(jqXHR, textStatus);
+            });
+        }
+    };
+
+    getVisitor = () => {
+        if (this.props.instances && this.props.instances.length > 0) {
+            this.props.addRequest();
+            let time = (new Date()).getTime();
+            jQuery.ajax({
+                method: "GET",
+                async: true,
+                url: getHttpProtocol(this.props.config) + '/scouter/v1/visitor/realTime?objHashes=' + JSON.stringify(this.props.instances.map((instance) => {
+                    return Number(instance.objHash);
+                }))
+            }).done((msg) => {
+                this.setState({
+                    visitor : {
+                        time : time,
+                        visitor : msg.result
+                    }
+                });
             }).fail((jqXHR, textStatus) => {
                 console.log(jqXHR, textStatus);
             });
@@ -269,15 +296,13 @@ class Paper extends Component {
         return key;
     };
 
-    addPaperAndAddMetic = (data) => {
+    addPaperAndAddMetric = (data) => {
         let key = this.addPaper();
 
         if (data) {
             let option = JSON.parse(data);
             this.setOption(key, option);
         }
-
-        console.log(data);
     };
 
     removePaper = (key) => {
@@ -416,14 +441,14 @@ class Paper extends Component {
         }
         return (
             <div className="papers">
-                <PaperControl addPaper={this.addPaper} addPaperAndAddMetic={this.addPaperAndAddMetic} clearLayout={this.clearLayout} fixedControl={this.state.fixedControl} />
+                <PaperControl addPaper={this.addPaper} addPaperAndAddMetric={this.addPaperAndAddMetric} clearLayout={this.clearLayout} fixedControl={this.state.fixedControl} />
                 <ResponsiveReactGridLayout className="layout" cols={{lg: 12, md: 10, sm: 6, xs: 4, xxs: 2}} layouts={this.state.layouts} rowHeight={30} onLayoutChange={(layout, layouts) => this.onLayoutChange(layout, layouts)}>
                     {this.state.boxes.map((box, i) => {
                         return <div className="box-layout" key={box.key} data-grid={box.layout}>
                             <button className="box-control box-layout-remove-btn last" onClick={this.removePaper.bind(null, box.key)}><i className="fa fa-times-circle-o" aria-hidden="true"></i></button>
                             {box.option && box.option.config && <button className="box-control box-layout-config-btn" onClick={this.toggleConfig.bind(null, box.key)}><i className="fa fa-cog" aria-hidden="true"></i></button>}
                             {box.config && <BoxConfig box={box} setOptionValues={this.setOptionValues} setOptionClose={this.setOptionClose} />}
-                            <Box setOption={this.setOption} box={box} data={this.state.data} config={this.props.config}/>
+                            <Box setOption={this.setOption} box={box} data={this.state.data} config={this.props.config} visitor={this.state.visitor}/>
                         </div>
                     })}
                 </ResponsiveReactGridLayout>
