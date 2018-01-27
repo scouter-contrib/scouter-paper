@@ -1,9 +1,13 @@
 .box-config {
     position: absolute;
-    height: 100%;
-    width: 100%;
+
     background-color: rgba(0, 0, 0, 0.8);
-    top: 0;
+    background-color: black;
+
+    top: 5px;
+    left: 5px;
+    height: calc(100% - 10px);
+    width: calc(100% - 10px);
     padding: 10px 0;
     font-family: 'Bungee';
     line-height: 0;
@@ -12,13 +16,20 @@
     z-index: 3;
 }
 
+.box-config input,
+.box-config select,
+.box-config button {
+    font-size: 9px;
+    box-sizing: border-box;
+}
+
 .box-config .box-config-content {
     display: table-cell;
     vertical-align: middle;
 }
 
 .box-config .box-config-item {
-    padding: 5px 0 10px;
+    padding: 2px 0 10px;
     width: 50%;
     display: inline-block;
     position: relative;
@@ -39,7 +50,7 @@
 
 .box-config .box-config-item input[type=text],
 .box-config .box-config-item select {
-    width: calc(100% - 110px);
+    width: calc(100% - 120px);
     padding: 0 5px;
     outline: none;
     border-radius: 3px;
@@ -56,12 +67,16 @@
 }
 
 .box-config .box-config-buttons {
-    padding: 15px 10px 0;
+    padding: 0 10px 0;
     text-align: center;
 }
 
+.box-config a {
+    color: white;
+}
+
 .box-config .box-config-buttons button {
-    padding: 12px 15px;
+    padding: 6px 8px;
     border: none;
     background-color: white;
     margin: 0 2px;
@@ -74,15 +89,10 @@
 
 .box-config .config-tooltip {
     color: white;
-    width: 100%;
     line-height: 100%;
     text-align: right;
-    height: 18px;
-    position: absolute;
-    bottom: -10px;
-    right: 10px;
     font-size: 8px;
-    _font-family: 'NanumBarunGothic', sans-serif;
+    padding: 2px 20px;
 }
 
 
