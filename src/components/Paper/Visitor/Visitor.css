@@ -1,9 +1,71 @@
 .visitor {
+    position: relative;
+    text-align: center;
+}
 
+.visitor .axix-y {
+    position: absolute;
+    top: 0;
+    font-size: 10px;
+}
+
+.visitor .axix-y.left {
+    left: 0;
+}
+
+.visitor .axix-y.right {
+    right: 0;
+}
+
+.visitor .axix-y > div {
+    width: 100%;
+    height: 12px;
+}
+
+.visitor .axix-y .top {
+    position: absolute;
+    top: 0;
+}
+
+.visitor .axix-y .middle {
+    position: absolute;
+    top: calc(50% - 6px);
+}
+
+.visitor .axix-y .bottom {
+    position: absolute;
+    bottom: 0;
 }
 
 .line {
     fill: none;
     stroke: steelblue;
     stroke-width: 2px;
+}
+
+.visitor .visitor-numbers {
+    position: absolute;
+    top: 0;
+    left: 0;
+    bottom: 0;
+    width: 100%;
+    height: 100%;
+    font-size: 30px;
+}
+
+.visitor .visitor-numbers.small {
+    font-size: 20px;
+}
+
+.visitor .visitor-numbers > div {
+    display: table;
+    width: 100%;
+    height: 100%;
+}
+
+.visitor .visitor-numbers > div > div {
+    display: table-cell;
+    width: 100%;
+    height: 100%;
+    vertical-align: middle;
 }

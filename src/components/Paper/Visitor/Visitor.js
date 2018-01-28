@@ -8,20 +8,22 @@ class Visitor extends Component {
 
     graph = {
         margin: {
-            top: 30, right: 20, bottom: 30, left: 40
+            top: 30, right: 40, bottom: 30, left: 40
         },
         svg: null,
         width: null,
         height: null,
         x: null,
         y: null,
-        path: null
+        path: null,
+        maxY : null
     };
 
     constructor(props) {
         super(props);
         this.state = {
-            visitors: []
+            visitors: [],
+            small : false
         }
     }
 
@@ -53,28 +55,6 @@ class Visitor extends Component {
                 }
             }
 
-            console.log(visitors.length);
-
-            this.setState({
-                visitors: visitors
-            });
-        }
-    }
-
-    componentDidUpdate = (prevProps, prevState) => {
-        this.resize();
-        this.draw();
-    };
-
-    draw = () => {
-
-        let that = this;
-        if (this.refs.visitor && this.graph.svg) {
-
-            this.graph.x.domain(d3.extent(this.state.visitors, function (d) {
-                return d.time;
-            }));
-
             let maxY = d3.max(this.state.visitors, function (d) {
                 return d.visitor;
             });
@@ -83,23 +63,86 @@ class Visitor extends Component {
                 maxY = 10;
             }
 
-            this.graph.y.domain([0, maxY]);
+            this.setState({
+                visitors: visitors,
+                maxY : maxY
+            });
+
+        }
+
+        let box = this.refs.visitor.parentNode.parentNode.parentNode;
+        if (box.offsetWidth < 300) {
+            if (!this.state.small) {
+                this.setState({
+                    small : true
+                });
+            }
+        } else {
+            if (this.state.small) {
+                this.setState({
+                    small : false
+                });
+            }
+        }
+    }
+
+    componentDidUpdate = (prevProps, prevState) => {
+
+        if (this.props.box.values.showGraph) {
+            this.graphInit();
+        }
+
+        this.graphResize();
+        this.draw();
 
 
-            var valueline = d3.line().curve(d3.curveCardinal)
-                .x(function (d) {
-                    return that.graph.x(d.time);
-                })
-                .y(function (d) {
-                    return that.graph.y(d.visitor);
+    };
+
+    draw = () => {
+        let that = this;
+
+        if (this.props.box.values.showGraph) {
+            if (this.refs.visitor && this.graph.svg) {
+
+                this.graph.x.domain(d3.extent(this.state.visitors, function (d) {
+                    return d.time;
+                }));
+
+                let maxY = d3.max(this.state.visitors, function (d) {
+                    return d.visitor;
                 });
 
-            this.graph.path.selectAll(".line").remove().exit();
-            this.graph.path.data([that.state.visitors]).transition().duration(500).attr("class", "line").attr("d", valueline);
-            this.graph.svg.select(".y-axis").transition().duration(500).call(d3.axisLeft(that.graph.y).ticks(5));
-            this.graph.svg.select(".y-axis").selectAll(".tick line").remove();
-            this.graph.svg.select(".y-axis").selectAll(".domain").remove();
+                if (maxY < 10) {
+                    maxY = 10;
+                }
+
+                this.graph.y.domain([0, maxY]);
+
+                var valueline = d3.line().curve(d3.curveCardinal)
+                    .x(function (d) {
+                        return that.graph.x(d.time);
+                    })
+                    .y(function (d) {
+                        return that.graph.y(d.visitor);
+                    });
+
+                this.graph.path.selectAll(".line").remove().exit();
+                this.graph.path.data([that.state.visitors]).transition().duration(500).attr("class", "line").attr("d", valueline);
+
+
+                /*this.graph.svg.select(".y-axis").transition().duration(500).call(d3.axisLeft(that.graph.y).ticks(5));
+                this.graph.svg.select(".y-axis").selectAll(".tick line").remove();
+                this.graph.svg.select(".y-axis").selectAll(".domain").remove();*/
+            }
+        } else {
+            let svg = d3.select(this.refs.visitor).select("svg");
+            if (svg.size() > 0) {
+                svg.remove();
+            }
         }
+
+
+
     };
 
     componentDidMount() {
@@ -110,10 +153,6 @@ class Visitor extends Component {
         return true;
     }
 
-    resize = () => {
-        this.graphResize();
-    };
-
     graphResize = () => {
         let box = this.refs.visitor.parentNode.parentNode.parentNode;
         if ((box.offsetWidth - this.graph.margin.left - this.graph.margin.right !== this.graph.width) || (this.graph.height !== box.offsetHeight - this.graph.margin.top - this.graph.margin.bottom - 27)) {
@@ -122,6 +161,11 @@ class Visitor extends Component {
     };
 
     graphInit = () => {
+
+        if (!this.props.box.values.showGraph) {
+            return;
+        }
+
         let box = this.refs.visitor.parentNode.parentNode.parentNode;
         this.graph.width = box.offsetWidth - this.graph.margin.left - this.graph.margin.right;
         this.graph.height = box.offsetHeight - this.graph.margin.top - this.graph.margin.bottom - 27;
@@ -152,19 +196,51 @@ class Visitor extends Component {
 
         this.graph.y.domain([0, maxY]);
 
+        if (box.clientHeight < 200) {
+            this.graph.margin.top = 10;
+            this.graph.margin.bottom = 10;
+        } else {
+            this.graph.margin.top = 30;
+            this.graph.margin.bottom = 30;
+        }
 
-        this.graph.svg.append("g").attr("class", "y-axis").call(d3.axisLeft(this.graph.y).ticks(5));
+        if (box.clientWidth < 300) {
+            this.graph.margin.left = 30;
+            this.graph.margin.right = 30;
+        } else {
+            this.graph.margin.left = 40;
+            this.graph.margin.right = 40;
+        }
+
+        /*this.graph.svg.append("g").attr("class", "y-axis").call(d3.axisLeft(this.graph.y).ticks(5));
         this.graph.svg.select(".y-axis").selectAll(".tick line").remove();
-        this.graph.svg.select(".y-axis").selectAll(".domain").remove();
+        this.graph.svg.select(".y-axis").selectAll(".domain").remove();*/
 
     };
 
     render() {
-
-        //console.log(this.props.box);
         return (
             <div className="visitor" ref="visitor">
                 {/*{this.state.visitors && this.state.visitors.length}*/}
+                {this.props.box.values.showGraph &&
+                <div className="axix-y left" style={{width : this.graph.margin.left + "px", top : this.graph.margin.top + "px", bottom : this.graph.margin.bottom + "px"}}>
+                    <div className="top">{this.state.maxY}</div>
+                    <div className="middle">{(this.state.maxY && !isNaN(this.state.maxY)) &&  Math.round(this.state.maxY / 2)}</div>
+                    <div className="bottom">0</div>
+                </div>}
+                {this.props.box.values.showGraph &&
+                <div className="axix-y right" style={{width : this.graph.margin.left + "px", top : this.graph.margin.top + "px", bottom : this.graph.margin.bottom + "px"}}>
+                    <div className="top">{this.state.maxY}</div>
+                    <div className="middle">{(this.state.maxY && !isNaN(this.state.maxY)) &&  Math.round(this.state.maxY / 2)}</div>
+                    <div className="bottom">0</div>
+                </div>}
+                {(this.props.box.values.showNumber && this.props.visitor) &&
+                <div className={"visitor-numbers " + (this.state.small ? 'small' : '')}>
+                    <div>
+                        <div>{this.props.visitor.visitor}</div>
+                    </div>
+                </div>
+                }
             </div>
         );
     }

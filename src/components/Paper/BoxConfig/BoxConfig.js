@@ -74,12 +74,12 @@ class BoxConfig extends Component {
                             return <div className="box-config-item" key={i}>
                                         <label>{this.props.box.option.config[attr].name}</label>
                                         <input type="text" onChange={this.onChange.bind(this, attr)} value={this.state.values[attr]}/>
-                                {this.props.box.option.config[attr].tooltip && this.props.box.option.config[attr].tooltip.type === "link" &&
-                                <div className="config-tooltip">
-                                    <a href={this.props.box.option.config[attr].tooltip.content} target="_blank"><i className="fa fa-info-circle" aria-hidden="true"></i> {this.props.box.option.config[attr].tooltip.content}</a>
-                                </div>}
-                                {this.props.box.option.config[attr].tooltip && this.props.box.option.config[attr].tooltip.type === "text" &&
-                                <div className="config-tooltip"><i className="fa fa-info-circle" aria-hidden="true"></i> {this.props.box.option.config[attr].tooltip.content}</div>}
+                                        {this.props.box.option.config[attr].tooltip && this.props.box.option.config[attr].tooltip.type === "link" &&
+                                        <div className="config-tooltip">
+                                            <a href={this.props.box.option.config[attr].tooltip.content} target="_blank"><i className="fa fa-info-circle" aria-hidden="true"></i> {this.props.box.option.config[attr].tooltip.content}</a>
+                                        </div>}
+                                        {this.props.box.option.config[attr].tooltip && this.props.box.option.config[attr].tooltip.type === "text" &&
+                                        <div className="config-tooltip"><i className="fa fa-info-circle" aria-hidden="true"></i> {this.props.box.option.config[attr].tooltip.content}</div>}
                                     </div>
                         } else if (this.props.box.option.config[attr].type === "selector") {
                             return <div className="box-config-item" key={i}>

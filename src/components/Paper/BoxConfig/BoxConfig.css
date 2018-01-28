@@ -28,15 +28,28 @@
     vertical-align: middle;
 }
 
+.box-config .box-config-items {
+    display: table;
+    width: 100%;
+    table-layout: fixed;
+}
+
 .box-config .box-config-item {
     padding: 2px 0 10px;
     width: 50%;
     display: inline-block;
     position: relative;
+    display: table-cell;
+    vertical-align: top;
+}
+
+.box-config.single-row .box-config-items {
+    display: block;
 }
 
 .box-config.single-row .box-config-item {
     width: 100%;
+    display: inline-block;
 }
 
 .box-config .box-config-item label {
@@ -55,6 +68,7 @@
     outline: none;
     border-radius: 3px;
     border: none;
+    line-height: 0;
 }
 
 .box-config .box-config-item input[type=checkbox] {
