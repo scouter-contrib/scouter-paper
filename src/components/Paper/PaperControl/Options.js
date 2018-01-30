@@ -58,12 +58,18 @@ export function options() {
                 showNumber: {
                     name : 'SHOW NUMBER',
                     type: "checkbox",
-                    value: false
+                    value: true
                 },
                 showGraph: {
                     name : 'SHOW GRAPH',
                     type: "checkbox",
                     value: false
+                },
+                showAxis: {
+                    name : 'AXIS',
+                    type: "selector",
+                    data: ["BOTH", "LEFT", "RIGHT", "NONE"],
+                    value: "BOTH"
                 },
                 range: {
                     name : 'Range',

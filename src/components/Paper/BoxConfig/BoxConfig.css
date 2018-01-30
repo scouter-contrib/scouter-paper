@@ -37,10 +37,11 @@
 .box-config .box-config-item {
     padding: 2px 0 10px;
     width: 50%;
+    height: 46px;
     display: inline-block;
     position: relative;
-    display: table-cell;
     vertical-align: top;
+    box-sizing: border-box;
 }
 
 .box-config.single-row .box-config-items {

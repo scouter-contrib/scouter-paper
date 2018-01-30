@@ -222,13 +222,13 @@ class Visitor extends Component {
         return (
             <div className="visitor" ref="visitor">
                 {/*{this.state.visitors && this.state.visitors.length}*/}
-                {this.props.box.values.showGraph &&
+                {(this.props.box.values.showGraph && (this.props.box.values.showAxis === "BOTH" || this.props.box.values.showAxis === "LEFT")) &&
                 <div className="axix-y left" style={{width : this.graph.margin.left + "px", top : this.graph.margin.top + "px", bottom : this.graph.margin.bottom + "px"}}>
                     <div className="top">{this.state.maxY}</div>
                     <div className="middle">{(this.state.maxY && !isNaN(this.state.maxY)) &&  Math.round(this.state.maxY / 2)}</div>
                     <div className="bottom">0</div>
                 </div>}
-                {this.props.box.values.showGraph &&
+                {(this.props.box.values.showGraph && (this.props.box.values.showAxis === "BOTH" || this.props.box.values.showAxis === "RIGHT")) &&
                 <div className="axix-y right" style={{width : this.graph.margin.left + "px", top : this.graph.margin.top + "px", bottom : this.graph.margin.bottom + "px"}}>
                     <div className="top">{this.state.maxY}</div>
                     <div className="middle">{(this.state.maxY && !isNaN(this.state.maxY)) &&  Math.round(this.state.maxY / 2)}</div>
