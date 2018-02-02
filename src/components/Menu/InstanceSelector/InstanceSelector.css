@@ -5,8 +5,9 @@
     right: 0;
     bottom: 0;
     background-color: rgba(0,0,0,0.3);
-    z-index: 3;
+    z-index: 30;
 }
+
 .instance-selector {
     background-color: #207ce5;
     border: 1px solid rgba(0, 0, 0, 0.6);

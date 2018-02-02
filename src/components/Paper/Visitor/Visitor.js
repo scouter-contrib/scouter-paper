@@ -118,7 +118,7 @@ class Visitor extends Component {
 
                 this.graph.y.domain([0, maxY]);
 
-                var valueline = d3.line().curve(d3.curveCardinal)
+                let lines = d3.line().curve(d3.curveCardinal)
                     .x(function (d) {
                         return that.graph.x(d.time);
                     })
@@ -127,7 +127,7 @@ class Visitor extends Component {
                     });
 
                 this.graph.path.selectAll(".line").remove().exit();
-                this.graph.path.data([that.state.visitors]).transition().duration(500).attr("class", "line").attr("d", valueline);
+                this.graph.path.data([that.state.visitors]).transition().duration(500).attr("class", "line").attr("d", lines);
 
 
                 /*this.graph.svg.select(".y-axis").transition().duration(500).call(d3.axisLeft(that.graph.y).ticks(5));
@@ -140,8 +140,6 @@ class Visitor extends Component {
                 svg.remove();
             }
         }
-
-
 
     };
 

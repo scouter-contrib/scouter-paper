@@ -7,30 +7,20 @@
     border-radius: 5px;
     height: 32px;
     box-sizing: border-box;
+    position: relative;
+    z-index: 20;
 }
 
 .papers-controls.fixed-control {
     position: fixed;
-    top : 0;
+    top: 0;
     width: 100%;
     width: calc(100% + 7px);
     z-index: 10;
     background-color: #207ce5;
     margin: 0;
     border-radius: 0;
-    border-bottom: 1px solid rgba(0,0,0,0.4);
-
-
-
-
-
-
-
-
-
-
-
-
+    border-bottom: 1px solid rgba(0, 0, 0, 0.4);
 }
 
 .papers-controls .paper-control-separator {
@@ -52,6 +42,13 @@
     border-radius: 3px;
     line-height: 100%;
     cursor: pointer;
+    height: 20px;
+    box-sizing: border-box;
+}
+
+.papers-controls .paper-control.multi-control {
+    position: relative;
+    top: -2px;
 }
 
 .papers-controls .paper-control .draggable {
@@ -80,5 +77,46 @@
     line-height: 0;
     position: relative;
     top: -3px;
+}
 
+.papers-controls .multi-metrics {
+    font-size: 8px;
+    position: relative;
+    cursor: auto;
+}
+
+.papers-controls .multi-metrics ul {
+    position: absolute;
+    line-height: 100%;
+    left: -5px;
+    top: 17px;
+    list-style: none;
+    margin: 0;
+    padding: 0;
+    background-color: #26466D;
+    border-radius: 2px;
+    display: none;
+}
+
+.papers-controls .multi-metrics:hover ul {
+    display: inline-block;
+}
+
+.papers-controls .multi-metrics ul li {
+
+}
+
+.papers-controls .multi-metrics ul li .draggable {
+    line-height: 10px;
+    display: block;
+    padding: 5px;
+}
+
+.papers-controls .multi-metrics ul li .draggable:hover {
+    background-color: rgba(0, 0, 0, 0.3);
+}
+
+.papers-controls .multi-metrics ul li span {
+    white-space: nowrap;
+    position: static !important;
 }

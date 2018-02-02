@@ -1,0 +1,32 @@
+.line-chart-wrapper .line-chart .line {
+    fill: none;
+    stroke: steelblue;
+    stroke-width: 2px;
+}
+
+.line-chart-wrapper .no-data {
+    position: absolute;
+    top : 27px;
+    left : 0;
+    right : 0;
+    bottom : 0;
+    text-align: center;
+    background-color: rgba(0,0,0,0.2);
+    border-radius:  0 0 2px 2px;
+
+}
+
+.line-chart-wrapper .no-data > div {
+    display: table;
+    width: 100%;
+    height: 100%;
+}
+
+.line-chart-wrapper .no-data > div > div {
+    display: table-cell;
+    width: 100%;
+    height: 100%;
+    vertical-align: middle;
+}
+
+

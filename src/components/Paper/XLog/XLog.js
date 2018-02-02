@@ -16,9 +16,9 @@ class XLog extends Component {
         height: null,
         brush: null,
         timeFormat: "%H:%M",
-        elapsedTicks: 5,
         last: 0,
         xAxisWidth: 70,
+        yAxisHeight: 30,
         originX: null,
         originY: null
     };
@@ -32,11 +32,11 @@ class XLog extends Component {
         this.state = {
             elapsed: 2000,
             xlog: [],
-            selection : {
-                x1 : null,
-                x2 : null,
-                y1 : null,
-                y2 : null
+            selection: {
+                x1: null,
+                x2: null,
+                y1: null,
+                y2: null
             }
         }
     }
@@ -91,7 +91,7 @@ class XLog extends Component {
                 }
 
                 if (x > 0) {
-                    console.log("d");
+                    console.log("draw");
                     if (Number(d.error)) {
                         context.drawImage(this.graph.errorBrush, x - gabX, y - gabY, this.graph.errorBrush.width, this.graph.errorBrush.height);
                     } else {
@@ -138,6 +138,12 @@ class XLog extends Component {
     };
 
     updateYAxis = (clear) => {
+
+        let yAxisCount = Math.floor(this.graph.height / this.graph.yAxisHeight);
+        if (yAxisCount < 1) {
+            yAxisCount = 1;
+        }
+
         let svg = d3.select(this.refs.xlogViewer).select("svg");
         this.graph.y.domain([0, this.state.elapsed]);
         svg.select(".axis-y").transition().duration(500).call(d3.axisLeft(this.graph.y).tickFormat((e) => {
@@ -146,8 +152,8 @@ class XLog extends Component {
             } else {
                 return (e / 1000).toFixed(1) + "s";
             }
-        }).ticks(this.graph.elapsedTicks));
-        svg.select(".grid-y").transition().duration(500).call(d3.axisLeft(this.graph.y).tickSize(-this.graph.width).tickFormat("").ticks(this.graph.elapsedTicks));
+        }).ticks(yAxisCount));
+        svg.select(".grid-y").transition().duration(500).call(d3.axisLeft(this.graph.y).tickSize(-this.graph.width).tickFormat("").ticks(yAxisCount));
 
         if (clear) {
             this.clear();
@@ -203,6 +209,11 @@ class XLog extends Component {
         }
         svg.append("g").attr("class", "axis-x").attr("transform", "translate(0," + this.graph.height + ")").call(d3.axisBottom(this.graph.x).tickFormat(d3.timeFormat(this.graph.timeFormat)).ticks(xAxisCount));
         // Y축 단위 그리기
+        let yAxisCount = Math.floor(this.graph.height / this.graph.yAxisHeight);
+        if (yAxisCount < 1) {
+            yAxisCount = 1;
+        }
+
         svg.append("g").attr("class", "axis-y").call(d3.axisLeft(this.graph.y).tickFormat(function (e) {
             if (this.state && this.state.elapsed < 1000) {
                 return (e / 1000).toFixed(2) + "s";
@@ -210,13 +221,13 @@ class XLog extends Component {
                 return (e / 1000).toFixed(1) + "s";
             }
 
-        }).ticks(this.graph.elapsedTicks));
+        }).ticks(yAxisCount));
 
         // X축 단위 그리드 그리기
         svg.append("g").attr("class", "grid-x").style("stroke-dasharray", "5 5").style("opacity", "0.3").attr("transform", "translate(0," + this.graph.height + ")").call(d3.axisBottom(this.graph.x).tickSize(-this.graph.height).tickFormat("").ticks(xAxisCount));
 
         // Y축 단위 그리드 그리기
-        svg.append("g").attr("class", "grid-y").style("stroke-dasharray", "5 5").style("opacity", "0.3").call(d3.axisLeft(this.graph.y).tickSize(-this.graph.width).tickFormat("").ticks(this.graph.elapsedTicks));
+        svg.append("g").attr("class", "grid-y").style("stroke-dasharray", "5 5").style("opacity", "0.3").call(d3.axisLeft(this.graph.y).tickSize(-this.graph.width).tickFormat("").ticks(yAxisCount));
 
         // 캔버스 그리기
         let canvasDiv = d3.select(this.refs.xlogViewer).select(".canvas-div");
@@ -282,11 +293,11 @@ class XLog extends Component {
                 }
 
                 that.setState({
-                    selection : {
-                        x1 : startTime.getTime(),
-                        x2 : endTime.getTime(),
-                        y1 : minTime,
-                        y2 : maxTime
+                    selection: {
+                        x1: startTime.getTime(),
+                        x2: endTime.getTime(),
+                        y1: minTime,
+                        y2: maxTime
                     }
                 });
 
@@ -353,11 +364,14 @@ class XLog extends Component {
 
     render() {
         return (
-            <div className="xlog-viewer" ref="xlogViewer" onTouchStart={this.stopProgation} onMouseDown={this.stopProgation}>
+            <div className="xlog-viewer" ref="xlogViewer" onTouchStart={this.stopProgation}
+                 onMouseDown={this.stopProgation}>
                 <div></div>
-                <div className="axis-button axis-up" onClick={this.axisUp} onMouseDown={this.stopProgation}><i className="fa fa-angle-up" aria-hidden="true"></i></div>
-                <div className="axis-button axis-down" onClick={this.axisDown} onMouseDown={this.stopProgation}><i className="fa fa-angle-down" aria-hidden="true"></i></div>
-                <Profiler selection={this.state.selection} xlogs={this.props.data.xlogs} />
+                <div className="axis-button axis-up" onClick={this.axisUp} onMouseDown={this.stopProgation}><i
+                    className="fa fa-angle-up" aria-hidden="true"></i></div>
+                <div className="axis-button axis-down" onClick={this.axisDown} onMouseDown={this.stopProgation}><i
+                    className="fa fa-angle-down" aria-hidden="true"></i></div>
+                <Profiler selection={this.state.selection} xlogs={this.props.data.xlogs}/>
             </div>
         );
     }

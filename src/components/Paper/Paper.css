@@ -74,3 +74,13 @@
     background-color: rgba(0,0,0,0.4);
     border-radius: 3px;
 }
+
+.papers .fixed-alter-object {
+    height: 54px;
+    margin-top: 10px;
+    display: none;
+}
+
+.papers .fixed-alter-object.show {
+    display: block;
+}

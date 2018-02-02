@@ -32,6 +32,7 @@ class Paper extends Component {
 
         this.state = {
             layouts: layouts,
+            layoutChangeTime : null,
             boxes: boxes,
 
             data : {
@@ -48,10 +49,15 @@ class Paper extends Component {
                 endTime: endTime,
                 range: range,
                 maxElapsed: 2000,
-                lastRequestTime : null,
-                /* visitor */
-                visitor : {
-                }
+                lastRequestTime : null
+            },
+            /* visitor */
+            visitor : {
+            },
+            /* counters */
+            counters : {
+                time : null,
+                data : null
             },
             fixedControl : false
         };
@@ -61,6 +67,7 @@ class Paper extends Component {
         this.dataRefreshTimer = setInterval(() => {
             this.getXLog();
             this.getVisitor()
+            this.getCounter();
         }, this.props.config.interval);
 
         setTimeout(() => {
@@ -89,6 +96,7 @@ class Paper extends Component {
     };
 
     getXLog = () => {
+
         if (this.props.instances && this.props.instances.length > 0) {
             this.props.addRequest();
             jQuery.ajax({
@@ -120,6 +128,57 @@ class Paper extends Component {
                     visitor : {
                         time : time,
                         visitor : msg.result
+                    }
+                });
+            }).fail((jqXHR, textStatus) => {
+                console.log(jqXHR, textStatus);
+            });
+        }
+    };
+
+    getCounter = () => {
+
+
+        if (this.props.instances && this.props.instances.length > 0) {
+
+            let counterKeys = this.state.boxes.filter((d) => (d.option && (d.option.type === "counter"))).map((d) => (d.option.counterKey));
+
+            if (!counterKeys) {
+                return;
+            }
+
+            if (counterKeys.length < 1) {
+                return false;
+            }
+
+
+            let params = JSON.stringify(counterKeys);
+            params = params.replace(/\"/gi, "");
+            this.props.addRequest();
+            jQuery.ajax({
+                method: "GET",
+                async: true,
+                url: getHttpProtocol(this.props.config) + '/scouter/v1/counter/realTime/' + params + '?objHashes=' + JSON.stringify(this.props.instances.map((instance) => {
+                    return Number(instance.objHash);
+                }))
+            }).done((msg) => {
+                //console.log(msg);
+                let map = {};
+
+                for (let i=0; i<counterKeys.length; i++) {
+                    map[counterKeys[i]] = {};
+                }
+                if (msg.result) {
+                    for (let i=0; i<msg.result.length; i++) {
+                        let counter = msg.result[i];
+                        map[counter.name][counter.objHash] = counter;
+                    }
+                }
+
+                this.setState({
+                    counters : {
+                        time : (new Date()).getTime(),
+                        data : map
                     }
                 });
             }).fail((jqXHR, textStatus) => {
@@ -238,7 +297,8 @@ class Paper extends Component {
         setData("layouts", layouts);
         setData("boxes", this.state.boxes);
         this.setState({
-            layouts : layouts
+            layouts : layouts,
+            layoutChangeTime: (new Date()).getTime()
         });
 
         setTimeout(() => {
@@ -330,19 +390,22 @@ class Paper extends Component {
 
         this.setState({
             boxes: boxes,
-            layouts: layouts
+            layouts: layouts,
+            layoutChangeTime: (new Date()).getTime()
         });
     };
 
     clearLayout = () => {
         this.setState({
             boxes: [],
-            layouts: {}
+            layouts: {},
+            layoutChangeTime: (new Date()).getTime()
         });
     };
 
     setOption = (key, option) => {
         let boxes = this.state.boxes;
+
         boxes.forEach((box) => {
             if (box.key === key) {
 
@@ -351,12 +414,14 @@ class Paper extends Component {
                         mode: option.mode,
                         type: option.type,
                         config: option.config,
+                        counterKey: option.counterKey
                     };
                 } else {
                     box.option.push({
                         mode: option.mode,
                         type: option.type,
                         config: option.config,
+                        counterKey: option.counterKey
                     });
                 }
 
@@ -441,6 +506,7 @@ class Paper extends Component {
         }
         return (
             <div className="papers">
+                <div className={"fixed-alter-object " + (this.state.fixedControl ? 'show' : '')}></div>
                 <PaperControl addPaper={this.addPaper} addPaperAndAddMetric={this.addPaperAndAddMetric} clearLayout={this.clearLayout} fixedControl={this.state.fixedControl} />
                 <ResponsiveReactGridLayout className="layout" cols={{lg: 12, md: 10, sm: 6, xs: 4, xxs: 2}} layouts={this.state.layouts} rowHeight={30} onLayoutChange={(layout, layouts) => this.onLayoutChange(layout, layouts)}>
                     {this.state.boxes.map((box, i) => {
@@ -448,7 +514,7 @@ class Paper extends Component {
                             <button className="box-control box-layout-remove-btn last" onClick={this.removePaper.bind(null, box.key)}><i className="fa fa-times-circle-o" aria-hidden="true"></i></button>
                             {box.option && box.option.config && <button className="box-control box-layout-config-btn" onClick={this.toggleConfig.bind(null, box.key)}><i className="fa fa-cog" aria-hidden="true"></i></button>}
                             {box.config && <BoxConfig box={box} setOptionValues={this.setOptionValues} setOptionClose={this.setOptionClose} />}
-                            <Box setOption={this.setOption} box={box} data={this.state.data} config={this.props.config} visitor={this.state.visitor}/>
+                            <Box setOption={this.setOption} box={box} data={this.state.data} config={this.props.config} visitor={this.state.visitor} counters={this.state.counters} layoutChangeTime={this.state.layoutChangeTime}/>
                         </div>
                     })}
                 </ResponsiveReactGridLayout>

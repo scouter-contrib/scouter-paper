@@ -30,22 +30,40 @@ class PaperControl extends Component {
                 <div className="paper-control-separator"></div>
                 }
                 <div className="label">METRICS</div>
-                {Object.keys(this.options).map((name, i) => (
-                    <div key={i} className="paper-control">
-                        {!this. touch &&
+                {Object.keys(this.options).map((name, i) => {
+
+                    let isArray = Array.isArray(this.options[name]);
+
+                    return <div key={i} className={"paper-control " + (isArray ? 'multi-control' : '')}>
+                        {(!isArray && !this. touch) &&
                         <Draggable type="metric" className="draggable" data={JSON.stringify(this.options[name])}>
                             {this.options[name].icon && <i className={"fa " + this.options[name].icon} aria-hidden="true"></i>}
                             {this.options[name].text && <span className="text-icon">{this.options[name].text}</span>}
                         </Draggable>
                         }
-                        {this.touch &&
+                        {isArray && <div className="multi-metrics">
+                            <div className="group-name">{name}</div>
+                            <ul>
+                                {this.options[name].map((counterName, j) => {
+                                    return <li key={j}>
+                                        <Draggable type="metric" className="draggable" data={JSON.stringify(counterName)}>
+                                            {counterName.icon && <i className={"fa " + counterName.icon} aria-hidden="true"></i>}
+                                            {counterName.text && <span className="text-icon">{counterName.text}</span>}
+                                        </Draggable>
+                                    </li>
+                            })}
+                            </ul>
+                        </div>}
+
+                        {(!isArray && this.touch) &&
                         <div onClick={this.props.addPaperAndAddMetric.bind(this, JSON.stringify(this.options[name]))}>
                             {this.options[name].icon && <i className={"fa " + this.options[name].icon} aria-hidden="true"></i>}
                             {this.options[name].text && <span className="text-icon">{this.options[name].text}</span>}
                         </div>
                         }
+
                     </div>
-                ))}
+                })}
                 <div className="paper-control paper-right" onClick={this.props.clearLayout}>
                     <i className="fa fa-trash-o" aria-hidden="true"></i>
                 </div>

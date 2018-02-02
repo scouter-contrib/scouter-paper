@@ -154,7 +154,6 @@ class InstanceSelector extends Component {
     };
 
     instanceClick = (instance) => {
-        console.log(instance);
 
         let selectedInstances = this.state.selectedInstances;
         if (selectedInstances[instance.objHash]) {
@@ -233,7 +232,6 @@ class InstanceSelector extends Component {
                             <div>INSTANCES</div>
                         </div>
                         {this.state.instances && this.state.instances.filter((instance) => {
-                            return true;
                             return instance.objType === 'tomcat';
                         }).map((instance, i) => {
                             return (<div key={i} className={"instance " +  (i === 0 ? 'first ' : ' ') + (!(!this.state.selectedInstances[instance.objHash]) ? "selected" : " ")} onClick={this.instanceClick.bind(this, instance)}>{instance.objName}</div>)
