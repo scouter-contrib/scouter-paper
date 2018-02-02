@@ -11,6 +11,8 @@
     z-index: 20;
 }
 
+
+
 .papers-controls.fixed-control {
     position: fixed;
     top: 0;
@@ -96,7 +98,9 @@
     background-color: #26466D;
     border-radius: 2px;
     display: none;
+    z-index: 21;
 }
+
 
 .papers-controls .multi-metrics:hover ul {
     display: inline-block;
@@ -106,7 +110,7 @@
 
 }
 
-.papers-controls .multi-metrics ul li .draggable {
+.papers-controls .multi-metrics ul li .control-item {
     line-height: 10px;
     display: block;
     padding: 5px;
@@ -120,3 +124,51 @@
     white-space: nowrap;
     position: static !important;
 }
+
+
+@media screen and (max-width: 800px) {
+    .papers-controls {
+        height: 58px;
+        padding-right: 30px;
+        text-align: justify;
+        line-height: 24px;
+    }
+
+    .papers-controls .label {
+        display: none;
+    }
+
+    .papers-controls .paper-right {
+        float: none;
+        position: absolute;
+        top : 19px;
+        right : 5px;
+    }
+
+    .papers-controls.fixed-control {
+        padding-right: 40px;
+    }
+
+    .papers-controls.fixed-control .paper-right {
+        right : 15px;
+    }
+
+    .papers-controls .multi-metrics ul {
+        top: 22px;
+    }
+
+    .papers-controls .multi-metrics ul li .control-item {
+        padding: 7px 5px;
+    }
+
+    .papers-controls .multi-metrics ul li .control-item:active {
+        background-color: rgba(0, 0, 0, 0.3);
+    }
+
+
+
+
+
+
+}
+

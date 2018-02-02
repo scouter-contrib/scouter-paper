@@ -10,10 +10,11 @@ class Settings extends Component {
     constructor(props) {
         super(props);
 
+        console.log(window.location);
         this.state = {
             config: {
-                protocol: "http",
-                address: "127.0.0.1",
+                protocol: window.location.protocol.replace(":", ""),
+                address: window.location.hostname,
                 port: 6188,
                 interval: 1000,
                 numberFormat: "999,999.00",
