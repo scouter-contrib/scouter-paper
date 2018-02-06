@@ -141,7 +141,28 @@ class Paper extends Component {
 
         if (this.props.instances && this.props.instances.length > 0) {
 
-            let counterKeys = this.state.boxes.filter((d) => (d.option && (d.option.type === "counter"))).map((d) => (d.option.counterKey));
+            let counterKeyMap = {};
+
+            for (let i=0; i<this.state.boxes.length; i++) {
+                let option = this.state.boxes[i].option;
+                if (Array.isArray(option)) {
+                    for (let j=0; j<option.length; j++) {
+                        let innerOption = option[j];
+                        if (innerOption.type === "counter") {
+                            counterKeyMap[innerOption.counterKey] = true;
+                        }
+                    }
+                } else {
+                    if (option && option.type === "counter") {
+                        counterKeyMap[option.counterKey] = true;
+                    }
+
+                }
+            }
+            let counterKeys = [];
+            for (let attr in counterKeyMap) {
+                counterKeys.push(attr);
+            }
 
             if (!counterKeys) {
                 return;
@@ -409,6 +430,7 @@ class Paper extends Component {
         boxes.forEach((box) => {
             if (box.key === key) {
 
+
                 if (option.mode === "exclusive") {
                     box.option = {
                         mode: option.mode,
@@ -417,11 +439,21 @@ class Paper extends Component {
                         counterKey: option.counterKey
                     };
                 } else {
+
+                    if (!box.option) {
+                        box.option = [];
+                    }
+
+                    if (box.option && !Array.isArray(box.option)) {
+                        box.option = [];
+                    }
+
                     box.option.push({
                         mode: option.mode,
                         type: option.type,
                         config: option.config,
-                        counterKey: option.counterKey
+                        counterKey: option.counterKey,
+                        title: option.title
                     });
                 }
 
@@ -430,14 +462,24 @@ class Paper extends Component {
                     box.values[attr] = option.config[attr].value;
                 }
 
-                box.config = false;
-                box.title = option.title;
+                if (Array.isArray(box.option)) {
+                    box.config = false;
+                    let title = "";
+                    for (let i=0; i<box.option.length; i++) {
+                        title += box.option[i].title;
+                        if (i < (box.option.length-1)) {
+                            title += ",";
+                        }
+                    }
+                    box.title = title
+                } else {
+                    box.config = false;
+                    box.title = option.title;
+                }
+
                 return false;
             }
         });
-
-
-
 
         this.setState({
             boxes: boxes

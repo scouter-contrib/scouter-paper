@@ -18,23 +18,18 @@ class Box extends Component {
     render() {
 
         let type = null;
-        let counterkey = null;
-        if (this.props.box && this.props.box.option && typeof(this.props.box.option) === "object") {
-            type = this.props.box.option.type;
-            counterkey = this.props.box.option.counterKey;
-        } else if (this.props.box && this.props.box.option && this.props.box.option.length > 0) {
-            // TODO check this option
-            for (let i = 0; i < this.props.box.metric.length; i++) {
-                let metric = this.props.box.metric[i];
-                if (metric.mode === "exclusive") {
-                    type = metric.type;
-                } else {
 
+        if (this.props.box && this.props.box.option && !Array.isArray(this.props.box.option)) {
+            type = this.props.box.option.type;
+        } else if (this.props.box && this.props.box.option && Array.isArray(this.props.box.option)) {
+            for (let i = 0; i < this.props.box.option.length; i++) {
+                let innerOption = this.props.box.option[i];
+                if (innerOption.mode === "nonexclusive") {
+                    type = innerOption.type;
+                    break;
                 }
             }
         }
-
-        //console.log(this.props.box.option);
 
         return (
             <Droppable className="box-droppable" types={['metric']} onDrop={this.onDrop.bind(this)}>
@@ -47,7 +42,7 @@ class Box extends Component {
                             {type === "xlogBar" && <XLogBar layoutChangeTime={this.props.layoutChangeTime} box={this.props.box} data={this.props.data} />}
                             {type === "xlog" && <XLog layoutChangeTime={this.props.layoutChangeTime} box={this.props.box} data={this.props.data} config={this.props.config} />}
                             {type === "visitor" && <Visitor layoutChangeTime={this.props.layoutChangeTime} visitor={this.props.visitor} box={this.props.box} />}
-                            {type === "counter" && <LineChart layoutChangeTime={this.props.layoutChangeTime} time={this.props.counters.time} counters={(this.props.counters.data ? this.props.counters.data[counterkey] : null)} box={this.props.box} />}
+                            {type === "counter" && <LineChart layoutChangeTime={this.props.layoutChangeTime} time={this.props.counters.time} box={this.props.box} counters={this.props.counters.data} />}
                         </div>
                     </div>
                 </div>

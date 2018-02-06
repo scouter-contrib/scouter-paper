@@ -86,112 +86,112 @@ export function options() {
         WAS: [
             {
                 text: "TPS",
-                mode: "exclusive",
+                mode: "nonexclusive",
                 type: "counter",
                 title: "TPS",
                 counterKey : "TPS"
             },
             {
                 text: "Active Speed",
-                mode: "exclusive",
+                mode: "nonexclusive",
                 type: "counter",
                 title: "Active Speed",
                 counterKey : "ActiveSpeed"
             },
             {
                 text: "Elapsed Time",
-                mode: "exclusive",
+                mode: "nonexclusive",
                 type: "counter",
                 title: "Elapsed Time",
                 counterKey : "ElapsedTime"
             },
             {
                 text: "Service Count",
-                mode: "exclusive",
+                mode: "nonexclusive",
                 type: "counter",
                 title: "Service Count",
                 counterKey : "ServiceCount"
             },
             {
                 text: "Error Rate",
-                mode: "exclusive",
+                mode: "nonexclusive",
                 type: "counter",
                 title: "Error Rate",
                 counterKey : "ErrorRate"
             },
             {
                 text: "Active Service",
-                mode: "exclusive",
+                mode: "nonexclusive",
                 type: "counter",
                 title: "Active Service",
                 counterKey : "ActiveService"
             },
             {
                 text: "Recent User",
-                mode: "exclusive",
+                mode: "nonexclusive",
                 type: "counter",
                 title: "Recent User",
                 counterKey : "RecentUser"
             },
             {
                 text: "SqlTime By Service",
-                mode: "exclusive",
+                mode: "nonexclusive",
                 type: "counter",
                 title: "SqlTime By Service",
                 counterKey : "SqlTimeByService"
             },
             {
                 text: "API Time By Service",
-                mode: "exclusive",
+                mode: "nonexclusive",
                 type: "counter",
                 title: "API Time By Service",
                 counterKey : "ApiTimeByService"
             },
             {
                 text: "Queuing Time",
-                mode: "exclusive",
+                mode: "nonexclusive",
                 type: "counter",
                 title: "Queuing Time",
                 counterKey : "QueuingTime"
             },
             {
                 text: "SQL Time",
-                mode: "exclusive",
+                mode: "nonexclusive",
                 type: "counter",
                 title: "SQL Time",
                 counterKey : "SqlTime"
             },
             {
                 text: "SQL TPS",
-                mode: "exclusive",
+                mode: "nonexclusive",
                 type: "counter",
                 title: "SQL TPS",
                 counterKey : "SqlTPS"
             },
             {
                 text: "SQL Error Rate",
-                mode: "exclusive",
+                mode: "nonexclusive",
                 type: "counter",
                 title: "SQL Error Rate",
                 counterKey : "SqlErrorRate"
             },
             {
                 text: "API Time",
-                mode: "exclusive",
+                mode: "nonexclusive",
                 type: "counter",
                 title: "API Time",
                 counterKey : "ApiTime"
             },
             {
                 text: "API TPS",
-                mode: "exclusive",
+                mode: "nonexclusive",
                 type: "counter",
                 title: "API TPS",
                 counterKey : "ApiTPS"
             },
             {
                 text: "API Error Rate",
-                mode: "exclusive",
+                mode: "nonexclusive",
                 type: "counter",
                 title: "API Error Rate",
                 counterKey : "ApiErrorRate"
@@ -201,63 +201,63 @@ export function options() {
         JAVA: [
             {
                 text: "GC Count",
-                mode: "exclusive",
+                mode: "nonexclusive",
                 type: "counter",
                 title: "GC Count",
                 counterKey : "GcCount"
             },
             {
                 text: "GC Time",
-                mode: "exclusive",
+                mode: "nonexclusive",
                 type: "counter",
                 title: "GC Time",
                 counterKey : "GcTime"
             },
             {
                 text: "Heap Total Usage",
-                mode: "exclusive",
+                mode: "nonexclusive",
                 type: "counter",
                 title: "Heap Total Usage",
                 counterKey : "HeapTotUsage"
             },
             {
                 text: "Heap Used",
-                mode: "exclusive",
+                mode: "nonexclusive",
                 type: "counter",
                 title: "Heap Used",
                 counterKey : "HeapUsed"
             },
             {
                 text: "CPU Time",
-                mode: "exclusive",
+                mode: "nonexclusive",
                 type: "counter",
                 title: "CPU Time",
                 counterKey : "CpuTime"
             },
             {
                 text: "Perm Used",
-                mode: "exclusive",
+                mode: "nonexclusive",
                 type: "counter",
                 title: "Perm Used",
                 counterKey : "PermUsed"
             },
             {
                 text: "Perm Percent",
-                mode: "exclusive",
+                mode: "nonexclusive",
                 type: "counter",
                 title: "Perm Percent",
                 counterKey : "PermPercent"
             },
             {
                 text: "Process Cpu",
-                mode: "exclusive",
+                mode: "nonexclusive",
                 type: "counter",
                 title: "Process Cpu",
                 counterKey : "ProcCpu"
             },
             {
                 text: "Fd Usage",
-                mode: "exclusive",
+                mode: "nonexclusive",
                 type: "counter",
                 title: "Fd Usage",
                 counterKey : "FdUsage"
@@ -267,35 +267,35 @@ export function options() {
         REQUEST: [
             {
                 text: "Bytes Received",
-                mode: "exclusive",
+                mode: "nonexclusive",
                 type: "counter",
                 title: "Bytes Received",
                 counterKey : "BytesReceived"
             },
             {
                 text: "Bytes Sent",
-                mode: "exclusive",
+                mode: "nonexclusive",
                 type: "counter",
                 title: "Bytes Sent",
                 counterKey : "BytesSent"
             },
             {
                 text: "Error Count",
-                mode: "exclusive",
+                mode: "nonexclusive",
                 type: "counter",
                 title: "Error Count",
                 counterKey : "ErrorCount"
             },
             {
                 text: "Processing Time",
-                mode: "exclusive",
+                mode: "nonexclusive",
                 type: "counter",
                 title: "Processing Time",
                 counterKey : "ProcessingTime"
             },
             {
                 text: "Request Count",
-                mode: "exclusive",
+                mode: "nonexclusive",
                 type: "counter",
                 title: "Request Count",
                 counterKey : "RequestCount"
@@ -306,21 +306,21 @@ export function options() {
         CONTEXT: [
             {
                 text: "Active Sessions",
-                mode: "exclusive",
+                mode: "nonexclusive",
                 type: "counter",
                 title: "Active Sessions",
                 counterKey : "ActiveSessions"
             },
             {
                 text: "Session Create Rate",
-                mode: "exclusive",
+                mode: "nonexclusive",
                 type: "counter",
                 title: "Session Create Rate",
                 counterKey : "SessionCreateRate"
             },
             {
                 text: "Session Expired Rate",
-                mode: "exclusive",
+                mode: "nonexclusive",
                 type: "counter",
                 title: "Session Expired Rate",
                 counterKey : "SessionExpiredRate"
@@ -330,21 +330,21 @@ export function options() {
         DATASOURCE: [
             {
                 text: "Conn Active",
-                mode: "exclusive",
+                mode: "nonexclusive",
                 type: "counter",
                 title: "Conn Active",
                 counterKey : "ConnActive"
             },
             {
                 text: "Conn Idle",
-                mode: "exclusive",
+                mode: "nonexclusive",
                 type: "counter",
                 title: "Conn Idle",
                 counterKey : "ConnIdle"
             },
             {
                 text: "Conn Max",
-                mode: "exclusive",
+                mode: "nonexclusive",
                 type: "counter",
                 title: "Conn Max",
                 counterKey : "ConnMax"
@@ -354,84 +354,84 @@ export function options() {
         HOST: [
             {
                 text: "Cpu",
-                mode: "exclusive",
+                mode: "nonexclusive",
                 type: "counter",
                 title: "Cpu",
                 counterKey : "Cpu"
             },
             {
                 text: "Sys Cpu",
-                mode: "exclusive",
+                mode: "nonexclusive",
                 type: "counter",
                 title: "Sys Cpu",
                 counterKey : "SysCpu"
             },
             {
                 text: "User Cpu",
-                mode: "exclusive",
+                mode: "nonexclusive",
                 type: "counter",
                 title: "User Cpu",
                 counterKey : "UserCpu"
             },
             {
                 text: "Mem",
-                mode: "exclusive",
+                mode: "nonexclusive",
                 type: "counter",
                 title: "Mem",
                 counterKey : "Mem"
             },
             {
                 text: "MemA",
-                mode: "exclusive",
+                mode: "nonexclusive",
                 type: "counter",
                 title: "MemA",
                 counterKey : "MemA"
             },
             {
                 text: "MemU",
-                mode: "exclusive",
+                mode: "nonexclusive",
                 type: "counter",
                 title: "MemU",
                 counterKey : "MemU"
             },
             {
                 text: "MemT",
-                mode: "exclusive",
+                mode: "nonexclusive",
                 type: "counter",
                 title: "MemT",
                 counterKey : "MemT"
             },
             {
                 text: "Page In",
-                mode: "exclusive",
+                mode: "nonexclusive",
                 type: "counter",
                 title: "Page In",
                 counterKey : "PageIn"
             },
             {
                 text: "Page Out",
-                mode: "exclusive",
+                mode: "nonexclusive",
                 type: "counter",
                 title: "Page Out",
                 counterKey : "PageOut"
             },
             {
                 text: "Swap",
-                mode: "exclusive",
+                mode: "nonexclusive",
                 type: "counter",
                 title: "Swap",
                 counterKey : "Swap"
             },
             {
                 text: "SwapU",
-                mode: "exclusive",
+                mode: "nonexclusive",
                 type: "counter",
                 title: "SwapU",
                 counterKey : "SwapU"
             },
             {
                 text: "SwapT",
-                mode: "exclusive",
+                mode: "nonexclusive",
                 type: "counter",
                 title: "SwapT",
                 counterKey : "SwapT"
@@ -441,56 +441,56 @@ export function options() {
         NETWORK: [
             {
                 text: "Net InBound",
-                mode: "exclusive",
+                mode: "nonexclusive",
                 type: "counter",
                 title: "Net InBound",
                 counterKey : "NetInBound"
             },
             {
                 text: "Net OutBound",
-                mode: "exclusive",
+                mode: "nonexclusive",
                 type: "counter",
                 title: "Net OutBound",
                 counterKey : "NetOutBound"
             },
             {
                 text: "TCP Stat CLS",
-                mode: "exclusive",
+                mode: "nonexclusive",
                 type: "counter",
                 title: "TCP Stat CLS",
                 counterKey : "TcpStatCLS"
             },
             {
                 text: "TCP Stat TIM",
-                mode: "exclusive",
+                mode: "nonexclusive",
                 type: "counter",
                 title: "TCP Stat TIM",
                 counterKey : "TcpStatTIM"
             },
             {
                 text: "TCP Stat FIN",
-                mode: "exclusive",
+                mode: "nonexclusive",
                 type: "counter",
                 title: "TCP Stat FIN",
                 counterKey : "TcpStatFIN"
             },
             {
                 text: "TCP Stat EST",
-                mode: "exclusive",
+                mode: "nonexclusive",
                 type: "counter",
                 title: "TCP Stat EST",
                 counterKey : "TcpStatEST"
             },
             {
                 text: "Net Rx Bytes",
-                mode: "exclusive",
+                mode: "nonexclusive",
                 type: "counter",
                 title: "Net Rx Bytes",
                 counterKey : "NetRxBytes"
             },
             {
                 text: "Net Tx Bytes",
-                mode: "exclusive",
+                mode: "nonexclusive",
                 type: "counter",
                 title: "Net Tx Bytes",
                 counterKey : "NetTxBytes"
@@ -500,14 +500,14 @@ export function options() {
         DISK: [
             {
                 text: "Disk Read Bytes",
-                mode: "exclusive",
+                mode: "nonexclusive",
                 type: "counter",
                 title: "Disk Read Bytes",
                 counterKey : "DiskReadBytes"
             },
             {
                 text: "Disk Write Bytes",
-                mode: "exclusive",
+                mode: "nonexclusive",
                 type: "counter",
                 title: "Disk Write Bytes",
                 counterKey : "DiskWriteBytes"
@@ -517,28 +517,28 @@ export function options() {
         BATCH: [
             {
                 text: "Batch Service",
-                mode: "exclusive",
+                mode: "nonexclusive",
                 type: "counter",
                 title: "Batch Service",
                 counterKey : "BatchService"
             },
             {
                 text: "Batch Start",
-                mode: "exclusive",
+                mode: "nonexclusive",
                 type: "counter",
                 title: "Batch Start",
                 counterKey : "BatchStart"
             },
             {
                 text: "Batch End",
-                mode: "exclusive",
+                mode: "nonexclusive",
                 type: "counter",
                 title: "Batch End",
                 counterKey : "BatchEnd"
             },
             {
                 text: "Batch End No Signal",
-                mode: "exclusive",
+                mode: "nonexclusive",
                 type: "counter",
                 title: "Batch End No Signal",
                 counterKey : "BatchEndNoSignal"

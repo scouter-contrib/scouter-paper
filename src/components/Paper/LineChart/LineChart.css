@@ -1,7 +1,7 @@
 .line-chart-wrapper .line-chart .line {
     fill: none;
-    stroke: steelblue;
     stroke-width: 2px;
+    opacity: 0.6;
 }
 
 .line-chart-wrapper .no-data {
@@ -13,7 +13,6 @@
     text-align: center;
     background-color: rgba(0,0,0,0.2);
     border-radius:  0 0 2px 2px;
-
 }
 
 .line-chart-wrapper .no-data > div {

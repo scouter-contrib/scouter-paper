@@ -30,60 +30,111 @@ class LineChart extends Component {
     constructor(props) {
         super(props);
         this.state = {
-            counters: []
+            counters: {}
         }
+    }
+
+    componentDidMount() {
+        this.graphInit();
+    }
+
+    shouldComponentUpdate() {
+        return true;
     }
 
     componentWillReceiveProps(nextProps) {
 
         if (nextProps.counters && nextProps.time !== this.lastCountersTime) {
+
+
             this.lastCountersTime = nextProps.time;
 
             let endTime = nextProps.time;
             let startTime = nextProps.time - (1000 * 60 * 10);
 
-            let counters = this.state.counters.slice(0);
-            counters.push({
-                time: nextProps.time,
-                data: nextProps.counters
-            });
+            let counters = Object.assign(this.state.counters);
 
-            let overIndex = -1;
-            for (let i = 0; i < counters.length; i++) {
-                if (counters[i].time < startTime) {
-                    overIndex = i;
-                }
+            if (Array.isArray(nextProps.box.option)) {
+                for (let i=0; i<nextProps.box.option.length; i++) {
+                    let counterKey = nextProps.box.option[i].counterKey;
+                    if (!counters[counterKey]) {
+                        counters[counterKey] = [];
+                    }
 
-                if (counters[i].time >= startTime) {
-                    break;
+                    counters[counterKey].push({
+                        time: nextProps.time,
+                        data: nextProps.counters[counterKey]
+                    });
+
                 }
+            } else {
+                let counterKey = nextProps.box.option.counterKey;
+                if (!counters[counterKey]) {
+                    counters[counterKey] = [];
+                }
+                counters[counterKey].push({
+                    time: nextProps.time,
+                    data: nextProps.counters[counterKey]
+                });
             }
 
-            if (overIndex > -1) {
-                counters.splice(0, overIndex + 1);
-            }
+            for (let attr in counters) {
+                let overIndex = -1;
+                for (let i = 0; i < counters[attr].length; i++) {
+                    if (counters[attr][i].time < startTime) {
+                        overIndex = i;
+                    }
 
-            let maxY = d3.max(counters, function (counter) {
-                let max = 0;
-                for (let objHash in counter.data) {
-                    if (counter.data[objHash].value > max) {
-                        max = counter.data[objHash].value;
+                    if (counters[attr][i].time >= startTime) {
+                        break;
                     }
                 }
-                return max;
-            });
+
+                if (overIndex > -1) {
+                    counters[attr].splice(0, overIndex + 1);
+                }
+            }
+
+            let maxY = 0;
+            for (let attr in this.state.counters) {
+                for (let i=0; i<this.state.counters[attr].length; i++) {
+                    for (let hash in this.state.counters[attr][i].data) {
+                        if (Number(this.state.counters[attr][i].data[hash].value) > maxY) {
+                            maxY = this.state.counters[attr][i].data[hash].value;
+                        }
+                    }
+                }
+            }
 
             if (!maxY || maxY < 10) {
                 maxY = 10;
+            } else {
+                maxY = Math.round(maxY * 1.2);
             }
 
             this.graph.maxY = maxY;
+
+            let noData = true;
+            if (Array.isArray(nextProps.box.option)) {
+                for (let i=0; i<nextProps.box.option.length; i++) {
+                    let counterKey = nextProps.box.option[i].counterKey;
+                    if (Object.keys(nextProps.counters[counterKey]).length !== 0) {
+                        noData = false;
+                        break;
+                    }
+                }
+            } else {
+                let counterKey = nextProps.box.option.counterKey;
+                if (Object.keys(nextProps.counters[counterKey]).length !== 0) {
+                    noData = false;
+                }
+            }
 
             this.setState({
                 startTime: startTime,
                 endTime: endTime,
                 counters: counters,
-                noData : Object.keys(nextProps.counters).length === 0
+                noData : noData
             });
         } else {
 
@@ -129,18 +180,21 @@ class LineChart extends Component {
 
         this.graph.x.domain([this.state.startTime, this.state.endTime]);
 
-        let maxY = d3.max(this.state.counters, function (counter) {
-            let max = 0;
-            for (let objHash in counter.data) {
-                if (counter.data[objHash].value > max) {
-                    max = counter.data[objHash].value;
+        let maxY = 0;
+        for (let attr in this.state.counters) {
+            for (let i=0; i<this.state.counters[attr].length; i++) {
+                for (let hash in this.state.counters[attr][i].data) {
+                    if (Number(this.state.counters[attr][i].data[hash].value) > maxY) {
+                        maxY = this.state.counters[attr][i].data[hash].value;
+                    }
                 }
             }
-            return Number(max);
-        });
+        }
 
         if (!maxY || maxY < 10) {
             maxY = 10;
+        } else {
+            maxY = Math.round(maxY * 1.2);
         }
 
         this.graph.maxY = maxY;
@@ -182,44 +236,45 @@ class LineChart extends Component {
         if (this.refs.lineChart && this.graph.svg) {
 
             this.graphAxis(this.graph.width, this.graph.height, false);
-
             if (this.props.instances) {
-                for (let i = 0; i < this.props.instances.length; i++) {
-                    let valueline = d3.line()
-                        .defined(function (d) {
-                            let objData = d.data[that.props.instances[i].objHash];
-                            return objData && !isNaN(objData.value);
-                        })
-                        .curve(d3.curveCardinal)
-                        .x(function (d) {
-                            return that.graph.x(d.time);
-                        })
-                        .y(function (counter) {
-                            let objData = counter.data[that.props.instances[i].objHash];
-                            if (objData) {
-                                return that.graph.y(Number(objData.value));
-                            } else {
-                                return that.graph.y(0);
-                            }
-                        });
+                let colorScale = d3.schemeCategory10;
+                let cnt = 0;
+                for (let attr in this.state.counters) {
+                    for (let i = 0; i < this.props.instances.length; i++) {
 
-                    this.graph.path.data([that.state.counters]).attr("class", "line line-" + that.props.instances[i].objHash).attr("d", valueline);
+                        let valueline = d3.line()
+                            .defined(function (d) {
+                                let objData = d.data[that.props.instances[i].objHash];
+                                return objData && !isNaN(objData.value);
+                            })
+
+                            .x(function (d) {
+                                return that.graph.x(d.time);
+                            })
+                            .y(function (counter) {
+                                let objData = counter.data[that.props.instances[i].objHash];
+                                if (objData) {
+                                    return that.graph.y(Number(objData.value));
+                                } else {
+                                    return that.graph.y(0);
+                                }
+                            });
+
+                        let pathClass = "line-" + that.props.instances[i].objHash + "-" + attr;
+
+                        let path = this.graph.svg.select(".line." + pathClass);
+                        if (path.size() < 1) {
+                            path = this.graph.svg.append("path").attr("class", "line " + pathClass).style("stroke", colorScale[cnt]);
+                        }
+                        path.data([that.state.counters[attr]]).attr("d", valueline);
+                        cnt++;
+                    }
                 }
-
             }
-
         }
-
-
     };
 
-    componentDidMount() {
-        this.graphInit();
-    }
 
-    shouldComponentUpdate() {
-        return true;
-    }
 
     graphResize = () => {
         let box = this.refs.lineChart.parentNode.parentNode.parentNode.parentNode;
@@ -243,7 +298,7 @@ class LineChart extends Component {
         this.graph.svg = d3.select(this.refs.lineChart).append("svg").attr("width", this.graph.width + this.graph.margin.left + this.graph.margin.right).attr("height", this.graph.height + this.graph.margin.top + this.graph.margin.bottom).append("g").attr("class", "top-group").attr("transform", "translate(" + this.graph.margin.left + "," + this.graph.margin.top + ")");
 
         this.graphAxis(this.graph.width, this.graph.height, true);
-        this.graph.path = this.graph.svg.append("path");
+
     };
 
     render() {
