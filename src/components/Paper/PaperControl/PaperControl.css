@@ -126,7 +126,8 @@
 }
 
 
-@media screen and (max-width: 800px) {
+@media screen and (max-width: 680px) {
+
     .papers-controls {
         height: 58px;
         padding-right: 30px;
@@ -149,11 +150,13 @@
         padding-right: 40px;
     }
 
+
+
     .papers-controls.fixed-control .paper-right {
         right : 15px;
     }
 
-    .papers-controls .multi-metrics ul {
+    .papers-controls.touch .multi-metrics ul {
         top: 22px;
     }
 

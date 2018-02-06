@@ -20,7 +20,7 @@ class PaperControl extends Component {
     render() {
 
         return (
-            <div className={"papers-controls noselect " + (this.props.fixedControl ? 'fixed-control' : '')}>
+            <div className={"papers-controls noselect " + (this.props.fixedControl ? 'fixed-control ' : ' ') + (this.touch ? 'touch' : '')}>
                 {!this.touch &&
                 <div className="paper-control" onClick={this.props.addPaper}>
                     <i className="fa fa-plus-circle" aria-hidden="true"></i>
