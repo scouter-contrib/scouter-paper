@@ -430,7 +430,6 @@ class Paper extends Component {
         boxes.forEach((box) => {
             if (box.key === key) {
 
-
                 if (option.mode === "exclusive") {
                     box.option = {
                         mode: option.mode,
@@ -448,13 +447,22 @@ class Paper extends Component {
                         box.option = [];
                     }
 
-                    box.option.push({
-                        mode: option.mode,
-                        type: option.type,
-                        config: option.config,
-                        counterKey: option.counterKey,
-                        title: option.title
-                    });
+                    let duplicated = false;
+                    for (let i=0; i<box.option.length; i++) {
+                        if (box.option[i].counterKey === option.counterKey) {
+                            duplicated = true;
+                        }
+                    }
+
+                    if (!duplicated) {
+                        box.option.push({
+                            mode: option.mode,
+                            type: option.type,
+                            config: option.config,
+                            counterKey: option.counterKey,
+                            title: option.title
+                        });
+                    }
                 }
 
                 box.values = {};
@@ -468,7 +476,7 @@ class Paper extends Component {
                     for (let i=0; i<box.option.length; i++) {
                         title += box.option[i].title;
                         if (i < (box.option.length-1)) {
-                            title += ",";
+                            title += ", ";
                         }
                     }
                     box.title = title

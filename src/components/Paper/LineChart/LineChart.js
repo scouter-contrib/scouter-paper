@@ -46,7 +46,6 @@ class LineChart extends Component {
 
         if (nextProps.counters && nextProps.time !== this.lastCountersTime) {
 
-
             this.lastCountersTime = nextProps.time;
 
             let endTime = nextProps.time;
@@ -242,7 +241,7 @@ class LineChart extends Component {
                 for (let attr in this.state.counters) {
                     for (let i = 0; i < this.props.instances.length; i++) {
 
-                        let valueline = d3.line()
+                        let valueline = d3.line().curve(d3.curveMonotoneX)
                             .defined(function (d) {
                                 let objData = d.data[that.props.instances[i].objHash];
                                 return objData && !isNaN(objData.value);
@@ -265,10 +264,11 @@ class LineChart extends Component {
                         let path = this.graph.svg.select(".line." + pathClass);
                         if (path.size() < 1) {
                             path = this.graph.svg.append("path").attr("class", "line " + pathClass).style("stroke", colorScale[cnt]);
+                            this.props.setTitle(attr, colorScale[cnt]);
                         }
                         path.data([that.state.counters[attr]]).attr("d", valueline);
-                        cnt++;
                     }
+                    cnt++;
                 }
             }
         }
