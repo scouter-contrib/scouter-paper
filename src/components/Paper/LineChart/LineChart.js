@@ -117,10 +117,13 @@ class LineChart extends Component {
             if (Array.isArray(nextProps.box.option)) {
                 for (let i=0; i<nextProps.box.option.length; i++) {
                     let counterKey = nextProps.box.option[i].counterKey;
-                    if (Object.keys(nextProps.counters[counterKey]).length !== 0) {
-                        noData = false;
-                        break;
+                    if (nextProps.counters[counterKey]) {
+                        if (Object.keys(nextProps.counters[counterKey]).length !== 0) {
+                            noData = false;
+                            break;
+                        }
                     }
+
                 }
             } else {
                 let counterKey = nextProps.box.option.counterKey;
@@ -243,7 +246,7 @@ class LineChart extends Component {
 
                         let valueline = d3.line().curve(d3.curveMonotoneX)
                             .defined(function (d) {
-                                let objData = d.data[that.props.instances[i].objHash];
+                                let objData = d.data ? d.data[that.props.instances[i].objHash] : {};
                                 return objData && !isNaN(objData.value);
                             })
 

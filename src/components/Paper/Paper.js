@@ -102,11 +102,12 @@ class Paper extends Component {
             jQuery.ajax({
                 method: "GET",
                 async: true,
+                dataType :'text',
                 url: getHttpProtocol(this.props.config) + '/scouter/v1/xlog/realTime/' + this.state.data.offset1 + '/' + this.state.data.offset2 + '?objHashes=' + JSON.stringify(this.props.instances.map((instance) => {
                     return Number(instance.objHash);
                 }))
             }).done((msg) => {
-                this.tick(msg.result);
+                this.tick(msg);
             }).fail((jqXHR, textStatus) => {
                 console.log(jqXHR, textStatus);
             });
@@ -183,7 +184,6 @@ class Paper extends Component {
                     return Number(instance.objHash);
                 }))
             }).done((msg) => {
-                //console.log(msg);
                 let map = {};
 
                 for (let i=0; i<counterKeys.length; i++) {
@@ -208,7 +208,13 @@ class Paper extends Component {
         }
     };
 
-    tick = (result) => {
+    tick = (msg) => {
+
+        if (!msg) {
+            return;
+        }
+
+        let result = (JSON.parse(msg)).result;
 
         let now = (new Date()).getTime();
 
