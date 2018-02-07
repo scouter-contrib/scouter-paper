@@ -7,14 +7,14 @@ import {Provider} from 'react-redux';
 import App from './App';
 import registerServiceWorker from './registerServiceWorker';
 import scouterApp from './reducers';
-import { BrowserRouter } from 'react-router-dom'
+import { HashRouter } from 'react-router-dom'
 
 const store = createStore(scouterApp);
 
 ReactDOM.render(
-    <BrowserRouter>
+    <HashRouter>
         <Provider store={store}>
             <App/>
         </Provider>
-    </BrowserRouter>, document.getElementById('root'));
+    </HashRouter>, document.getElementById('root'));
 registerServiceWorker();
