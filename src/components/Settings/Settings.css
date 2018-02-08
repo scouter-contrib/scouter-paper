@@ -140,24 +140,32 @@
     transition: background-color 0.3s;
 }
 
-.settings .forms .xlog-size .xlog-label {
+.settings .forms .xlog-option {
+    margin-bottom: 10px;
+}
+
+.settings .forms .xlog-option.last {
+    margin-bottom: 0;
+}
+
+.settings .forms .xlog-option .xlog-label {
     display: inline-block !important;
     width: 70px;
     padding-left: 2px;
     font-size: 10px;
 }
 
-.settings .forms .xlog-size .xlog-label.second {
+.settings .forms .xlog-option .xlog-label.second {
     margin-left: 20px;
 }
 
-.settings .forms .xlog-size select {
+.settings .forms .xlog-option select {
     padding: 0;
     width: calc(50% - 80px);
     border: 1px solid rgba(0, 0, 0, 0.3);
 }
 
-.settings .forms .xlog-size select[disabled] {
+.settings .forms .xlog-option select[disabled] {
     background-color: rgba(0, 0, 0, 0.1);
     border: 1px solid transparent;
     color: #333;

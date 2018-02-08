@@ -45,6 +45,19 @@ class XLog extends Component {
         this.graphResize();
     };
 
+    shouldComponentUpdate(nextProps, nextState) {
+
+        if (this.lastStartTime !== this.props.data.startTime || this.lastEndTime !== this.props.data.endTime) {
+            return true;
+        }
+
+        if (this.state.elapsed !== nextState.elapsed) {
+            return true;
+        }
+
+        return false;
+    }
+
     componentDidMount() {
         this.graphInit();
     }
@@ -83,6 +96,9 @@ class XLog extends Component {
             let gabX = Math.floor(this.graph.normalBrush.width / 2);
             let gabY = Math.floor(this.graph.normalBrush.height / 2);
             xlogs.forEach((d, i) => {
+
+
+
                 let x = this.graph.x(d.endTime);
                 let y = this.graph.y(d.elapsed);
 
@@ -91,10 +107,26 @@ class XLog extends Component {
                 }
 
                 if (x > 0) {
-                    console.log("draw");
+
                     if (Number(d.error)) {
+                        if (Number(this.props.config.xlog.error.sampling) !== 100) {
+                            if (Math.round(Math.random() * 100) > this.props.config.xlog.error.sampling) {
+                                console.log("PASS");
+                                return;
+                            }
+                        }
+
+                        console.log("DRAW");
                         context.drawImage(this.graph.errorBrush, x - gabX, y - gabY, this.graph.errorBrush.width, this.graph.errorBrush.height);
                     } else {
+                        if (Number(this.props.config.xlog.normal.sampling) !== 100) {
+                            if (Math.round(Math.random() * 100) > this.props.config.xlog.normal.sampling) {
+                                console.log("PASS");
+                                return;
+                            }
+                        }
+
+                        console.log("DRAW");
                         context.drawImage(this.graph.normalBrush, x - gabX, y - gabY, this.graph.normalBrush.width, this.graph.normalBrush.height);
                     }
                 }
@@ -237,7 +269,6 @@ class XLog extends Component {
         canvasDiv = d3.select(this.refs.xlogViewer).append("div").attr("class", "canvas-div").style('position', 'absolute').style('top', '0px').style('left', '0px');
         let canvas = canvasDiv.append('canvas').attr('height', this.graph.height).attr('width', this.graph.width + 20).style('position', 'absolute').style('top', this.graph.margin.top + 'px').style('left', this.graph.margin.left + 'px');
 
-
         // 드래그 셀렉트
         svg.append("g").append("rect").attr("class", "selection").attr("opacity", 0.2);
         let that = this;
@@ -314,7 +345,7 @@ class XLog extends Component {
         this.graph.normalBrush.height = this.props.config.xlog.normal.columns;
         let normalContext = this.graph.normalBrush.getContext("2d");
 
-        normalContext.globalAlpha = 0.6;
+        normalContext.globalAlpha = Number(this.props.config.xlog.normal.opacity);
         for (let i = 0; i < this.props.config.xlog.normal.rows; i++) {
             for (let j = 0; j < this.props.config.xlog.normal.columns; j++) {
                 if (this.props.config.xlog.normal.fills["D_" + i + "_" + j] && this.props.config.xlog.normal.fills["D_" + i + "_" + j].color !== "transparent") {
@@ -329,7 +360,7 @@ class XLog extends Component {
         this.graph.errorBrush.height = this.props.config.xlog.error.columns;
         let errorContext = this.graph.errorBrush.getContext("2d");
 
-        errorContext.globalAlpha = 0.6;
+        errorContext.globalAlpha = Number(this.props.config.xlog.error.opacity);
         for (let i = 0; i < this.props.config.xlog.error.rows; i++) {
             for (let j = 0; j < this.props.config.xlog.error.columns; j++) {
                 if (this.props.config.xlog.error.fills["D_" + i + "_" + j] && this.props.config.xlog.error.fills["D_" + i + "_" + j].color !== "transparent") {
@@ -342,9 +373,6 @@ class XLog extends Component {
         this.redraw();
     };
 
-    shouldComponentUpdate() {
-        return true;
-    }
 
     axisUp = (e) => {
         this.setState({

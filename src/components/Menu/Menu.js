@@ -2,20 +2,45 @@ import React, {Component} from 'react';
 import {NavLink} from 'react-router-dom'
 import './Menu.css';
 import {InstanceInfo, InstanceSelector} from "../../components";
+import {connect} from 'react-redux';
+import {withRouter} from 'react-router-dom';
 
 class Menu extends Component {
 
     constructor(props) {
         super(props);
         this.state = {
-            selector: false
+            selector: false,
+            menu : null
         };
+    }
+
+    componentDidMount() {
+        console.log(this.props.location);
+        /*let menu = "";
+        if (this.props.location.pathname === "/paper") {
+            menu = "paper";
+        }*/
     }
 
     toggleSelectorVisible = () => {
         this.setState({
             selector: !this.state.selector
         });
+    };
+
+
+
+    menuClick = (name, e) => {
+        if (this.state.menu !== name) {
+            this.setState({
+                menu : name
+            });
+        } else {
+            if (this.props.location.pathname === name) {
+                e.preventDefault();
+            }
+        }
     };
 
     render() {
@@ -31,25 +56,25 @@ class Menu extends Component {
                             </div>
                         </NavLink>
                     </div>
-                    <NavLink className="menu-item" to="/paper" activeClassName="active">
+                    <NavLink className={"menu-item " + (this.state.menu === "paper" ? "active" : "")} to={"/paper" + '?instances=' + this.props.instances.map((d) => {return d.objHash})} onClick={this.menuClick.bind(this, "/paper")}>
                         <div>
                             <div className="icon"><i className="fa fa-newspaper-o" aria-hidden="true"></i></div>
                             <div className="text">PAPERS</div>
                         </div>
                     </NavLink>
-                    <NavLink className="menu-item" to="/settings" activeClassName="active">
+                    <NavLink className={"menu-item " + (this.state.menu === "settings" ? "active" : "")} to="/settings" activeClassName="active" onClick={this.menuClick.bind(this, "/settings")}>
                         <div>
                             <div className="icon"><i className="fa fa-cog" aria-hidden="true"></i></div>
                             <div className="text">SETTINGS</div>
                         </div>
                     </NavLink>
-                    <NavLink className="menu-item" to="/about" activeClassName="active">
+                    <NavLink className={"menu-item " + (this.state.menu === "about" ? "active" : "")} to="/about" activeClassName="active" onClick={this.menuClick.bind(this, "/about")}>
                         <div>
                             <div className="icon"><i className="fa fa-info-circle" aria-hidden="true"></i></div>
                             <div className="text">ABOUT</div>
                         </div>
                     </NavLink>
-                    <NavLink className="menu-item right" to="/login" activeClassName="active">
+                    <NavLink className={"menu-item right " + (this.state.menu === "login" ? "active" : "")} to="/login" activeClassName="active" onClick={this.menuClick.bind(this, "/login")}>
                         <div>
                             <div className="icon"><i className="fa fa-handshake-o" aria-hidden="true"></i></div>
                             <div className="text">LOGIN</div>
@@ -64,4 +89,13 @@ class Menu extends Component {
     }
 }
 
-export default Menu;
+let mapStateToProps = (state) => {
+    return {
+        instances: state.target.instances,
+        config: state.config
+    };
+};
+
+Menu = connect(mapStateToProps, undefined)(Menu);
+export default withRouter(Menu);
+

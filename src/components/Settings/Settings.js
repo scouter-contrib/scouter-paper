@@ -10,7 +10,6 @@ class Settings extends Component {
     constructor(props) {
         super(props);
 
-        console.log(window.location);
         this.state = {
             config: {
                 protocol: window.location.protocol.replace(":", ""),
@@ -25,6 +24,8 @@ class Settings extends Component {
                     normal: {
                         rows: 5,
                         columns: 5,
+                        opacity : 0.7,
+                        sampling : 100,
                         fills: {
                             D_0_2: {
                                 color: "#0062B1"
@@ -58,6 +59,8 @@ class Settings extends Component {
                     error: {
                         rows: 5,
                         columns: 5,
+                        opacity : 0.7,
+                        sampling : 100,
                         fills: {
                             D_0_2: {
                                 color: "#9F0500"
@@ -104,6 +107,12 @@ class Settings extends Component {
         };
     }
 
+    componentDidUpdate(prevProps, prevState) {
+
+
+    }
+
+
     onChange = (attr, event) => {
         let config = this.state.config;
         config[attr] = event.target.value;
@@ -112,7 +121,7 @@ class Settings extends Component {
         });
     };
 
-    onXLogSizeChange = (type, dir, event) => {
+    onXLogOptionChange = (type, dir, event) => {
 
         let config = this.state.config;
 
@@ -313,8 +322,7 @@ class Settings extends Component {
                                 <div>PROTOCOL</div>
                             </div>
                             <div className="input">
-                                <input type="text" readOnly={!this.state.edit}
-                                       onChange={this.onChange.bind(this, "protocol")} value={this.state.config.protocol}/>
+                                <input type="text" readOnly={!this.state.edit} onChange={this.onChange.bind(this, "protocol")} value={this.state.config.protocol} placeholder="HTTP or HTTPS"/>
                             </div>
                         </div>
                         <div className="row">
@@ -322,8 +330,7 @@ class Settings extends Component {
                                 <div>ADDRESS</div>
                             </div>
                             <div className="input">
-                                <input type="text" readOnly={!this.state.edit}
-                                       onChange={this.onChange.bind(this, "address")} value={this.state.config.address}/>
+                                <input type="text" readOnly={!this.state.edit} onChange={this.onChange.bind(this, "address")} value={this.state.config.address} placeholder="SCOUTER WEBAPP SERVER ADDRESS" />
                             </div>
                         </div>
                         <div className="row">
@@ -331,8 +338,7 @@ class Settings extends Component {
                                 <div>POST</div>
                             </div>
                             <div className="input">
-                                <input type="text" readOnly={!this.state.edit} onChange={this.onChange.bind(this, "port")}
-                                       value={this.state.config.port}/>
+                                <input type="text" readOnly={!this.state.edit} onChange={this.onChange.bind(this, "port")} value={this.state.config.port} placeholder="SCOUTER WEBAPP SERVER PORT (DEFAULT 6188)" />
                             </div>
                         </div>
                         <div className="row">
@@ -340,8 +346,7 @@ class Settings extends Component {
                                 <div>INTERVAL</div>
                             </div>
                             <div className="input">
-                                <input type="text" readOnly={!this.state.edit}
-                                       onChange={this.onChange.bind(this, "interval")} value={this.state.config.interval}/>
+                                <input type="text" readOnly={!this.state.edit} onChange={this.onChange.bind(this, "interval")} value={this.state.config.interval} placeholder="POLLING INTERVAL (MS)" />
                             </div>
                         </div>
                     </div>
@@ -354,9 +359,7 @@ class Settings extends Component {
                                 <div>NUMBER FORMAT</div>
                             </div>
                             <div className="input">
-                                <input type="text" readOnly={!this.state.edit}
-                                       onChange={this.onChange.bind(this, "numberFormat")}
-                                       value={this.state.config.numberFormat}/>
+                                <input type="text" readOnly={!this.state.edit} onChange={this.onChange.bind(this, "numberFormat")} value={this.state.config.numberFormat} placeholder="999,999,00" />
                             </div>
                         </div>
                         <div className="row">
@@ -364,9 +367,7 @@ class Settings extends Component {
                                 <div>DATE FORMAT</div>
                             </div>
                             <div className="input">
-                                <input type="text" readOnly={!this.state.edit}
-                                       onChange={this.onChange.bind(this, "dateFormat")}
-                                       value={this.state.config.dateFormat}/>
+                                <input type="text" readOnly={!this.state.edit} onChange={this.onChange.bind(this, "dateFormat")} value={this.state.config.dateFormat} placeholder="YYYY-MM-DD" />
                             </div>
                         </div>
                         <div className="row ">
@@ -374,9 +375,7 @@ class Settings extends Component {
                                 <div>TIME FORMAT</div>
                             </div>
                             <div className="input">
-                                <input type="text" readOnly={!this.state.edit}
-                                       onChange={this.onChange.bind(this, "timeFormat")}
-                                       value={this.state.config.timeFormat}/>
+                                <input type="text" readOnly={!this.state.edit} onChange={this.onChange.bind(this, "timeFormat")} value={this.state.config.timeFormat} placeholder="HH:MM:SS" />
                             </div>
                         </div>
                         <div className="row last">
@@ -384,9 +383,7 @@ class Settings extends Component {
                                 <div>MINUTES FORMAT</div>
                             </div>
                             <div className="input">
-                                <input type="text" readOnly={!this.state.edit}
-                                       onChange={this.onChange.bind(this, "minuteFormat")}
-                                       value={this.state.config.minuteFormat}/>
+                                <input type="text" readOnly={!this.state.edit} onChange={this.onChange.bind(this, "minuteFormat")} value={this.state.config.minuteFormat}  placeholder="HH:MM" />
                             </div>
                         </div>
                     </div>
@@ -398,14 +395,24 @@ class Settings extends Component {
                             <div className="label">
                                 <div>DOT SIZE (NORMAL)</div>
                             </div>
-                            <div className="input xlog-size">
+                            <div className="input xlog-option">
                                 <div className="xlog-label">ROWS</div>
-                                <select value={this.state.config.xlog.normal.rows} onChange={this.onXLogSizeChange.bind(this, "normal", "rows")} disabled={!this.state.edit}>
+                                <select value={this.state.config.xlog.normal.rows} onChange={this.onXLogOptionChange.bind(this, "normal", "rows")} disabled={!this.state.edit}>
                                     <option>3</option><option>4</option><option>5</option><option>6</option><option>7</option><option>8</option>
                                 </select>
                                 <div className="xlog-label second">COLUMNS</div>
-                                <select value={this.state.config.xlog.normal.columns} onChange={this.onXLogSizeChange.bind(this, "normal", "columns")} disabled={!this.state.edit}>
+                                <select value={this.state.config.xlog.normal.columns} onChange={this.onXLogOptionChange.bind(this, "normal", "columns")} disabled={!this.state.edit}>
                                     <option>3</option><option>4</option><option>5</option><option>6</option><option>7</option><option>8</option>
+                                </select>
+                            </div>
+                            <div className="input xlog-option last">
+                                <div className="xlog-label">OPACITY</div>
+                                <select value={this.state.config.xlog.normal.opacity} onChange={this.onXLogOptionChange.bind(this, "normal", "opacity")} disabled={!this.state.edit}>
+                                    <option>0.1</option><option>0.2</option><option>0.3</option><option>0.4</option><option>0.5</option><option>0.6</option><option>0.7</option><option>0.8</option><option>0.9</option><option>1</option>
+                                </select>
+                                <div className="xlog-label second">SAMPLING</div>
+                                <select value={this.state.config.xlog.normal.sampling} onChange={this.onXLogOptionChange.bind(this, "normal", "sampling")} disabled={!this.state.edit}>
+                                    <option value="10">10%</option><option value="20">20%</option><option value="30">30%</option><option value="40">40%</option><option value="50">50%</option><option value="60">60%</option><option value="70">70%</option><option value="80">80%</option><option value="90">90%</option><option value="100">100%</option>
                                 </select>
                             </div>
                         </div>
@@ -413,14 +420,24 @@ class Settings extends Component {
                             <div className="label">
                                 <div>DOT SIZE (ERROR)</div>
                             </div>
-                            <div className="input xlog-size">
+                            <div className="input xlog-option">
                                 <div className="xlog-label">ROWS</div>
-                                <select value={this.state.config.xlog.error.rows} onChange={this.onXLogSizeChange.bind(this, "error", "rows")} disabled={!this.state.edit}>
+                                <select value={this.state.config.xlog.error.rows} onChange={this.onXLogOptionChange.bind(this, "error", "rows")} disabled={!this.state.edit}>
                                     <option>3</option><option>4</option><option>5</option><option>6</option><option>7</option><option>8</option>
                                 </select>
                                 <div className="xlog-label second">COLUMNS</div>
-                                <select value={this.state.config.xlog.error.columns} onChange={this.onXLogSizeChange.bind(this, "error", "columns")} disabled={!this.state.edit}>
+                                <select value={this.state.config.xlog.error.columns} onChange={this.onXLogOptionChange.bind(this, "error", "columns")} disabled={!this.state.edit}>
                                     <option>3</option><option>4</option><option>5</option><option>6</option><option>7</option><option>8</option>
+                                </select>
+                            </div>
+                            <div className="input xlog-option last">
+                                <div className="xlog-label">OPACITY</div>
+                                <select value={this.state.config.xlog.error.opacity} onChange={this.onXLogOptionChange.bind(this, "error", "opacity")} disabled={!this.state.edit}>
+                                    <option>0.1</option><option>0.2</option><option>0.3</option><option>0.4</option><option>0.5</option><option>0.6</option><option>0.7</option><option>0.8</option><option>0.9</option><option>1</option>
+                                </select>
+                                <div className="xlog-label second">SAMPLING</div>
+                                <select value={this.state.config.xlog.error.sampling} onChange={this.onXLogOptionChange.bind(this, "error", "sampling")} disabled={!this.state.edit}>
+                                    <option value="10">10%</option><option value="20">20%</option><option value="30">30%</option><option value="40">40%</option><option value="50">50%</option><option value="60">60%</option><option value="70">70%</option><option value="80">80%</option><option value="90">90%</option><option value="100">100%</option>
                                 </select>
                             </div>
                         </div>

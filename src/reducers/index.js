@@ -16,6 +16,8 @@ const configState = {
         normal: {
             rows: 5,
             columns: 5,
+            opacity : 0.7,
+            sampling : 100,
             fills: {
                 D_0_2: {
                     color: "#0062B1"
@@ -49,6 +51,8 @@ const configState = {
         error: {
             rows: 5,
             columns: 5,
+            opacity : 0.7,
+            sampling : 100,
             fills: {
                 D_0_2: {
                     color: "#9F0500"
