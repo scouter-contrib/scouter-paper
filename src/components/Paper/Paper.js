@@ -218,12 +218,37 @@ class Paper extends Component {
 
         let now = (new Date()).getTime();
 
-        let datas = result.xlogs.map((d) => {
-            d["_custom"] = {
-                p: false
-            };
-            return d;
-        });
+        let datas = null;
+        if (Number(this.props.config.xlog.normal.sampling) !== 100 || Number(this.props.config.xlog.error.sampling) !== 100) {
+            datas = result.xlogs.filter((d) => {
+
+                if (Number(d.error)) {
+                    if (Math.round(Math.random() * 100) > (100 - this.props.config.xlog.error.sampling)) {
+                        return true;
+                    } else {
+                        return false;
+                    }
+                } else {
+                    if (Math.round(Math.random() * 100) > (100 - this.props.config.xlog.normal.sampling)) {
+                        return true;
+                    } else {
+                        return false;
+                    }
+                }
+            }).map((d) => {
+                d["_custom"] = {
+                    p: false
+                };
+                return d;
+            });
+        } else {
+            datas = result.xlogs.map((d) => {
+                d["_custom"] = {
+                    p: false
+                };
+                return d;
+            });
+        }
 
         let tempXlogs = this.state.data.tempXlogs.concat(datas);
 
@@ -232,7 +257,6 @@ class Paper extends Component {
         data.offset2 = result.xlogIndex;
         data.tempXlogs = tempXlogs;
         data.lastRequestTime = now;
-
 
         let endTime = (new Date()).getTime();
         let startTime = endTime - this.state.data.range;

@@ -2,6 +2,7 @@ import React, {Component} from 'react';
 import './XLog.css';
 import * as d3 from "d3";
 import Profiler from "./Profiler/Profiler";
+import XLogPreviewer from "./XLogPreviewer/XLogPreviewer";
 
 
 class XLog extends Component {
@@ -20,11 +21,15 @@ class XLog extends Component {
         xAxisWidth: 70,
         yAxisHeight: 30,
         originX: null,
-        originY: null
+        originY: null,
+        preview : {
+            width : 100
+        }
     };
 
     lastStartTime = null;
     lastEndTime = null;
+    lastSecondStepTimestamp = null;
 
     constructor(props) {
         super(props);
@@ -78,13 +83,25 @@ class XLog extends Component {
             this.updateYAxis(true);
         }
 
+
+
         this.draw(this.props.data.newXLogs);
+
+
     };
 
 
     graphResize = () => {
         let box = this.refs.xlogViewer.parentNode.parentNode.parentNode;
-        if ((box.offsetWidth - this.graph.margin.left - this.graph.margin.right !== this.graph.width) || (this.graph.height !== box.offsetHeight - this.graph.margin.top - this.graph.margin.bottom - 27)) {
+
+        let currentWidth = 0;
+        if (this.props.box.values.showPreview === "Y") {
+            currentWidth = box.offsetWidth - this.graph.margin.left - this.graph.preview.width;
+        } else {
+            currentWidth = box.offsetWidth - this.graph.margin.left - this.graph.margin.right;
+        }
+
+        if ((currentWidth !== this.graph.width) || (this.graph.height !== box.offsetHeight - this.graph.margin.top - this.graph.margin.bottom - 27)) {
             this.graphInit();
         }
     };
@@ -97,8 +114,6 @@ class XLog extends Component {
             let gabY = Math.floor(this.graph.normalBrush.height / 2);
             xlogs.forEach((d, i) => {
 
-
-
                 let x = this.graph.x(d.endTime);
                 let y = this.graph.y(d.elapsed);
 
@@ -107,26 +122,10 @@ class XLog extends Component {
                 }
 
                 if (x > 0) {
-
+                    console.log("DRAW");
                     if (Number(d.error)) {
-                        if (Number(this.props.config.xlog.error.sampling) !== 100) {
-                            if (Math.round(Math.random() * 100) > this.props.config.xlog.error.sampling) {
-                                console.log("PASS");
-                                return;
-                            }
-                        }
-
-                        console.log("DRAW");
                         context.drawImage(this.graph.errorBrush, x - gabX, y - gabY, this.graph.errorBrush.width, this.graph.errorBrush.height);
                     } else {
-                        if (Number(this.props.config.xlog.normal.sampling) !== 100) {
-                            if (Math.round(Math.random() * 100) > this.props.config.xlog.normal.sampling) {
-                                console.log("PASS");
-                                return;
-                            }
-                        }
-
-                        console.log("DRAW");
                         context.drawImage(this.graph.normalBrush, x - gabX, y - gabY, this.graph.normalBrush.width, this.graph.normalBrush.height);
                     }
                 }
@@ -221,7 +220,12 @@ class XLog extends Component {
 
     graphInit = () => {
         let box = this.refs.xlogViewer.parentNode.parentNode.parentNode;
-        this.graph.width = box.offsetWidth - this.graph.margin.left - this.graph.margin.right;
+        if (this.props.box.values.showPreview === "Y") {
+            this.graph.width = box.offsetWidth - this.graph.margin.left - this.graph.preview.width;
+        } else {
+            this.graph.width = box.offsetWidth - this.graph.margin.left - this.graph.margin.right;
+        }
+
         this.graph.height = box.offsetHeight - this.graph.margin.top - this.graph.margin.bottom - 27;
 
         let svg = d3.select(this.refs.xlogViewer).select("svg");
@@ -230,9 +234,12 @@ class XLog extends Component {
         }
         svg = d3.select(this.refs.xlogViewer).append("svg").attr("width", this.graph.width + this.graph.margin.left + this.graph.margin.right).attr("height", this.graph.height + this.graph.margin.top + this.graph.margin.bottom).append("g").attr("class", "top-group").attr("transform", "translate(" + this.graph.margin.left + "," + this.graph.margin.top + ")");
 
-
         this.graph.x = d3.scaleTime().range([0, this.graph.width]).domain([this.props.data.startTime, this.props.data.endTime]);
-        this.graph.y = d3.scaleLinear().range([this.graph.height, 0]).domain([0, this.props.data.maxElapsed]);
+        if (this.state.elapsed) {
+            this.graph.y = d3.scaleLinear().range([this.graph.height, 0]).domain([0, this.state.elapsed]);
+        } else {
+            this.graph.y = d3.scaleLinear().range([this.graph.height, 0]).domain([0, this.props.data.maxElapsed]);
+        }
 
         // X축 단위 그리기
         let xAxisCount = Math.floor(this.graph.width / this.graph.xAxisWidth);
@@ -392,13 +399,11 @@ class XLog extends Component {
 
     render() {
         return (
-            <div className="xlog-viewer" ref="xlogViewer" onTouchStart={this.stopProgation}
-                 onMouseDown={this.stopProgation}>
+            <div className="xlog-viewer" ref="xlogViewer" onTouchStart={this.stopProgation} onMouseDown={this.stopProgation}>
                 <div></div>
-                <div className="axis-button axis-up" onClick={this.axisUp} onMouseDown={this.stopProgation}><i
-                    className="fa fa-angle-up" aria-hidden="true"></i></div>
-                <div className="axis-button axis-down" onClick={this.axisDown} onMouseDown={this.stopProgation}><i
-                    className="fa fa-angle-down" aria-hidden="true"></i></div>
+                <div className="axis-button axis-up" onClick={this.axisUp} onMouseDown={this.stopProgation}><i className="fa fa-angle-up" aria-hidden="true"></i></div>
+                <div className="axis-button axis-down" onClick={this.axisDown} onMouseDown={this.stopProgation}><i className="fa fa-angle-down" aria-hidden="true"></i></div>
+                {this.props.box.values.showPreview === "Y" && <XLogPreviewer secondStepTimestamp={this.props.data.secondStepTimestamp} secondStepXlogs={this.props.data.secondStepXlogs} width={this.graph.preview.width} margin={this.graph.margin} maxElapsed={this.state.elapsed} />}
                 <Profiler selection={this.state.selection} xlogs={this.props.data.xlogs}/>
             </div>
         );

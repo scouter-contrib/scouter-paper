@@ -6,7 +6,7 @@
     _background-color: white;
     height: 100%;
     height: calc(100% - 5px);
-
+    text-align: left;
 }
 
 .xlog-viewer > div.xlog-viewer-content {
@@ -59,6 +59,14 @@
 
 .xlog-viewer .axis-button.axis-down {
     bottom: 7px;
+}
+
+.xlog-viewer .preview-area {
+    background-color: red;
+    position: absolute;
+    top : 0;
+    right : 0;
+    bottom : 0;
 }
 
 

@@ -55,7 +55,7 @@ class Login extends Component {
             url: this.props.config.protocol + "://" + this.props.config.address + ":" + this.props.config.port + "/scouter/v1/user/info",
             xhrFields: {
                 withCredentials: true
-            },
+            }
         }).done((msg) => {
             if (msg) {
                 if (msg.status === "200" && msg.resultCode === "0" && msg.result) {
@@ -97,7 +97,7 @@ class Login extends Component {
             processData: false,
             xhrFields: {
                 withCredentials: true
-            },
+            }
         }).done((msg) => {
             this.info();
         }).fail((jqXHR, textStatus) => {

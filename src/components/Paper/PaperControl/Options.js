@@ -47,7 +47,15 @@ export function options() {
             icon: "fa-bullseye",
             mode: "exclusive",
             type: "xlog",
-            title: "XLOG"
+            title: "XLOG",
+            config: {
+                showPreview: {
+                    name: 'SHOW PROCESS',
+                    type: "selector",
+                    data: ["Y", "N"],
+                    value: "Y"
+                }
+            }
         },
         visitor: {
             icon: "fa-child",
