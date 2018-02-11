@@ -232,7 +232,7 @@ class InstanceSelector extends Component {
                             <div>INSTANCES</div>
                         </div>
                         {this.state.instances && this.state.instances.filter((instance) => {
-                            return instance.objType === 'tomcat';
+                            return instance.objFamily === 'javaee';
                         }).map((instance, i) => {
                             return (<div key={i} className={"instance " +  (i === 0 ? 'first ' : ' ') + (!(!this.state.selectedInstances[instance.objHash]) ? "selected" : " ")} onClick={this.instanceClick.bind(this, instance)}>{instance.objName}</div>)
                         })}
