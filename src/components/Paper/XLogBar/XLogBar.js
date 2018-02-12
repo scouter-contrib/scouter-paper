@@ -147,7 +147,7 @@ class XLogBar extends Component {
                     {this.props.box.values.history > 1 &&
                         <div className="request-history-count-list" ref="historyCount" style={{fontSize: this.state.fontSize + "px"}}>
                         {this.state.history.map((d, i) => {
-                            return <div className={"request-history-count " + "step-" + (this.state.history.length - i)} key={i}>{d}</div>
+                            return <div className={"request-history-count step-" + (this.state.history.length - i)} key={i}>{d}</div>
                         })}
                         </div>}
                     </div>

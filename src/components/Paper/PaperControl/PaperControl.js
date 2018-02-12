@@ -35,13 +35,13 @@ class PaperControl extends Component {
                     let isArray = Array.isArray(this.options[name]);
 
                     return <div key={i} className={"paper-control " + (isArray ? 'multi-control' : '')}>
-                        {(!isArray && !this. touch) &&
+                        {(!isArray && !this.touch) &&
                         <Draggable type="metric" className="draggable control-item" data={JSON.stringify(this.options[name])}>
                             {this.options[name].icon && <i className={"fa " + this.options[name].icon} aria-hidden="true"></i>}
                             {this.options[name].text && <span className="text-icon">{this.options[name].text}</span>}
                         </Draggable>
                         }
-                        {(isArray && !this. touch) && <div className="multi-metrics">
+                        {(isArray && !this.touch) && <div className="multi-metrics">
                             <div className="group-name">{name}</div>
                             <ul>
                                 {this.options[name].map((counterName, j) => {
@@ -62,7 +62,7 @@ class PaperControl extends Component {
                             {this.options[name].text && <span className="text-icon">{this.options[name].text}</span>}
                         </div>
                         }
-                        {(isArray && this. touch) && <div className="multi-metrics">
+                        {(isArray && this.touch) && <div className="multi-metrics">
                             <div className="group-name">{name}</div>
                             <ul>
                                 {this.options[name].map((counterName, j) => {

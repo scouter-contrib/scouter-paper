@@ -107,6 +107,8 @@ class BoxConfig extends Component {
                                 {this.props.box.option.config[attr].tooltip && this.props.box.option.config[attr].tooltip.type === "text" &&
                                 <div className="config-tooltip"><i className="fa fa-info-circle" aria-hidden="true"></i> {this.props.box.option.config[attr].tooltip.content}</div>}
                             </div>
+                        } else {
+                            return undefined;
                         }
                     })}
                     </div>

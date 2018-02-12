@@ -104,7 +104,8 @@ export function options() {
                 mode: "nonexclusive",
                 type: "counter",
                 title: "Active Speed",
-                counterKey : "ActiveSpeed"
+                counterKey : "ActiveSpeed",
+                multiValue : ["L", "M", "S"]
             },
             {
                 text: "Elapsed Time",
@@ -226,7 +227,8 @@ export function options() {
                 mode: "nonexclusive",
                 type: "counter",
                 title: "Heap Total Usage",
-                counterKey : "HeapTotUsage"
+                counterKey : "HeapTotUsage",
+                multiValue : ["MAX", "USED"]
             },
             {
                 text: "Heap Used",
