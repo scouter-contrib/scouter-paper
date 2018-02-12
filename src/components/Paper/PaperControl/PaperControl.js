@@ -77,9 +77,17 @@ class PaperControl extends Component {
                         </div>}
                     </div>
                 })}
+                {!this.touch &&
+                <div className="paper-control paper-right" onClick={this.props.clearLayout} data-tip="CLICK TO CLEAR ALL">
+                    <i className="fa fa-trash-o" aria-hidden="true"></i>
+                </div>
+                }
+                {this.touch &&
                 <div className="paper-control paper-right" onClick={this.props.clearLayout}>
                     <i className="fa fa-trash-o" aria-hidden="true"></i>
                 </div>
+                }
+
                 <ReactTooltip />
             </div>
         );
