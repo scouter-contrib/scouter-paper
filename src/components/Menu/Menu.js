@@ -16,7 +16,6 @@ class Menu extends Component {
     }
 
     componentDidMount() {
-        console.log(this.props.location);
         /*let menu = "";
         if (this.props.location.pathname === "/paper") {
             menu = "paper";
@@ -56,7 +55,7 @@ class Menu extends Component {
                             </div>
                         </NavLink>
                     </div>
-                    <NavLink className={"menu-item " + (this.state.menu === "paper" ? "active" : "")} to={"/paper" + '?instances=' + this.props.instances.map((d) => {return d.objHash})} onClick={this.menuClick.bind(this, "/paper")}>
+                    <NavLink className={"menu-item " + (this.state.menu === "paper" ? "active" : "")} to={"/paper?instances=" + this.props.instances.map((d) => {return d.objHash})} onClick={this.menuClick.bind(this, "/paper")}>
                         <div>
                             <div className="icon"><i className="fa fa-newspaper-o" aria-hidden="true"></i></div>
                             <div className="text">PAPERS</div>

@@ -35,7 +35,6 @@ class Box extends Component {
     }
 
     render() {
-
         let type = null;
 
         if (this.props.box && this.props.box.option && !Array.isArray(this.props.box.option)) {

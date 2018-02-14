@@ -133,7 +133,7 @@ class Login extends Component {
                     {!this.props.user.id &&
                     <div className="login-content">
                         <div className="login-image">
-                            <img src={building}/>
+                            <img src={building} alt="building" />
                         </div>
                         <div>
                             <input type="text" placeholder="ID" value={this.state.control.id}

@@ -24,7 +24,7 @@ class LineChart extends Component {
         timeFormat: "%H:%M",
         xAxisWidth: 70,
         yAxisHeight: 30,
-        noData : true
+        noData: true
     };
 
     constructor(props) {
@@ -54,7 +54,7 @@ class LineChart extends Component {
             let counters = Object.assign(this.state.counters);
 
             if (Array.isArray(nextProps.box.option)) {
-                for (let i=0; i<nextProps.box.option.length; i++) {
+                for (let i = 0; i < nextProps.box.option.length; i++) {
                     let counterKey = nextProps.box.option[i].counterKey;
                     if (!counters[counterKey]) {
                         counters[counterKey] = [];
@@ -96,10 +96,18 @@ class LineChart extends Component {
 
             let maxY = 0;
             for (let attr in this.state.counters) {
-                for (let i=0; i<this.state.counters[attr].length; i++) {
+                for (let i = 0; i < this.state.counters[attr].length; i++) {
                     for (let hash in this.state.counters[attr][i].data) {
-                        if (Number(this.state.counters[attr][i].data[hash].value) > maxY) {
-                            maxY = this.state.counters[attr][i].data[hash].value;
+                        if (Array.isArray(this.state.counters[attr][i].data[hash].value)) {
+                            for (let j = 0; j < this.state.counters[attr][i].data[hash].value.length; j++) {
+                                if (Number(this.state.counters[attr][i].data[hash].value[j]) > maxY) {
+                                    maxY = Number(this.state.counters[attr][i].data[hash].value[j]);
+                                }
+                            }
+                        } else {
+                            if (Number(this.state.counters[attr][i].data[hash].value) > maxY) {
+                                maxY = Number(this.state.counters[attr][i].data[hash].value);
+                            }
                         }
                     }
                 }
@@ -115,7 +123,7 @@ class LineChart extends Component {
 
             let noData = true;
             if (Array.isArray(nextProps.box.option)) {
-                for (let i=0; i<nextProps.box.option.length; i++) {
+                for (let i = 0; i < nextProps.box.option.length; i++) {
                     let counterKey = nextProps.box.option[i].counterKey;
                     if (nextProps.counters[counterKey]) {
                         if (Object.keys(nextProps.counters[counterKey]).length !== 0) {
@@ -136,7 +144,7 @@ class LineChart extends Component {
                 startTime: startTime,
                 endTime: endTime,
                 counters: counters,
-                noData : noData
+                noData: noData
             });
         } else {
 
@@ -181,26 +189,7 @@ class LineChart extends Component {
         this.graph.y = d3.scaleLinear().range([height, 0]);
 
         this.graph.x.domain([this.state.startTime, this.state.endTime]);
-
-        let maxY = 0;
-        for (let attr in this.state.counters) {
-            for (let i=0; i<this.state.counters[attr].length; i++) {
-                for (let hash in this.state.counters[attr][i].data) {
-                    if (Number(this.state.counters[attr][i].data[hash].value) > maxY) {
-                        maxY = this.state.counters[attr][i].data[hash].value;
-                    }
-                }
-            }
-        }
-
-        if (!maxY || maxY < 10) {
-            maxY = 10;
-        } else {
-            maxY = Math.round(maxY * 1.2);
-        }
-
-        this.graph.maxY = maxY;
-        this.graph.y.domain([0, maxY]);
+        this.graph.y.domain([0, this.graph.maxY]);
 
         let xAxisCount = Math.floor(this.graph.width / this.graph.xAxisWidth);
         if (xAxisCount < 1) {
@@ -234,49 +223,89 @@ class LineChart extends Component {
 
         let that = this;
 
-
         if (this.refs.lineChart && this.graph.svg) {
 
             this.graphAxis(this.graph.width, this.graph.height, false);
             if (this.props.instances) {
                 let colorScale = d3.schemeCategory10;
                 let cnt = 0;
-                for (let attr in this.state.counters) {
+                for (let counterKey in this.state.counters) {
                     for (let i = 0; i < this.props.instances.length; i++) {
 
-                        let valueline = d3.line().curve(d3.curveMonotoneX)
-                            .defined(function (d) {
-                                let objData = d.data ? d.data[that.props.instances[i].objHash] : {};
-                                return objData && !isNaN(objData.value);
-                            })
-
-                            .x(function (d) {
-                                return that.graph.x(d.time);
-                            })
-                            .y(function (counter) {
-                                let objData = counter.data[that.props.instances[i].objHash];
-                                if (objData) {
-                                    return that.graph.y(Number(objData.value));
-                                } else {
-                                    return that.graph.y(0);
+                        let isMultiValue = false;
+                        let thisOption = null;
+                        for (let j = 0; j < this.props.box.option.length; j++) {
+                            if (this.props.box.option[j].counterKey === counterKey) {
+                                thisOption = this.props.box.option[j];
+                                if (this.props.box.option[j].multiValue) {
+                                    isMultiValue = true;
                                 }
-                            });
-
-                        let pathClass = "line-" + that.props.instances[i].objHash + "-" + attr;
-
-                        let path = this.graph.svg.select(".line." + pathClass);
-                        if (path.size() < 1) {
-                            path = this.graph.svg.append("path").attr("class", "line " + pathClass).style("stroke", colorScale[cnt]);
-                            this.props.setTitle(attr, colorScale[cnt]);
+                                break;
+                            }
                         }
-                        path.data([that.state.counters[attr]]).attr("d", valueline);
+
+                        if (isMultiValue) {
+                            for (let j = 0; j < thisOption.multiValue.length; j++) {
+                                let valueLine = d3.line().curve(d3.curveMonotoneX)
+                                    .defined(function (d) {
+                                        let objData = (d.data && d.data[that.props.instances[i].objHash] && d.data[that.props.instances[i].objHash].value) ? d.data[that.props.instances[i].objHash].value : null;
+                                        return objData && !isNaN(objData[j]);
+                                    })
+                                    .x(function (d) {
+                                        return that.graph.x(d.time);
+                                    })
+                                    .y(function (counter) {
+                                        let objData = counter.data[that.props.instances[i].objHash];
+                                        if (objData.value[j]) {
+                                            return that.graph.y(Number(objData.value[j]));
+                                        } else {
+                                            return that.graph.y(0);
+                                        }
+                                    });
+
+                                let pathClass = "line-" + that.props.instances[i].objHash + "-" + counterKey + "-" + thisOption.multiValue[j];
+
+                                let path = this.graph.svg.select(".line." + pathClass);
+                                if (path.size() < 1) {
+                                    path = this.graph.svg.append("path").attr("class", "line " + pathClass).style("stroke", colorScale[cnt]);
+                                    this.props.setTitle(thisOption.title + "(" + thisOption.multiValue[j] + ")", colorScale[cnt]);
+                                }
+                                path.data([that.state.counters[counterKey]]).attr("d", valueLine);
+                                cnt++;
+                            }
+                        } else {
+                            let valueLine = d3.line().curve(d3.curveMonotoneX)
+                                .defined(function (d) {
+                                    let objData = d.data ? d.data[that.props.instances[i].objHash] : null;
+                                    return objData && !isNaN(objData.value);
+                                })
+                                .x(function (d) {
+                                    return that.graph.x(d.time);
+                                })
+                                .y(function (counter) {
+                                    let objData = counter.data[that.props.instances[i].objHash];
+                                    if (objData) {
+                                        return that.graph.y(Number(objData.value));
+                                    } else {
+                                        return that.graph.y(0);
+                                    }
+                                });
+
+                            let pathClass = "line-" + that.props.instances[i].objHash + "-" + counterKey;
+
+                            let path = this.graph.svg.select(".line." + pathClass);
+                            if (path.size() < 1) {
+                                path = this.graph.svg.append("path").attr("class", "line " + pathClass).style("stroke", colorScale[cnt]);
+                                this.props.setTitle(thisOption.title, colorScale[cnt]);
+                            }
+                            path.data([that.state.counters[counterKey]]).attr("d", valueLine);
+                            cnt++;
+                        }
                     }
-                    cnt++;
                 }
             }
         }
     };
-
 
 
     graphResize = () => {

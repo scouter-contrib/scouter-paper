@@ -9,7 +9,6 @@ import {
     Login,
     Overlay,
     Message,
-    Realtime,
     ContentWrapper
 } from './components';
 import {Route, Switch} from 'react-router-dom';
@@ -46,7 +45,6 @@ class App extends Component {
                     <Route exact path='/login' component={Login}/>
                     <Route exact path='/paper' component={Paper}/>
                     <Route exact path='/settings' component={Settings}/>
-                    <Route exact path='/realtime' component={Realtime}/>
                 </Switch>
                 {this.props.control.Message &&
                 <Overlay>

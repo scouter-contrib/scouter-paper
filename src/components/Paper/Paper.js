@@ -139,9 +139,7 @@ class Paper extends Component {
 
     getCounter = () => {
 
-
         if (this.props.instances && this.props.instances.length > 0) {
-
             let counterKeyMap = {};
 
             for (let i=0; i<this.state.boxes.length; i++) {
@@ -175,7 +173,7 @@ class Paper extends Component {
 
 
             let params = JSON.stringify(counterKeys);
-            params = params.replace(/\"/gi, "");
+            params = params.replace(/"/gi, "");
             this.props.addRequest();
             jQuery.ajax({
                 method: "GET",
@@ -189,6 +187,7 @@ class Paper extends Component {
                 for (let i=0; i<counterKeys.length; i++) {
                     map[counterKeys[i]] = {};
                 }
+
                 if (msg.result) {
                     for (let i=0; i<msg.result.length; i++) {
                         let counter = msg.result[i];
@@ -365,12 +364,12 @@ class Paper extends Component {
         do {
             dup = false;
             key = String(this.state.boxes.length + i);
-            this.state.boxes.forEach((box) => {
-                if (box.key === key) {
+            for (let i=0; i<this.state.boxes.length; i++) {
+                if (this.state.boxes[i].key === key) {
                     dup = true;
-                    return false;
+                    break;
                 }
-            });
+            }
             i++;
         } while (dup);
 
@@ -384,7 +383,6 @@ class Paper extends Component {
         let maxY = 0;
         let height = 0;
         for (let i=0; i<boxes.length; i++) {
-            console.log(boxes[i]);
             if (maxY < boxes[i].layout.y)  {
                 maxY = boxes[i].layout.y;
                 height = boxes[i].layout.h;
@@ -465,7 +463,8 @@ class Paper extends Component {
                         mode: option.mode,
                         type: option.type,
                         config: option.config,
-                        counterKey: option.counterKey
+                        counterKey: option.counterKey,
+                        multiValue: option.multiValue
                     };
                 } else {
 
@@ -490,7 +489,8 @@ class Paper extends Component {
                             type: option.type,
                             config: option.config,
                             counterKey: option.counterKey,
-                            title: option.title
+                            title: option.title,
+                            multiValue: option.multiValue
                         });
                     }
                 }

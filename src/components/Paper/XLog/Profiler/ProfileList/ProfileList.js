@@ -1,6 +1,6 @@
 import React, {Component} from 'react';
 import './ProfileList.css';
-import {getDate, getHttpProtocol} from '../../../../../common/common';
+import {getDate} from '../../../../../common/common';
 
 const layout = [
     {

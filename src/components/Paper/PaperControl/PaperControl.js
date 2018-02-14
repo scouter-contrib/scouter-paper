@@ -2,6 +2,7 @@ import React, {Component} from 'react';
 import './PaperControl.css';
 import * as Options from './Options';
 import {Draggable} from 'react-drag-and-drop'
+import ReactTooltip from 'react-tooltip'
 
 class PaperControl extends Component {
 
@@ -22,26 +23,25 @@ class PaperControl extends Component {
         return (
             <div className={"papers-controls noselect " + (this.props.fixedControl ? 'fixed-control ' : ' ') + (this.touch ? 'touch' : '')}>
                 {!this.touch &&
-                <div className="paper-control" onClick={this.props.addPaper}>
+                <div className="paper-control" onClick={this.props.addPaper} data-tip="CLICK TO ADD EMPTY PAPER">
                     <i className="fa fa-plus-circle" aria-hidden="true"></i>
                 </div>
                 }
                 {!this.touch &&
                 <div className="paper-control-separator"></div>
                 }
-                <div className="label">METRICS</div>
+                <div className="label" data-tip="DRAG RIGHT ICON TO THE PAPER">METRICS</div>
                 {Object.keys(this.options).map((name, i) => {
-
                     let isArray = Array.isArray(this.options[name]);
 
                     return <div key={i} className={"paper-control " + (isArray ? 'multi-control' : '')}>
-                        {(!isArray && !this. touch) &&
+                        {(!isArray && !this.touch) &&
                         <Draggable type="metric" className="draggable control-item" data={JSON.stringify(this.options[name])}>
-                            {this.options[name].icon && <i className={"fa " + this.options[name].icon} aria-hidden="true"></i>}
+                            {this.options[name].icon && <i data-tip={this.options[name].title} className={"fa " + this.options[name].icon} aria-hidden="true"></i>}
                             {this.options[name].text && <span className="text-icon">{this.options[name].text}</span>}
                         </Draggable>
                         }
-                        {(isArray && !this. touch) && <div className="multi-metrics">
+                        {(isArray && !this.touch) && <div className="multi-metrics">
                             <div className="group-name">{name}</div>
                             <ul>
                                 {this.options[name].map((counterName, j) => {
@@ -62,7 +62,7 @@ class PaperControl extends Component {
                             {this.options[name].text && <span className="text-icon">{this.options[name].text}</span>}
                         </div>
                         }
-                        {(isArray && this. touch) && <div className="multi-metrics">
+                        {(isArray && this.touch) && <div className="multi-metrics">
                             <div className="group-name">{name}</div>
                             <ul>
                                 {this.options[name].map((counterName, j) => {
@@ -77,9 +77,18 @@ class PaperControl extends Component {
                         </div>}
                     </div>
                 })}
+                {!this.touch &&
+                <div className="paper-control paper-right" onClick={this.props.clearLayout} data-tip="CLICK TO CLEAR ALL">
+                    <i className="fa fa-trash-o" aria-hidden="true"></i>
+                </div>
+                }
+                {this.touch &&
                 <div className="paper-control paper-right" onClick={this.props.clearLayout}>
                     <i className="fa fa-trash-o" aria-hidden="true"></i>
                 </div>
+                }
+
+                <ReactTooltip />
             </div>
         );
     }

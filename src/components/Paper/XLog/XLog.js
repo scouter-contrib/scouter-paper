@@ -22,14 +22,13 @@ class XLog extends Component {
         yAxisHeight: 30,
         originX: null,
         originY: null,
-        preview : {
-            width : 100
+        preview: {
+            width: 100
         }
     };
 
     lastStartTime = null;
     lastEndTime = null;
-    lastSecondStepTimestamp = null;
 
     constructor(props) {
         super(props);
@@ -84,7 +83,6 @@ class XLog extends Component {
         }
 
 
-
         this.draw(this.props.data.newXLogs);
 
 
@@ -122,7 +120,6 @@ class XLog extends Component {
                 }
 
                 if (x > 0) {
-                    console.log("DRAW");
                     if (Number(d.error)) {
                         context.drawImage(this.graph.errorBrush, x - gabX, y - gabY, this.graph.errorBrush.width, this.graph.errorBrush.height);
                     } else {
@@ -399,11 +396,17 @@ class XLog extends Component {
 
     render() {
         return (
-            <div className="xlog-viewer" ref="xlogViewer" onTouchStart={this.stopProgation} onMouseDown={this.stopProgation}>
+            <div className="xlog-viewer" ref="xlogViewer" onTouchStart={this.stopProgation}
+                 onMouseDown={this.stopProgation}>
                 <div></div>
-                <div className="axis-button axis-up" onClick={this.axisUp} onMouseDown={this.stopProgation}><i className="fa fa-angle-up" aria-hidden="true"></i></div>
-                <div className="axis-button axis-down" onClick={this.axisDown} onMouseDown={this.stopProgation}><i className="fa fa-angle-down" aria-hidden="true"></i></div>
-                {this.props.box.values.showPreview === "Y" && <XLogPreviewer secondStepTimestamp={this.props.data.secondStepTimestamp} secondStepXlogs={this.props.data.secondStepXlogs} width={this.graph.preview.width} margin={this.graph.margin} maxElapsed={this.state.elapsed} />}
+                <div className="axis-button axis-up" onClick={this.axisUp} onMouseDown={this.stopProgation}><i
+                    className="fa fa-angle-up" aria-hidden="true"></i></div>
+                <div className="axis-button axis-down" onClick={this.axisDown} onMouseDown={this.stopProgation}><i
+                    className="fa fa-angle-down" aria-hidden="true"></i></div>
+                {this.props.box.values.showPreview === "Y" &&
+                <XLogPreviewer secondStepTimestamp={this.props.data.secondStepTimestamp}
+                               secondStepXlogs={this.props.data.secondStepXlogs} width={this.graph.preview.width}
+                               margin={this.graph.margin} maxElapsed={this.state.elapsed}/>}
                 <Profiler selection={this.state.selection} xlogs={this.props.data.xlogs}/>
             </div>
         );
