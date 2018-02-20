@@ -5,6 +5,7 @@ import {EmptyBox, ClockBox, XLogBar} from "../../components";
 import XLog from "../Paper/XLog/XLog";
 import Visitor from "../Paper/Visitor/Visitor";
 import LineChart from "../Paper/LineChart/LineChart";
+import Tooltip from "./Tooltip/Tooltip";
 
 class Box extends Component {
 
@@ -12,7 +13,10 @@ class Box extends Component {
         super(props);
 
         this.state = {
-            titles : {}
+            titles : {},
+            tooltip : {
+                show : false
+            }
         };
     }
 
@@ -33,6 +37,27 @@ class Box extends Component {
             this.props.setOption(this.props.box.key, option);
         }
     }
+
+    showTooltip = (x, y, marginLeft, marginTop, data) => {
+        this.setState({
+            tooltip : {
+                show : true,
+                x : x,
+                y : y,
+                marginLeft : marginLeft,
+                marginTop : marginTop,
+                data : data
+            }
+        });
+    };
+
+    hideTooltip = () => {
+        this.setState({
+            tooltip : {
+                show : false
+            }
+        });
+    };
 
     render() {
         let type = null;
@@ -61,7 +86,8 @@ class Box extends Component {
                             {type === "xlogBar" && <XLogBar layoutChangeTime={this.props.layoutChangeTime} box={this.props.box} data={this.props.data} />}
                             {type === "xlog" && <XLog layoutChangeTime={this.props.layoutChangeTime} box={this.props.box} data={this.props.data} config={this.props.config} />}
                             {type === "visitor" && <Visitor layoutChangeTime={this.props.layoutChangeTime} visitor={this.props.visitor} box={this.props.box} />}
-                            {type === "counter" && <LineChart layoutChangeTime={this.props.layoutChangeTime} time={this.props.counters.time} box={this.props.box} counters={this.props.counters.data} setTitle={this.setTitle} />}
+                            {type === "counter" && <LineChart layoutChangeTime={this.props.layoutChangeTime} time={this.props.counters.time} box={this.props.box} counters={this.props.counters.data} setTitle={this.setTitle} showTooltip={this.showTooltip} hideTooltip={this.hideTooltip} />}
+                            {this.state.tooltip.show && <Tooltip tooltip={this.state.tooltip}/>}
                         </div>
                     </div>
                 </div>

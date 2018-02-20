@@ -13,6 +13,7 @@ class LineChart extends Component {
             top: 24, right: 20, bottom: 30, left: 40
         },
         svg: null,
+        overlay : null,
         width: null,
         height: null,
         x: null,
@@ -22,9 +23,11 @@ class LineChart extends Component {
         startTime: (new Date()).getTime() - (1000 * 60 * 10),
         endTime: (new Date()).getTime(),
         timeFormat: "%H:%M",
+        fullTimeFormat: "%Y-%m-%d %H:%M:%S",
         xAxisWidth: 70,
         yAxisHeight: 30,
-        noData: true
+        noData: true,
+        bisector : null
     };
 
     constructor(props) {
@@ -202,16 +205,16 @@ class LineChart extends Component {
         }
 
         if (init) {
-            this.graph.svg.append("g").attr("class", "axis-y").call(d3.axisLeft(this.graph.y).ticks(yAxisCount));
-            this.graph.svg.append("g").attr("class", "grid-y").style("stroke-dasharray", "5 5").style("opacity", "0.3").call(d3.axisLeft(this.graph.y).tickSize(-this.graph.width).tickFormat("").ticks(yAxisCount));
+            this.graph.svg.insert("g", ":first-child").attr("class", "axis-y").call(d3.axisLeft(this.graph.y).ticks(yAxisCount));
+            this.graph.svg.insert("g", ":first-child").attr("class", "grid-y").style("stroke-dasharray", "5 5").style("opacity", "0.3").call(d3.axisLeft(this.graph.y).tickSize(-this.graph.width).tickFormat("").ticks(yAxisCount));
         } else {
             this.graph.svg.select(".axis-x").call(d3.axisBottom(this.graph.x).tickFormat(d3.timeFormat(this.graph.timeFormat)).ticks(xAxisCount));
             this.graph.svg.select(".grid-x").call(d3.axisBottom(this.graph.x).tickSize(-this.graph.height).tickFormat("").ticks(xAxisCount));
         }
 
         if (init) {
-            this.graph.svg.append("g").attr("class", "axis-x").attr("transform", "translate(0," + this.graph.height + ")").call(d3.axisBottom(this.graph.x).tickFormat(d3.timeFormat(this.graph.timeFormat)).ticks(xAxisCount));
-            this.graph.svg.append("g").attr("class", "grid-x").style("stroke-dasharray", "5 5").style("opacity", "0.3").attr("transform", "translate(0," + this.graph.height + ")").call(d3.axisBottom(this.graph.x).tickSize(-this.graph.height).tickFormat("").ticks(xAxisCount));
+            this.graph.svg.insert("g", ":first-child").attr("class", "axis-x").attr("transform", "translate(0," + this.graph.height + ")").call(d3.axisBottom(this.graph.x).tickFormat(d3.timeFormat(this.graph.timeFormat)).ticks(xAxisCount));
+            this.graph.svg.insert("g", ":first-child").attr("class", "grid-x").style("stroke-dasharray", "5 5").style("opacity", "0.3").attr("transform", "translate(0," + this.graph.height + ")").call(d3.axisBottom(this.graph.x).tickSize(-this.graph.height).tickFormat("").ticks(xAxisCount));
         } else {
             this.graph.svg.select(".axis-y").transition().duration(500).call(d3.axisLeft(this.graph.y).ticks(yAxisCount));
             this.graph.svg.select(".grid-y").transition().duration(500).call(d3.axisLeft(this.graph.y).tickSize(-this.graph.width).tickFormat("").ticks(yAxisCount));
@@ -267,7 +270,7 @@ class LineChart extends Component {
 
                                 let path = this.graph.svg.select(".line." + pathClass);
                                 if (path.size() < 1) {
-                                    path = this.graph.svg.append("path").attr("class", "line " + pathClass).style("stroke", colorScale[cnt]);
+                                    path = this.graph.svg.insert("path", ":first-child").attr("class", "line " + pathClass).style("stroke", colorScale[cnt]);
                                     this.props.setTitle(thisOption.title + "(" + thisOption.multiValue[j] + ")", colorScale[cnt]);
                                 }
                                 path.data([that.state.counters[counterKey]]).attr("d", valueLine);
@@ -295,7 +298,7 @@ class LineChart extends Component {
 
                             let path = this.graph.svg.select(".line." + pathClass);
                             if (path.size() < 1) {
-                                path = this.graph.svg.append("path").attr("class", "line " + pathClass).style("stroke", colorScale[cnt]);
+                                path = this.graph.svg.insert("path", ":first-child").attr("class", "line " + pathClass).style("stroke", colorScale[cnt]);
                                 this.props.setTitle(thisOption.title, colorScale[cnt]);
                             }
                             path.data([that.state.counters[counterKey]]).attr("d", valueLine);
@@ -315,9 +318,9 @@ class LineChart extends Component {
         }
     };
 
-
     graphInit = () => {
 
+        let that = this;
         let box = this.refs.lineChart.parentNode.parentNode.parentNode.parentNode;
         this.graph.width = box.offsetWidth - this.graph.margin.left - this.graph.margin.right;
         this.graph.height = box.offsetHeight - this.graph.margin.top - this.graph.margin.bottom - 27;
@@ -328,6 +331,107 @@ class LineChart extends Component {
         }
 
         this.graph.svg = d3.select(this.refs.lineChart).append("svg").attr("width", this.graph.width + this.graph.margin.left + this.graph.margin.right).attr("height", this.graph.height + this.graph.margin.top + this.graph.margin.bottom).append("g").attr("class", "top-group").attr("transform", "translate(" + this.graph.margin.left + "," + this.graph.margin.top + ")");
+        this.graph.focus = this.graph.svg.append("g").attr("class", "tooltip-focus");
+        this.graph.overlay = this.graph.svg.append("rect").attr("class", "tooltip-overlay").attr("width", this.graph.width).attr("height", this.graph.height);
+
+
+
+
+        this.graph.overlay.on("mouseover", function() {
+            let hoverLine = that.graph.focus.select("line.x-hover-line");
+            if (hoverLine.size() > 0) {
+                hoverLine.style("display", "block");
+            }
+
+            that.props.showTooltip();
+        });
+        this.graph.overlay.on("mouseout", function() {
+
+            let hoverLine = that.graph.focus.select("line.x-hover-line");
+            if (hoverLine.size() > 0) {
+                hoverLine.style("display", "none");
+            }
+
+            that.props.hideTooltip();
+        });
+
+        this.graph.bisector = d3.bisector(function(d) { return d.time; }).left;
+
+        this.graph.overlay.on("mousemove", function() {
+
+            let tooltip = {};
+            tooltip.lines = [];
+
+            let x0 = that.graph.x.invert(d3.mouse(this)[0]);
+            let timeFormat = d3.timeFormat(that.graph.fullTimeFormat);
+
+            let colorScale = d3.schemeCategory10;
+            let cnt = 0;
+            for (let counterKey in that.state.counters) {
+                for (let i = 0; i < that.props.instances.length; i++) {
+                    let isMultiValue = false;
+                    let thisOption = null;
+                    for (let j = 0; j < that.props.box.option.length; j++) {
+                        if (that.props.box.option[j].counterKey === counterKey) {
+                            thisOption = that.props.box.option[j];
+                            if (that.props.box.option[j].multiValue) {
+                                isMultiValue = true;
+                            }
+                            break;
+                        }
+                    }
+
+                    let dataIndex = that.graph.bisector(that.state.counters[counterKey], x0, 0);
+
+                    if (tooltip.timeValue && (tooltip.timeValue < that.state.counters[counterKey][dataIndex].time)) {
+
+                    } else {
+                        tooltip.time = timeFormat(that.state.counters[counterKey][dataIndex].time);
+                        tooltip.timeValue =  that.state.counters[counterKey][dataIndex].time;
+                    }
+
+                    if (!that.state.counters[counterKey][dataIndex]) {
+                        break;
+                    }
+
+                    if (isMultiValue) {
+                        for (let j = 0; j < thisOption.multiValue.length; j++) {
+                            tooltip.lines.push({
+                                instanceName : that.props.instances[i].objName,
+                                metricName : thisOption.title + "(" + thisOption.multiValue[j] + ")",
+                                value : Math.round(that.state.counters[counterKey][dataIndex].data[that.props.instances[i].objHash].value[j] * 10) / 10,
+                                color : colorScale[cnt]
+                            });
+                            cnt++;
+                        }
+                    } else {
+                        tooltip.lines.push({
+                            instanceName : that.props.instances[i].objName,
+                            metricName : thisOption.title ,
+                            value : that.state.counters[counterKey][dataIndex].data[that.props.instances[i].objHash] ? Math.round(that.state.counters[counterKey][dataIndex].data[that.props.instances[i].objHash].value * 10) / 10 : null,
+                            color : colorScale[cnt]
+                        });
+                        cnt++;
+                    }
+                }
+            }
+
+
+            let hoverLine = that.graph.focus.select("line.x-hover-line");
+            if (hoverLine.size() < 1) {
+                hoverLine = that.graph.focus.append("line").attr("class", "x-hover-line hover-line").attr("y1", 0).attr("y2", that.graph.height);
+            }
+
+            if (tooltip.timeValue) {
+                hoverLine.attr("x1",  that.graph.x(tooltip.timeValue));
+                hoverLine.attr("x2",  that.graph.x(tooltip.timeValue));
+            }
+
+            that.props.showTooltip(d3.mouse(this)[0], d3.mouse(this)[1], that.graph.margin.left, that.graph.margin.top, tooltip);
+
+        });
+
+
 
         this.graphAxis(this.graph.width, this.graph.height, true);
 
