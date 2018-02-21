@@ -38,6 +38,13 @@
 
 .hover-line {
     stroke: #6F257F;
-    stroke-width: 2px;
+    stroke-width: 1px;
     stroke-dasharray: 3,3;
+    opacity: 0.5;
+}
+
+.tooltip-focus circle {
+    fill : none;
+    stroke-width: 2px;
+    opacity: 0.5;
 }
