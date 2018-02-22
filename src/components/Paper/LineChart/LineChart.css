@@ -1,3 +1,7 @@
+.line-chart-wrapper {
+    position: relative;
+}
+
 .line-chart-wrapper .line-chart .line {
     fill: none;
     stroke-width: 2px;
@@ -6,13 +10,13 @@
 
 .line-chart-wrapper .no-data {
     position: absolute;
-    top : 27px;
-    left : 0;
-    right : 0;
-    bottom : 0;
+    top: 27px;
+    left: 0;
+    right: 0;
+    bottom: 0;
     text-align: center;
-    background-color: rgba(0,0,0,0.2);
-    border-radius:  0 0 2px 2px;
+    background-color: rgba(0, 0, 0, 0.2);
+    border-radius: 0 0 2px 2px;
 }
 
 .line-chart-wrapper .no-data > div {
@@ -28,7 +32,6 @@
     vertical-align: middle;
 }
 
-
 .tooltip-overlay {
     fill: none;
 
@@ -39,12 +42,44 @@
 .hover-line {
     stroke: #6F257F;
     stroke-width: 1px;
-    stroke-dasharray: 3,3;
+    stroke-dasharray: 3, 3;
     opacity: 0.5;
 }
 
 .tooltip-focus circle {
-    fill : none;
+    fill: none;
     stroke-width: 2px;
     opacity: 0.5;
+}
+
+.line-chart-wrapper text {
+    font-family: 'Bungee', 'NanumBarunGothic', sans-serif;
+    font-size: 8px;
+}
+
+.line-chart-wrapper .axis-button {
+    position: absolute;
+    left: 4px;
+    display: inline-block;
+    border-radius: 1px;
+    cursor: pointer;
+    border: 1px solid #666;
+    box-sizing: border-box;
+    width: 16px;
+    height: 13px;
+    text-align: center;
+    font-size: 10px;
+}
+
+.line-chart-wrapper .axis-button:hover {
+    background-color: #FBDB0C;
+}
+
+.line-chart-wrapper .axis-button.axis-up {
+    top: 5px;
+
+}
+
+.line-chart-wrapper .axis-button.axis-down {
+    bottom: 6px;
 }

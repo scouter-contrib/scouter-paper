@@ -19,7 +19,6 @@ class LineChart extends Component {
         x: null,
         y: null,
         path: null,
-        maxY: null,
         startTime: (new Date()).getTime() - (1000 * 60 * 10),
         endTime: (new Date()).getTime(),
         timeFormat: "%H:%M",
@@ -34,7 +33,9 @@ class LineChart extends Component {
     constructor(props) {
         super(props);
         this.state = {
-            counters: {}
+            counters: {},
+            maxY : null,
+            autoMaxY : null
         }
     }
 
@@ -119,11 +120,22 @@ class LineChart extends Component {
 
             if (!maxY || maxY < 10) {
                 maxY = 10;
-            } else {
-                maxY = Math.round(maxY * 1.2);
             }
 
-            this.graph.maxY = maxY;
+            this.graph.autoMaxY = maxY;
+
+            if (!this.graph.maxY) {
+                this.graph.maxY = maxY * 1.2;
+            }
+
+            if (this.graph.autoMaxY > this.graph.maxY) {
+                this.graph.maxY = this.graph.autoMaxY;
+            }
+
+            /*if (maxY > this.graph.maxY) {
+                this.graph.maxY = maxY;
+            }*/
+
 
             let noData = true;
             if (Array.isArray(nextProps.box.option)) {
@@ -177,25 +189,6 @@ class LineChart extends Component {
             hoverLine.attr("x2", xPosition);
         }
     };
-
-    updateAxis = (clear) => {
-        let svg = d3.select(this.refs.lineChart).select("svg");
-        this.graph.y.domain([0, this.state.elapsed]);
-        svg.select(".axis-y").transition().duration(500).call(d3.axisLeft(this.graph.y).tickFormat((e) => {
-            if (this.state && (this.state.elapsed < 1000)) {
-                return (e / 1000).toFixed(2) + "s";
-            } else {
-                return (e / 1000).toFixed(1) + "s";
-            }
-        }).ticks(this.graph.elapsedTicks));
-        svg.select(".grid-y").transition().duration(500).call(d3.axisLeft(this.graph.y).tickSize(-this.graph.width).tickFormat("").ticks(this.graph.elapsedTicks));
-
-        if (clear) {
-            this.clear();
-            this.redraw();
-        }
-    };
-
 
     graphAxis = (width, height, init) => {
         this.graph.x = d3.scaleTime().range([0, width]);
@@ -518,10 +511,33 @@ class LineChart extends Component {
 
     };
 
+    axisUp = () => {
+        this.graph.maxY = this.graph.maxY * 1.2;
+        this.graphAxis(this.graph.width, this.graph.height, false);
+        this.draw();
+    };
+
+    axisDown = () => {
+
+        this.graph.maxY = this.graph.maxY * 0.8;
+        if (this.graph.maxY < this.graph.autoMaxY) {
+            this.graph.maxY = this.graph.autoMaxY;
+        }
+
+        this.graphAxis(this.graph.width, this.graph.height, false);
+        this.draw();
+    };
+
+    stopProgation = (e) => {
+        e.stopPropagation();
+    };
+
     render() {
         return (
             <div className="line-chart-wrapper">
                 <div className="line-chart" ref="lineChart"></div>
+                <div className="axis-button axis-up noselect" onClick={this.axisUp} onMouseDown={this.stopProgation}>+</div>
+                <div className="axis-button axis-down noselect" onClick={this.axisDown} onMouseDown={this.stopProgation}>-</div>
                 {this.state.noData && <div className="no-data">
                     <div>
                         <div>NO DATA RECEIVED</div>

@@ -396,17 +396,12 @@ class XLog extends Component {
 
     render() {
         return (
-            <div className="xlog-viewer" ref="xlogViewer" onTouchStart={this.stopProgation}
-                 onMouseDown={this.stopProgation}>
-                <div></div>
-                <div className="axis-button axis-up" onClick={this.axisUp} onMouseDown={this.stopProgation}><i
-                    className="fa fa-angle-up" aria-hidden="true"></i></div>
-                <div className="axis-button axis-down" onClick={this.axisDown} onMouseDown={this.stopProgation}><i
-                    className="fa fa-angle-down" aria-hidden="true"></i></div>
+            <div className="xlog-viewer" ref="xlogViewer" onTouchStart={this.stopProgation} onMouseDown={this.stopProgation}>
+                <div className="axis-button axis-up noselect" onClick={this.axisUp} onMouseDown={this.stopProgation}>+</div>
+                <div className="axis-button axis-down noselect" onClick={this.axisDown} onMouseDown={this.stopProgation}>-</div>
                 {this.props.box.values.showPreview === "Y" &&
-                <XLogPreviewer secondStepTimestamp={this.props.data.secondStepTimestamp}
-                               secondStepXlogs={this.props.data.secondStepXlogs} width={this.graph.preview.width}
-                               margin={this.graph.margin} maxElapsed={this.state.elapsed}/>}
+                <XLogPreviewer secondStepTimestamp={this.props.data.secondStepTimestamp} secondStepXlogs={this.props.data.secondStepXlogs} width={this.graph.preview.width} margin={this.graph.margin} maxElapsed={this.state.elapsed}/>
+                }
                 <Profiler selection={this.state.selection} xlogs={this.props.data.xlogs}/>
             </div>
         );
