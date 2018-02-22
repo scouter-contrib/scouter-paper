@@ -410,7 +410,25 @@ class LineChart extends Component {
             let tooltip = {};
             tooltip.lines = [];
 
-            let x0 = that.graph.x.invert(d3.mouse(this)[0]);
+            let xPos = d3.mouse(this)[0];
+            let yPos = d3.mouse(this)[1];
+
+            if(navigator.userAgent.toLowerCase().indexOf('firefox') > -1){
+                let box = that.refs.lineChart.parentNode.parentNode.parentNode.parentNode.parentNode.parentNode;
+                if(window.getComputedStyle) {
+                    let style = getComputedStyle(box);
+                    let transform = style.transform || style.webkitTransform || style.mozTransform;
+                    let mat = transform.match(/^matrix3d\((.+)\)$/);
+                    if(mat) return parseFloat(mat[1].split(', ')[13]);
+                    mat = transform.match(/^matrix\((.+)\)$/);
+                    let transformX =mat ? parseFloat(mat[1].split(', ')[4]) : 0;
+                    let transformY = mat ? parseFloat(mat[1].split(', ')[5]) : 0;
+                    xPos = xPos - transformX;
+                    yPos = yPos - transformY;
+                }
+            }
+
+            let x0 = that.graph.x.invert(xPos);
             let timeFormat = d3.timeFormat(that.graph.fullTimeFormat);
 
             let colorScale = d3.schemeCategory10;
@@ -431,6 +449,10 @@ class LineChart extends Component {
 
                     let dataIndex = that.graph.bisector(that.state.counters[counterKey], x0, 0);
 
+                    if (!that.state.counters[counterKey][dataIndex]) {
+                        break;
+                    }
+
                     if (tooltip.timeValue && (tooltip.timeValue < that.state.counters[counterKey][dataIndex].time)) {
 
                     } else {
@@ -438,9 +460,7 @@ class LineChart extends Component {
                         tooltip.timeValue = that.state.counters[counterKey][dataIndex].time;
                     }
 
-                    if (!that.state.counters[counterKey][dataIndex]) {
-                        break;
-                    }
+
 
                     if (isMultiValue) {
                         for (let j = 0; j < thisOption.multiValue.length; j++) {
@@ -502,9 +522,7 @@ class LineChart extends Component {
             }
 
             that.graph.currentTooltipTime = tooltip.timeValue;
-
-            that.props.showTooltip(d3.mouse(this)[0], d3.mouse(this)[1], that.graph.margin.left, that.graph.margin.top, tooltip);
-
+            that.props.showTooltip(xPos, yPos, that.graph.margin.left, that.graph.margin.top, tooltip);
         });
 
         this.graphAxis(this.graph.width, this.graph.height, true);

@@ -5,6 +5,7 @@ import {connect} from 'react-redux';
 import jQuery from "jquery";
 import {withRouter} from 'react-router-dom';
 import {getHttpProtocol} from '../../../common/common';
+import 'url-search-params-polyfill';
 
 class InstanceSelector extends Component {
 
