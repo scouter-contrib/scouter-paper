@@ -15,7 +15,11 @@ import {Route, Switch} from 'react-router-dom';
 import {connect} from 'react-redux';
 import {withRouter} from 'react-router-dom';
 import {setConfig} from './actions';
+import {detect} from 'detect-browser';
+import Unsupport from "./components/Unsupport/Unsupport";
 
+const browser = detect();
+const support = (browser.name === "chrome" || browser.name === "firefox" || browser.name === "opera" || browser.name === "safari");
 class App extends Component {
 
     constructor(props) {
@@ -38,21 +42,26 @@ class App extends Component {
 
     render() {
         return (
-            <ContentWrapper>
-                <RequestBar/>
-                <Menu/>
-                <Switch>
-                    <Route exact path='/login' component={Login}/>
-                    <Route exact path='/paper' component={Paper}/>
-                    <Route exact path='/settings' component={Settings}/>
-                </Switch>
-                {this.props.control.Message &&
-                <Overlay>
-                    <Message messages={this.props.messages}/>
-                </Overlay>
+            <div>
+                {support &&
+                <ContentWrapper>
+                    <RequestBar/>
+                    <Menu/>
+                    <Switch>
+                        <Route exact path='/login' component={Login}/>
+                        <Route exact path='/paper' component={Paper}/>
+                        <Route exact path='/settings' component={Settings}/>
+                    </Switch>
+                    {this.props.control.Message &&
+                    <Overlay>
+                        <Message messages={this.props.messages}/>
+                    </Overlay>
+                    }
+                    <Loading visible={this.props.control.Loading}></Loading>
+                </ContentWrapper>
                 }
-                <Loading visible={this.props.control.Loading}></Loading>
-            </ContentWrapper>
+                {!support && <Unsupport name={browser.name} version={browser.version} />}
+            </div>
         );
     }
 }
