@@ -1,0 +1,47 @@
+.tooltip {
+    position: absolute;
+    font-size: 9px;
+    white-space: nowrap;
+    background-color: white;
+    border: 1px solid black;
+    padding: 5px;
+    border-radius: 3px;
+    text-align: left;
+}
+
+.tooltip.false {
+    display: none;
+}
+
+.tooltip .time {
+    padding: 2px 4px;
+}
+
+.tooltip ul {
+    margin: 0;
+    padding: 0;
+    list-style: none;
+    display: table;
+}
+
+.tooltip ul li {
+    display: table-row;
+}
+
+.tooltip ul li > div {
+    display: table-cell;
+    padding: 2px 4px;
+}
+
+.tooltip ul .instance-name {
+
+}
+
+.tooltip ul .metric-name {
+
+}
+
+.tooltip ul .value {
+
+}
+
