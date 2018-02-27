@@ -46,6 +46,8 @@ class Login extends Component {
 
     info = () => {
 
+        var that = this;
+
         this.props.setControlVisibility("Loading", true);
         this.props.addRequest();
 
@@ -53,9 +55,11 @@ class Login extends Component {
             method: "GET",
             async: true,
             url: this.props.config.protocol + "://" + this.props.config.address + ":" + this.props.config.port + "/scouter/v1/user/info",
-            xhrFields: {
-                withCredentials: true
-            }
+            beforeSend: function (xhr) {
+                if (that.props.user.token) {
+                    xhr.setRequestHeader('Authorization', 'bearer ' + that.props.user.token);
+                }
+            },
         }).done((msg) => {
             if (msg) {
                 if (msg.status === "200" && msg.resultCode === "0" && msg.result) {
@@ -91,15 +95,21 @@ class Login extends Component {
 
         jQuery.ajax({
             method: "POST",
-            url: this.props.config.protocol + "://" + this.props.config.address + ":" + this.props.config.port + "/scouter/v1/user/login",
+            url: this.props.config.protocol + "://" + this.props.config.address + ":" + this.props.config.port + "/scouter/v1/user/loginGetToken",
             data: JSON.stringify(condition),
             contentType: "application/json; charset=UTF-8",
-            processData: false,
-            xhrFields: {
-                withCredentials: true
-            }
+            processData: false
         }).done((msg) => {
-            this.info();
+            //this.info();
+
+            if (msg.result.success) {
+                this.props.setUserId(this.state.control.id, msg.result.bearerToken);
+            } else {
+                this.setState({
+                    message: "LOGIN FAILED"
+                });
+            }
+
         }).fail((jqXHR, textStatus) => {
             this.setState({
                 message: "LOGIN FAILED"
@@ -113,7 +123,7 @@ class Login extends Component {
 
     componentDidMount() {
         if (!this.props.user || !this.props.user.id) {
-            this.info();
+            //this.info();
         }
     }
 
@@ -166,7 +176,7 @@ let mapDispatchToProps = (dispatch) => {
     return {
         setControlVisibility: (name, value) => dispatch(setControlVisibility(name, value)),
         clearAllMessage: () => dispatch(clearAllMessage()),
-        setUserId: (id) => dispatch(setUserId(id)),
+        setUserId: (id, token) => dispatch(setUserId(id, token)),
         addRequest: () => dispatch(addRequest()),
     };
 };

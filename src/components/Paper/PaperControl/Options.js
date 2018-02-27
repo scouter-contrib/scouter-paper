@@ -524,7 +524,7 @@ export function options() {
             }
         ],
 
-        BATCH: [
+        /*BATCH: [
             {
                 text: "Batch Service",
                 mode: "nonexclusive",
@@ -553,7 +553,7 @@ export function options() {
                 title: "Batch End No Signal",
                 counterKey : "BatchEndNoSignal"
             }
-        ]
+        ]*/
 
     }
 }

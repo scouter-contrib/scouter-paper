@@ -136,6 +136,7 @@ class InstanceSelector extends Component {
     }
 
     onHostClick = (hostId) => {
+        var that = this;
         this.setState({
             activeHostId: hostId
         });
@@ -144,7 +145,12 @@ class InstanceSelector extends Component {
         jQuery.ajax({
             method: "GET",
             async: true,
-            url: getHttpProtocol(this.props.config) + '/scouter/v1/object?serverId=' + hostId
+            url: getHttpProtocol(this.props.config) + '/scouter/v1/object?serverId=' + hostId,
+            beforeSend: function (xhr) {
+                if (that.props.user.token) {
+                    xhr.setRequestHeader('Authorization', 'bearer ' + that.props.user.token);
+                }
+            },
         }).done((msg) => {
             this.setState({
                 instances: msg.result
@@ -251,7 +257,8 @@ class InstanceSelector extends Component {
 let mapStateToProps = (state) => {
     return {
         instances: state.target.instances,
-        config: state.config
+        config: state.config,
+        user: state.user
     };
 };
 

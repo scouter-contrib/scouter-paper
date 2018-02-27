@@ -269,15 +269,27 @@ class LineChart extends Component {
                                         }
                                     });
 
+                                let multiPathClass = "line-" + that.props.instances[i].objHash + "-" + counterKey;
                                 let pathClass = "line-" + that.props.instances[i].objHash + "-" + counterKey + "-" + thisOption.multiValue[j];
 
-                                let path = this.graph.svg.select(".line." + pathClass);
+                                let path = this.graph.svg.select("path." + pathClass);
                                 if (path.size() < 1) {
-                                    path = this.graph.svg.insert("path", ":first-child").attr("class", "line " + pathClass).style("stroke", colorScale[cnt]);
-                                    this.props.setTitle(thisOption.title + "(" + thisOption.multiValue[j] + ")", colorScale[cnt]);
+                                    path = this.graph.svg.insert("path", ":first-child").attr("class", pathClass + " " + multiPathClass).style("stroke", colorScale[cnt]);
+                                    this.props.setTitle(counterKey, thisOption.title + "(" + thisOption.multiValue[j] + ")", colorScale[cnt]);
+                                } else {
+                                    if (thisOption) {
+                                        path.style("stroke", colorScale[cnt]);
+                                        this.props.setTitle(counterKey, thisOption.title + "(" + thisOption.multiValue[j] + ")", colorScale[cnt]);
+                                        let circleKey = "circle-" + that.props.instances[i].objHash + "_" + counterKey + thisOption.multiValue[j];
+                                        that.graph.focus.select("circle." + circleKey).attr("stroke", colorScale[cnt]);
+                                    }
                                 }
-                                path.data([that.state.counters[counterKey]]).attr("d", valueLine);
-                                cnt++;
+
+                                if (thisOption) {
+                                    path.data([that.state.counters[counterKey]]).attr("d", valueLine);
+                                    cnt++;
+                                }
+
                             }
                         } else {
                             let valueLine = d3.line().curve(d3.curveMonotoneX)
@@ -299,13 +311,54 @@ class LineChart extends Component {
 
                             let pathClass = "line-" + that.props.instances[i].objHash + "-" + counterKey;
 
-                            let path = this.graph.svg.select(".line." + pathClass);
-                            if (path.size() < 1) {
-                                path = this.graph.svg.insert("path", ":first-child").attr("class", "line " + pathClass).style("stroke", colorScale[cnt]);
-                                this.props.setTitle(thisOption.title, colorScale[cnt]);
+                            let path = this.graph.svg.selectAll("path." + pathClass);
+                            if (thisOption && path.size() < 1) {
+                                path = this.graph.svg.insert("path", ":first-child").attr("class", pathClass).style("stroke", colorScale[cnt]);
+                                this.props.setTitle(counterKey, thisOption.title, colorScale[cnt]);
+                            } else {
+                                if (thisOption) {
+                                    path.style("stroke", colorScale[cnt]);
+                                    this.props.setTitle(counterKey, thisOption.title, colorScale[cnt]);
+                                    let circleKey = "circle-" + that.props.instances[i].objHash + "_" + counterKey;
+                                    that.graph.focus.select("circle." + circleKey).attr("stroke", colorScale[cnt]);
+                                }
                             }
-                            path.data([that.state.counters[counterKey]]).attr("d", valueLine);
-                            cnt++;
+
+                            // 삭제된 매트릭 (삭제는 멀티도 여기서 삭제됨)
+                            if (!thisOption) {
+
+                                // 데이터 삭제
+                                let counters = Object.assign(this.state.counters);
+                                if(counters[counterKey]) {
+                                    delete counters[counterKey];
+                                }
+                                delete this.state.counters[counterKey];
+                                this.setState({
+                                    counters : counters
+                                });
+
+                                // 라인 그래프 삭제
+                                if (path && path.size() > 0) {
+                                    path.remove();
+                                }
+
+                                // 툴팁 그래프 삭제
+                                let circleKey = "circle-" + that.props.instances[i].objHash + "_" + counterKey;
+                                let circle = that.graph.focus.selectAll("circle." + circleKey);
+
+                                if (circle.size() > 0) {
+                                    circle.remove();
+                                }
+
+                                // 제목 삭제
+                                this.props.removeTitle(counterKey);
+                            }
+
+                            if (thisOption) {
+                                path.data([that.state.counters[counterKey]]).attr("d", valueLine);
+                                cnt++;
+                            }
+
                         }
                     }
                 }
@@ -364,17 +417,22 @@ class LineChart extends Component {
                         }
                     }
 
+                    if (!thisOption) {
+                        return;
+                    }
+
                     if (isMultiValue) {
                         for (let j = 0; j < thisOption.multiValue.length; j++) {
-                            let circleKey = (that.props.instances[i].objName + "_" + thisOption.counterKey + "_" + thisOption.multiValue[j]).replace(/\//gi, "_");
+                            let circleMultiKey = "circle-" + that.props.instances[i].objHash + "_" + thisOption.counterKey;
+                            let circleKey = "circle-" + that.props.instances[i].objHash + "_" + thisOption.counterKey + "_" + thisOption.multiValue[j];
                             let circle = that.graph.focus.select("circle." + circleKey);
                             if (circle.size() < 1) {
-                                circle = that.graph.focus.append("circle").attr("class", circleKey).attr("r", r).attr("stroke", colorScale[cnt]);
+                                circle = that.graph.focus.append("circle").attr("class", circleMultiKey + " " + circleKey).attr("r", r).attr("stroke", colorScale[cnt]);
                             }
                             cnt++;
                         }
                     } else {
-                        let circleKey = (that.props.instances[i].objName + "_" + thisOption.counterKey).replace(/\//gi, "_");
+                        let circleKey = "circle-" + that.props.instances[i].objHash + "_" + thisOption.counterKey;
                         let circle = that.graph.focus.select("circle." + circleKey);
                         if (circle.size() < 1) {
                             circle = that.graph.focus.append("circle").attr("class", circleKey).attr("r", r).attr("stroke", colorScale[cnt]);
@@ -461,10 +519,13 @@ class LineChart extends Component {
                     }
 
 
+                    if (!thisOption) {
+                        break;
+                    }
 
                     if (isMultiValue) {
                         for (let j = 0; j < thisOption.multiValue.length; j++) {
-                            let circleKey = (that.props.instances[i].objName + "_" + thisOption.counterKey + "_" + thisOption.multiValue[j]).replace(/\//gi, "_");
+                            let circleKey = "circle-" + that.props.instances[i].objHash + "_" + thisOption.counterKey + "_" + thisOption.multiValue[j];
                             if (tooltip.timeValue === that.state.counters[counterKey][dataIndex].time) {
                                 tooltip.lines.push({
                                     instanceName: that.props.instances[i].objName,
@@ -480,13 +541,13 @@ class LineChart extends Component {
                             cnt++;
                         }
                     } else {
-                        let circleKey = (that.props.instances[i].objName + "_" + thisOption.counterKey).replace(/\//gi, "_");
+                        let circleKey = "circle-" + that.props.instances[i].objHash + "_" + thisOption.counterKey;
                         if (tooltip.timeValue === that.state.counters[counterKey][dataIndex].time) {
                             tooltip.lines.push({
                                 instanceName: that.props.instances[i].objName,
                                 circleKey: circleKey,
                                 metricName: thisOption.title,
-                                value: that.state.counters[counterKey][dataIndex].data[that.props.instances[i].objHash] ? Math.round(that.state.counters[counterKey][dataIndex].data[that.props.instances[i].objHash].value * 10) / 10 : null,
+                                value: that.props.instances[i].objHash && that.state.counters[counterKey][dataIndex].data[that.props.instances[i].objHash] ? Math.round(that.state.counters[counterKey][dataIndex].data[that.props.instances[i].objHash].value * 10) / 10 : null,
                                 color: colorScale[cnt]
                             });
                         } else {

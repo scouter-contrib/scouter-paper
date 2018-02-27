@@ -99,7 +99,7 @@
     border: none;
     color: white;
     display: inline-block;
-    padding: 2px 10px;
+    padding: 8px 10px;
 }
 
 .login-wrapper button:hover {

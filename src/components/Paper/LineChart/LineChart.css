@@ -2,7 +2,7 @@
     position: relative;
 }
 
-.line-chart-wrapper .line-chart .line {
+.line-chart-wrapper .line-chart path {
     fill: none;
     stroke-width: 2px;
     opacity: 0.6;
@@ -10,7 +10,7 @@
 
 .line-chart-wrapper .no-data {
     position: absolute;
-    top: 27px;
+    top: 0;
     left: 0;
     right: 0;
     bottom: 0;

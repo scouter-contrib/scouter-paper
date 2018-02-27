@@ -19,7 +19,8 @@ import {detect} from 'detect-browser';
 import Unsupport from "./components/Unsupport/Unsupport";
 
 const browser = detect();
-const support = (browser.name === "chrome" || browser.name === "firefox" || browser.name === "opera" || browser.name === "safari");
+//const support = (browser.name === "chrome" || browser.name === "firefox" || browser.name === "opera" || browser.name === "safari");
+const support = (browser.name !== "ie" && browser.name !== "edge");
 class App extends Component {
 
     constructor(props) {

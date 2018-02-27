@@ -105,6 +105,7 @@ const user = (state = userState, action) => {
         case SET_USER_ID:
             return Object.assign({}, state, {
                 id: action.id,
+                token : action.token,
                 when : new Date()
             });
         default:
