@@ -4,7 +4,6 @@ import {connect} from 'react-redux';
 import {addRequest, clearAllMessage, setControlVisibility, setUserId} from '../../actions';
 import jQuery from "jquery";
 import {withRouter} from 'react-router-dom';
-import building from './building.png';
 import TimeAgo from 'react-timeago'
 
 class Login extends Component {
@@ -44,41 +43,11 @@ class Login extends Component {
         }
     }
 
-    info = () => {
-
-        var that = this;
-
-        this.props.setControlVisibility("Loading", true);
-        this.props.addRequest();
-
-        jQuery.ajax({
-            method: "GET",
-            async: true,
-            url: this.props.config.protocol + "://" + this.props.config.address + ":" + this.props.config.port + "/scouter/v1/user/info",
-            beforeSend: function (xhr) {
-                if (that.props.user.token) {
-                    xhr.setRequestHeader('Authorization', 'bearer ' + that.props.user.token);
-                }
-            },
-        }).done((msg) => {
-            if (msg) {
-                if (msg.status === "200" && msg.resultCode === "0" && msg.result) {
-                    this.props.setUserId(msg.result.id);
-                    this.setState({
-                        message: null
-                    });
-                }
-            }
-        }).fail((jqXHR, textStatus) => {
-            console.log(jqXHR, textStatus);
-        }).always(() => {
-            this.props.setControlVisibility("Loading", false);
-        });
-    };
 
     logout = () => {
         document.cookie = 'JSESSIONID=; expires=Thu, 01 Jan 1970 00:00:01 GMT;';
-        this.props.setUserId(null);
+        this.props.setUserId(null, null, null);
+        sessionStorage.removeItem("user");
     };
 
     login = () => {
@@ -100,16 +69,19 @@ class Login extends Component {
             contentType: "application/json; charset=UTF-8",
             processData: false
         }).done((msg) => {
-            //this.info();
-
             if (msg.result.success) {
-                this.props.setUserId(this.state.control.id, msg.result.bearerToken);
+                let user = {
+                    id : this.state.control.id,
+                    token : msg.result.bearerToken,
+                    time : (new Date()).getTime()
+                };
+                sessionStorage.setItem("user", JSON.stringify(user));
+                this.props.setUserId(this.state.control.id, msg.result.bearerToken, (new Date()).getTime());
             } else {
                 this.setState({
                     message: "LOGIN FAILED"
                 });
             }
-
         }).fail((jqXHR, textStatus) => {
             this.setState({
                 message: "LOGIN FAILED"
@@ -121,29 +93,25 @@ class Login extends Component {
 
     };
 
-    componentDidMount() {
-        if (!this.props.user || !this.props.user.id) {
-            //this.info();
-        }
-    }
-
     render() {
-
         return (
             <div className="login-wrapper">
                 <div>
                     {this.props.user.id &&
                     <div className="user-content">
                         <div className="user-id">{this.props.user.id}</div>
-                        <div className="when">LOGIN <TimeAgo date={this.props.user.when}/></div>
+                        <div className="when">LOGIN <TimeAgo date={this.props.user.time}/></div>
                         <div className="logout-btn">
                             <button onClick={this.logout}>LOGOUT</button>
                         </div>
                     </div>}
                     {!this.props.user.id &&
                     <div className="login-content">
-                        <div className="login-image">
-                            <img src={building} alt="building" />
+                        <div className="login-logo">
+                            <div className="logo-box">
+                                <div className="logo"><i className="fa fa-bolt" aria-hidden="true"></i></div>
+                                <div className="name">SCOUTER PAPER</div>
+                            </div>
                         </div>
                         <div>
                             <input type="text" placeholder="ID" value={this.state.control.id}
@@ -176,7 +144,7 @@ let mapDispatchToProps = (dispatch) => {
     return {
         setControlVisibility: (name, value) => dispatch(setControlVisibility(name, value)),
         clearAllMessage: () => dispatch(clearAllMessage()),
-        setUserId: (id, token) => dispatch(setUserId(id, token)),
+        setUserId: (id, token, time) => dispatch(setUserId(id, token, time)),
         addRequest: () => dispatch(addRequest()),
     };
 };

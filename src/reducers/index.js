@@ -12,6 +12,10 @@ const configState = {
     dateFormat: "YYYY-MM-DD",
     timeFormat: "HH:MM:SS",
     minuteFormat: "HH:MM",
+    authentification : {
+        type : "bearer",
+        timeout : 1000 * 60 * 60 * 24
+    },
     xlog: {
         normal: {
             rows: 5,
@@ -97,7 +101,8 @@ const config = (state = configState, action) => {
 
 const userState = {
     id: null,
-    when : null
+    token : null,
+    time : null
 };
 
 const user = (state = userState, action) => {
@@ -106,7 +111,7 @@ const user = (state = userState, action) => {
             return Object.assign({}, state, {
                 id: action.id,
                 token : action.token,
-                when : new Date()
+                time : action.time
             });
         default:
             return state;

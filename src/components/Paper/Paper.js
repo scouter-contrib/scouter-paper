@@ -95,21 +95,34 @@ class Paper extends Component {
         }
     };
 
+    getWithCredentials () {
+        return {
+            withCredentials: (this.props.config.authentification && this.props.config.authentification.type === "token")
+        }
+    }
+
+    setAuthHeader (xhr) {
+        if (this.props.config.authentification && this.props.config.authentification.type === "bearer") {
+            if (this.props.user && this.props.user.token) {
+                xhr.setRequestHeader('Authorization', 'bearer ' + this.props.user.token);
+            }
+        }
+    }
+
     getXLog = () => {
         var that = this;
         if (this.props.instances && this.props.instances.length > 0) {
             this.props.addRequest();
             jQuery.ajax({
                 method: "GET",
-                async: true,
+                async: false,
                 dataType :'text',
                 url: getHttpProtocol(this.props.config) + '/scouter/v1/xlog/realTime/' + this.state.data.offset1 + '/' + this.state.data.offset2 + '?objHashes=' + JSON.stringify(this.props.instances.map((instance) => {
                     return Number(instance.objHash);
                 })),
+                xhrFields: that.getWithCredentials(),
                 beforeSend: function (xhr) {
-                    if (that.props.user.token) {
-                        xhr.setRequestHeader('Authorization', 'bearer ' + that.props.user.token);
-                    }
+                    that.setAuthHeader(xhr);
                 }
             }).done((msg) => {
                 this.tick(msg);
@@ -126,14 +139,13 @@ class Paper extends Component {
             let time = (new Date()).getTime();
             jQuery.ajax({
                 method: "GET",
-                async: true,
+                async: false,
                 url: getHttpProtocol(this.props.config) + '/scouter/v1/visitor/realTime?objHashes=' + JSON.stringify(this.props.instances.map((instance) => {
                     return Number(instance.objHash);
                 })),
+                xhrFields: that.getWithCredentials(),
                 beforeSend: function (xhr) {
-                    if (that.props.user.token) {
-                        xhr.setRequestHeader('Authorization', 'bearer ' + that.props.user.token);
-                    }
+                    that.setAuthHeader(xhr);
                 }
             }).done((msg) => {
                 this.setState({
@@ -188,14 +200,13 @@ class Paper extends Component {
             this.props.addRequest();
             jQuery.ajax({
                 method: "GET",
-                async: true,
+                async: false,
                 url: getHttpProtocol(this.props.config) + '/scouter/v1/counter/realTime/' + params + '?objHashes=' + JSON.stringify(this.props.instances.map((instance) => {
                     return Number(instance.objHash);
                 })),
+                xhrFields: that.getWithCredentials(),
                 beforeSend: function (xhr) {
-                    if (that.props.user.token) {
-                        xhr.setRequestHeader('Authorization', 'bearer ' + that.props.user.token);
-                    }
+                    that.setAuthHeader(xhr);
                 }
             }).done((msg) => {
                 let map = {};

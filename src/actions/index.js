@@ -14,11 +14,12 @@ export function setConfig(config) {
     };
 }
 
-export function setUserId(id, token) {
+export function setUserId(id, token, time) {
     return {
         type: SET_USER_ID,
         id : id,
-        token : token
+        token : token,
+        time : time
     };
 }
 

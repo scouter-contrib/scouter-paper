@@ -9,6 +9,8 @@ import 'url-search-params-polyfill';
 
 class InstanceSelector extends Component {
 
+    init = false;
+
     constructor(props) {
         super(props);
         this.state = {
@@ -19,95 +21,121 @@ class InstanceSelector extends Component {
         };
     }
 
-    componentDidMount() {
+    componentWillReceiveProps(nextProps){
 
-        this.props.addRequest();
-        jQuery.ajax({
-            method: "GET",
-            async: true,
-            url: getHttpProtocol(this.props.config) + '/scouter/v1/info/server'
-        }).done((msg) => {
-            if (msg && msg.result) {
-                let hosts = msg.result;
+        var that = this;
 
-                // GET INSTANCES INFO FROM URL IF EXISTS
-                let instancesParam = new URLSearchParams(this.props.location.search).get('instances');
-                let instanceIds = null;
-                if (instancesParam) {
-                    instanceIds = instancesParam.split(",");
-                    if (instanceIds) {
-                        instanceIds = instanceIds.map((d) => {return Number(d)});
+        if (!this.init && nextProps.user && nextProps.user.id) {
+            this.init = true;
+
+            this.props.addRequest();
+            jQuery.ajax({
+                method: "GET",
+                async: true,
+                url: getHttpProtocol(nextProps.config) + '/scouter/v1/info/server',
+                xhrFields: {
+                    withCredentials: (nextProps.config.authentification && nextProps.config.authentification.type === "token")
+                },
+                beforeSend: function (xhr) {
+                    if (nextProps.config.authentification && nextProps.config.authentification.type === "bearer") {
+                        if (nextProps.user && nextProps.user.token) {
+                            xhr.setRequestHeader('Authorization', 'bearer ' + nextProps.user.token);
+                        }
                     }
                 }
+            }).done((msg) => {
+                if (msg && msg.result) {
+                    let hosts = msg.result;
 
-                if (instanceIds) {
-                    let selectedInstances = [];
-                    let instances = [];
-                    let activeHostId = null;
-                    hosts.forEach((host) => {
-                        jQuery.ajax({
-                            method: "GET",
-                            async: false,
-                            url: getHttpProtocol(this.props.config) + '/scouter/v1/object?serverId=' + host.id
-                        }).done(function(msg) {
-                            instances = msg.result;
-                            if (instances && instances.length > 0) {
-                                instances.forEach((instance) => {
-                                    instanceIds.forEach((id) => {
-                                        if (id === Number(instance.objHash)) {
-                                            selectedInstances.push(instance);
-                                            if (!host.selectedInstanceCount) {
-                                                host.selectedInstanceCount = 0;
-                                            }
-                                            host.selectedInstanceCount++;
-                                            // 마지막으로 찾은 호스트 ID로 세팅
-                                            activeHostId = host.id;
-                                        }
-                                    });
-                                })
-                            }
-                        }).fail(function(jqXHR, textStatus) {
-                            console.log(jqXHR, textStatus);
-                        });
-                    });
-
-                    // LUCKY! FIND ALL INSTANCE
-                    if (instanceIds.length === selectedInstances.length) {
-
-                        let selectedInstanceMap = {};
-
-                        for (let i=0; i<selectedInstances.length; i++) {
-                            selectedInstanceMap[selectedInstances[i].objHash] = selectedInstances[i];
+                    // GET INSTANCES INFO FROM URL IF EXISTS
+                    let instancesParam = new URLSearchParams(this.props.location.search).get('instances');
+                    let instanceIds = null;
+                    if (instancesParam) {
+                        instanceIds = instancesParam.split(",");
+                        if (instanceIds) {
+                            instanceIds = instanceIds.map((d) => {return Number(d)});
                         }
+                    }
 
-                        this.setState({
-                            hosts: hosts,
-                            instances : instances,
-                            activeHostId : activeHostId,
-                            selectedInstances: selectedInstanceMap
+                    if (instanceIds) {
+                        let selectedInstances = [];
+                        let instances = [];
+                        let activeHostId = null;
+                        hosts.forEach((host) => {
+                            jQuery.ajax({
+                                method: "GET",
+                                async: false,
+                                url: getHttpProtocol(this.props.config) + '/scouter/v1/object?serverId=' + host.id,
+                                xhrFields: {
+                                    withCredentials: (nextProps.config.authentification && nextProps.config.authentification.type === "token")
+                                },
+                                beforeSend: function (xhr) {
+                                    if (nextProps.config.authentification && nextProps.config.authentification.type === "bearer") {
+                                        if (nextProps.user && nextProps.user.token) {
+                                            xhr.setRequestHeader('Authorization', 'bearer ' + nextProps.user.token);
+                                        }
+                                    }
+                                }
+                            }).done(function(msg) {
+                                instances = msg.result;
+                                if (instances && instances.length > 0) {
+                                    instances.forEach((instance) => {
+                                        instanceIds.forEach((id) => {
+                                            if (id === Number(instance.objHash)) {
+                                                selectedInstances.push(instance);
+                                                if (!host.selectedInstanceCount) {
+                                                    host.selectedInstanceCount = 0;
+                                                }
+                                                host.selectedInstanceCount++;
+                                                // 마지막으로 찾은 호스트 ID로 세팅
+                                                activeHostId = host.id;
+                                            }
+                                        });
+                                    })
+                                }
+                            }).fail(function(jqXHR, textStatus) {
+                                console.log(jqXHR, textStatus);
+                            });
                         });
 
-                        this.props.setInstances(selectedInstances);
+                        // LUCKY! FIND ALL INSTANCE
+                        if (instanceIds.length === selectedInstances.length) {
+
+                            let selectedInstanceMap = {};
+
+                            for (let i=0; i<selectedInstances.length; i++) {
+                                selectedInstanceMap[selectedInstances[i].objHash] = selectedInstances[i];
+                            }
+
+                            this.setState({
+                                hosts: hosts,
+                                instances : instances,
+                                activeHostId : activeHostId,
+                                selectedInstances: selectedInstanceMap
+                            });
+
+                            this.props.setInstances(selectedInstances);
+
+                        } else {
+                            this.setState({
+                                hosts: hosts
+                            });
+                        }
 
                     } else {
                         this.setState({
                             hosts: hosts
                         });
                     }
-
-                } else {
-                    this.setState({
-                        hosts: hosts
-                    });
                 }
-            }
 
-        }).fail((jqXHR, textStatus) => {
-            console.log(jqXHR, textStatus);
-        });
-
+            }).fail((jqXHR, textStatus) => {
+                console.log(jqXHR, textStatus);
+            });
 
 
+
+        }
     }
 
     getHosts = () => {

@@ -67,16 +67,16 @@ class Menu extends Component {
                             <div className="text">SETTINGS</div>
                         </div>
                     </NavLink>
-                    <NavLink className={"menu-item " + (this.state.menu === "about" ? "active" : "")} to="/about" activeClassName="active" onClick={this.menuClick.bind(this, "/about")}>
+                    {/*<NavLink className={"menu-item " + (this.state.menu === "about" ? "active" : "")} to="/about" activeClassName="active" onClick={this.menuClick.bind(this, "/about")}>
                         <div>
                             <div className="icon"><i className="fa fa-info-circle" aria-hidden="true"></i></div>
                             <div className="text">ABOUT</div>
                         </div>
-                    </NavLink>
+                    </NavLink>*/}
                     <NavLink className={"menu-item right " + (this.state.menu === "login" ? "active" : "")} to="/login" activeClassName="active" onClick={this.menuClick.bind(this, "/login")}>
                         <div>
-                            <div className="icon"><i className="fa fa-handshake-o" aria-hidden="true"></i></div>
-                            <div className="text">LOGIN</div>
+                            {(this.props.user && this.props.user.id) ? <div className="text"></div> : <div className="icon"><i className="fa fa-handshake-o" aria-hidden="true"></i></div>}
+                            {(this.props.user && this.props.user.id) ? <div className="text"><i className="fa fa-child login-icon" aria-hidden="true"></i></div> : <div>LOGIN</div>}
                         </div>
                     </NavLink>
                     <InstanceInfo className="menu-instance-selector" toggleSelectorVisible={this.toggleSelectorVisible}/>
@@ -91,7 +91,8 @@ class Menu extends Component {
 let mapStateToProps = (state) => {
     return {
         instances: state.target.instances,
-        config: state.config
+        config: state.config,
+        user: state.user
     };
 };
 

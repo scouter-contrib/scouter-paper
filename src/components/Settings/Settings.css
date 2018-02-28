@@ -159,10 +159,24 @@
     margin-left: 20px;
 }
 
+.settings .forms .auth-info select {
+    padding: 0;
+    width: 100%;
+    border: 1px solid rgba(0, 0, 0, 0.3);
+    font-size: 10px;
+}
+
+.settings .forms .auth-info select[disabled] {
+    background-color: rgba(0, 0, 0, 0.1);
+    border: 1px solid transparent;
+    color: #333;
+}
+
 .settings .forms .xlog-option select {
     padding: 0;
     width: calc(50% - 80px);
     border: 1px solid rgba(0, 0, 0, 0.3);
+    font-size: 10px;
 }
 
 .settings .forms .xlog-option select[disabled] {

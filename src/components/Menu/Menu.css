@@ -121,6 +121,10 @@
     transition: opacity 0.3s;
 }
 
+.menu .menu-item .login-icon {
+
+}
+
 .menu .menu-item.right {
     float: right;
 }
