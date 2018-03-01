@@ -18,18 +18,13 @@ import {setConfig, addRequest, clearAllMessage, setControlVisibility, setUserId,
 import {detect} from 'detect-browser';
 import Unsupport from "./components/Unsupport/Unsupport";
 import jQuery from "jquery";
+import {errorHandler} from './common/common';
 
 const browser = detect();
 //const support = (browser.name === "chrome" || browser.name === "firefox" || browser.name === "opera" || browser.name === "safari");
 const support = (browser.name !== "ie" && browser.name !== "edge");
 
 class App extends Component {
-
-    init = false;
-
-    constructor(props) {
-        super(props);
-    }
 
     info = (user, config) => {
         this.props.setControlVisibility("Loading", true);
@@ -60,14 +55,17 @@ class App extends Component {
                 }
 
             } else {
-                sessionStorage.removeItem("user");
+                localStorage.removeItem("user");
             }
-        }).fail(() => {
-            if (config.authentification && config.authentification.type === "none") {
+        }).fail((xhr, textStatus, errorThrown) => {
+            // 응답이 왔고, 401코드인데, 인증 안함 설정한 경우
+            if (xhr.readyState === 4 && xhr.responseJSON.resultCode === "401" && config.authentification && config.authentification.type === "none") {
                 this.props.pushMessage("error", "CHECK SETTINGS", "current setting does not require authentication, but it actually requires authentication.");
                 this.props.setControlVisibility("Message", true);
+            } else {
+                errorHandler(xhr, textStatus, errorThrown, this.props);
             }
-            sessionStorage.removeItem("user");
+            localStorage.removeItem("user");
         }).always(() => {
             this.props.setControlVisibility("Loading", false);
         });
@@ -83,12 +81,12 @@ class App extends Component {
             config = this.props.config;
         }
 
-        let user = sessionStorage.getItem("user");
+        let user = localStorage.getItem("user");
         if (user) {
             user = JSON.parse(user);
             let now = (new Date()).getTime();
             if (config && config.authentification.timeout < (now - user.time)) {
-                sessionStorage.removeItem("user");
+                localStorage.removeItem("user");
             } else {
                 this.info(user, config);
             }

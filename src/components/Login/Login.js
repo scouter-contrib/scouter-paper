@@ -1,10 +1,11 @@
 import React, {Component} from 'react';
 import './Login.css';
 import {connect} from 'react-redux';
-import {addRequest, clearAllMessage, setControlVisibility, setUserId} from '../../actions';
+import {addRequest, clearAllMessage, setControlVisibility, pushMessage, setUserId} from '../../actions';
 import jQuery from "jquery";
 import {withRouter} from 'react-router-dom';
 import TimeAgo from 'react-timeago'
+import {errorHandler} from '../../common/common';
 
 class Login extends Component {
 
@@ -47,7 +48,7 @@ class Login extends Component {
     logout = () => {
         document.cookie = 'JSESSIONID=; expires=Thu, 01 Jan 1970 00:00:01 GMT;';
         this.props.setUserId(null, null, null);
-        sessionStorage.removeItem("user");
+        localStorage.removeItem("user");
     };
 
     login = () => {
@@ -75,22 +76,18 @@ class Login extends Component {
                     token : msg.result.bearerToken,
                     time : (new Date()).getTime()
                 };
-                sessionStorage.setItem("user", JSON.stringify(user));
+                localStorage.setItem("user", JSON.stringify(user));
                 this.props.setUserId(this.state.control.id, msg.result.bearerToken, (new Date()).getTime());
             } else {
                 this.setState({
                     message: "LOGIN FAILED"
                 });
             }
-        }).fail((jqXHR, textStatus) => {
-            this.setState({
-                message: "LOGIN FAILED"
-            });
-            console.log(jqXHR, textStatus);
+        }).fail((xhr, textStatus, errorThrown) => {
+            errorHandler(xhr, textStatus, errorThrown, this.props);
         }).always(() => {
             this.props.setControlVisibility("Loading", false);
         });
-
     };
 
     render() {
@@ -146,6 +143,7 @@ let mapDispatchToProps = (dispatch) => {
         clearAllMessage: () => dispatch(clearAllMessage()),
         setUserId: (id, token, time) => dispatch(setUserId(id, token, time)),
         addRequest: () => dispatch(addRequest()),
+        pushMessage: (category, title, content) => dispatch(pushMessage(category, title, content))
     };
 };
 

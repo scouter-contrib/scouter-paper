@@ -87,3 +87,7 @@
     padding: 10px;
 }
 
+.message-btns button {
+    cursor: pointer;
+}
+

@@ -2,12 +2,12 @@ import React, {Component} from 'react';
 import './Paper.css';
 import './Resizable.css';
 import {connect} from 'react-redux';
-import {addRequest} from '../../actions';
+import {addRequest, pushMessage, setControlVisibility} from '../../actions';
 import {withRouter} from 'react-router-dom';
 import {Responsive, WidthProvider} from "react-grid-layout";
 import {Box, BoxConfig, PaperControl} from "../../components";
 import jQuery from "jquery";
-import {getData, setData, getHttpProtocol} from '../../common/common';
+import {getData, setData, getHttpProtocol, errorHandler, getWithCredentials, setAuthHeader} from '../../common/common';
 const ResponsiveReactGridLayout = WidthProvider(Responsive);
 
 class Paper extends Component {
@@ -66,7 +66,7 @@ class Paper extends Component {
     componentDidMount() {
         this.dataRefreshTimer = setInterval(() => {
             this.getXLog();
-            this.getVisitor()
+            this.getVisitor();
             this.getCounter();
         }, this.props.config.interval);
 
@@ -95,20 +95,6 @@ class Paper extends Component {
         }
     };
 
-    getWithCredentials () {
-        return {
-            withCredentials: (this.props.config.authentification && this.props.config.authentification.type === "token")
-        }
-    }
-
-    setAuthHeader (xhr) {
-        if (this.props.config.authentification && this.props.config.authentification.type === "bearer") {
-            if (this.props.user && this.props.user.token) {
-                xhr.setRequestHeader('Authorization', 'bearer ' + this.props.user.token);
-            }
-        }
-    }
-
     getXLog = () => {
         var that = this;
         if (this.props.instances && this.props.instances.length > 0) {
@@ -120,14 +106,14 @@ class Paper extends Component {
                 url: getHttpProtocol(this.props.config) + '/scouter/v1/xlog/realTime/' + this.state.data.offset1 + '/' + this.state.data.offset2 + '?objHashes=' + JSON.stringify(this.props.instances.map((instance) => {
                     return Number(instance.objHash);
                 })),
-                xhrFields: that.getWithCredentials(),
+                xhrFields: getWithCredentials(that.props.config),
                 beforeSend: function (xhr) {
-                    that.setAuthHeader(xhr);
+                    setAuthHeader(xhr, that.props.config, that.props.user);
                 }
             }).done((msg) => {
                 this.tick(msg);
-            }).fail((jqXHR, textStatus) => {
-                console.log(jqXHR, textStatus);
+            }).fail((xhr, textStatus, errorThrown) => {
+                errorHandler(xhr, textStatus, errorThrown, this.props);
             });
         }
     };
@@ -143,9 +129,9 @@ class Paper extends Component {
                 url: getHttpProtocol(this.props.config) + '/scouter/v1/visitor/realTime?objHashes=' + JSON.stringify(this.props.instances.map((instance) => {
                     return Number(instance.objHash);
                 })),
-                xhrFields: that.getWithCredentials(),
+                xhrFields: getWithCredentials(that.props.config),
                 beforeSend: function (xhr) {
-                    that.setAuthHeader(xhr);
+                    setAuthHeader(xhr, that.props.config, that.props.user);
                 }
             }).done((msg) => {
                 this.setState({
@@ -154,8 +140,8 @@ class Paper extends Component {
                         visitor : msg.result
                     }
                 });
-            }).fail((jqXHR, textStatus) => {
-                console.log(jqXHR, textStatus);
+            }).fail((xhr, textStatus, errorThrown) => {
+                errorHandler(xhr, textStatus, errorThrown, this.props);
             });
         }
     };
@@ -204,9 +190,9 @@ class Paper extends Component {
                 url: getHttpProtocol(this.props.config) + '/scouter/v1/counter/realTime/' + params + '?objHashes=' + JSON.stringify(this.props.instances.map((instance) => {
                     return Number(instance.objHash);
                 })),
-                xhrFields: that.getWithCredentials(),
+                xhrFields: getWithCredentials(that.props.config),
                 beforeSend: function (xhr) {
-                    that.setAuthHeader(xhr);
+                    setAuthHeader(xhr, that.props.config, that.props.user);
                 }
             }).done((msg) => {
                 let map = {};
@@ -228,8 +214,8 @@ class Paper extends Component {
                         data : map
                     }
                 });
-            }).fail((jqXHR, textStatus) => {
-                console.log(jqXHR, textStatus);
+            }).fail((xhr, textStatus, errorThrown) => {
+                errorHandler(xhr, textStatus, errorThrown, this.props);
             });
         }
     };
@@ -691,7 +677,9 @@ let mapStateToProps = (state) => {
 
 let mapDispatchToProps = (dispatch) => {
     return {
-        addRequest: () => dispatch(addRequest())
+        addRequest: () => dispatch(addRequest()),
+        pushMessage: (category, title, content) => dispatch(pushMessage(category, title, content)),
+        setControlVisibility: (name, value) => dispatch(setControlVisibility(name, value))
     };
 };
 

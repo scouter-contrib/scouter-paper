@@ -4,7 +4,7 @@ import {addRequest, pushMessage, setInstances, clearAllMessage, setControlVisibi
 import {connect} from 'react-redux';
 import jQuery from "jquery";
 import {withRouter} from 'react-router-dom';
-import {getHttpProtocol} from '../../../common/common';
+import {getHttpProtocol, errorHandler, getWithCredentials, setAuthHeader} from '../../../common/common';
 import 'url-search-params-polyfill';
 
 class InstanceSelector extends Component {
@@ -22,9 +22,7 @@ class InstanceSelector extends Component {
     }
 
     componentWillReceiveProps(nextProps){
-
         var that = this;
-
         if (!this.init && nextProps.user && nextProps.user.id) {
             this.init = true;
 
@@ -33,15 +31,9 @@ class InstanceSelector extends Component {
                 method: "GET",
                 async: true,
                 url: getHttpProtocol(nextProps.config) + '/scouter/v1/info/server',
-                xhrFields: {
-                    withCredentials: (nextProps.config.authentification && nextProps.config.authentification.type === "token")
-                },
+                xhrFields: getWithCredentials(nextProps.config),
                 beforeSend: function (xhr) {
-                    if (nextProps.config.authentification && nextProps.config.authentification.type === "bearer") {
-                        if (nextProps.user && nextProps.user.token) {
-                            xhr.setRequestHeader('Authorization', 'bearer ' + nextProps.user.token);
-                        }
-                    }
+                    setAuthHeader(xhr, nextProps.config, nextProps.user);
                 }
             }).done((msg) => {
                 if (msg && msg.result) {
@@ -66,15 +58,9 @@ class InstanceSelector extends Component {
                                 method: "GET",
                                 async: false,
                                 url: getHttpProtocol(this.props.config) + '/scouter/v1/object?serverId=' + host.id,
-                                xhrFields: {
-                                    withCredentials: (nextProps.config.authentification && nextProps.config.authentification.type === "token")
-                                },
+                                xhrFields: getWithCredentials(nextProps.config),
                                 beforeSend: function (xhr) {
-                                    if (nextProps.config.authentification && nextProps.config.authentification.type === "bearer") {
-                                        if (nextProps.user && nextProps.user.token) {
-                                            xhr.setRequestHeader('Authorization', 'bearer ' + nextProps.user.token);
-                                        }
-                                    }
+                                    setAuthHeader(xhr, nextProps.config, nextProps.user);
                                 }
                             }).done(function(msg) {
                                 instances = msg.result;
@@ -93,8 +79,8 @@ class InstanceSelector extends Component {
                                         });
                                     })
                                 }
-                            }).fail(function(jqXHR, textStatus) {
-                                console.log(jqXHR, textStatus);
+                            }).fail(function(xhr, textStatus, errorThrown) {
+                                errorHandler(xhr, textStatus, errorThrown, that.props);
                             });
                         });
 
@@ -129,16 +115,14 @@ class InstanceSelector extends Component {
                     }
                 }
 
-            }).fail((jqXHR, textStatus) => {
-                console.log(jqXHR, textStatus);
+            }).fail((xhr, textStatus, errorThrown) => {
+                errorHandler(xhr, textStatus, errorThrown, that.props);
             });
-
-
-
         }
     }
 
     getHosts = () => {
+        var that = this;
         this.props.addRequest();
         jQuery.ajax({
             method: "GET",
@@ -148,8 +132,8 @@ class InstanceSelector extends Component {
             this.setState({
                 hosts: msg.result
             });
-        }).fail((jqXHR, textStatus) => {
-            console.log(jqXHR, textStatus);
+        }).fail((xhr, textStatus, errorThrown) => {
+            errorHandler(xhr, textStatus, errorThrown, that.props);
         });
 
     };
@@ -174,17 +158,16 @@ class InstanceSelector extends Component {
             method: "GET",
             async: true,
             url: getHttpProtocol(this.props.config) + '/scouter/v1/object?serverId=' + hostId,
+            xhrFields: getWithCredentials(that.props.config),
             beforeSend: function (xhr) {
-                if (that.props.user.token) {
-                    xhr.setRequestHeader('Authorization', 'bearer ' + that.props.user.token);
-                }
+                setAuthHeader(xhr, that.props.config, that.props.user);
             },
         }).done((msg) => {
             this.setState({
                 instances: msg.result
             });
-        }).fail((jqXHR, textStatus) => {
-            console.log(jqXHR, textStatus);
+        }).fail((xhr, textStatus, errorThrown) => {
+            errorHandler(xhr, textStatus, errorThrown, that.props);
         });
     };
 

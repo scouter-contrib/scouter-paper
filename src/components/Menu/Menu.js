@@ -73,12 +73,14 @@ class Menu extends Component {
                             <div className="text">ABOUT</div>
                         </div>
                     </NavLink>*/}
-                    <NavLink className={"menu-item right " + (this.state.menu === "login" ? "active" : "")} to="/login" activeClassName="active" onClick={this.menuClick.bind(this, "/login")}>
-                        <div>
-                            {(this.props.user && this.props.user.id) ? <div className="text"></div> : <div className="icon"><i className="fa fa-handshake-o" aria-hidden="true"></i></div>}
-                            {(this.props.user && this.props.user.id) ? <div className="text"><i className="fa fa-child login-icon" aria-hidden="true"></i></div> : <div>LOGIN</div>}
-                        </div>
-                    </NavLink>
+                    {(this.props.config.authentification && this.props.config.authentification.type !== "none") &&
+                        <NavLink className={"menu-item right " + (this.state.menu === "login" ? "active" : "")} to="/login" activeClassName="active" onClick={this.menuClick.bind(this, "/login")}>
+                            <div>
+                                {(this.props.user && this.props.user.id) ? <div className="text"></div> : <div className="icon"><i className="fa fa-handshake-o" aria-hidden="true"></i></div>}
+                                {(this.props.user && this.props.user.id) ? <div className="text"><i className="fa fa-child login-icon" aria-hidden="true"></i></div> : <div>LOGIN</div>}
+                            </div>
+                        </NavLink>
+                    }
                     <InstanceInfo className="menu-instance-selector" toggleSelectorVisible={this.toggleSelectorVisible}/>
                 </div>
                 <div className="bar"></div>
