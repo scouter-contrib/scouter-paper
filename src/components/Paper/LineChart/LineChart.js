@@ -13,13 +13,12 @@ class LineChart extends Component {
             top: 24, right: 20, bottom: 30, left: 40
         },
         svg: null,
-        overlay : null,
+        overlay: null,
         width: null,
         height: null,
         x: null,
         y: null,
         path: null,
-        maxY: null,
         startTime: (new Date()).getTime() - (1000 * 60 * 10),
         endTime: (new Date()).getTime(),
         timeFormat: "%H:%M",
@@ -27,13 +26,16 @@ class LineChart extends Component {
         xAxisWidth: 70,
         yAxisHeight: 30,
         noData: true,
-        bisector : null
+        bisector: null,
+        currentTooltipTime: null
     };
 
     constructor(props) {
         super(props);
         this.state = {
-            counters: {}
+            counters: {},
+            maxY : null,
+            autoMaxY : null
         }
     }
 
@@ -118,11 +120,22 @@ class LineChart extends Component {
 
             if (!maxY || maxY < 10) {
                 maxY = 10;
-            } else {
-                maxY = Math.round(maxY * 1.2);
             }
 
-            this.graph.maxY = maxY;
+            this.graph.autoMaxY = maxY;
+
+            if (!this.graph.maxY) {
+                this.graph.maxY = maxY * 1.2;
+            }
+
+            if (this.graph.autoMaxY > this.graph.maxY) {
+                this.graph.maxY = this.graph.autoMaxY;
+            }
+
+            /*if (maxY > this.graph.maxY) {
+                this.graph.maxY = maxY;
+            }*/
+
 
             let noData = true;
             if (Array.isArray(nextProps.box.option)) {
@@ -150,7 +163,6 @@ class LineChart extends Component {
                 noData: noData
             });
         } else {
-
             let startTime = (new Date()).getTime() - (1000 * 60 * 10);
             let endTime = (new Date()).getTime();
 
@@ -158,9 +170,8 @@ class LineChart extends Component {
                 startTime: startTime,
                 endTime: endTime
             });
-
-
         }
+
     }
 
     componentDidUpdate = (prevProps, prevState) => {
@@ -168,24 +179,16 @@ class LineChart extends Component {
         this.draw();
     };
 
-    updateAxis = (clear) => {
-        let svg = d3.select(this.refs.lineChart).select("svg");
-        this.graph.y.domain([0, this.state.elapsed]);
-        svg.select(".axis-y").transition().duration(500).call(d3.axisLeft(this.graph.y).tickFormat((e) => {
-            if (this.state && (this.state.elapsed < 1000)) {
-                return (e / 1000).toFixed(2) + "s";
-            } else {
-                return (e / 1000).toFixed(1) + "s";
-            }
-        }).ticks(this.graph.elapsedTicks));
-        svg.select(".grid-y").transition().duration(500).call(d3.axisLeft(this.graph.y).tickSize(-this.graph.width).tickFormat("").ticks(this.graph.elapsedTicks));
+    moveTooltip = () => {
+        if (this.graph.currentTooltipTime) {
+            let xPosition = this.graph.x(this.graph.currentTooltipTime);
+            this.graph.focus.selectAll("circle").attr("cx", xPosition);
 
-        if (clear) {
-            this.clear();
-            this.redraw();
+            let hoverLine = this.graph.focus.select("line.x-hover-line");
+            hoverLine.attr("x1", xPosition);
+            hoverLine.attr("x2", xPosition);
         }
     };
-
 
     graphAxis = (width, height, init) => {
         this.graph.x = d3.scaleTime().range([0, width]);
@@ -266,15 +269,27 @@ class LineChart extends Component {
                                         }
                                     });
 
+                                let multiPathClass = "line-" + that.props.instances[i].objHash + "-" + counterKey;
                                 let pathClass = "line-" + that.props.instances[i].objHash + "-" + counterKey + "-" + thisOption.multiValue[j];
 
-                                let path = this.graph.svg.select(".line." + pathClass);
+                                let path = this.graph.svg.select("path." + pathClass);
                                 if (path.size() < 1) {
-                                    path = this.graph.svg.insert("path", ":first-child").attr("class", "line " + pathClass).style("stroke", colorScale[cnt]);
-                                    this.props.setTitle(thisOption.title + "(" + thisOption.multiValue[j] + ")", colorScale[cnt]);
+                                    path = this.graph.svg.insert("path", ":first-child").attr("class", pathClass + " " + multiPathClass).style("stroke", colorScale[cnt]);
+                                    this.props.setTitle(counterKey, thisOption.title + "(" + thisOption.multiValue[j] + ")", colorScale[cnt]);
+                                } else {
+                                    if (thisOption) {
+                                        path.style("stroke", colorScale[cnt]);
+                                        this.props.setTitle(counterKey, thisOption.title + "(" + thisOption.multiValue[j] + ")", colorScale[cnt]);
+                                        let circleKey = "circle-" + that.props.instances[i].objHash + "_" + counterKey + thisOption.multiValue[j];
+                                        that.graph.focus.select("circle." + circleKey).attr("stroke", colorScale[cnt]);
+                                    }
                                 }
-                                path.data([that.state.counters[counterKey]]).attr("d", valueLine);
-                                cnt++;
+
+                                if (thisOption) {
+                                    path.data([that.state.counters[counterKey]]).attr("d", valueLine);
+                                    cnt++;
+                                }
+
                             }
                         } else {
                             let valueLine = d3.line().curve(d3.curveMonotoneX)
@@ -296,18 +311,61 @@ class LineChart extends Component {
 
                             let pathClass = "line-" + that.props.instances[i].objHash + "-" + counterKey;
 
-                            let path = this.graph.svg.select(".line." + pathClass);
-                            if (path.size() < 1) {
-                                path = this.graph.svg.insert("path", ":first-child").attr("class", "line " + pathClass).style("stroke", colorScale[cnt]);
-                                this.props.setTitle(thisOption.title, colorScale[cnt]);
+                            let path = this.graph.svg.selectAll("path." + pathClass);
+                            if (thisOption && path.size() < 1) {
+                                path = this.graph.svg.insert("path", ":first-child").attr("class", pathClass).style("stroke", colorScale[cnt]);
+                                this.props.setTitle(counterKey, thisOption.title, colorScale[cnt]);
+                            } else {
+                                if (thisOption) {
+                                    path.style("stroke", colorScale[cnt]);
+                                    this.props.setTitle(counterKey, thisOption.title, colorScale[cnt]);
+                                    let circleKey = "circle-" + that.props.instances[i].objHash + "_" + counterKey;
+                                    that.graph.focus.select("circle." + circleKey).attr("stroke", colorScale[cnt]);
+                                }
                             }
-                            path.data([that.state.counters[counterKey]]).attr("d", valueLine);
-                            cnt++;
+
+                            // 삭제된 매트릭 (삭제는 멀티도 여기서 삭제됨)
+                            if (!thisOption) {
+
+                                // 데이터 삭제
+                                let counters = Object.assign(this.state.counters);
+                                if(counters[counterKey]) {
+                                    delete counters[counterKey];
+                                }
+                                delete this.state.counters[counterKey];
+                                this.setState({
+                                    counters : counters
+                                });
+
+                                // 라인 그래프 삭제
+                                if (path && path.size() > 0) {
+                                    path.remove();
+                                }
+
+                                // 툴팁 그래프 삭제
+                                let circleKey = "circle-" + that.props.instances[i].objHash + "_" + counterKey;
+                                let circle = that.graph.focus.selectAll("circle." + circleKey);
+
+                                if (circle.size() > 0) {
+                                    circle.remove();
+                                }
+
+                                // 제목 삭제
+                                this.props.removeTitle(counterKey);
+                            }
+
+                            if (thisOption) {
+                                path.data([that.state.counters[counterKey]]).attr("d", valueLine);
+                                cnt++;
+                            }
+
                         }
                     }
                 }
             }
         }
+
+        this.moveTooltip();
     };
 
 
@@ -332,37 +390,103 @@ class LineChart extends Component {
 
         this.graph.svg = d3.select(this.refs.lineChart).append("svg").attr("width", this.graph.width + this.graph.margin.left + this.graph.margin.right).attr("height", this.graph.height + this.graph.margin.top + this.graph.margin.bottom).append("g").attr("class", "top-group").attr("transform", "translate(" + this.graph.margin.left + "," + this.graph.margin.top + ")");
         this.graph.focus = this.graph.svg.append("g").attr("class", "tooltip-focus");
+
         this.graph.overlay = this.graph.svg.append("rect").attr("class", "tooltip-overlay").attr("width", this.graph.width).attr("height", this.graph.height);
 
-
-
-
-        this.graph.overlay.on("mouseover", function() {
+        this.graph.overlay.on("mouseover", function () {
+            let r = 3;
             let hoverLine = that.graph.focus.select("line.x-hover-line");
             if (hoverLine.size() > 0) {
                 hoverLine.style("display", "block");
             }
 
+            let colorScale = d3.schemeCategory10;
+            let cnt = 0;
+            for (let counterKey in that.state.counters) {
+                for (let i = 0; i < that.props.instances.length; i++) {
+
+                    let isMultiValue = false;
+                    let thisOption = null;
+                    for (let j = 0; j < that.props.box.option.length; j++) {
+                        if (that.props.box.option[j].counterKey === counterKey) {
+                            thisOption = that.props.box.option[j];
+                            if (that.props.box.option[j].multiValue) {
+                                isMultiValue = true;
+                            }
+                            break;
+                        }
+                    }
+
+                    if (!thisOption) {
+                        return;
+                    }
+
+                    if (isMultiValue) {
+                        for (let j = 0; j < thisOption.multiValue.length; j++) {
+                            let circleMultiKey = "circle-" + that.props.instances[i].objHash + "_" + thisOption.counterKey;
+                            let circleKey = "circle-" + that.props.instances[i].objHash + "_" + thisOption.counterKey + "_" + thisOption.multiValue[j];
+                            let circle = that.graph.focus.select("circle." + circleKey);
+                            if (circle.size() < 1) {
+                                circle = that.graph.focus.append("circle").attr("class", circleMultiKey + " " + circleKey).attr("r", r).attr("stroke", colorScale[cnt]);
+                            }
+                            cnt++;
+                        }
+                    } else {
+                        let circleKey = "circle-" + that.props.instances[i].objHash + "_" + thisOption.counterKey;
+                        let circle = that.graph.focus.select("circle." + circleKey);
+                        if (circle.size() < 1) {
+                            circle = that.graph.focus.append("circle").attr("class", circleKey).attr("r", r).attr("stroke", colorScale[cnt]);
+                        }
+                        cnt++;
+                    }
+
+                }
+            }
+
+            that.graph.focus.selectAll("circle").style("display", "block");
+
             that.props.showTooltip();
         });
-        this.graph.overlay.on("mouseout", function() {
+        this.graph.overlay.on("mouseout", function () {
 
             let hoverLine = that.graph.focus.select("line.x-hover-line");
             if (hoverLine.size() > 0) {
                 hoverLine.style("display", "none");
             }
 
+            that.graph.focus.selectAll("circle").style("display", "none");
+
             that.props.hideTooltip();
         });
 
-        this.graph.bisector = d3.bisector(function(d) { return d.time; }).left;
+        this.graph.bisector = d3.bisector(function (d) {
+            return d.time;
+        }).left;
 
-        this.graph.overlay.on("mousemove", function() {
+        this.graph.overlay.on("mousemove", function () {
 
             let tooltip = {};
             tooltip.lines = [];
 
-            let x0 = that.graph.x.invert(d3.mouse(this)[0]);
+            let xPos = d3.mouse(this)[0];
+            let yPos = d3.mouse(this)[1];
+
+            if(navigator.userAgent.toLowerCase().indexOf('firefox') > -1){
+                let box = that.refs.lineChart.parentNode.parentNode.parentNode.parentNode.parentNode.parentNode;
+                if(window.getComputedStyle) {
+                    let style = getComputedStyle(box);
+                    let transform = style.transform || style.webkitTransform || style.mozTransform;
+                    let mat = transform.match(/^matrix3d\((.+)\)$/);
+                    if(mat) return parseFloat(mat[1].split(', ')[13]);
+                    mat = transform.match(/^matrix\((.+)\)$/);
+                    let transformX =mat ? parseFloat(mat[1].split(', ')[4]) : 0;
+                    let transformY = mat ? parseFloat(mat[1].split(', ')[5]) : 0;
+                    xPos = xPos - transformX;
+                    yPos = yPos - transformY;
+                }
+            }
+
+            let x0 = that.graph.x.invert(xPos);
             let timeFormat = d3.timeFormat(that.graph.fullTimeFormat);
 
             let colorScale = d3.schemeCategory10;
@@ -383,64 +507,116 @@ class LineChart extends Component {
 
                     let dataIndex = that.graph.bisector(that.state.counters[counterKey], x0, 0);
 
+                    if (!that.state.counters[counterKey][dataIndex]) {
+                        break;
+                    }
+
                     if (tooltip.timeValue && (tooltip.timeValue < that.state.counters[counterKey][dataIndex].time)) {
 
                     } else {
                         tooltip.time = timeFormat(that.state.counters[counterKey][dataIndex].time);
-                        tooltip.timeValue =  that.state.counters[counterKey][dataIndex].time;
+                        tooltip.timeValue = that.state.counters[counterKey][dataIndex].time;
                     }
 
-                    if (!that.state.counters[counterKey][dataIndex]) {
+
+                    if (!thisOption) {
                         break;
                     }
 
                     if (isMultiValue) {
                         for (let j = 0; j < thisOption.multiValue.length; j++) {
-                            tooltip.lines.push({
-                                instanceName : that.props.instances[i].objName,
-                                metricName : thisOption.title + "(" + thisOption.multiValue[j] + ")",
-                                value : Math.round(that.state.counters[counterKey][dataIndex].data[that.props.instances[i].objHash].value[j] * 10) / 10,
-                                color : colorScale[cnt]
-                            });
+                            let circleKey = "circle-" + that.props.instances[i].objHash + "_" + thisOption.counterKey + "_" + thisOption.multiValue[j];
+                            if (tooltip.timeValue === that.state.counters[counterKey][dataIndex].time) {
+                                tooltip.lines.push({
+                                    instanceName: that.props.instances[i].objName,
+                                    circleKey: circleKey,
+                                    metricName: thisOption.title + "(" + thisOption.multiValue[j] + ")",
+                                    value: Math.round(that.state.counters[counterKey][dataIndex].data[that.props.instances[i].objHash].value[j] * 10) / 10,
+                                    color: colorScale[cnt]
+                                });
+                            } else {
+                                that.graph.focus.select("circle." + circleKey).style("display", "none");
+                            }
+
                             cnt++;
                         }
                     } else {
-                        tooltip.lines.push({
-                            instanceName : that.props.instances[i].objName,
-                            metricName : thisOption.title ,
-                            value : that.state.counters[counterKey][dataIndex].data[that.props.instances[i].objHash] ? Math.round(that.state.counters[counterKey][dataIndex].data[that.props.instances[i].objHash].value * 10) / 10 : null,
-                            color : colorScale[cnt]
-                        });
+                        let circleKey = "circle-" + that.props.instances[i].objHash + "_" + thisOption.counterKey;
+                        if (tooltip.timeValue === that.state.counters[counterKey][dataIndex].time) {
+                            tooltip.lines.push({
+                                instanceName: that.props.instances[i].objName,
+                                circleKey: circleKey,
+                                metricName: thisOption.title,
+                                value: that.props.instances[i].objHash && that.state.counters[counterKey][dataIndex].data[that.props.instances[i].objHash] ? Math.round(that.state.counters[counterKey][dataIndex].data[that.props.instances[i].objHash].value * 10) / 10 : null,
+                                color: colorScale[cnt]
+                            });
+                        } else {
+                            that.graph.focus.select("circle." + circleKey).style("display", "none");
+                        }
+
                         cnt++;
                     }
                 }
             }
-
 
             let hoverLine = that.graph.focus.select("line.x-hover-line");
             if (hoverLine.size() < 1) {
                 hoverLine = that.graph.focus.append("line").attr("class", "x-hover-line hover-line").attr("y1", 0).attr("y2", that.graph.height);
             }
 
+            let xPosition = that.graph.x(tooltip.timeValue);
             if (tooltip.timeValue) {
-                hoverLine.attr("x1",  that.graph.x(tooltip.timeValue));
-                hoverLine.attr("x2",  that.graph.x(tooltip.timeValue));
+                hoverLine.attr("x1", xPosition);
+                hoverLine.attr("x2", xPosition);
             }
 
-            that.props.showTooltip(d3.mouse(this)[0], d3.mouse(this)[1], that.graph.margin.left, that.graph.margin.top, tooltip);
+            if (tooltip && tooltip.lines) {
+                for (let i = 0; i < tooltip.lines.length; i++) {
+                    if (!isNaN(tooltip.lines[i].value)) {
+                        let circle = that.graph.focus.select("circle." + tooltip.lines[i].circleKey);
+                        if (circle.size() > 0) {
+                            circle.attr("cx", xPosition);
+                            circle.attr("cy", that.graph.y(tooltip.lines[i].value));
+                        }
+                    }
+                }
+            }
 
+            that.graph.currentTooltipTime = tooltip.timeValue;
+            that.props.showTooltip(xPos, yPos, that.graph.margin.left, that.graph.margin.top, tooltip);
         });
-
-
 
         this.graphAxis(this.graph.width, this.graph.height, true);
 
+    };
+
+    axisUp = () => {
+        this.graph.maxY = this.graph.maxY * 1.2;
+        this.graphAxis(this.graph.width, this.graph.height, false);
+        this.draw();
+    };
+
+    axisDown = () => {
+
+        this.graph.maxY = this.graph.maxY * 0.8;
+        if (this.graph.maxY < this.graph.autoMaxY) {
+            this.graph.maxY = this.graph.autoMaxY;
+        }
+
+        this.graphAxis(this.graph.width, this.graph.height, false);
+        this.draw();
+    };
+
+    stopProgation = (e) => {
+        e.stopPropagation();
     };
 
     render() {
         return (
             <div className="line-chart-wrapper">
                 <div className="line-chart" ref="lineChart"></div>
+                <div className="axis-button axis-up noselect" onClick={this.axisUp} onMouseDown={this.stopProgation}>+</div>
+                <div className="axis-button axis-down noselect" onClick={this.axisDown} onMouseDown={this.stopProgation}>-</div>
                 {this.state.noData && <div className="no-data">
                     <div>
                         <div>NO DATA RECEIVED</div>

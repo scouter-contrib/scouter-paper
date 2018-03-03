@@ -34,10 +34,10 @@ class PaperControl extends Component {
                 {Object.keys(this.options).map((name, i) => {
                     let isArray = Array.isArray(this.options[name]);
 
-                    return <div key={i} className={"paper-control " + (isArray ? 'multi-control' : '')}>
+                    return <div key={i} className={"paper-control " + (isArray ? 'multi-control' : '')} data-tip={this.options[name].title} >
                         {(!isArray && !this.touch) &&
-                        <Draggable type="metric" className="draggable control-item" data={JSON.stringify(this.options[name])}>
-                            {this.options[name].icon && <i data-tip={this.options[name].title} className={"fa " + this.options[name].icon} aria-hidden="true"></i>}
+                        <Draggable type="metric" className="draggable control-item" data={JSON.stringify(this.options[name])} >
+                            {this.options[name].icon && <i className={"fa " + this.options[name].icon} aria-hidden="true"></i>}
                             {this.options[name].text && <span className="text-icon">{this.options[name].text}</span>}
                         </Draggable>
                         }

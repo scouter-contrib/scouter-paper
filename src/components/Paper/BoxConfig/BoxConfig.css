@@ -3,6 +3,13 @@
 
     background-color: rgba(0, 0, 0, 0.8);
     background-color: black;
+    background-color: #104E8B;
+
+
+
+
+
+
 
     top: 5px;
     left: 5px;
@@ -108,6 +115,49 @@
     text-align: right;
     font-size: 8px;
     padding: 2px 20px;
+}
+.box-config .exclusive-options-title {
+    text-align: center;
+    padding: 10px;
+
+}
+
+.box-config .exclusive-options {
+    line-height: 100%;
+    color: white;
+    padding: 10px;
+}
+
+.box-config .exclusive-options .metric-option {
+    display: inline-block;
+    background-color: white;
+    color: #333;
+    border: 1px solid rgba(0,0,0,0.5);
+    margin-right: 5px;
+    border-radius: 3px;
+}
+
+.box-config .exclusive-options .metric-option span {
+    padding: 7px;
+    display: inline-block;
+    border-right: 1px solid rgba(0,0,0,0.5);
+}
+
+.box-config .exclusive-options .metric-option.removed span {
+    text-decoration: line-through;
+}
+
+.box-config .exclusive-options .metric-option .remove-btn {
+    padding: 7px 7px 7px 5px;
+    border-right: none;
+    border-radius: 0 3px 3px 0;
+    text-decoration: none;
+}
+
+.box-config .exclusive-options .metric-option .remove-btn:hover {
+    background-color: #F8171B;
+    cursor: pointer;
+    color: white;
 }
 
 

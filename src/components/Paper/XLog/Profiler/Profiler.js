@@ -1,10 +1,10 @@
 import React, {Component} from 'react';
 import './Profiler.css';
-import {addRequest} from '../../../../actions';
+import {addRequest, setControlVisibility, pushMessage} from '../../../../actions';
 import {withRouter} from 'react-router-dom';
 import {connect} from 'react-redux';
 import jQuery from "jquery";
-import {getDate, getHttpProtocol} from '../../../../common/common';
+import {getDate, getHttpProtocol, errorHandler, getWithCredentials, setAuthHeader} from '../../../../common/common';
 import SingleProfile from "./SingleProfile/SingleProfile";
 import ProfileList from "./ProfileList/ProfileList";
 
@@ -17,15 +17,15 @@ class Profiler extends Component {
             show: false,
             xlogs: [],
             last: null,
-            txid : null,
-            enter : false,
-            profile : null,
-            steps : null,
-            summary : true,
-            bind : true,
-            wrap : true,
-            gap : true,
-            formatter : true
+            txid: null,
+            enter: false,
+            profile: null,
+            steps: null,
+            summary: true,
+            bind: true,
+            wrap: true,
+            gap: true,
+            formatter: true
         }
     }
 
@@ -116,8 +116,8 @@ class Profiler extends Component {
     }
 
 
-
     getList = (x1, x2, y1, y2) => {
+        var that = this;
 
         let date = getDate(new Date(x1), 1);
 
@@ -125,7 +125,11 @@ class Profiler extends Component {
         jQuery.ajax({
             method: "GET",
             async: true,
-            url: getHttpProtocol(this.props.config) + '/scouter/v1/xlog-data/search/' + date + '?objHashes=' + this.props.instances[0].objHash + "&startTimeMillis=" + x1 + "&endTimeMillis=" + x2
+            url: getHttpProtocol(this.props.config) + '/scouter/v1/xlog-data/search/' + date + '?objHashes=' + this.props.instances[0].objHash + "&startTimeMillis=" + x1 + "&endTimeMillis=" + x2,
+            xhrFields: getWithCredentials(that.props.config),
+            beforeSend: function (xhr) {
+                setAuthHeader(xhr, that.props.config, that.props.user);
+            }
         }).done((msg) => {
 
             let list = msg.result;
@@ -133,7 +137,7 @@ class Profiler extends Component {
             if (list && list.length > 0) {
 
                 let instanceMap = {};
-                for (let i=0; i<this.props.instances.length; i++) {
+                for (let i = 0; i < this.props.instances.length; i++) {
                     instanceMap[this.props.instances[i].objHash] = this.props.instances[i].objName;
                 }
 
@@ -161,8 +165,8 @@ class Profiler extends Component {
 
             }
 
-        }).fail((jqXHR, textStatus) => {
-            console.log(jqXHR, textStatus);
+        }).fail((xhr, textStatus, errorThrown) => {
+            errorHandler(xhr, textStatus, errorThrown, this.props);
         });
     };
 
@@ -171,15 +175,18 @@ class Profiler extends Component {
             show: false,
             xlogs: [],
             last: null,
-            txid : null,
-            enter : false,
-            profile : null,
-            steps : null
+            txid: null,
+            enter: false,
+            profile: null,
+            steps: null
         });
     };
 
 
     rowClick = (xlog) => {
+
+        var that = this;
+
         if (this.state.txid === xlog.txid) {
             this.setState({
                 txid: null
@@ -197,13 +204,17 @@ class Profiler extends Component {
         jQuery.ajax({
             method: "GET",
             async: true,
-            url: getHttpProtocol(this.props.config) + '/scouter/v1/xlog-data/' + getDate(new Date(Number(xlog.endTime)), 1) + "/" + xlog.txid
+            url: getHttpProtocol(this.props.config) + '/scouter/v1/xlog-data/' + getDate(new Date(Number(xlog.endTime)), 1) + "/" + xlog.txid,
+            xhrFields: getWithCredentials(that.props.config),
+            beforeSend: function (xhr) {
+                setAuthHeader(xhr, that.props.config, that.props.user);
+            }
         }).done((msg) => {
             this.setState({
-                profile : msg.result
+                profile: msg.result
             });
-        }).fail((jqXHR, textStatus) => {
-            console.log(jqXHR, textStatus);
+        }).fail((xhr, textStatus, errorThrown) => {
+            errorHandler(xhr, textStatus, errorThrown, this.props);
         });
 
         // XLOG DATA
@@ -211,14 +222,18 @@ class Profiler extends Component {
         jQuery.ajax({
             method: "GET",
             async: true,
-            url: getHttpProtocol(this.props.config) + '/scouter/v1/profile-data/' + getDate(new Date(Number(xlog.endTime)), 1) + "/" + xlog.txid
+            url: getHttpProtocol(this.props.config) + '/scouter/v1/profile-data/' + getDate(new Date(Number(xlog.endTime)), 1) + "/" + xlog.txid,
+            xhrFields: getWithCredentials(that.props.config),
+            beforeSend: function (xhr) {
+                setAuthHeader(xhr, that.props.config, that.props.user);
+            }
         }).done((msg) => {
             this.setState({
-                steps : msg.result
+                steps: msg.result
             });
 
-        }).fail((jqXHR, textStatus) => {
-            console.log(jqXHR, textStatus);
+        }).fail((xhr, textStatus, errorThrown) => {
+            errorHandler(xhr, textStatus, errorThrown, this.props);
         });
 
 
@@ -238,32 +253,32 @@ class Profiler extends Component {
 
     toggleSummary = () => {
         this.setState({
-            summary : !this.state.summary
+            summary: !this.state.summary
         });
     };
 
     toggleBind = () => {
         this.setState({
-            bind : !this.state.bind
+            bind: !this.state.bind
         });
     };
 
 
     toggleWrap = () => {
         this.setState({
-            wrap : !this.state.wrap
+            wrap: !this.state.wrap
         });
     };
 
     toggleGap = () => {
         this.setState({
-            gap : !this.state.gap
+            gap: !this.state.gap
         });
     };
 
     toggleFormatter = () => {
         this.setState({
-            formatter : !this.state.formatter
+            formatter: !this.state.formatter
         });
     };
 
@@ -275,20 +290,33 @@ class Profiler extends Component {
 
         return (
             <div className={"xlog-profiler " + (this.state.show ? ' ' : 'hidden ' ) + (selectRow ? 'select-row' : '')}>
-                <div className="profile-list scrollbar" onMouseEnter={this.mouseListEnter} onMouseLeave={this.mouseListLeave}>
-                    <ProfileList txid={this.state.txid} xlogs={this.state.xlogs} rowClick={this.rowClick} />
+                <div className="profile-list scrollbar" onMouseEnter={this.mouseListEnter}
+                     onMouseLeave={this.mouseListLeave}>
+                    <ProfileList txid={this.state.txid} xlogs={this.state.xlogs} rowClick={this.rowClick}/>
                 </div>
-                <div className={"profile-steps "+ (selectRow ? 'select-row' : '')}>
+                <div className={"profile-steps " + (selectRow ? 'select-row' : '')}>
                     <div className="profile-steps-control">
-                        <div className={"profile-control-btn " + (this.state.summary ? 'active' : '')} onClick={this.toggleSummary}>SUMMARY</div>
-                        <div className={"profile-control-btn " + (this.state.bind ? 'active' : '')} onClick={this.toggleBind}>BIND</div>
-                        <div className={"profile-control-btn " + (this.state.wrap ? 'active' : '')} onClick={this.toggleWrap}>WRAP</div>
-                        <div className={"profile-control-btn " + (this.state.gap ? 'active' : '')} onClick={this.toggleGap}>GAP</div>
-                        <div className={"profile-control-btn " + (this.state.formatter ? 'active' : '')} onClick={this.toggleFormatter}>FORMATTER</div>
+                        <div className={"profile-control-btn " + (this.state.summary ? 'active' : '')}
+                             onClick={this.toggleSummary}>SUMMARY
+                        </div>
+                        <div className={"profile-control-btn " + (this.state.bind ? 'active' : '')}
+                             onClick={this.toggleBind}>BIND
+                        </div>
+                        <div className={"profile-control-btn " + (this.state.wrap ? 'active' : '')}
+                             onClick={this.toggleWrap}>WRAP
+                        </div>
+                        <div className={"profile-control-btn " + (this.state.gap ? 'active' : '')}
+                             onClick={this.toggleGap}>GAP
+                        </div>
+                        <div className={"profile-control-btn " + (this.state.formatter ? 'active' : '')}
+                             onClick={this.toggleFormatter}>FORMATTER
+                        </div>
                         <div onClick={this.close} className="close-btn"></div>
                     </div>
                     <div className="profile-steps-content scrollbar">
-                        <SingleProfile txid={this.state.txid} profile={this.state.profile} steps={this.state.steps} summary={this.state.summary} bind={this.state.bind} wrap={this.state.wrap} gap={this.state.gap} formatter={this.state.formatter} />
+                        <SingleProfile txid={this.state.txid} profile={this.state.profile} steps={this.state.steps}
+                                       summary={this.state.summary} bind={this.state.bind} wrap={this.state.wrap}
+                                       gap={this.state.gap} formatter={this.state.formatter}/>
                     </div>
                 </div>
             </div>
@@ -306,7 +334,9 @@ let mapStateToProps = (state) => {
 
 let mapDispatchToProps = (dispatch) => {
     return {
-        addRequest: () => dispatch(addRequest())
+        addRequest: () => dispatch(addRequest()),
+        pushMessage: (category, title, content) => dispatch(pushMessage(category, title, content)),
+        setControlVisibility: (name, value) => dispatch(setControlVisibility(name, value)),
     };
 };
 

@@ -8,7 +8,8 @@ class BoxConfig extends Component {
 
         this.state = {
             values:  Object.assign({}, this.props.box.values),
-            singleRow : false
+            singleRow : false,
+            removeKeys : []
         };
     }
 
@@ -57,17 +58,60 @@ class BoxConfig extends Component {
     };
 
     onApply = () => {
-        this.props.setOptionValues(this.props.box.key, this.state.values);
+
+        if (this.state.removeKeys && this.state.removeKeys.length > 0) {
+            this.props.removeMetrics(this.props.box.key, this.state.removeKeys)
+        } else {
+            this.props.setOptionValues(this.props.box.key, this.state.values);
+        }
     };
 
     onCancel = () => {
         this.props.setOptionClose(this.props.box.key);
+        this.setState({
+            removeKeys: []
+        });
+    };
+
+    onRemoveToggle = ( counterKey) => {
+        let removeKeys = Object.assign(this.state.removeKeys);
+        let findIndex = removeKeys.findIndex(function (e) {
+            return e === counterKey
+        });
+
+        if (findIndex < 0) {
+            removeKeys.push(counterKey);
+        } else {
+            removeKeys.splice(findIndex, 1)
+        }
+
+        this.setState({
+            removeKeys: removeKeys
+        });
     };
 
     render() {
         return (
             <div className={"box-config " + (this.state.singleRow ? "single-row" : "")} onMouseDown={(e) => {e.stopPropagation();}} onMouseUp={(e) => {e.stopPropagation();}} ref="boxConfig">
                 <div className="box-config-content">
+                    <div className="exclusive-options">
+                    {(this.props.box.option && this.props.box.option.length > 1) &&
+                    this.props.box.option.map((d, i) => {
+
+                        let removed = false;
+                        if (this.state.removeKeys) {
+                            for (let j=0; j<this.state.removeKeys.length; j++) {
+                                if (d.counterKey === this.state.removeKeys[j]) {
+                                    removed = true;
+                                    break;
+                                }
+                            }
+                        }
+
+                        return <div className={"metric-option " + (removed ? "removed" : "")} key={i}><span>{d.title}</span><span onClick={this.onRemoveToggle.bind(this, d.counterKey)} className="remove-btn"><i className={"fa " + (removed ? "fa-undo" : "fa-times")} aria-hidden="true"></i></span></div>
+                    })
+                    }
+                    </div>
                     <div className="box-config-items">
                     {this.props.box.option && this.props.box.option.config && Object.keys(this.props.box.option.config).map((attr, i) => {
                         if (this.props.box.option.config[attr].type === "input") {

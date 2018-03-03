@@ -2,12 +2,12 @@ import React, {Component} from 'react';
 import './Paper.css';
 import './Resizable.css';
 import {connect} from 'react-redux';
-import {addRequest} from '../../actions';
+import {addRequest, pushMessage, setControlVisibility} from '../../actions';
 import {withRouter} from 'react-router-dom';
 import {Responsive, WidthProvider} from "react-grid-layout";
 import {Box, BoxConfig, PaperControl} from "../../components";
 import jQuery from "jquery";
-import {getData, setData, getHttpProtocol} from '../../common/common';
+import {getData, setData, getHttpProtocol, errorHandler, getWithCredentials, setAuthHeader} from '../../common/common';
 const ResponsiveReactGridLayout = WidthProvider(Responsive);
 
 class Paper extends Component {
@@ -66,7 +66,7 @@ class Paper extends Component {
     componentDidMount() {
         this.dataRefreshTimer = setInterval(() => {
             this.getXLog();
-            this.getVisitor()
+            this.getVisitor();
             this.getCounter();
         }, this.props.config.interval);
 
@@ -96,34 +96,43 @@ class Paper extends Component {
     };
 
     getXLog = () => {
-
+        var that = this;
         if (this.props.instances && this.props.instances.length > 0) {
             this.props.addRequest();
             jQuery.ajax({
                 method: "GET",
-                async: true,
+                async: false,
                 dataType :'text',
                 url: getHttpProtocol(this.props.config) + '/scouter/v1/xlog/realTime/' + this.state.data.offset1 + '/' + this.state.data.offset2 + '?objHashes=' + JSON.stringify(this.props.instances.map((instance) => {
                     return Number(instance.objHash);
-                }))
+                })),
+                xhrFields: getWithCredentials(that.props.config),
+                beforeSend: function (xhr) {
+                    setAuthHeader(xhr, that.props.config, that.props.user);
+                }
             }).done((msg) => {
                 this.tick(msg);
-            }).fail((jqXHR, textStatus) => {
-                console.log(jqXHR, textStatus);
+            }).fail((xhr, textStatus, errorThrown) => {
+                errorHandler(xhr, textStatus, errorThrown, this.props);
             });
         }
     };
 
     getVisitor = () => {
+        var that = this;
         if (this.props.instances && this.props.instances.length > 0) {
             this.props.addRequest();
             let time = (new Date()).getTime();
             jQuery.ajax({
                 method: "GET",
-                async: true,
+                async: false,
                 url: getHttpProtocol(this.props.config) + '/scouter/v1/visitor/realTime?objHashes=' + JSON.stringify(this.props.instances.map((instance) => {
                     return Number(instance.objHash);
-                }))
+                })),
+                xhrFields: getWithCredentials(that.props.config),
+                beforeSend: function (xhr) {
+                    setAuthHeader(xhr, that.props.config, that.props.user);
+                }
             }).done((msg) => {
                 this.setState({
                     visitor : {
@@ -131,14 +140,14 @@ class Paper extends Component {
                         visitor : msg.result
                     }
                 });
-            }).fail((jqXHR, textStatus) => {
-                console.log(jqXHR, textStatus);
+            }).fail((xhr, textStatus, errorThrown) => {
+                errorHandler(xhr, textStatus, errorThrown, this.props);
             });
         }
     };
 
     getCounter = () => {
-
+        var that = this;
         if (this.props.instances && this.props.instances.length > 0) {
             let counterKeyMap = {};
 
@@ -177,10 +186,14 @@ class Paper extends Component {
             this.props.addRequest();
             jQuery.ajax({
                 method: "GET",
-                async: true,
+                async: false,
                 url: getHttpProtocol(this.props.config) + '/scouter/v1/counter/realTime/' + params + '?objHashes=' + JSON.stringify(this.props.instances.map((instance) => {
                     return Number(instance.objHash);
-                }))
+                })),
+                xhrFields: getWithCredentials(that.props.config),
+                beforeSend: function (xhr) {
+                    setAuthHeader(xhr, that.props.config, that.props.user);
+                }
             }).done((msg) => {
                 let map = {};
 
@@ -201,8 +214,8 @@ class Paper extends Component {
                         data : map
                     }
                 });
-            }).fail((jqXHR, textStatus) => {
-                console.log(jqXHR, textStatus);
+            }).fail((xhr, textStatus, errorThrown) => {
+                errorHandler(xhr, textStatus, errorThrown, this.props);
             });
         }
     };
@@ -576,6 +589,49 @@ class Paper extends Component {
 
     };
 
+    removeMetrics = (boxKey, counterKeys) => {
+
+        let boxes = this.state.boxes;
+        boxes.forEach((box) => {
+            if (box.key === boxKey) {
+                box.config = false;
+
+                let options = box.option.filter((option) => {
+                    let index = counterKeys.findIndex(function(e) {
+                        return e === option.counterKey;
+                    });
+
+                    return index < 0;
+                });
+
+                box.option = options;
+
+                if (Array.isArray(box.option)) {
+                    box.config = false;
+                    let title = "";
+                    for (let i=0; i<box.option.length; i++) {
+                        title += box.option[i].title;
+                        if (i < (box.option.length-1)) {
+                            title += ", ";
+                        }
+                    }
+                    box.title = title
+                } else {
+                    box.config = false;
+                    box.title = box.option.title;
+                }
+            }
+        });
+
+
+
+        this.setState({
+            boxes: boxes
+        });
+
+        setData("boxes", boxes);
+    };
+
     render() {
         let instanceSelected = this.props.instances.length > 0 ? true : false;
 
@@ -592,8 +648,8 @@ class Paper extends Component {
                     {this.state.boxes.map((box, i) => {
                         return <div className="box-layout" key={box.key} data-grid={box.layout}>
                             <button className="box-control box-layout-remove-btn last" onClick={this.removePaper.bind(null, box.key)}><i className="fa fa-times-circle-o" aria-hidden="true"></i></button>
-                            {box.option && box.option.config && <button className="box-control box-layout-config-btn" onClick={this.toggleConfig.bind(null, box.key)}><i className="fa fa-cog" aria-hidden="true"></i></button>}
-                            {box.config && <BoxConfig box={box} setOptionValues={this.setOptionValues} setOptionClose={this.setOptionClose} />}
+                            {box.option && (box.option.length > 1 || box.option.config ) && <button className="box-control box-layout-config-btn" onClick={this.toggleConfig.bind(null, box.key)}><i className="fa fa-cog" aria-hidden="true"></i></button>}
+                            {box.config && <BoxConfig box={box} setOptionValues={this.setOptionValues} setOptionClose={this.setOptionClose} removeMetrics={this.removeMetrics} />}
                             <Box setOption={this.setOption} box={box} data={this.state.data} config={this.props.config} visitor={this.state.visitor} counters={this.state.counters} layoutChangeTime={this.state.layoutChangeTime}/>
                         </div>
                     })}
@@ -621,7 +677,9 @@ let mapStateToProps = (state) => {
 
 let mapDispatchToProps = (dispatch) => {
     return {
-        addRequest: () => dispatch(addRequest())
+        addRequest: () => dispatch(addRequest()),
+        pushMessage: (category, title, content) => dispatch(pushMessage(category, title, content)),
+        setControlVisibility: (name, value) => dispatch(setControlVisibility(name, value))
     };
 };
 

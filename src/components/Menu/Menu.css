@@ -121,6 +121,10 @@
     transition: opacity 0.3s;
 }
 
+.menu .menu-item .login-icon {
+
+}
+
 .menu .menu-item.right {
     float: right;
 }
@@ -151,6 +155,7 @@
     padding-top : 10px;
     font-size: 10px;
     float: right;
+    margin-right: 10px;
 }
 
 

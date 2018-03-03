@@ -1,11 +1,11 @@
 import React, {Component} from 'react';
 import './Login.css';
 import {connect} from 'react-redux';
-import {addRequest, clearAllMessage, setControlVisibility, setUserId} from '../../actions';
+import {addRequest, clearAllMessage, setControlVisibility, pushMessage, setUserId} from '../../actions';
 import jQuery from "jquery";
 import {withRouter} from 'react-router-dom';
-import building from './building.png';
 import TimeAgo from 'react-timeago'
+import {errorHandler} from '../../common/common';
 
 class Login extends Component {
 
@@ -44,37 +44,11 @@ class Login extends Component {
         }
     }
 
-    info = () => {
-
-        this.props.setControlVisibility("Loading", true);
-        this.props.addRequest();
-
-        jQuery.ajax({
-            method: "GET",
-            async: true,
-            url: this.props.config.protocol + "://" + this.props.config.address + ":" + this.props.config.port + "/scouter/v1/user/info",
-            xhrFields: {
-                withCredentials: true
-            }
-        }).done((msg) => {
-            if (msg) {
-                if (msg.status === "200" && msg.resultCode === "0" && msg.result) {
-                    this.props.setUserId(msg.result.id);
-                    this.setState({
-                        message: null
-                    });
-                }
-            }
-        }).fail((jqXHR, textStatus) => {
-            console.log(jqXHR, textStatus);
-        }).always(() => {
-            this.props.setControlVisibility("Loading", false);
-        });
-    };
 
     logout = () => {
         document.cookie = 'JSESSIONID=; expires=Thu, 01 Jan 1970 00:00:01 GMT;';
-        this.props.setUserId(null);
+        this.props.setUserId(null, null, null);
+        localStorage.removeItem("user");
     };
 
     login = () => {
@@ -91,49 +65,50 @@ class Login extends Component {
 
         jQuery.ajax({
             method: "POST",
-            url: this.props.config.protocol + "://" + this.props.config.address + ":" + this.props.config.port + "/scouter/v1/user/login",
+            url: this.props.config.protocol + "://" + this.props.config.address + ":" + this.props.config.port + "/scouter/v1/user/loginGetToken",
             data: JSON.stringify(condition),
             contentType: "application/json; charset=UTF-8",
-            processData: false,
-            xhrFields: {
-                withCredentials: true
-            }
+            processData: false
         }).done((msg) => {
-            this.info();
-        }).fail((jqXHR, textStatus) => {
-            this.setState({
-                message: "LOGIN FAILED"
-            });
-            console.log(jqXHR, textStatus);
+            if (msg.result.success) {
+                let user = {
+                    id : this.state.control.id,
+                    token : msg.result.bearerToken,
+                    time : (new Date()).getTime()
+                };
+                localStorage.setItem("user", JSON.stringify(user));
+                this.props.setUserId(this.state.control.id, msg.result.bearerToken, (new Date()).getTime());
+            } else {
+                this.setState({
+                    message: "LOGIN FAILED"
+                });
+            }
+        }).fail((xhr, textStatus, errorThrown) => {
+            errorHandler(xhr, textStatus, errorThrown, this.props);
         }).always(() => {
             this.props.setControlVisibility("Loading", false);
         });
-
     };
 
-    componentDidMount() {
-        if (!this.props.user || !this.props.user.id) {
-            this.info();
-        }
-    }
-
     render() {
-
         return (
             <div className="login-wrapper">
                 <div>
                     {this.props.user.id &&
                     <div className="user-content">
                         <div className="user-id">{this.props.user.id}</div>
-                        <div className="when">LOGIN <TimeAgo date={this.props.user.when}/></div>
+                        <div className="when">LOGIN <TimeAgo date={this.props.user.time}/></div>
                         <div className="logout-btn">
                             <button onClick={this.logout}>LOGOUT</button>
                         </div>
                     </div>}
                     {!this.props.user.id &&
                     <div className="login-content">
-                        <div className="login-image">
-                            <img src={building} alt="building" />
+                        <div className="login-logo">
+                            <div className="logo-box">
+                                <div className="logo"><i className="fa fa-bolt" aria-hidden="true"></i></div>
+                                <div className="name">SCOUTER PAPER</div>
+                            </div>
                         </div>
                         <div>
                             <input type="text" placeholder="ID" value={this.state.control.id}
@@ -166,8 +141,9 @@ let mapDispatchToProps = (dispatch) => {
     return {
         setControlVisibility: (name, value) => dispatch(setControlVisibility(name, value)),
         clearAllMessage: () => dispatch(clearAllMessage()),
-        setUserId: (id) => dispatch(setUserId(id)),
+        setUserId: (id, token, time) => dispatch(setUserId(id, token, time)),
         addRequest: () => dispatch(addRequest()),
+        pushMessage: (category, title, content) => dispatch(pushMessage(category, title, content))
     };
 };
 

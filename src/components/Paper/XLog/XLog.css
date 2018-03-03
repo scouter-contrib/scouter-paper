@@ -5,7 +5,6 @@
     overflow: hidden;
     _background-color: white;
     height: 100%;
-    height: calc(100% - 5px);
     text-align: left;
 }
 
@@ -32,43 +31,52 @@
 }
 
 .xlog-viewer canvas {
-    image-rendering: optimizeSpeed;             /* Older versions of FF          */
-    image-rendering: -moz-crisp-edges;          /* FF 6.0+                       */
-    image-rendering: -webkit-optimize-contrast; /* Safari                        */
-    image-rendering: -o-crisp-edges;            /* OS X & Windows Opera (12.02+) */
-    image-rendering: pixelated;                 /* Awesome future-browsers       */
-    -ms-interpolation-mode: nearest-neighbor;   /* IE                            */
+    image-rendering: optimizeSpeed;
+    image-rendering: -moz-crisp-edges;
+    image-rendering: -webkit-optimize-contrast;
+    image-rendering: -o-crisp-edges;
+    image-rendering: pixelated;
+    -ms-interpolation-mode: nearest-neighbor;
 }
 
 .xlog-viewer .axis-button {
     position: absolute;
-    left : 17px;
+    left: 4px;
     display: inline-block;
-    padding: 1px 3px 0;
-    border-radius: 3px;
+    border-radius: 1px;
     cursor: pointer;
+    border: 1px solid #666;
+    box-sizing: border-box;
+    width: 16px;
+    height: 13px;
+    text-align: center;
+    font-size: 10px;
 }
 
 .xlog-viewer .axis-button:hover {
-    background-color: rgba(0,0,0,0.4);
+    background-color: #FBDB0C;
 }
 
 .xlog-viewer .axis-button.axis-up {
-    top : 4px;
+    top: 4px;
 }
 
 .xlog-viewer .axis-button.axis-down {
-    bottom: 7px;
+    bottom: 6px;
 }
 
 .xlog-viewer .preview-area {
     background-color: red;
     position: absolute;
-    top : 0;
-    right : 0;
-    bottom : 0;
+    top: 0;
+    right: 0;
+    bottom: 0;
 }
 
+.xlog-viewer text {
+    font-family: 'Bungee', 'NanumBarunGothic', sans-serif;
+    font-size: 8px;
+}
 
 
 

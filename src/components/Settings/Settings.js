@@ -20,6 +20,10 @@ class Settings extends Component {
                 dateFormat: "YYYY-MM-DD",
                 timeFormat: "HH:MM:SS",
                 minuteFormat: "HH:MM",
+                authentification : {
+                    type : "bearer",
+                    timeout : 1000 * 60 * 60 * 24
+                },
                 xlog: {
                     normal: {
                         rows: 5,
@@ -121,6 +125,16 @@ class Settings extends Component {
         });
     };
 
+    onChangeSession = (attr, event) => {
+
+        let config = this.state.config;
+        config.authentification[attr] = event.target.value;
+
+        this.setState({
+            config: config
+        });
+    };
+
     onXLogOptionChange = (type, dir, event) => {
 
         let config = this.state.config;
@@ -134,7 +148,7 @@ class Settings extends Component {
 
     applyConfig = () => {
         if (localStorage) {
-            this.props.setConfig(this.state.config)
+            this.props.setConfig(this.state.config);
             localStorage.setItem("config", JSON.stringify(this.state.config));
             this.setState({
                 edit: false,
@@ -349,6 +363,32 @@ class Settings extends Component {
                                 <input type="text" readOnly={!this.state.edit} onChange={this.onChange.bind(this, "interval")} value={this.state.config.interval} placeholder="POLLING INTERVAL (MS)" />
                             </div>
                         </div>
+                    </div>
+                    <div className="category">
+                        <div>AUTHENTIFICATION CONFIGURATION</div>
+                    </div>
+                    <div className="setting-box auth-info">
+                        <div className="row">
+                            <div className="label">
+                                <div>TYPE</div>
+                            </div>
+                            <div className="input">
+                                <select value={this.state.config.authentification.type} onChange={this.onChangeSession.bind(this, "type")} disabled={!this.state.edit}>
+                                    <option value="bearer">token (bearer)</option>
+                                    <option value="cookie">cookie</option>
+                                    <option value="none">N/A</option>
+                                </select>
+                            </div>
+                        </div>
+                        {this.state.config.authentification.type !== "none" &&
+                        <div className="row">
+                            <div className="label">
+                                <div>SESSION TIMEOUT (MS)</div>
+                            </div>
+                            <div className="input">
+                                <input type="text" readOnly={!this.state.edit} onChange={this.onChangeSession.bind(this, "timeout")} value={this.state.config.authentification.timeout} placeholder="SESSION TIME (MS)" />
+                            </div>
+                        </div>}
                     </div>
                     <div className="category">
                         <div>DATA FORMAT CONFIGURATION</div>
