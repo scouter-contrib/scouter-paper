@@ -314,8 +314,6 @@ class XLog extends Component {
                 var p = d3.mouse(this);
                 that.graph.originX = p[0];
                 that.graph.originY = p[1];
-                console.log("start x:" + that.graph.originX);
-                console.log("start y:" + that.graph.originY);
                 d3.select(".selection").attr("x", that.graph.originX).attr("y", that.graph.originY).attr("width", 0).attr("height", 0);
             })
             .on("end", function () {
