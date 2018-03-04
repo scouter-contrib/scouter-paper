@@ -19,6 +19,7 @@ import {detect} from 'detect-browser';
 import Unsupport from "./components/Unsupport/Unsupport";
 import jQuery from "jquery";
 import {errorHandler} from './common/common';
+import Home from "./components/Home/Home";
 
 const browser = detect();
 //const support = (browser.name === "chrome" || browser.name === "firefox" || browser.name === "opera" || browser.name === "safari");
@@ -110,6 +111,7 @@ class App extends Component {
                     <RequestBar/>
                     <Menu/>
                     <Switch>
+                        <Route exact path='/' component={Home}/>
                         <Route exact path='/login' component={Login}/>
                         <Route exact path='/paper' component={Paper}/>
                         <Route exact path='/settings' component={Settings}/>

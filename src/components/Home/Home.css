@@ -1,0 +1,200 @@
+.home {
+    width: 100%;
+    height: 100%;
+    height: calc(100% - 51px);
+    color: white;
+}
+
+.home > div {
+    display: table;
+    width: 100%;
+    height: 100%;
+}
+
+.home > div > div {
+    display: table-cell;
+    width: 100%;
+    height: 100%;
+    vertical-align: top;
+    text-align: center;
+}
+
+.home .top-content {
+    margin: 0 auto;
+    height: 100%;
+
+}
+
+.home .top-content .top-div {
+    padding: 20px 0;
+    background-color: rgba(0, 0, 0, 0.2);
+    height: 200px;
+    box-sizing: border-box;
+}
+
+.home .top-content .center-wrapper {
+    height: calc(100% - 200px);
+    max-height: 800px;
+
+}
+
+.home .top-content .top-div .product {
+    display: inline-block;
+    background-color: rgba(0, 0, 0, 0.4);
+    padding: 4px 8px;
+    border-radius: 3px;
+    margin-bottom: 5px;
+}
+
+.home .top-content .top-div .version {
+    font-size: 10px;
+    margin-bottom: 3px;
+}
+
+.home .top-content .top-div .power-by {
+    font-size: 9px;
+}
+
+.home .logo-div {
+    padding: 10px 0;
+}
+
+.home img.logo {
+    width: 60px;
+}
+
+.home a {
+    color: white;
+}
+
+.home .center-div {
+    display: table;
+    width: 100%;
+    height: 100%;
+    max-width: 1400px;
+    margin: 0 auto;
+    padding: 20px 10px;
+    box-sizing: border-box;
+}
+
+.home .center-div > div {
+    display: table-cell;
+    width: 33.33%;
+    height: 100%;
+}
+
+.home .center-div > div .center-content {
+    background-color: white;
+    height: 100%;
+    width: calc(100% - 20px);
+    color: #333;
+    border-radius: 3px;
+    margin-left: 10px;
+    border : 1px solid #666;
+}
+
+.home .center-div > div .center-content h3 {
+    padding: 15px 20px;
+    margin: 0;
+    font-weight: normal;
+    border-bottom: 1px solid #666;
+    font-size: 13px;
+}
+
+.home .center-div > div .center-content h4 {
+    font-weight: normal;
+    padding: 0;
+    margin: 5px 0 5px;
+    background-color: #FFCC11;
+    display: inline-block;
+    padding: 3px 5px;
+    border-radius: 3px;
+    font-size: 10px;
+}
+
+.home .center-div > div .center-content a {
+    color: #333;
+    text-decoration: none;
+}
+
+.home .center-div > div .center-content a:before {
+    content: '<';
+}
+
+.home .center-div > div .center-content a:after {
+    content: '>';
+}
+
+.home .center-div > div .center-content > div {
+    padding: 10px;
+    text-align: justify;
+}
+
+.home .center-div > div .center-content > div p {
+    margin-top: 0;
+    font-size: 11px;
+    padding: 0 2px;
+    word-break: break-all;
+}
+
+.home .center-div > div .center-content > div ul,
+.home .center-div > div .center-content > div ol {
+    margin: 0;
+    padding: 0;
+    list-style-position: inside;
+    font-size: 11px;
+}
+
+.home .center-div > div .center-content > div ul li,
+.home .center-div > div .center-content > div ol li {
+    margin-bottom: 10px;
+    word-break: break-all;
+}
+
+.home .center-div > div .center-content > div ul li:last-child,
+.home .center-div > div .center-content > div ol li:last-child {
+    margin-bottom: 0;
+}
+
+@media screen and (max-width: 1400px) {
+    .home .center-div {
+        padding: 10px 5px;
+    }
+
+    .home .center-div > div .center-content {
+        width: calc(100% - 10px);
+        margin-left: 5px;
+    }
+
+}
+
+@media screen and (max-width: 1200px) {
+
+    .home .center-div {
+        display: block;
+        width: 100%;
+        height: auto;
+        margin: 0 auto;
+    }
+
+    .home .center-div > div {
+        display: block;
+        width: auto;
+        height: auto;
+        margin-bottom: 10px;
+    }
+
+    .home .center-div > div:last-child {
+        margin-bottom: 0;
+    }
+
+    .home .center-div > div .center-content h3 {
+        padding: 10px 20px;
+        font-size: 12px;
+    }
+
+}
+
+
+
+

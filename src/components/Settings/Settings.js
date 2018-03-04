@@ -355,6 +355,11 @@ class Settings extends Component {
                                 <input type="text" readOnly={!this.state.edit} onChange={this.onChange.bind(this, "port")} value={this.state.config.port} placeholder="SCOUTER WEBAPP SERVER PORT (DEFAULT 6188)" />
                             </div>
                         </div>
+                    </div>
+                    <div className="category first">
+                        <div>POLLING INTERVAL</div>
+                    </div>
+                    <div className="setting-box">
                         <div className="row">
                             <div className="label">
                                 <div>INTERVAL</div>
