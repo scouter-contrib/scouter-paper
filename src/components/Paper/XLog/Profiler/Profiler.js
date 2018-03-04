@@ -7,9 +7,11 @@ import jQuery from "jquery";
 import {getDate, getHttpProtocol, errorHandler, getWithCredentials, setAuthHeader} from '../../../../common/common';
 import SingleProfile from "./SingleProfile/SingleProfile";
 import ProfileList from "./ProfileList/ProfileList";
+import _ from "lodash";
+
+const xlogMaxSelectionCount = 200;
 
 class Profiler extends Component {
-
 
     constructor(props) {
         super(props);
@@ -115,17 +117,23 @@ class Profiler extends Component {
         }
     }
 
-
     getList = (x1, x2, y1, y2) => {
         var that = this;
+        let allXLogs = that.props.xlogs;
+        const filtered = _(allXLogs)
+            .filter(x => x1 <= x.endTime * 1 && x.endTime * 1 <= x2 && y1 <= x.elapsed * 1 && x.elapsed * 1 <= y2)
+            .take(xlogMaxSelectionCount).value();
+
+        if (filtered.length == 0) {
+            return;
+        }
 
         let date = getDate(new Date(x1), 1);
-
         this.props.addRequest();
         jQuery.ajax({
             method: "GET",
             async: true,
-            url: getHttpProtocol(this.props.config) + '/scouter/v1/xlog-data/search/' + date + '?objHashes=' + this.props.instances[0].objHash + "&startTimeMillis=" + x1 + "&endTimeMillis=" + x2,
+            url: getHttpProtocol(this.props.config) + '/scouter/v1/xlog-data/' + date + '/multi/' + filtered.map(x => x.txid).toString(),
             xhrFields: getWithCredentials(that.props.config),
             beforeSend: function (xhr) {
                 setAuthHeader(xhr, that.props.config, that.props.user);
@@ -289,7 +297,7 @@ class Profiler extends Component {
         }
 
         return (
-            <div className={"xlog-profiler " + (this.state.show ? ' ' : 'hidden ' ) + (selectRow ? 'select-row' : '')}>
+            <div className={"xlog-profiler " + (this.state.show ? ' ' : 'hidden ') + (selectRow ? 'select-row' : '')}>
                 <div className="profile-list scrollbar" onMouseEnter={this.mouseListEnter}
                      onMouseLeave={this.mouseListLeave}>
                     <ProfileList txid={this.state.txid} xlogs={this.state.xlogs} rowClick={this.rowClick}/>

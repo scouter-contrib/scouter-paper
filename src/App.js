@@ -72,16 +72,17 @@ class App extends Component {
         });
     };
 
-    componentDidMount() {
+    componentWillMount() {
         let config = null;
         let str = localStorage.getItem("config");
         if (str) {
             config = JSON.parse(str);
+            config = Object.assign(this.props.config, config); //for added config's properties on later versions.
             this.props.setConfig(config);
+            localStorage.setItem("config", JSON.stringify(config));
         } else {
             config = this.props.config;
         }
-
         let user = localStorage.getItem("user");
         if (user) {
             user = JSON.parse(user);
@@ -96,7 +97,9 @@ class App extends Component {
         if (!user && config && config.authentification.type === "none") {
             this.info(user, config);
         }
+    }
 
+    componentDidMount() {
     }
 
     componentDidUpdate(prevProps, prevState) {
