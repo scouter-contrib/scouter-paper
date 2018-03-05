@@ -124,7 +124,7 @@ class Profiler extends Component {
             .filter(x => x1 <= x.endTime * 1 && x.endTime * 1 <= x2 && y1 <= x.elapsed * 1 && x.elapsed * 1 <= y2)
             .take(xlogMaxSelectionCount).value();
 
-        if (filtered.length == 0) {
+        if (filtered.length === 0) {
             return;
         }
 

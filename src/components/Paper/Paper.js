@@ -640,10 +640,25 @@ class Paper extends Component {
         } else {
             //document.querySelector("body").style.overflow = "hidden";
         }
+
         return (
             <div className="papers">
                 <div className={"fixed-alter-object " + (this.state.fixedControl ? 'show' : '')}></div>
                 <PaperControl addPaper={this.addPaper} addPaperAndAddMetric={this.addPaperAndAddMetric} clearLayout={this.clearLayout} fixedControl={this.state.fixedControl} />
+                {(instanceSelected && (!this.state.boxes || this.state.boxes.length === 0)) &&
+                <div className="quick-usage">
+                    <div>
+                        <div>
+                            <div>
+                                <h3>NO PAPER</h3>
+                                <ol>
+                                    <li>CLICK [<i className="fa fa-plus-circle" aria-hidden="true"></i>] BUTTON TO ADD PAPER</li>
+                                    <li>AND DRAG METRIC TO PAPER</li>
+                                </ol>
+                            </div>
+                        </div>
+                    </div>
+                </div>}
                 <ResponsiveReactGridLayout className="layout" cols={{lg: 12, md: 10, sm: 6, xs: 4, xxs: 2}} layouts={this.state.layouts} rowHeight={30} onLayoutChange={(layout, layouts) => this.onLayoutChange(layout, layouts)}>
                     {this.state.boxes.map((box, i) => {
                         return <div className="box-layout" key={box.key} data-grid={box.layout}>
@@ -655,10 +670,12 @@ class Paper extends Component {
                     })}
                 </ResponsiveReactGridLayout>
                 {!instanceSelected &&
-                <div className="select-instance">
+                <div className={"select-instance " + (this.state.fixedControl ? 'fixed' : '')}>
                     <div>
-                        <div className="icon"><div><i className="fa fa-info-circle" aria-hidden="true"></i></div></div>
-                        <div className="msg">NO INSTANCE SELECTED</div>
+                        <div className="select-instance-message">
+                            <div className="icon"><div><i className="fa fa-info-circle" aria-hidden="true"></i></div></div>
+                            <div className="msg">NO INSTANCE SELECTED</div>
+                        </div>
                     </div>
                 </div>
                 }

@@ -54,6 +54,7 @@ export function getDate(date, type) {
 }
 
 export function errorHandler(xhr, textStatus, errorThrown, props) {
+
     if (xhr.readyState === 4) {
         if (xhr.responseJSON) {
             if (xhr.responseJSON.resultCode === "401") {

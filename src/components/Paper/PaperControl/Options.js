@@ -53,7 +53,7 @@ export function options() {
                     name: 'SHOW PROCESS',
                     type: "selector",
                     data: ["Y", "N"],
-                    value: "Y"
+                    value: "N"
                 }
             }
         },

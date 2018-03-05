@@ -176,6 +176,14 @@
         padding-top : 6px;
     }
 
+    .menu-instance-selector {
+        margin-right: 5px;
+    }
+
+    .menu .menu-item.right {
+        margin-right: 5px;
+    }
+
 }
 
 

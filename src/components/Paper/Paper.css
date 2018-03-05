@@ -1,6 +1,7 @@
 .papers {
     max-width: 1600px;
     margin: 0 auto;
+    height: calc(100% - 61px);
 }
 
 .papers .box-layout {
@@ -17,7 +18,7 @@
     font-size: 14px;
     float: right;
     position: relative;
-    top : 4px;
+    top: 4px;
     padding: 1px 4px;
 }
 
@@ -26,16 +27,16 @@
 }
 
 .papers .box-layout .box-control:hover {
-    background-color: rgba(0,0,0,0.1);
+    background-color: rgba(0, 0, 0, 0.1);
 }
 
 .papers .select-instance {
     position: fixed;
-    top : 55px;
-    left : 0;
-    right : 0;
-    bottom : 0;
-    background-color: rgba(0,0,0,0.4);
+    top: 55px;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    background-color: rgba(0, 0, 0, 0.6);
     text-align: center;
     display: table;
     width: 100%;
@@ -44,20 +45,37 @@
     color: white;
 }
 
+@media screen and (max-width: 600px) {
+    .papers .select-instance {
+        top: 45px;
+    }
+}
+
+.papers .select-instance.fixed {
+    top: 32px;
+    top: 0;
+}
+
 .papers .select-instance > div {
     display: table-cell;
     width: 100%;
     height: 100%;
     vertical-align: middle;
-
 }
 
-.papers .select-instance > div > div.icon {
+.papers .select-instance div.select-instance-message {
+    background-color: rgba(0, 0, 0, 0.4);
+    background-color: white;
+    padding: 20px;
+    color: #333;
+}
+
+.papers .select-instance div.select-instance-message div.icon {
     font-size: 30px;
     line-height: 0;
 }
 
-.papers .select-instance > div > div.icon > div {
+.papers .select-instance div.select-instance-message div.icon > div {
     display: inline-block;
     box-sizing: border-box;
     width: 40px;
@@ -65,13 +83,12 @@
     border-radius: 50%;
     padding-top: 5px;
     position: relative;
-    top : 0;
+    top: 0;
 }
 
-.papers .select-instance > div > div.msg {
+.papers .select-instance div.select-instance-message > div.msg {
     display: inline-block;
     padding: 5px 10px;
-    background-color: rgba(0,0,0,0.4);
     border-radius: 3px;
 }
 
@@ -84,3 +101,71 @@
 .papers .fixed-alter-object.show {
     display: block;
 }
+
+.papers .quick-usage {
+    height: calc(100% - 46px);
+    box-sizing: border-box;
+    padding: 10px 10px 0;
+}
+
+.papers .quick-usage > div {
+    height: 100%;
+    box-sizing: border-box;
+    color: white;
+    background-color: rgba(0, 0, 0, 0.2);
+    border-radius: 5px;
+}
+
+.papers .quick-usage > div > div {
+    display: table;
+    width: 100%;
+    height: 100%;
+}
+
+.papers .quick-usage > div > div > div {
+    display: table-cell;
+    width: 100%;
+    height: 100%;
+    vertical-align: middle;
+}
+
+.papers .quick-usage h3 {
+    text-align: center;
+    font-weight: normal;
+    font-size: 14px;
+}
+
+.papers .quick-usage h3:before {
+    content: '<';
+}
+
+.papers .quick-usage h3:after {
+    content: '>';
+}
+
+.papers .quick-usage ol {
+    line-height: 160%;
+    text-align: center;
+    list-style: none;
+    padding: 0;
+    margin: 0;
+}
+
+.papers .quick-usage ol li {
+    text-align: center;
+}
+
+@media screen and (max-width: 680px) {
+    .papers .quick-usage {
+        height: calc(100% - 72px);
+    }
+}
+
+@media screen and (max-width: 600px) {
+    .papers .quick-usage {
+        height: calc(100% - 62px);
+    }
+}
+
+
+
