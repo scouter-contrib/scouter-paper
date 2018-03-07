@@ -1,3 +1,9 @@
+스카우터 페이퍼
+빌드
+npm run start
+npm run build
+- ![#f03c15](https://placehold.it/15/f03c15/000000?text=+) `#f03c15`
+
 This project was bootstrapped with [Create React App](https://github.com/facebookincubator/create-react-app).
 
 Below you will find some information on how to perform common tasks.<br>
