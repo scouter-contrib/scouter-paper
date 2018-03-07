@@ -503,7 +503,7 @@ export function options() {
                 type: "counter",
                 title: "Net InBound",
                 counterKey : "NetInBound",
-                objectType : "instance"
+                objectType : "host"
             },
             {
                 text: "Net OutBound",
@@ -511,7 +511,7 @@ export function options() {
                 type: "counter",
                 title: "Net OutBound",
                 counterKey : "NetOutBound",
-                objectType : "instance"
+                objectType : "host"
             },
             {
                 text: "TCP Stat CLS",
@@ -519,7 +519,7 @@ export function options() {
                 type: "counter",
                 title: "TCP Stat CLS",
                 counterKey : "TcpStatCLS",
-                objectType : "instance"
+                objectType : "host"
             },
             {
                 text: "TCP Stat TIM",
@@ -527,7 +527,7 @@ export function options() {
                 type: "counter",
                 title: "TCP Stat TIM",
                 counterKey : "TcpStatTIM",
-                objectType : "instance"
+                objectType : "host"
             },
             {
                 text: "TCP Stat FIN",
@@ -535,7 +535,7 @@ export function options() {
                 type: "counter",
                 title: "TCP Stat FIN",
                 counterKey : "TcpStatFIN",
-                objectType : "instance"
+                objectType : "host"
             },
             {
                 text: "TCP Stat EST",
@@ -543,7 +543,7 @@ export function options() {
                 type: "counter",
                 title: "TCP Stat EST",
                 counterKey : "TcpStatEST",
-                objectType : "instance"
+                objectType : "host"
             },
             {
                 text: "Net Rx Bytes",
@@ -551,7 +551,7 @@ export function options() {
                 type: "counter",
                 title: "Net Rx Bytes",
                 counterKey : "NetRxBytes",
-                objectType : "instance"
+                objectType : "host"
             },
             {
                 text: "Net Tx Bytes",
@@ -559,7 +559,7 @@ export function options() {
                 type: "counter",
                 title: "Net Tx Bytes",
                 counterKey : "NetTxBytes",
-                objectType : "instance"
+                objectType : "host"
             }
         ],
 
@@ -570,7 +570,7 @@ export function options() {
                 type: "counter",
                 title: "Disk Read Bytes",
                 counterKey : "DiskReadBytes",
-                objectType : "instance"
+                objectType : "host"
             },
             {
                 text: "Disk Write Bytes",
@@ -578,7 +578,7 @@ export function options() {
                 type: "counter",
                 title: "Disk Write Bytes",
                 counterKey : "DiskWriteBytes",
-                objectType : "instance"
+                objectType : "host"
             }
         ],
 
