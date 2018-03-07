@@ -224,6 +224,36 @@ class LineChart extends Component {
         }
     };
 
+    removeObjectLine = (obj, counterKey) => {
+        let pathClass = "line-" + obj.objHash + "-" + counterKey;
+        let path = this.graph.svg.selectAll("path." + pathClass);
+
+        // 데이터 삭제
+        let counters = Object.assign(this.state.counters);
+        if (counters[counterKey]) {
+            delete counters[counterKey];
+        }
+        delete this.state.counters[counterKey];
+        this.setState({
+            counters: counters
+        });
+
+        // 라인 그래프 삭제
+        if (path && path.size() > 0) {
+            path.remove();
+        }
+
+        // 툴팁 그래프 삭제
+        let circleKey = "circle-" +  obj.objHash + "_" + counterKey;
+        let circle = this.graph.focus.selectAll("circle." + circleKey);
+
+        if (circle.size() > 0) {
+            circle.remove();
+        }
+
+        // 제목 삭제
+        this.props.removeTitle(counterKey);
+    }
 
     drawObjectLine = (obj, option, counterKey, isMulti, colorScale, cnt) => {
         var that = this;
@@ -302,36 +332,6 @@ class LineChart extends Component {
                 }
             }
 
-            // 삭제된 매트릭 (삭제는 멀티도 여기서 삭제됨)
-            if (!option) {
-
-                // 데이터 삭제
-                let counters = Object.assign(this.state.counters);
-                if (counters[counterKey]) {
-                    delete counters[counterKey];
-                }
-                delete this.state.counters[counterKey];
-                this.setState({
-                    counters: counters
-                });
-
-                // 라인 그래프 삭제
-                if (path && path.size() > 0) {
-                    path.remove();
-                }
-
-                // 툴팁 그래프 삭제
-                let circleKey = "circle-" + obj.objHash + "_" + counterKey;
-                let circle = that.graph.focus.selectAll("circle." + circleKey);
-
-                if (circle.size() > 0) {
-                    circle.remove();
-                }
-
-                // 제목 삭제
-                this.props.removeTitle(counterKey);
-            }
-
             if (option) {
                 path.data([that.state.counters[counterKey]]).attr("d", valueLine);
                 cnt++;
@@ -367,17 +367,28 @@ class LineChart extends Component {
                         }
                     }
 
-                    if (thisOption.objectType === "instance") {
+                    if (!thisOption) {
+                        for (let i = 0; i < this.props.instances.length; i++) {
+                            this.removeObjectLine(this.props.instances[i], counterKey);
+                        }
+                        for (let i = 0; i < this.props.hosts.length; i++) {
+                            this.removeObjectLine(this.props.hosts[i], counterKey);
+                        }
+                    }
+
+                    if (thisOption && thisOption.objectType === "instance") {
                         for (let i = 0; i < this.props.instances.length; i++) {
                             cnt = this.drawObjectLine(that.props.instances[i], thisOption, counterKey, isMultiValue, colorScale, cnt);
                         }
                     }
 
-                    if (thisOption.objectType === "host") {
+                    if (thisOption && thisOption.objectType === "host") {
                         for (let i = 0; i < this.props.hosts.length; i++) {
                             cnt = this.drawObjectLine(that.props.hosts[i], thisOption, counterKey, isMultiValue, colorScale, cnt);
                         }
                     }
+
+
 
                 }
             }
@@ -456,7 +467,7 @@ class LineChart extends Component {
         }
 
         return cnt;
-    }
+    };
 
     graphInit = () => {
 
@@ -500,7 +511,7 @@ class LineChart extends Component {
 
 
                 if (!thisOption) {
-                    return;
+                    break;
                 }
 
                 if (thisOption.objectType === "instance") {
