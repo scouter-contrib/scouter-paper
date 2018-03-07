@@ -73,6 +73,11 @@
     font-size: 9px;
 }
 
+.home .home-content .top-div .compatibility {
+    font-size: 8px;
+    color: #E3170D;
+}
+
 .home .home-content .top-div .tag {
     display: inline-block;
     padding: 2px 4px;
@@ -83,6 +88,7 @@
 
 .home .home-content .top-div .git {
     font-size: 8px;
+    margin-top: 5px;
 }
 
 .home .logo-div {
