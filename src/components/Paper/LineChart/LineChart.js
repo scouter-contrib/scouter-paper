@@ -208,7 +208,7 @@ class LineChart extends Component {
         }
 
         if (init) {
-            this.graph.svg.insert("g", ":first-child").attr("class", "axis-y").call(d3.axisLeft(this.graph.y).ticks(yAxisCount));
+            this.graph.svg.insert("g", ":first-child").attr("class", "axis-y").call(d3.axisLeft(this.graph.y).tickFormat(d3.format(".0s")).ticks(yAxisCount));
             this.graph.svg.insert("g", ":first-child").attr("class", "grid-y").style("stroke-dasharray", "5 5").style("opacity", "0.3").call(d3.axisLeft(this.graph.y).tickSize(-this.graph.width).tickFormat("").ticks(yAxisCount));
         } else {
             this.graph.svg.select(".axis-x").call(d3.axisBottom(this.graph.x).tickFormat(d3.timeFormat(this.graph.timeFormat)).ticks(xAxisCount));
@@ -219,7 +219,7 @@ class LineChart extends Component {
             this.graph.svg.insert("g", ":first-child").attr("class", "axis-x").attr("transform", "translate(0," + this.graph.height + ")").call(d3.axisBottom(this.graph.x).tickFormat(d3.timeFormat(this.graph.timeFormat)).ticks(xAxisCount));
             this.graph.svg.insert("g", ":first-child").attr("class", "grid-x").style("stroke-dasharray", "5 5").style("opacity", "0.3").attr("transform", "translate(0," + this.graph.height + ")").call(d3.axisBottom(this.graph.x).tickSize(-this.graph.height).tickFormat("").ticks(xAxisCount));
         } else {
-            this.graph.svg.select(".axis-y").transition().duration(500).call(d3.axisLeft(this.graph.y).ticks(yAxisCount));
+            this.graph.svg.select(".axis-y").transition().duration(500).call(d3.axisLeft(this.graph.y).tickFormat(d3.format(".0s")).ticks(yAxisCount));
             this.graph.svg.select(".grid-y").transition().duration(500).call(d3.axisLeft(this.graph.y).tickSize(-this.graph.width).tickFormat("").ticks(yAxisCount));
         }
     };
@@ -253,7 +253,7 @@ class LineChart extends Component {
 
         // 제목 삭제
         this.props.removeTitle(counterKey);
-    }
+    };
 
     drawObjectLine = (obj, option, counterKey, isMulti, colorScale, cnt) => {
         var that = this;
@@ -387,9 +387,6 @@ class LineChart extends Component {
                             cnt = this.drawObjectLine(that.props.hosts[i], thisOption, counterKey, isMultiValue, colorScale, cnt);
                         }
                     }
-
-
-
                 }
             }
         }
@@ -433,6 +430,7 @@ class LineChart extends Component {
     mouseMoveObject = (isMultiValue, obj, thisOption, counterKey, dataIndex, colorScale, cnt, tooltip) => {
         var that = this;
         if (isMultiValue) {
+
             for (let j = 0; j < thisOption.multiValue.length; j++) {
                 let circleKey = "circle-" + obj.objHash + "_" + thisOption.counterKey + "_" + thisOption.multiValue[j];
                 if (tooltip.timeValue === that.state.counters[counterKey][dataIndex].time) {
@@ -440,7 +438,7 @@ class LineChart extends Component {
                         instanceName: obj.objName,
                         circleKey: circleKey,
                         metricName: thisOption.title + "(" + thisOption.multiValue[j] + ")",
-                        value: Math.round(that.state.counters[counterKey][dataIndex].data[obj.objHash].value[j] * 10) / 10,
+                        value: (Math.round(that.state.counters[counterKey][dataIndex].data[obj.objHash].value[j] * 10) / 10) + " " + that.state.counters[counterKey][dataIndex].data[obj.objHash].unit,
                         color: colorScale[cnt]
                     });
                 } else {
@@ -450,13 +448,14 @@ class LineChart extends Component {
                 cnt++;
             }
         } else {
+
             let circleKey = "circle-" + obj.objHash + "_" + thisOption.counterKey;
             if (tooltip.timeValue === that.state.counters[counterKey][dataIndex].time) {
                 tooltip.lines.push({
                     instanceName: obj.objName,
                     circleKey: circleKey,
                     metricName: thisOption.title,
-                    value: obj.objHash && that.state.counters[counterKey][dataIndex].data[obj.objHash] ? Math.round(that.state.counters[counterKey][dataIndex].data[obj.objHash].value * 10) / 10 : null,
+                    value: obj.objHash && that.state.counters[counterKey][dataIndex].data[obj.objHash] ? (Math.round(that.state.counters[counterKey][dataIndex].data[obj.objHash].value * 10) / 10) + " " + that.state.counters[counterKey][dataIndex].data[obj.objHash].unit : null,
                     color: colorScale[cnt]
                 });
             } else {
