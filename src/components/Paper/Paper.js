@@ -8,6 +8,7 @@ import {Responsive, WidthProvider} from "react-grid-layout";
 import {Box, BoxConfig, PaperControl} from "../../components";
 import jQuery from "jquery";
 import {getData, setData, getHttpProtocol, errorHandler, getWithCredentials, setAuthHeader} from '../../common/common';
+
 const ResponsiveReactGridLayout = WidthProvider(Responsive);
 
 class Paper extends Component {
@@ -32,10 +33,10 @@ class Paper extends Component {
 
         this.state = {
             layouts: layouts,
-            layoutChangeTime : null,
+            layoutChangeTime: null,
             boxes: boxes,
 
-            data : {
+            data: {
                 tempXlogs: [],
                 firstStepXlogs: [],
                 firstStepTimestamp: null,
@@ -49,17 +50,16 @@ class Paper extends Component {
                 endTime: endTime,
                 range: range,
                 maxElapsed: 2000,
-                lastRequestTime : null
+                lastRequestTime: null
             },
             /* visitor */
-            visitor : {
-            },
+            visitor: {},
             /* counters */
-            counters : {
-                time : null,
-                data : null
+            counters: {
+                time: null,
+                data: null
             },
-            fixedControl : false
+            fixedControl: false
         };
     }
 
@@ -86,11 +86,11 @@ class Paper extends Component {
     scroll = (e) => {
         if (document.documentElement.scrollTop > 60) {
             this.setState({
-                fixedControl : true
+                fixedControl: true
             });
         } else {
             this.setState({
-                fixedControl : false
+                fixedControl: false
             });
         }
     };
@@ -102,7 +102,7 @@ class Paper extends Component {
             jQuery.ajax({
                 method: "GET",
                 async: false,
-                dataType :'text',
+                dataType: 'text',
                 url: getHttpProtocol(this.props.config) + '/scouter/v1/xlog/realTime/' + this.state.data.offset1 + '/' + this.state.data.offset2 + '?objHashes=' + JSON.stringify(this.props.instances.map((instance) => {
                     return Number(instance.objHash);
                 })),
@@ -135,9 +135,9 @@ class Paper extends Component {
                 }
             }).done((msg) => {
                 this.setState({
-                    visitor : {
-                        time : time,
-                        visitor : msg.result
+                    visitor: {
+                        time: time,
+                        visitor: msg.result
                     }
                 });
             }).fail((xhr, textStatus, errorThrown) => {
@@ -147,14 +147,15 @@ class Paper extends Component {
     };
 
     getCounter = () => {
+
         var that = this;
         if (this.props.instances && this.props.instances.length > 0) {
             let counterKeyMap = {};
 
-            for (let i=0; i<this.state.boxes.length; i++) {
+            for (let i = 0; i < this.state.boxes.length; i++) {
                 let option = this.state.boxes[i].option;
                 if (Array.isArray(option)) {
-                    for (let j=0; j<option.length; j++) {
+                    for (let j = 0; j < option.length; j++) {
                         let innerOption = option[j];
                         if (innerOption.type === "counter") {
                             counterKeyMap[innerOption.counterKey] = true;
@@ -181,14 +182,16 @@ class Paper extends Component {
             }
 
 
+            let instancesAndHosts = this.props.instances.concat(this.props.hosts);
+
             let params = JSON.stringify(counterKeys);
             params = params.replace(/"/gi, "");
             this.props.addRequest();
             jQuery.ajax({
                 method: "GET",
                 async: false,
-                url: getHttpProtocol(this.props.config) + '/scouter/v1/counter/realTime/' + params + '?objHashes=' + JSON.stringify(this.props.instances.map((instance) => {
-                    return Number(instance.objHash);
+                url: getHttpProtocol(this.props.config) + '/scouter/v1/counter/realTime/' + params + '?objHashes=' + JSON.stringify(instancesAndHosts.map((obj) => {
+                    return Number(obj.objHash);
                 })),
                 xhrFields: getWithCredentials(that.props.config),
                 beforeSend: function (xhr) {
@@ -197,21 +200,21 @@ class Paper extends Component {
             }).done((msg) => {
                 let map = {};
 
-                for (let i=0; i<counterKeys.length; i++) {
+                for (let i = 0; i < counterKeys.length; i++) {
                     map[counterKeys[i]] = {};
                 }
 
                 if (msg.result) {
-                    for (let i=0; i<msg.result.length; i++) {
+                    for (let i = 0; i < msg.result.length; i++) {
                         let counter = msg.result[i];
                         map[counter.name][counter.objHash] = counter;
                     }
                 }
 
                 this.setState({
-                    counters : {
-                        time : (new Date()).getTime(),
-                        data : map
+                    counters: {
+                        time: (new Date()).getTime(),
+                        data: map
                     }
                 });
             }).fail((xhr, textStatus, errorThrown) => {
@@ -343,7 +346,7 @@ class Paper extends Component {
         data.endTime = endTime;
 
         this.setState({
-            data : data
+            data: data
         });
     };
 
@@ -360,7 +363,7 @@ class Paper extends Component {
         setData("layouts", layouts);
         setData("boxes", this.state.boxes);
         this.setState({
-            layouts : layouts,
+            layouts: layouts,
             layoutChangeTime: (new Date()).getTime()
         });
 
@@ -377,7 +380,7 @@ class Paper extends Component {
         do {
             dup = false;
             key = String(this.state.boxes.length + i);
-            for (let i=0; i<this.state.boxes.length; i++) {
+            for (let i = 0; i < this.state.boxes.length; i++) {
                 if (this.state.boxes[i].key === key) {
                     dup = true;
                     break;
@@ -395,8 +398,8 @@ class Paper extends Component {
 
         let maxY = 0;
         let height = 0;
-        for (let i=0; i<boxes.length; i++) {
-            if (maxY < boxes[i].layout.y)  {
+        for (let i = 0; i < boxes.length; i++) {
+            if (maxY < boxes[i].layout.y) {
                 maxY = boxes[i].layout.y;
                 height = boxes[i].layout.h;
             }
@@ -466,6 +469,7 @@ class Paper extends Component {
     };
 
     setOption = (key, option) => {
+
         let boxes = this.state.boxes;
 
         boxes.forEach((box) => {
@@ -477,7 +481,8 @@ class Paper extends Component {
                         type: option.type,
                         config: option.config,
                         counterKey: option.counterKey,
-                        multiValue: option.multiValue
+                        multiValue: option.multiValue,
+                        objectType: option.objectType
                     };
                 } else {
 
@@ -490,7 +495,7 @@ class Paper extends Component {
                     }
 
                     let duplicated = false;
-                    for (let i=0; i<box.option.length; i++) {
+                    for (let i = 0; i < box.option.length; i++) {
                         if (box.option[i].counterKey === option.counterKey) {
                             duplicated = true;
                         }
@@ -503,7 +508,8 @@ class Paper extends Component {
                             config: option.config,
                             counterKey: option.counterKey,
                             title: option.title,
-                            multiValue: option.multiValue
+                            multiValue: option.multiValue,
+                            objectType: option.objectType
                         });
                     }
                 }
@@ -516,9 +522,9 @@ class Paper extends Component {
                 if (Array.isArray(box.option)) {
                     box.config = false;
                     let title = "";
-                    for (let i=0; i<box.option.length; i++) {
+                    for (let i = 0; i < box.option.length; i++) {
                         title += box.option[i].title;
-                        if (i < (box.option.length-1)) {
+                        if (i < (box.option.length - 1)) {
                             title += ", ";
                         }
                     }
@@ -558,7 +564,7 @@ class Paper extends Component {
         setData("boxes", boxes);
     };
 
-    setOptionClose= (key) => {
+    setOptionClose = (key) => {
         let boxes = this.state.boxes;
         boxes.forEach((box) => {
             if (box.key === key) {
@@ -597,7 +603,7 @@ class Paper extends Component {
                 box.config = false;
 
                 let options = box.option.filter((option) => {
-                    let index = counterKeys.findIndex(function(e) {
+                    let index = counterKeys.findIndex(function (e) {
                         return e === option.counterKey;
                     });
 
@@ -609,9 +615,9 @@ class Paper extends Component {
                 if (Array.isArray(box.option)) {
                     box.config = false;
                     let title = "";
-                    for (let i=0; i<box.option.length; i++) {
+                    for (let i = 0; i < box.option.length; i++) {
                         title += box.option[i].title;
-                        if (i < (box.option.length-1)) {
+                        if (i < (box.option.length - 1)) {
                             title += ", ";
                         }
                     }
@@ -622,7 +628,6 @@ class Paper extends Component {
                 }
             }
         });
-
 
 
         this.setState({
@@ -644,7 +649,8 @@ class Paper extends Component {
         return (
             <div className="papers">
                 <div className={"fixed-alter-object " + (this.state.fixedControl ? 'show' : '')}></div>
-                <PaperControl addPaper={this.addPaper} addPaperAndAddMetric={this.addPaperAndAddMetric} clearLayout={this.clearLayout} fixedControl={this.state.fixedControl} />
+                <PaperControl addPaper={this.addPaper} addPaperAndAddMetric={this.addPaperAndAddMetric}
+                              clearLayout={this.clearLayout} fixedControl={this.state.fixedControl}/>
                 {(instanceSelected && (!this.state.boxes || this.state.boxes.length === 0)) &&
                 <div className="quick-usage">
                     <div>
@@ -652,20 +658,33 @@ class Paper extends Component {
                             <div>
                                 <h3>NO PAPER</h3>
                                 <ol>
-                                    <li>CLICK [<i className="fa fa-plus-circle" aria-hidden="true"></i>] BUTTON TO ADD PAPER</li>
+                                    <li>CLICK [<i className="fa fa-plus-circle" aria-hidden="true"></i>] BUTTON TO ADD
+                                        PAPER
+                                    </li>
                                     <li>AND DRAG METRIC TO PAPER</li>
                                 </ol>
                             </div>
                         </div>
                     </div>
                 </div>}
-                <ResponsiveReactGridLayout className="layout" cols={{lg: 12, md: 10, sm: 6, xs: 4, xxs: 2}} layouts={this.state.layouts} rowHeight={30} onLayoutChange={(layout, layouts) => this.onLayoutChange(layout, layouts)}>
+                <ResponsiveReactGridLayout className="layout" cols={{lg: 12, md: 10, sm: 6, xs: 4, xxs: 2}}
+                                           layouts={this.state.layouts} rowHeight={30}
+                                           onLayoutChange={(layout, layouts) => this.onLayoutChange(layout, layouts)}>
                     {this.state.boxes.map((box, i) => {
                         return <div className="box-layout" key={box.key} data-grid={box.layout}>
-                            <button className="box-control box-layout-remove-btn last" onClick={this.removePaper.bind(null, box.key)}><i className="fa fa-times-circle-o" aria-hidden="true"></i></button>
-                            {box.option && (box.option.length > 1 || box.option.config ) && <button className="box-control box-layout-config-btn" onClick={this.toggleConfig.bind(null, box.key)}><i className="fa fa-cog" aria-hidden="true"></i></button>}
-                            {box.config && <BoxConfig box={box} setOptionValues={this.setOptionValues} setOptionClose={this.setOptionClose} removeMetrics={this.removeMetrics} />}
-                            <Box setOption={this.setOption} box={box} data={this.state.data} config={this.props.config} visitor={this.state.visitor} counters={this.state.counters} layoutChangeTime={this.state.layoutChangeTime}/>
+                            <button className="box-control box-layout-remove-btn last"
+                                    onClick={this.removePaper.bind(null, box.key)}><i className="fa fa-times-circle-o"
+                                                                                      aria-hidden="true"></i></button>
+                            {box.option && (box.option.length > 1 || box.option.config ) &&
+                            <button className="box-control box-layout-config-btn"
+                                    onClick={this.toggleConfig.bind(null, box.key)}><i className="fa fa-cog"
+                                                                                       aria-hidden="true"></i></button>}
+                            {box.config && <BoxConfig box={box} setOptionValues={this.setOptionValues}
+                                                      setOptionClose={this.setOptionClose}
+                                                      removeMetrics={this.removeMetrics}/>}
+                            <Box setOption={this.setOption} box={box} data={this.state.data} config={this.props.config}
+                                 visitor={this.state.visitor} counters={this.state.counters}
+                                 layoutChangeTime={this.state.layoutChangeTime}/>
                         </div>
                     })}
                 </ResponsiveReactGridLayout>
@@ -673,7 +692,9 @@ class Paper extends Component {
                 <div className={"select-instance " + (this.state.fixedControl ? 'fixed' : '')}>
                     <div>
                         <div className="select-instance-message">
-                            <div className="icon"><div><i className="fa fa-info-circle" aria-hidden="true"></i></div></div>
+                            <div className="icon">
+                                <div><i className="fa fa-info-circle" aria-hidden="true"></i></div>
+                            </div>
                             <div className="msg">NO INSTANCE SELECTED</div>
                         </div>
                     </div>
@@ -686,6 +707,7 @@ class Paper extends Component {
 
 let mapStateToProps = (state) => {
     return {
+        hosts: state.target.hosts,
         instances: state.target.instances,
         config: state.config,
         user: state.user

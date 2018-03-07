@@ -1,3 +1,4 @@
+export const SET_TARGET = 'SET_TARGET';
 export const SET_INSTANCES = 'SET_INSTANCES';
 export const SET_CONTROL_VISIBILITY = 'SET_CONTROL_VISIBILITY';
 export const PUSH_MESSAGE = 'PUSH_MESSAGE';
@@ -26,6 +27,14 @@ export function setUserId(id, token, time) {
 export function setInstances(instances) {
     return {
         type: SET_INSTANCES,
+        instances : instances
+    };
+}
+
+export function setTarget(hosts, instances) {
+    return {
+        type: SET_TARGET,
+        hosts : hosts,
         instances : instances
     };
 }

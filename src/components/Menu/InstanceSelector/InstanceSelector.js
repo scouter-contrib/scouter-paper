@@ -1,6 +1,6 @@
 import React, {Component} from 'react';
 import './InstanceSelector.css';
-import {addRequest, pushMessage, setInstances, clearAllMessage, setControlVisibility} from '../../../actions';
+import {addRequest, pushMessage, setTarget, setInstances, clearAllMessage, setControlVisibility} from '../../../actions';
 import {connect} from 'react-redux';
 import jQuery from "jquery";
 import {withRouter} from 'react-router-dom';
@@ -14,67 +14,105 @@ class InstanceSelector extends Component {
     constructor(props) {
         super(props);
         this.state = {
-            hosts: [],
+            servers: [],
             instances: [],
-            activeHostId: null,
-            selectedInstances: {}
+            activeServerId: null,
+            selectedInstances: {},
+            selectedHosts: {}
         };
     }
 
-    componentWillReceiveProps(nextProps){
+    componentDidMount() {
+        this.setTargetFromUrl(this.props);
+    }
+
+    setTargetFromUrl = (props) => {
+        let authMethod = "bearer";
+        if (props.config && props.config.authentification) {
+            authMethod = props.config.authentification.type;
+        }
+
         var that = this;
-        if (!this.init && nextProps.user && nextProps.user.id) {
+        if (!this.init && ((props.user && props.user.id) || authMethod === "none")) {
             this.init = true;
 
             this.props.addRequest();
             jQuery.ajax({
                 method: "GET",
                 async: true,
-                url: getHttpProtocol(nextProps.config) + '/scouter/v1/info/server',
-                xhrFields: getWithCredentials(nextProps.config),
+                url: getHttpProtocol(props.config) + '/scouter/v1/info/server',
+                xhrFields: getWithCredentials(props.config),
                 beforeSend: function (xhr) {
-                    setAuthHeader(xhr, nextProps.config, nextProps.user);
+                    setAuthHeader(xhr, props.config, props.user);
                 }
             }).done((msg) => {
+
                 if (msg && msg.result) {
-                    let hosts = msg.result;
+                    let servers = msg.result;
 
                     // GET INSTANCES INFO FROM URL IF EXISTS
                     let instancesParam = new URLSearchParams(this.props.location.search).get('instances');
-                    let instanceIds = null;
+                    let urlInstanceObjHashes = null;
                     if (instancesParam) {
-                        instanceIds = instancesParam.split(",");
-                        if (instanceIds) {
-                            instanceIds = instanceIds.map((d) => {return Number(d)});
+                        urlInstanceObjHashes = instancesParam.split(",");
+                        if (urlInstanceObjHashes) {
+                            urlInstanceObjHashes = urlInstanceObjHashes.map((d) => {return Number(d)});
                         }
                     }
 
-                    if (instanceIds) {
+                    if (urlInstanceObjHashes) {
+                        let selectedHosts = [];
+                        let selectedHostMap = {};
                         let selectedInstances = [];
                         let instances = [];
-                        let activeHostId = null;
-                        hosts.forEach((host) => {
+                        let activeServerId = null;
+                        servers.forEach((server) => {
                             jQuery.ajax({
                                 method: "GET",
                                 async: false,
-                                url: getHttpProtocol(this.props.config) + '/scouter/v1/object?serverId=' + host.id,
-                                xhrFields: getWithCredentials(nextProps.config),
+                                url: getHttpProtocol(this.props.config) + '/scouter/v1/object?serverId=' + server.id,
+                                xhrFields: getWithCredentials(props.config),
                                 beforeSend: function (xhr) {
-                                    setAuthHeader(xhr, nextProps.config, nextProps.user);
+                                    setAuthHeader(xhr, props.config, props.user);
                                 }
                             }).done(function(msg) {
                                 instances = msg.result;
+
+                                if (instances) {
+                                    let host = null;
+                                    for (let i=0; i<instances.length; i++) {
+                                        if (instances[i].objFamily === 'host') {
+                                            host = instances[i];
+                                            break;
+                                        }
+                                    }
+
+                                    for (let i=0; i<instances.length; i++) {
+                                        if (instances[i].objFamily === 'javaee') {
+                                            instances[i].host = host;
+                                        }
+                                    }
+                                }
+
                                 if (instances && instances.length > 0) {
                                     instances.forEach((instance) => {
-                                        instanceIds.forEach((id) => {
-                                            if (id === Number(instance.objHash)) {
+                                        urlInstanceObjHashes.forEach((objHash) => {
+                                            if (objHash === Number(instance.objHash)) {
                                                 selectedInstances.push(instance);
-                                                if (!host.selectedInstanceCount) {
-                                                    host.selectedInstanceCount = 0;
+                                                if (!server.selectedInstanceCount) {
+                                                    server.selectedInstanceCount = 0;
                                                 }
-                                                host.selectedInstanceCount++;
-                                                // 마지막으로 찾은 호스트 ID로 세팅
-                                                activeHostId = host.id;
+
+                                                if (instance.host) {
+                                                    if (!selectedHostMap[instance.host.objHash]) {
+                                                        selectedHostMap[instance.host.objHash] = instance.host;
+                                                        selectedHosts.push(instance.host);
+                                                    }
+                                                }
+
+                                                server.selectedInstanceCount++;
+                                                // 마지막으로 찾은 서버 ID로 세팅
+                                                activeServerId = server.id;
                                             }
                                         });
                                     })
@@ -84,8 +122,9 @@ class InstanceSelector extends Component {
                             });
                         });
 
+
                         // LUCKY! FIND ALL INSTANCE
-                        if (instanceIds.length === selectedInstances.length) {
+                        if (urlInstanceObjHashes.length === selectedInstances.length) {
 
                             let selectedInstanceMap = {};
 
@@ -94,23 +133,23 @@ class InstanceSelector extends Component {
                             }
 
                             this.setState({
-                                hosts: hosts,
+                                servers: servers,
                                 instances : instances,
-                                activeHostId : activeHostId,
+                                activeServerId : activeServerId,
                                 selectedInstances: selectedInstanceMap
                             });
 
-                            this.props.setInstances(selectedInstances);
+                            this.props.setTarget(selectedHosts, selectedInstances);
 
                         } else {
                             this.setState({
-                                hosts: hosts
+                                servers: servers
                             });
                         }
 
                     } else {
                         this.setState({
-                            hosts: hosts
+                            servers: servers
                         });
                     }
                 }
@@ -119,9 +158,16 @@ class InstanceSelector extends Component {
                 errorHandler(xhr, textStatus, errorThrown, that.props);
             });
         }
+    };
+
+    componentWillReceiveProps(nextProps){
+
+        this.setTargetFromUrl(nextProps);
+
+
     }
 
-    getHosts = () => {
+    getServers = () => {
         var that = this;
         this.props.addRequest();
         jQuery.ajax({
@@ -130,7 +176,7 @@ class InstanceSelector extends Component {
             url: getHttpProtocol(this.props.config) + '/scouter/v1/info/server'
         }).done((msg) => {
             this.setState({
-                hosts: msg.result
+                servers: msg.result
             });
         }).fail((xhr, textStatus, errorThrown) => {
             errorHandler(xhr, textStatus, errorThrown, that.props);
@@ -140,32 +186,49 @@ class InstanceSelector extends Component {
 
     componentDidUpdate(prevProps, prevState) {
         if (this.props.visible && prevProps.visible !== this.props.visible) {
-            if (!this.state.hosts || this.state.hosts.length < 1) {
-                this.getHosts();
+            if (!this.state.servers || this.state.servers.length < 1) {
+                this.getServers();
             }
-
         }
     }
 
-    onHostClick = (hostId) => {
+    onServerClick = (serverId) => {
         var that = this;
         this.setState({
-            activeHostId: hostId
+            activeServerId: serverId
         });
 
         this.props.addRequest();
         jQuery.ajax({
             method: "GET",
             async: true,
-            url: getHttpProtocol(this.props.config) + '/scouter/v1/object?serverId=' + hostId,
+            url: getHttpProtocol(this.props.config) + '/scouter/v1/object?serverId=' + serverId,
             xhrFields: getWithCredentials(that.props.config),
             beforeSend: function (xhr) {
                 setAuthHeader(xhr, that.props.config, that.props.user);
             },
         }).done((msg) => {
+            if (msg.result) {
+                // find host
+                let host = null;
+                for (let i=0; i<msg.result.length; i++) {
+                    if (msg.result[i].objFamily === 'host') {
+                        host = msg.result[i];
+                        break;
+                    }
+                }
+
+                for (let i=0; i<msg.result.length; i++) {
+                    if (msg.result[i].objFamily === 'javaee') {
+                        msg.result[i].host = host;
+                    }
+                }
+            }
+
             this.setState({
                 instances: msg.result
             });
+
         }).fail((xhr, textStatus, errorThrown) => {
             errorHandler(xhr, textStatus, errorThrown, that.props);
         });
@@ -173,7 +236,7 @@ class InstanceSelector extends Component {
 
     instanceClick = (instance) => {
 
-        let selectedInstances = this.state.selectedInstances;
+        let selectedInstances = Object.assign(this.state.selectedInstances);
         if (selectedInstances[instance.objHash]) {
             delete selectedInstances[instance.objHash];
         } else {
@@ -189,15 +252,15 @@ class InstanceSelector extends Component {
             }
         }
 
-        let hosts = this.state.hosts;
-        for (let i = 0; i < hosts.length; i++) {
-            if (hosts[i].id === this.state.activeHostId) {
-                hosts[i].selectedInstanceCount = selectedInstanceCount;
+        let servers = this.state.servers;
+        for (let i = 0; i < servers.length; i++) {
+            if (servers[i].id === this.state.activeServerId) {
+                servers[i].selectedInstanceCount = selectedInstanceCount;
             }
         }
 
         this.setState({
-            hosts: hosts,
+            servers: servers,
             selectedInstances: selectedInstances
         });
 
@@ -205,15 +268,25 @@ class InstanceSelector extends Component {
 
     setInstances = () => {
         let instances = [];
+        let hosts = [];
+        let hostMap = {};
         for (let hash in this.state.selectedInstances) {
-            instances.push(this.state.selectedInstances[hash]);
+            let instance = this.state.selectedInstances[hash];
+            let host = instance.host;
+            instances.push(instance);
+            if (host) {
+                if (!hostMap[host.objHash]) {
+                    hostMap[host.objHash] = true;
+                    hosts.push(host);
+                }
+            }
         }
 
         if (instances.length < 1) {
             this.props.pushMessage("info", "NO MONITORING TARGET", "At least one instance must be selected");
             this.props.setControlVisibility("Message", true);
         } else {
-            this.props.setInstances(instances);
+            this.props.setTarget(hosts, instances);
             this.props.setControlVisibility("TargetSelector", false);
 
             this.props.history.push({
@@ -238,10 +311,10 @@ class InstanceSelector extends Component {
                 <div className="instance-selector-content">
                     <div className="host-list">
                         <div className="title">
-                            <div>HOSTS</div>
+                            <div>SERVER</div>
                         </div>
-                        {this.state.hosts && this.state.hosts.map((host, i) => {
-                                return (<div className={'host ' + (i === 0 ? 'first ' : ' ') + (host.id === this.state.activeHostId ? 'active ' : ' ')} key={i} onClick={this.onHostClick.bind(this, host.id)}>{host.name}{host.selectedInstanceCount > 0 && <span className="host-selected-count">{host.selectedInstanceCount}</span>}</div>)
+                        {this.state.servers && this.state.servers.map((host, i) => {
+                                return (<div className={'host ' + (i === 0 ? 'first ' : ' ') + (host.id === this.state.activeServerId ? 'active ' : ' ')} key={i} onClick={this.onServerClick.bind(this, host.id)}>{host.name}{host.selectedInstanceCount > 0 && <span className="host-selected-count">{host.selectedInstanceCount}</span>}</div>)
                             }
                         )}
                     </div>
@@ -275,6 +348,7 @@ let mapStateToProps = (state) => {
 
 let mapDispatchToProps = (dispatch) => {
     return {
+        setTarget: (hosts, instances) => dispatch(setTarget(hosts, instances)),
         setInstances: (instances) => dispatch(setInstances(instances)),
         setControlVisibility: (name, value) => dispatch(setControlVisibility(name, value)),
         clearAllMessage: () => dispatch(clearAllMessage()),

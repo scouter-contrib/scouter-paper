@@ -97,7 +97,8 @@ export function options() {
                 mode: "nonexclusive",
                 type: "counter",
                 title: "TPS",
-                counterKey : "TPS"
+                counterKey : "TPS",
+                objectType : "instance"
             },
             {
                 text: "Active Speed",
@@ -105,105 +106,120 @@ export function options() {
                 type: "counter",
                 title: "Active Speed",
                 counterKey : "ActiveSpeed",
-                multiValue : ["L", "M", "S"]
+                multiValue : ["L", "M", "S"],
+                objectType : "instance"
             },
             {
                 text: "Elapsed Time",
                 mode: "nonexclusive",
                 type: "counter",
                 title: "Elapsed Time",
-                counterKey : "ElapsedTime"
+                counterKey : "ElapsedTime",
+                objectType : "instance"
             },
             {
                 text: "Service Count",
                 mode: "nonexclusive",
                 type: "counter",
                 title: "Service Count",
-                counterKey : "ServiceCount"
+                counterKey : "ServiceCount",
+                objectType : "instance"
             },
             {
                 text: "Error Rate",
                 mode: "nonexclusive",
                 type: "counter",
                 title: "Error Rate",
-                counterKey : "ErrorRate"
+                counterKey : "ErrorRate",
+                objectType : "instance"
             },
             {
                 text: "Active Service",
                 mode: "nonexclusive",
                 type: "counter",
                 title: "Active Service",
-                counterKey : "ActiveService"
+                counterKey : "ActiveService",
+                objectType : "instance"
             },
             {
                 text: "Recent User",
                 mode: "nonexclusive",
                 type: "counter",
                 title: "Recent User",
-                counterKey : "RecentUser"
+                counterKey : "RecentUser",
+                objectType : "instance"
             },
             {
                 text: "SqlTime By Service",
                 mode: "nonexclusive",
                 type: "counter",
                 title: "SqlTime By Service",
-                counterKey : "SqlTimeByService"
+                counterKey : "SqlTimeByService",
+                objectType : "instance"
             },
             {
                 text: "API Time By Service",
                 mode: "nonexclusive",
                 type: "counter",
                 title: "API Time By Service",
-                counterKey : "ApiTimeByService"
+                counterKey : "ApiTimeByService",
+                objectType : "instance"
             },
             {
                 text: "Queuing Time",
                 mode: "nonexclusive",
                 type: "counter",
                 title: "Queuing Time",
-                counterKey : "QueuingTime"
+                counterKey : "QueuingTime",
+                objectType : "instance"
             },
             {
                 text: "SQL Time",
                 mode: "nonexclusive",
                 type: "counter",
                 title: "SQL Time",
-                counterKey : "SqlTime"
+                counterKey : "SqlTime",
+                objectType : "instance"
             },
             {
                 text: "SQL TPS",
                 mode: "nonexclusive",
                 type: "counter",
                 title: "SQL TPS",
-                counterKey : "SqlTPS"
+                counterKey : "SqlTPS",
+                objectType : "instance"
             },
             {
                 text: "SQL Error Rate",
                 mode: "nonexclusive",
                 type: "counter",
                 title: "SQL Error Rate",
-                counterKey : "SqlErrorRate"
+                counterKey : "SqlErrorRate",
+                objectType : "instance"
             },
             {
                 text: "API Time",
                 mode: "nonexclusive",
                 type: "counter",
                 title: "API Time",
-                counterKey : "ApiTime"
+                counterKey : "ApiTime",
+                objectType : "instance"
             },
             {
                 text: "API TPS",
                 mode: "nonexclusive",
                 type: "counter",
                 title: "API TPS",
-                counterKey : "ApiTPS"
+                counterKey : "ApiTPS",
+                objectType : "instance"
             },
             {
                 text: "API Error Rate",
                 mode: "nonexclusive",
                 type: "counter",
                 title: "API Error Rate",
-                counterKey : "ApiErrorRate"
+                counterKey : "ApiErrorRate",
+                objectType : "instance"
             }
         ],
 
@@ -213,14 +229,16 @@ export function options() {
                 mode: "nonexclusive",
                 type: "counter",
                 title: "GC Count",
-                counterKey : "GcCount"
+                counterKey : "GcCount",
+                objectType : "instance"
             },
             {
                 text: "GC Time",
                 mode: "nonexclusive",
                 type: "counter",
                 title: "GC Time",
-                counterKey : "GcTime"
+                counterKey : "GcTime",
+                objectType : "instance"
             },
             {
                 text: "Heap Total Usage",
@@ -228,49 +246,56 @@ export function options() {
                 type: "counter",
                 title: "Heap Total Usage",
                 counterKey : "HeapTotUsage",
-                multiValue : ["MAX", "USED"]
+                multiValue : ["MAX", "USED"],
+                objectType : "instance"
             },
             {
                 text: "Heap Used",
                 mode: "nonexclusive",
                 type: "counter",
                 title: "Heap Used",
-                counterKey : "HeapUsed"
+                counterKey : "HeapUsed",
+                objectType : "instance"
             },
             {
                 text: "CPU Time",
                 mode: "nonexclusive",
                 type: "counter",
                 title: "CPU Time",
-                counterKey : "CpuTime"
+                counterKey : "CpuTime",
+                objectType : "instance"
             },
             {
                 text: "Perm Used",
                 mode: "nonexclusive",
                 type: "counter",
                 title: "Perm Used",
-                counterKey : "PermUsed"
+                counterKey : "PermUsed",
+                objectType : "instance"
             },
             {
                 text: "Perm Percent",
                 mode: "nonexclusive",
                 type: "counter",
                 title: "Perm Percent",
-                counterKey : "PermPercent"
+                counterKey : "PermPercent",
+                objectType : "instance"
             },
             {
                 text: "Process Cpu",
                 mode: "nonexclusive",
                 type: "counter",
                 title: "Process Cpu",
-                counterKey : "ProcCpu"
+                counterKey : "ProcCpu",
+                objectType : "instance"
             },
             {
                 text: "Fd Usage",
                 mode: "nonexclusive",
                 type: "counter",
                 title: "Fd Usage",
-                counterKey : "FdUsage"
+                counterKey : "FdUsage",
+                objectType : "instance"
             }
         ],
 
@@ -280,35 +305,40 @@ export function options() {
                 mode: "nonexclusive",
                 type: "counter",
                 title: "Bytes Received",
-                counterKey : "BytesReceived"
+                counterKey : "BytesReceived",
+                objectType : "instance"
             },
             {
                 text: "Bytes Sent",
                 mode: "nonexclusive",
                 type: "counter",
                 title: "Bytes Sent",
-                counterKey : "BytesSent"
+                counterKey : "BytesSent",
+                objectType : "instance"
             },
             {
                 text: "Error Count",
                 mode: "nonexclusive",
                 type: "counter",
                 title: "Error Count",
-                counterKey : "ErrorCount"
+                counterKey : "ErrorCount",
+                objectType : "instance"
             },
             {
                 text: "Processing Time",
                 mode: "nonexclusive",
                 type: "counter",
                 title: "Processing Time",
-                counterKey : "ProcessingTime"
+                counterKey : "ProcessingTime",
+                objectType : "instance"
             },
             {
                 text: "Request Count",
                 mode: "nonexclusive",
                 type: "counter",
                 title: "Request Count",
-                counterKey : "RequestCount"
+                counterKey : "RequestCount",
+                objectType : "instance"
             }
 
         ],
@@ -319,21 +349,24 @@ export function options() {
                 mode: "nonexclusive",
                 type: "counter",
                 title: "Active Sessions",
-                counterKey : "ActiveSessions"
+                counterKey : "ActiveSessions",
+                objectType : "instance"
             },
             {
                 text: "Session Create Rate",
                 mode: "nonexclusive",
                 type: "counter",
                 title: "Session Create Rate",
-                counterKey : "SessionCreateRate"
+                counterKey : "SessionCreateRate",
+                objectType : "instance"
             },
             {
                 text: "Session Expired Rate",
                 mode: "nonexclusive",
                 type: "counter",
                 title: "Session Expired Rate",
-                counterKey : "SessionExpiredRate"
+                counterKey : "SessionExpiredRate",
+                objectType : "instance"
             }
         ],
 
@@ -343,21 +376,24 @@ export function options() {
                 mode: "nonexclusive",
                 type: "counter",
                 title: "Conn Active",
-                counterKey : "ConnActive"
+                counterKey : "ConnActive",
+                objectType : "instance"
             },
             {
                 text: "Conn Idle",
                 mode: "nonexclusive",
                 type: "counter",
                 title: "Conn Idle",
-                counterKey : "ConnIdle"
+                counterKey : "ConnIdle",
+                objectType : "instance"
             },
             {
                 text: "Conn Max",
                 mode: "nonexclusive",
                 type: "counter",
                 title: "Conn Max",
-                counterKey : "ConnMax"
+                counterKey : "ConnMax",
+                objectType : "instance"
             }
         ],
 
@@ -367,84 +403,96 @@ export function options() {
                 mode: "nonexclusive",
                 type: "counter",
                 title: "Cpu",
-                counterKey : "Cpu"
+                counterKey : "Cpu",
+                objectType : "host"
             },
             {
                 text: "Sys Cpu",
                 mode: "nonexclusive",
                 type: "counter",
                 title: "Sys Cpu",
-                counterKey : "SysCpu"
+                counterKey : "SysCpu",
+                objectType : "host"
             },
             {
                 text: "User Cpu",
                 mode: "nonexclusive",
                 type: "counter",
                 title: "User Cpu",
-                counterKey : "UserCpu"
+                counterKey : "UserCpu",
+                objectType : "host"
             },
             {
                 text: "Mem",
                 mode: "nonexclusive",
                 type: "counter",
                 title: "Mem",
-                counterKey : "Mem"
+                counterKey : "Mem",
+                objectType : "host"
             },
             {
                 text: "MemA",
                 mode: "nonexclusive",
                 type: "counter",
                 title: "MemA",
-                counterKey : "MemA"
+                counterKey : "MemA",
+                objectType : "host"
             },
             {
                 text: "MemU",
                 mode: "nonexclusive",
                 type: "counter",
                 title: "MemU",
-                counterKey : "MemU"
+                counterKey : "MemU",
+                objectType : "host"
             },
             {
                 text: "MemT",
                 mode: "nonexclusive",
                 type: "counter",
                 title: "MemT",
-                counterKey : "MemT"
+                counterKey : "MemT",
+                objectType : "host"
             },
             {
                 text: "Page In",
                 mode: "nonexclusive",
                 type: "counter",
                 title: "Page In",
-                counterKey : "PageIn"
+                counterKey : "PageIn",
+                objectType : "host"
             },
             {
                 text: "Page Out",
                 mode: "nonexclusive",
                 type: "counter",
                 title: "Page Out",
-                counterKey : "PageOut"
+                counterKey : "PageOut",
+                objectType : "host"
             },
             {
                 text: "Swap",
                 mode: "nonexclusive",
                 type: "counter",
                 title: "Swap",
-                counterKey : "Swap"
+                counterKey : "Swap",
+                objectType : "host"
             },
             {
                 text: "SwapU",
                 mode: "nonexclusive",
                 type: "counter",
                 title: "SwapU",
-                counterKey : "SwapU"
+                counterKey : "SwapU",
+                objectType : "host"
             },
             {
                 text: "SwapT",
                 mode: "nonexclusive",
                 type: "counter",
                 title: "SwapT",
-                counterKey : "SwapT"
+                counterKey : "SwapT",
+                objectType : "host"
             }
         ],
 
@@ -454,56 +502,64 @@ export function options() {
                 mode: "nonexclusive",
                 type: "counter",
                 title: "Net InBound",
-                counterKey : "NetInBound"
+                counterKey : "NetInBound",
+                objectType : "instance"
             },
             {
                 text: "Net OutBound",
                 mode: "nonexclusive",
                 type: "counter",
                 title: "Net OutBound",
-                counterKey : "NetOutBound"
+                counterKey : "NetOutBound",
+                objectType : "instance"
             },
             {
                 text: "TCP Stat CLS",
                 mode: "nonexclusive",
                 type: "counter",
                 title: "TCP Stat CLS",
-                counterKey : "TcpStatCLS"
+                counterKey : "TcpStatCLS",
+                objectType : "instance"
             },
             {
                 text: "TCP Stat TIM",
                 mode: "nonexclusive",
                 type: "counter",
                 title: "TCP Stat TIM",
-                counterKey : "TcpStatTIM"
+                counterKey : "TcpStatTIM",
+                objectType : "instance"
             },
             {
                 text: "TCP Stat FIN",
                 mode: "nonexclusive",
                 type: "counter",
                 title: "TCP Stat FIN",
-                counterKey : "TcpStatFIN"
+                counterKey : "TcpStatFIN",
+                objectType : "instance"
             },
             {
                 text: "TCP Stat EST",
                 mode: "nonexclusive",
                 type: "counter",
                 title: "TCP Stat EST",
-                counterKey : "TcpStatEST"
+                counterKey : "TcpStatEST",
+                objectType : "instance"
             },
             {
                 text: "Net Rx Bytes",
                 mode: "nonexclusive",
                 type: "counter",
                 title: "Net Rx Bytes",
-                counterKey : "NetRxBytes"
+                counterKey : "NetRxBytes",
+                objectType : "instance"
             },
             {
                 text: "Net Tx Bytes",
                 mode: "nonexclusive",
                 type: "counter",
                 title: "Net Tx Bytes",
-                counterKey : "NetTxBytes"
+                counterKey : "NetTxBytes",
+                objectType : "instance"
             }
         ],
 
@@ -513,14 +569,16 @@ export function options() {
                 mode: "nonexclusive",
                 type: "counter",
                 title: "Disk Read Bytes",
-                counterKey : "DiskReadBytes"
+                counterKey : "DiskReadBytes",
+                objectType : "instance"
             },
             {
                 text: "Disk Write Bytes",
                 mode: "nonexclusive",
                 type: "counter",
                 title: "Disk Write Bytes",
-                counterKey : "DiskWriteBytes"
+                counterKey : "DiskWriteBytes",
+                objectType : "instance"
             }
         ],
 

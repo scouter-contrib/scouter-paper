@@ -37,7 +37,9 @@ class Tooltip extends Component {
             show = true;
         }
 
-
+        if (isNaN(x)) {
+            x = this.lastX;
+        }
 
         return (
             <div ref="tooltipRoot" className="tooltip" style={{left : x, top : y}}>
