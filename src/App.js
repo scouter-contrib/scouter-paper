@@ -25,6 +25,11 @@ const browser = detect();
 //const support = (browser.name === "chrome" || browser.name === "firefox" || browser.name === "opera" || browser.name === "safari");
 const support = (browser.name !== "ie" && browser.name !== "edge");
 
+
+if(browser.os.toUpperCase() === "MAC OS") {
+    document.querySelector("#root").classList.add("mac");
+}
+
 class App extends Component {
 
     info = (user, config) => {

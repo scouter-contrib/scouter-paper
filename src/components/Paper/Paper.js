@@ -101,7 +101,7 @@ class Paper extends Component {
             this.props.addRequest();
             jQuery.ajax({
                 method: "GET",
-                async: false,
+                async: true,
                 dataType: 'text',
                 url: getHttpProtocol(this.props.config) + '/scouter/v1/xlog/realTime/' + this.state.data.offset1 + '/' + this.state.data.offset2 + '?objHashes=' + JSON.stringify(this.props.instances.map((instance) => {
                     return Number(instance.objHash);
@@ -125,7 +125,7 @@ class Paper extends Component {
             let time = (new Date()).getTime();
             jQuery.ajax({
                 method: "GET",
-                async: false,
+                async: true,
                 url: getHttpProtocol(this.props.config) + '/scouter/v1/visitor/realTime?objHashes=' + JSON.stringify(this.props.instances.map((instance) => {
                     return Number(instance.objHash);
                 })),
@@ -189,7 +189,7 @@ class Paper extends Component {
             this.props.addRequest();
             jQuery.ajax({
                 method: "GET",
-                async: false,
+                async: true,
                 url: getHttpProtocol(this.props.config) + '/scouter/v1/counter/realTime/' + params + '?objHashes=' + JSON.stringify(instancesAndHosts.map((obj) => {
                     return Number(obj.objHash);
                 })),

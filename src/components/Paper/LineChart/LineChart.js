@@ -438,7 +438,8 @@ class LineChart extends Component {
                         instanceName: obj.objName,
                         circleKey: circleKey,
                         metricName: thisOption.title + "(" + thisOption.multiValue[j] + ")",
-                        value: (Math.round(that.state.counters[counterKey][dataIndex].data[obj.objHash].value[j] * 10) / 10) + " " + that.state.counters[counterKey][dataIndex].data[obj.objHash].unit,
+                        value: (Math.round(that.state.counters[counterKey][dataIndex].data[obj.objHash].value[j] * 10) / 10),
+                        displayValue: (Math.round(that.state.counters[counterKey][dataIndex].data[obj.objHash].value[j] * 10) / 10) + " " + that.state.counters[counterKey][dataIndex].data[obj.objHash].unit,
                         color: colorScale[cnt]
                     });
                 } else {
@@ -455,7 +456,8 @@ class LineChart extends Component {
                     instanceName: obj.objName,
                     circleKey: circleKey,
                     metricName: thisOption.title,
-                    value: obj.objHash && that.state.counters[counterKey][dataIndex].data[obj.objHash] ? (Math.round(that.state.counters[counterKey][dataIndex].data[obj.objHash].value * 10) / 10) + " " + that.state.counters[counterKey][dataIndex].data[obj.objHash].unit : null,
+                    value: obj.objHash && that.state.counters[counterKey][dataIndex].data[obj.objHash] ? (Math.round(that.state.counters[counterKey][dataIndex].data[obj.objHash].value * 10) / 10) : null,
+                    displayValue: obj.objHash && that.state.counters[counterKey][dataIndex].data[obj.objHash] ? (Math.round(that.state.counters[counterKey][dataIndex].data[obj.objHash].value * 10) / 10) + " " + that.state.counters[counterKey][dataIndex].data[obj.objHash].unit : null,
                     color: colorScale[cnt]
                 });
             } else {
