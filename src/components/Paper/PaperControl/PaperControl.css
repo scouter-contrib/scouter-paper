@@ -99,7 +99,7 @@
     z-index: 21;
 }
 
-.papers-controls .multi-metrics:hover ul {
+.papers-controls .multi-control:hover ul {
     display: inline-block;
 }
 
