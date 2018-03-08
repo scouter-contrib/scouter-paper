@@ -63,13 +63,18 @@ class Paper extends Component {
         };
     }
 
-    componentDidMount() {
-        this.dataRefreshTimer = setInterval(() => {
-            this.getXLog();
-            this.getVisitor();
-            this.getCounter();
-        }, this.props.config.interval);
+    getLatestData() {
+        this.getXLog();
+        this.getVisitor();
+        this.getCounter();
 
+        this.dataRefreshTimer = setTimeout(() => {
+            this.getLatestData();
+        }, this.props.config.interval);
+    }
+
+    componentDidMount() {
+        this.getLatestData();
         setTimeout(() => {
             window.dispatchEvent(new Event('resize'));
         }, 1000);
