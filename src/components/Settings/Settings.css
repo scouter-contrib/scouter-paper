@@ -140,6 +140,10 @@
     transition: background-color 0.3s;
 }
 
+.mac .settings .forms input {
+    padding: 7px;
+}
+
 .settings .forms .xlog-option {
     margin-bottom: 10px;
 }
@@ -166,6 +170,11 @@
     font-size: 10px;
 }
 
+.mac .settings .forms .auth-info select {
+    padding: 7px;
+    -webkit-appearance:none;
+}
+
 .settings .forms .auth-info select[disabled] {
     background-color: rgba(0, 0, 0, 0.1);
     border: 1px solid transparent;
@@ -177,6 +186,11 @@
     width: calc(50% - 80px);
     border: 1px solid rgba(0, 0, 0, 0.3);
     font-size: 10px;
+}
+
+.mac .settings .forms .xlog-option select {
+    padding: 7px;
+    -webkit-appearance:none;
 }
 
 .settings .forms .xlog-option select[disabled] {

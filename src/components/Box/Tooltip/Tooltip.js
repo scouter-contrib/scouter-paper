@@ -52,7 +52,7 @@ class Tooltip extends Component {
                                     <li key={i} style={{color :d.color}}>
                                         <div className="instance-name">{d.instanceName}</div>
                                         <div className="metric-name">{d.metricName}</div>
-                                        <div className="value">{d.value}</div>
+                                        <div className="value">{d.displayValue}</div>
                                     </li>)
                             })}
                         </ul>

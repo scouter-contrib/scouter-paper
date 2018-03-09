@@ -70,7 +70,7 @@ class RequestBar extends Component {
         });
 
         requests.forEach((d) => {
-            let dup = this.refs.requestBar.querySelectorAll("div[data-time='" + d.time + "'");
+            let dup = this.refs.requestBar.querySelectorAll("div[data-time='" + d.time + "']");
             if (dup.length < 1) {
                 let div = document.createElement("div");
                 div.setAttribute("data-time", d.time);
@@ -105,6 +105,6 @@ let mapStateToProps = (state) => {
     };
 };
 
-RequestBar = connect(mapStateToProps, null)(RequestBar);
+RequestBar = connect(mapStateToProps, undefined)(RequestBar);
 
 export default withRouter(RequestBar);
