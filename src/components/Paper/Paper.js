@@ -13,6 +13,8 @@ const ResponsiveReactGridLayout = WidthProvider(Responsive);
 
 class Paper extends Component {
     dataRefreshTimer = null;
+    backgroundTimestamp = 0;
+    keepBackgroundAliveMillis = 2 * 1000;
 
     constructor(props) {
         super(props);
@@ -73,6 +75,26 @@ class Paper extends Component {
         }, this.props.config.interval);
     }
 
+    setStateIfCanUpdate(obj) {
+        if(this.canUpdate()) {
+            this.setState(obj);
+            return true;
+        } else {
+            console.log("[ignored] set state ignored - background tab");
+            return false;
+        }
+    };
+
+    canUpdate() {
+        if(!document.hidden) {
+            return true;
+        }
+        if(this.backgroundTimestamp + this.keepBackgroundAliveMillis > Date.now()) {
+            return true;
+        }
+        return false;
+    }
+
     componentDidMount() {
         this.getLatestData();
         setTimeout(() => {
@@ -80,12 +102,17 @@ class Paper extends Component {
         }, 1000);
 
         document.addEventListener("scroll", this.scroll.bind(this));
+        document.addEventListener('visibilitychange', this.visibilitychange.bind(this));
     }
 
     componentWillUnmount() {
         clearInterval(this.dataRefreshTimer);
         this.dataRefreshTimer = null;
         document.removeEventListener("scroll", this.scroll.bind(this));
+    }
+
+    shouldComponentUpdate() {
+        return this.canUpdate();
     }
 
     scroll = (e) => {
@@ -98,6 +125,13 @@ class Paper extends Component {
                 fixedControl: false
             });
         }
+    };
+
+    visibilitychange = (e) => {
+        if(document.hidden) {
+            this.backgroundTimestamp = Date.now();
+        }
+        console.log(new Date() + " [on visibilitychange]" + document.hidden);
     };
 
     getXLog = () => {
