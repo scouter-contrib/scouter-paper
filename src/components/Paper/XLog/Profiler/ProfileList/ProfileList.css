@@ -48,7 +48,10 @@
 .xlog-profile-list > div > span.elapsed,
 .xlog-profile-list > div > span.cpu,
 .xlog-profile-list > div > span.queuingTime,
-.xlog-profile-list > div > span.sqlTime {
+.xlog-profile-list > div > span.sqlCount,
+.xlog-profile-list > div > span.sqlTime,
+.xlog-profile-list > div > span.allocatedMemory
+.xlog-profile-list > div > span.hasDump {
     text-align: right;
 }
 

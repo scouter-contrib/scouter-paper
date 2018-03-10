@@ -63,6 +63,7 @@ export function getDate(date, type) {
             (mm > 9 ? '' : '0') + mm,
             (dd > 9 ? '' : '0') + dd
         ].join('');
+
     } else if (type === 2) {
         let mm = date.getMonth() + 1; // getMonth() is zero-based
         let dd = date.getDate();
@@ -83,6 +84,19 @@ export function getDate(date, type) {
             ms = ms * 10;
         }
         return yyyymmdd + ' ' + hhmmss + "." + ms;
+
+    } else if (type === 3) { //only time
+        let hhmmss = [date.getHours(), date.getMinutes(), date.getSeconds()].join(':');
+
+        let ms = date.getMilliseconds();
+        if (ms < 1) {
+            ms = "000";
+        } else if (ms < 10) {
+            ms = ms * 100;
+        } else if (ms < 100) {
+            ms = ms * 10;
+        }
+        return hhmmss + "." + ms;
     }
 
 }
