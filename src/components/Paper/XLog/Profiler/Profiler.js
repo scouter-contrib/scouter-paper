@@ -236,8 +236,9 @@ class Profiler extends Component {
                 setAuthHeader(xhr, that.props.config, that.props.user);
             }
         }).done((msg) => {
+            const orderedSteps = _.orderBy(msg.result, (e) => Number(e.step.order), ['asc']);
             this.setState({
-                steps: msg.result
+                steps: orderedSteps
             });
 
         }).fail((xhr, textStatus, errorThrown) => {
