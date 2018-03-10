@@ -148,7 +148,12 @@ class Visitor extends Component {
     }
 
     shouldComponentUpdate() {
-        return true;
+        if(this.props.isNotBlockedByBrowser()) {
+            return true;
+        } else {
+            //console.log("[Visitor] isNotBlockedByBrowser False");
+            return false;
+        }
     }
 
     graphResize = () => {

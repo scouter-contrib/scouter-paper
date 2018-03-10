@@ -44,7 +44,12 @@ class LineChart extends Component {
     }
 
     shouldComponentUpdate() {
-        return true;
+        if(this.props.isNotBlockedByBrowser()) {
+            return true;
+        } else {
+            //console.log("[LineChart] isNotBlockedByBrowser False");
+            return false;
+        }
     }
 
     componentWillReceiveProps(nextProps) {

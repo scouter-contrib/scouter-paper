@@ -50,6 +50,10 @@ class XLog extends Component {
     };
 
     shouldComponentUpdate(nextProps, nextState) {
+        if(!this.props.isNotBlockedByBrowser()) {
+            //console.log("[Visitor] isNotBlockedByBrowser False");
+            return false;
+        }
 
         if (this.lastStartTime !== this.props.data.startTime || this.lastEndTime !== this.props.data.endTime) {
             return true;
