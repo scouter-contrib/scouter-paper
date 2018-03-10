@@ -1,3 +1,5 @@
+// local storage access
+
 export function getData(key) {
     let ls = null;
     if (global.localStorage) {
@@ -14,6 +16,38 @@ export function setData(key, value) {
     if (global.localStorage) {
         global.localStorage.setItem(key, JSON.stringify(value));
     }
+}
+
+
+// simple stored settings
+
+const LOCAL_SETTING_KEY = "scouter-paper-local-setting";
+let localSetting = {};
+
+export function getLocalSetting() {
+    let ls = null;
+    if (global.localStorage) {
+        try {
+            ls = JSON.parse(global.localStorage.getItem(LOCAL_SETTING_KEY));
+        } catch (e) {}
+        if(ls) {
+            localSetting = ls;
+        }
+    }
+    return localSetting;
+}
+
+export function setLocalSettingData(key, value) {
+    getLocalSetting();
+    localSetting[key] = value;
+    if (global.localStorage) {
+        global.localStorage.setItem(LOCAL_SETTING_KEY, JSON.stringify(localSetting));
+    }
+}
+
+export function getLocalSettingData(key, defaultValue) {
+    let value = getLocalSetting()[key];
+    return value ? value : defaultValue;
 }
 
 export function getHttpProtocol(config) {
