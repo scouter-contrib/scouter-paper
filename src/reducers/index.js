@@ -7,7 +7,7 @@ const configState = {
     protocol: window.location.protocol.replace(":", ""),
     address: window.location.hostname,
     port: 6188,
-    interval: 1000,
+    interval: 2000,
     numberFormat: "999,999.00",
     dateFormat: "YYYY-MM-DD",
     timeFormat: "HH:MM:SS",

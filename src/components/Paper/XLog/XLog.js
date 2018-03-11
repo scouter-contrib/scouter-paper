@@ -3,7 +3,9 @@ import './XLog.css';
 import * as d3 from "d3";
 import Profiler from "./Profiler/Profiler";
 import XLogPreviewer from "./XLogPreviewer/XLogPreviewer";
+import * as common from "../../../common/common";
 
+const XLOG_ELAPSED = 'xlogElapsed';
 
 class XLog extends Component {
 
@@ -34,7 +36,7 @@ class XLog extends Component {
         super(props);
 
         this.state = {
-            elapsed: 2000,
+            elapsed: common.getLocalSettingData(XLOG_ELAPSED, 2000),
             xlog: [],
             selection: {
                 x1: null,
@@ -50,6 +52,10 @@ class XLog extends Component {
     };
 
     shouldComponentUpdate(nextProps, nextState) {
+        if(!this.props.isNotBlockedByBrowser()) {
+            //console.log("[Visitor] isNotBlockedByBrowser False");
+            return false;
+        }
 
         if (this.lastStartTime !== this.props.data.startTime || this.lastEndTime !== this.props.data.endTime) {
             return true;
@@ -378,12 +384,14 @@ class XLog extends Component {
 
 
     axisUp = (e) => {
+        common.setLocalSettingData(XLOG_ELAPSED, this.state.elapsed * 2);
         this.setState({
             elapsed: this.state.elapsed * 2
         });
     };
 
     axisDown = () => {
+        common.setLocalSettingData(XLOG_ELAPSED, this.state.elapsed / 2);
         this.setState({
             elapsed: this.state.elapsed / 2
         });

@@ -13,6 +13,8 @@ const ResponsiveReactGridLayout = WidthProvider(Responsive);
 
 class Paper extends Component {
     dataRefreshTimer = null;
+    backgroundTimestamp = 0;
+    keepBackgroundAliveMillis = 1 * 1000;
 
     constructor(props) {
         super(props);
@@ -63,18 +65,34 @@ class Paper extends Component {
         };
     }
 
-    componentDidMount() {
-        this.dataRefreshTimer = setInterval(() => {
-            this.getXLog();
-            this.getVisitor();
-            this.getCounter();
-        }, this.props.config.interval);
+    getLatestData() {
+        this.getXLog();
+        this.getVisitor();
+        this.getCounter();
 
+        this.dataRefreshTimer = setTimeout(() => {
+            this.getLatestData();
+        }, this.props.config.interval);
+    }
+
+    isNotBlockedByBrowser() {
+        if(!document.hidden) {
+            return true;
+        }
+        if(this.backgroundTimestamp + this.keepBackgroundAliveMillis > Date.now()) {
+            return true;
+        }
+        return false;
+    }
+
+    componentDidMount() {
+        this.getLatestData();
         setTimeout(() => {
             window.dispatchEvent(new Event('resize'));
         }, 1000);
 
         document.addEventListener("scroll", this.scroll.bind(this));
+        document.addEventListener('visibilitychange', this.visibilitychange.bind(this));
     }
 
     componentWillUnmount() {
@@ -82,6 +100,10 @@ class Paper extends Component {
         this.dataRefreshTimer = null;
         document.removeEventListener("scroll", this.scroll.bind(this));
     }
+
+    // shouldComponentUpdate() {
+    //     return this.isNotBlockedByBrowser();
+    // }
 
     scroll = (e) => {
         if (document.documentElement.scrollTop > 60) {
@@ -93,6 +115,13 @@ class Paper extends Component {
                 fixedControl: false
             });
         }
+    };
+
+    visibilitychange = (e) => {
+        if(document.hidden) {
+            this.backgroundTimestamp = Date.now();
+        }
+        console.log(new Date() + " [on visibilitychange - hidden]" + document.hidden);
     };
 
     getXLog = () => {
@@ -266,8 +295,8 @@ class Paper extends Component {
         }
 
         let tempXlogs = this.state.data.tempXlogs.concat(datas);
-
         let data = this.state.data;
+
         data.offset1 = result.xlogLoop;
         data.offset2 = result.xlogIndex;
         data.tempXlogs = tempXlogs;
@@ -278,6 +307,14 @@ class Paper extends Component {
 
         let firstStepStartTime = this.state.data.lastRequestTime - 1000;
         let secondStepStartTime = firstStepStartTime - 5000;
+
+        this.removeOverTimeXLogFrom(tempXlogs, startTime);
+        if (!this.isNotBlockedByBrowser()) {
+            this.setState({
+                data: data
+            });
+            return;
+        }
 
         let xlogs = this.state.data.xlogs;
         let newXLogs = this.state.data.newXLogs;
@@ -322,18 +359,7 @@ class Paper extends Component {
         xlogs = xlogs.concat(newXLogs);
         newXLogs = lastStepXlogs;
 
-        let outOfRangeIndex = -1;
-        for (let i = 0; i < xlogs.length; i++) {
-            let d = xlogs[i];
-            if (startTime < d.endTime) {
-                break;
-            }
-            outOfRangeIndex = i;
-        }
-
-        if (outOfRangeIndex > -1) {
-            xlogs.splice(0, outOfRangeIndex + 1);
-        }
+        this.removeOverTimeXLogFrom(xlogs, startTime);
 
         data.tempXlogs = [];
         data.firstStepXlogs = firstStepXlogs;
@@ -349,6 +375,21 @@ class Paper extends Component {
             data: data
         });
     };
+
+    removeOverTimeXLogFrom(tempXlogs, startTime) {
+        let outOfRangeIndex = -1;
+        for (let i = 0; i < tempXlogs.length; i++) {
+            let d = tempXlogs[i];
+            if (startTime < d.endTime) {
+                break;
+            }
+            outOfRangeIndex = i;
+        }
+
+        if (outOfRangeIndex > -1) {
+            tempXlogs.splice(0, outOfRangeIndex + 1);
+        }
+    }
 
     onLayoutChange(layout, layouts) {
         let boxes = this.state.boxes;
@@ -682,7 +723,7 @@ class Paper extends Component {
                             {box.config && <BoxConfig box={box} setOptionValues={this.setOptionValues}
                                                       setOptionClose={this.setOptionClose}
                                                       removeMetrics={this.removeMetrics}/>}
-                            <Box setOption={this.setOption} box={box} data={this.state.data} config={this.props.config}
+                            <Box isNotBlockedByBrowser={this.isNotBlockedByBrowser} setOption={this.setOption} box={box} data={this.state.data} config={this.props.config}
                                  visitor={this.state.visitor} counters={this.state.counters}
                                  layoutChangeTime={this.state.layoutChangeTime}/>
                         </div>

@@ -85,7 +85,7 @@ const profileMetas = [
     },
     {
         key: "city",
-        name: "CIty",
+        name: "City",
         type: "string",
         show: false
     },

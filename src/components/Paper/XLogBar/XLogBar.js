@@ -22,11 +22,12 @@ class XLogBar extends Component {
             history : history,
             fontSize: 30
         };
-
-
     }
 
     shouldComponentUpdate(nextProps, nextState) {
+        if(!this.props.isNotBlockedByBrowser()) {
+            return false;
+        }
 
         if (this.firstStepTimestamp !== nextProps.data.firstStepTimestamp) {
             this.firstStepTimestamp = nextProps.data.firstStepTimestamp;

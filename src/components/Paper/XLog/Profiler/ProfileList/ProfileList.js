@@ -14,14 +14,13 @@ const layout = [
     {
         key: "endTime",
         name: "END TIME",
-        type: "date"
+        type: "time"
     },
     {
         key: "elapsed",
         name: "ELAPSED",
         type: "ms"
     },
-
     /*{
         key: "txid",
         name: "TXID"
@@ -33,6 +32,15 @@ const layout = [
     {
         key: "apicallTime",
         name: "API CALL TIME",
+        type: "ms"
+    },
+    {
+        key: "sqlCount",
+        name: "SQL COUNT"
+    },
+    {
+        key: "sqlTime",
+        name: "SQL TIME",
         type: "ms"
     },
     /*{
@@ -47,15 +55,6 @@ const layout = [
         key: "countryCode",
         name: "COUNTRY"
     },*/
-    {
-        key: "cpu",
-        name: "CPU",
-        type: "ms"
-    },
-    /*{
-        key: "desc",
-        name: "DESC"
-    },*/
     /*{
         key: "group",
         name: "GROUP"
@@ -64,21 +63,18 @@ const layout = [
         key: "gxid",
         name: "GXID"
     },*/
-    /*{
-        key: "hasDump",
-        name: "HAS DUMP"
-    },*/
     {
-        key: "ipaddr",
+        key: "ipAddr", // on xlog data api
         name: "IP ADDRESS"
     },
     {
-        key: "kbytes",
-        name: "KBYTES"
+        key: "cpu",
+        name: "CPU",
+        type: "ms"
     },
     {
-        key: "login",
-        name: "LOGIN"
+        key: "allocatedMemory", // on xlog data api
+        name: "KBYTES"
     },
     /*{
         key: "objHash",
@@ -93,12 +89,35 @@ const layout = [
         key: "referrer",
         name: "REFERRER"
     },
-    {
-        key: "sqlTime",
-        name: "SQL TIME",
-        type: "ms"
-    },
     /*{
+        key: "threadNameHash",
+        name: "THREAD NAME HASH"
+    },
+    {
+        key: "userAgent",
+        name: "USER AGENT"
+    },*/
+    /*{
+        key: "userid",
+        name: "USERID"
+    },
+    {
+        key: "xtype",
+        name: "XTYPE"
+    }*/
+    {
+        key: "hasDump",
+        name: "HAS DUMP"
+    },
+    {
+        key: "login",
+        name: "LOGIN"
+    },
+    {
+        key: "desc",
+        name: "DESC"
+    },
+    {
         key: "text1",
         name: "TEXT1"
     },
@@ -117,23 +136,7 @@ const layout = [
     {
         key: "text5",
         name: "TEXT5"
-    },*/
-    /*{
-        key: "threadNameHash",
-        name: "THREAD NAME HASH"
     },
-    {
-        key: "userAgent",
-        name: "USER AGENT"
-    },*/
-    /*{
-        key: "userid",
-        name: "USERID"
-    },
-    {
-        key: "xtype",
-        name: "XTYPE"
-    }*/
     {
         key: "error",
         name: "ERROR"
@@ -147,9 +150,10 @@ class ProfileList extends Component {
             let className = meta.key;
             if (meta.type === "ms") {
                 return <span className={className} key={j}>{row[meta.key]} ms</span>
-            }
-            if (meta.type === "date") {
+            } else if (meta.type === "date") {
                 return <span className={className} key={j}>{getDate(new Date(Number(row[meta.key])), 2)}</span>
+            } else if (meta.type === "time") {
+                return <span className={className} key={j}>{getDate(new Date(Number(row[meta.key])), 3)}</span>
             } else {
                 return <span className={className} key={j}>{row[meta.key]}</span>
             }

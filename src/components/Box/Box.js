@@ -97,10 +97,10 @@ class Box extends Component {
                         <div className="content">
                             {!type && <EmptyBox/>}
                             {type === "clock" && <ClockBox layoutChangeTime={this.props.layoutChangeTime} box={this.props.box} />}
-                            {type === "xlogBar" && <XLogBar layoutChangeTime={this.props.layoutChangeTime} box={this.props.box} data={this.props.data} />}
-                            {type === "xlog" && <XLog layoutChangeTime={this.props.layoutChangeTime} box={this.props.box} data={this.props.data} config={this.props.config} />}
-                            {type === "visitor" && <Visitor layoutChangeTime={this.props.layoutChangeTime} visitor={this.props.visitor} box={this.props.box} />}
-                            {type === "counter" && <LineChart layoutChangeTime={this.props.layoutChangeTime} time={this.props.counters.time} box={this.props.box} counters={this.props.counters.data} setTitle={this.setTitle} removeTitle={this.removeTitle} showTooltip={this.showTooltip} hideTooltip={this.hideTooltip} />}
+                            {type === "xlogBar" && <XLogBar isNotBlockedByBrowser={this.props.isNotBlockedByBrowser} layoutChangeTime={this.props.layoutChangeTime} box={this.props.box} data={this.props.data} />}
+                            {type === "xlog" && <XLog isNotBlockedByBrowser={this.props.isNotBlockedByBrowser} layoutChangeTime={this.props.layoutChangeTime} box={this.props.box} data={this.props.data} config={this.props.config} />}
+                            {type === "visitor" && <Visitor isNotBlockedByBrowser={this.props.isNotBlockedByBrowser} layoutChangeTime={this.props.layoutChangeTime} visitor={this.props.visitor} box={this.props.box} />}
+                            {type === "counter" && <LineChart isNotBlockedByBrowser={this.props.isNotBlockedByBrowser} layoutChangeTime={this.props.layoutChangeTime} time={this.props.counters.time} box={this.props.box} counters={this.props.counters.data} setTitle={this.setTitle} removeTitle={this.removeTitle} showTooltip={this.showTooltip} hideTooltip={this.hideTooltip} />}
                             {this.state.tooltip.show && <Tooltip tooltip={this.state.tooltip}/>}
                         </div>
                     </div>
