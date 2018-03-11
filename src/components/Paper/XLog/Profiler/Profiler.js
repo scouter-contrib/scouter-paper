@@ -237,6 +237,8 @@ class Profiler extends Component {
             }
         }).done((msg) => {
             const orderedSteps = _.orderBy(msg.result, (e) => Number(e.step.order), ['asc']);
+            this.addIndentPropertyTo(orderedSteps);
+
             this.setState({
                 steps: orderedSteps
             });
@@ -247,6 +249,15 @@ class Profiler extends Component {
 
 
     };
+
+    addIndentPropertyTo(orderedSteps) {
+        const indentMap = {};
+        orderedSteps.forEach((v) => {
+            const indent = indentMap.hasOwnProperty(v.step.parent) ? indentMap[v.step.parent] + 1 : 0;
+            indentMap[v.step.index] = indent;
+            v.step.indent = indent;
+        });
+    }
 
     mouseListEnter = () => {
         this.setState({
