@@ -47,7 +47,7 @@ class Menu extends Component {
             <div className="menu-div">
                 <div className="menu">
                     <div className="logo">
-                        <NavLink to="/" activeClassName="active">
+                        <NavLink to="/" activeClassName="active" onClick={this.menuClick.bind(this, "/")}>
                             <div className="logo-icon"><i className="fa fa-bolt" aria-hidden="true"></i></div>
                             <div className="logo-text-div">
                                 <div className="logo-text logo-text-1">SCOUTER</div>
@@ -55,13 +55,13 @@ class Menu extends Component {
                             </div>
                         </NavLink>
                     </div>
-                    <NavLink className={"menu-item " + (this.state.menu === "paper" ? "active" : "")} to={"/paper?instances=" + this.props.instances.map((d) => {return d.objHash})} onClick={this.menuClick.bind(this, "/paper")}>
+                    <NavLink className={"menu-item " + (this.state.menu === "/paper" ? "active" : "")} to={"/paper?instances=" + this.props.instances.map((d) => {return d.objHash})} onClick={this.menuClick.bind(this, "/paper")}>
                         <div>
                             <div className="icon"><i className="fa fa-newspaper-o" aria-hidden="true"></i></div>
                             <div className="text">PAPERS</div>
                         </div>
                     </NavLink>
-                    <NavLink className={"menu-item " + (this.state.menu === "settings" ? "active" : "")} to="/settings" activeClassName="active" onClick={this.menuClick.bind(this, "/settings")}>
+                    <NavLink className={"menu-item " + (this.state.menu === "/settings" ? "active" : "")} to="/settings" activeClassName="active" onClick={this.menuClick.bind(this, "/settings")}>
                         <div>
                             <div className="icon"><i className="fa fa-cog" aria-hidden="true"></i></div>
                             <div className="text">SETTINGS</div>

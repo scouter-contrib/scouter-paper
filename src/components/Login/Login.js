@@ -6,6 +6,7 @@ import jQuery from "jquery";
 import {withRouter} from 'react-router-dom';
 import TimeAgo from 'react-timeago'
 import {errorHandler} from '../../common/common';
+import logo from '../../img/scouter.png';
 
 class Login extends Component {
 
@@ -94,36 +95,34 @@ class Login extends Component {
         return (
             <div className="login-wrapper">
                 <div>
-                    {this.props.user.id &&
-                    <div className="user-content">
-                        <div className="user-id">{this.props.user.id}</div>
-                        <div className="when">LOGIN <TimeAgo date={this.props.user.time}/></div>
-                        <div className="logout-btn">
-                            <button onClick={this.logout}>LOGOUT</button>
-                        </div>
-                    </div>}
-                    {!this.props.user.id &&
                     <div className="login-content">
-                        <div className="login-logo">
-                            <div className="logo-box">
-                                <div className="logo"><i className="fa fa-bolt" aria-hidden="true"></i></div>
-                                <div className="name">SCOUTER PAPER</div>
+                        {!this.props.user.id &&
+                        <div className="login-box">
+                            <div className="logo-div"><img alt="scouter-logo" className="logo" src={logo}/></div>
+                            <div className="product">SCOUTER PAPER</div>
+                            <div>
+                                <input type="text" placeholder="ID" value={this.state.control.id} onChange={this.handleChange.bind(this, "id")}/>
                             </div>
+                            <div>
+                                <input type="password" placeholder="PASSWORD" value={this.state.control.password} onChange={this.handleChange.bind(this, "password")}/>
+                            </div>
+                            <div className="login-btn">
+                                <button onClick={this.login}>LOGIN</button>
+                            </div>
+                            <div className="login-message">{this.state.message}</div>
                         </div>
-                        <div>
-                            <input type="text" placeholder="ID" value={this.state.control.id}
-                                   onChange={this.handleChange.bind(this, "id")}/>
-                        </div>
-                        <div>
-                            <input type="password" placeholder="PASSWORD" value={this.state.control.password}
-                                   onChange={this.handleChange.bind(this, "password")}/>
-                        </div>
-                        <div className="login-btn">
-                            <button onClick={this.login}>LOGIN</button>
-                        </div>
-                        <div className="login-message">{this.state.message}</div>
+                        }
+                        {this.props.user.id &&
+                        <div className="login-box">
+                            <div className="logo-div"><img alt="scouter-logo" className="logo" src={logo}/></div>
+                            <div className="product">SCOUTER PAPER</div>
+                            <div className="user-id">{this.props.user.id}</div>
+                            <div className="when">LOGIN <TimeAgo date={this.props.user.time}/></div>
+                            <div className="logout-btn">
+                                <button onClick={this.logout}>LOGOUT</button>
+                            </div>
+                        </div>}
                     </div>
-                    }
                 </div>
             </div>
         );

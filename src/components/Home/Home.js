@@ -1,7 +1,7 @@
 import React, {Component} from 'react';
 import './Home.css';
 import {withRouter} from 'react-router-dom';
-import logo from './scouter.png';
+import logo from '../../img/scouter.png';
 
 const git = "https://github.com/KIMSEONGSEOB/scouter-page";
 
