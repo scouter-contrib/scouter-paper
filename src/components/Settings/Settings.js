@@ -282,7 +282,6 @@ class Settings extends Component {
 
             selected.normal.color = color.hex;
 
-            console.log(selected);
             this.setState({
                 config : config,
                 selected : selected

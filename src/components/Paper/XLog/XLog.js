@@ -52,8 +52,7 @@ class XLog extends Component {
     };
 
     shouldComponentUpdate(nextProps, nextState) {
-        if(!this.props.isNotBlockedByBrowser()) {
-            //console.log("[Visitor] isNotBlockedByBrowser False");
+        if(!this.props.visible) {
             return false;
         }
 

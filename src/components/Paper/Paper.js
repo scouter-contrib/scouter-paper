@@ -13,8 +13,6 @@ const ResponsiveReactGridLayout = WidthProvider(Responsive);
 
 class Paper extends Component {
     dataRefreshTimer = null;
-    backgroundTimestamp = 0;
-    keepBackgroundAliveMillis = 1 * 1000;
 
     constructor(props) {
         super(props);
@@ -61,7 +59,8 @@ class Paper extends Component {
                 time: null,
                 data: null
             },
-            fixedControl: false
+            fixedControl: false,
+            visible : true
         };
     }
 
@@ -75,16 +74,6 @@ class Paper extends Component {
         }, this.props.config.interval);
     }
 
-    isNotBlockedByBrowser() {
-        if(!document.hidden) {
-            return true;
-        }
-        if(this.backgroundTimestamp + this.keepBackgroundAliveMillis > Date.now()) {
-            return true;
-        }
-        return false;
-    }
-
     componentDidMount() {
         this.getLatestData();
         setTimeout(() => {
@@ -93,17 +82,18 @@ class Paper extends Component {
 
         document.addEventListener("scroll", this.scroll.bind(this));
         document.addEventListener('visibilitychange', this.visibilitychange.bind(this));
+
+        this.setState({
+            visible : document.visibilityState === 'visible' ? true : false
+        });
     }
 
     componentWillUnmount() {
         clearInterval(this.dataRefreshTimer);
         this.dataRefreshTimer = null;
         document.removeEventListener("scroll", this.scroll.bind(this));
+        document.removeEventListener('visibilitychange', this.visibilitychange.bind(this));
     }
-
-    // shouldComponentUpdate() {
-    //     return this.isNotBlockedByBrowser();
-    // }
 
     scroll = (e) => {
         if (document.documentElement.scrollTop > 60) {
@@ -118,10 +108,11 @@ class Paper extends Component {
     };
 
     visibilitychange = (e) => {
-        if(document.hidden) {
-            this.backgroundTimestamp = Date.now();
-        }
-        console.log(new Date() + " [on visibilitychange - hidden]" + document.hidden);
+        this.setState({
+            visible : document.visibilityState === 'visible' ? true : false
+        });
+
+        console.log(document.visibilityState === 'visible' ? true : false);
     };
 
     getXLog = () => {
@@ -309,7 +300,7 @@ class Paper extends Component {
         let secondStepStartTime = firstStepStartTime - 5000;
 
         this.removeOverTimeXLogFrom(tempXlogs, startTime);
-        if (!this.isNotBlockedByBrowser()) {
+        if (!this.state.visible) {
             this.setState({
                 data: data
             });
@@ -712,21 +703,14 @@ class Paper extends Component {
                                            layouts={this.state.layouts} rowHeight={30}
                                            onLayoutChange={(layout, layouts) => this.onLayoutChange(layout, layouts)}>
                     {this.state.boxes.map((box, i) => {
-                        return <div className="box-layout" key={box.key} data-grid={box.layout}>
-                            <button className="box-control box-layout-remove-btn last"
-                                    onClick={this.removePaper.bind(null, box.key)}><i className="fa fa-times-circle-o"
-                                                                                      aria-hidden="true"></i></button>
-                            {box.option && (box.option.length > 1 || box.option.config ) &&
-                            <button className="box-control box-layout-config-btn"
-                                    onClick={this.toggleConfig.bind(null, box.key)}><i className="fa fa-cog"
-                                                                                       aria-hidden="true"></i></button>}
-                            {box.config && <BoxConfig box={box} setOptionValues={this.setOptionValues}
-                                                      setOptionClose={this.setOptionClose}
-                                                      removeMetrics={this.removeMetrics}/>}
-                            <Box isNotBlockedByBrowser={this.isNotBlockedByBrowser} setOption={this.setOption} box={box} data={this.state.data} config={this.props.config}
-                                 visitor={this.state.visitor} counters={this.state.counters}
-                                 layoutChangeTime={this.state.layoutChangeTime}/>
-                        </div>
+                        return (
+                            <div className="box-layout" key={box.key} data-grid={box.layout}>
+                                <button className="box-control box-layout-remove-btn last" onClick={this.removePaper.bind(null, box.key)}><i className="fa fa-times-circle-o" aria-hidden="true"></i></button>
+                                {box.option && (box.option.length > 1 || box.option.config ) && <button className="box-control box-layout-config-btn" onClick={this.toggleConfig.bind(null, box.key)}><i className="fa fa-cog" aria-hidden="true"></i></button>}
+                                {box.config && <BoxConfig box={box} setOptionValues={this.setOptionValues} setOptionClose={this.setOptionClose} removeMetrics={this.removeMetrics}/>}
+                                <Box visible={this.state.visible} setOption={this.setOption} box={box} data={this.state.data} config={this.props.config} visitor={this.state.visitor} counters={this.state.counters} layoutChangeTime={this.state.layoutChangeTime}/>
+                            </div>
+                        )
                     })}
                 </ResponsiveReactGridLayout>
                 {!instanceSelected &&

@@ -25,7 +25,7 @@ class XLogBar extends Component {
     }
 
     shouldComponentUpdate(nextProps, nextState) {
-        if(!this.props.isNotBlockedByBrowser()) {
+        if(!this.props.visible) {
             return false;
         }
 

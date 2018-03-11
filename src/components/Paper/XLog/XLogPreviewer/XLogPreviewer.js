@@ -129,15 +129,6 @@ class XLogPreviewer extends Component {
     }
 
     render() {
-
-        if (this.props) {
-            //console.log(this.props.secondStepTimestamp);
-            //console.log(this.props.secondStepXlogs);
-
-
-        }
-
-
         return (
             <div className="xlog-preview" ref="xlogMover"
                  style={{width: this.props.width, top: this.props.margin.top, bottom: this.props.margin.bottom}}></div>

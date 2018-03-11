@@ -148,10 +148,9 @@ class Visitor extends Component {
     }
 
     shouldComponentUpdate() {
-        if(this.props.isNotBlockedByBrowser()) {
+        if(this.props.visible) {
             return true;
         } else {
-            //console.log("[Visitor] isNotBlockedByBrowser False");
             return false;
         }
     }
