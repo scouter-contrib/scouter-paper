@@ -7,6 +7,7 @@ import * as d3 from "d3";
 class LineChart extends Component {
 
     lastCountersTime = null;
+    historyInit = {};
 
     graph = {
         margin: {
@@ -52,6 +53,54 @@ class LineChart extends Component {
     }
 
     componentWillReceiveProps(nextProps) {
+        let counters = Object.assign(this.state.counters);
+        if (nextProps.countersHistory) {
+            if (Array.isArray(nextProps.box.option)) {
+                for (let i = 0; i < nextProps.box.option.length; i++) {
+                    let counterKey = nextProps.box.option[i].counterKey;
+                    if (!counters[counterKey]) {
+                        counters[counterKey] = [];
+                    }
+
+                    if (nextProps.countersHistory[counterKey] && !this.historyInit[counterKey]) {
+
+                        for (let objHash in nextProps.countersHistory[counterKey]) {
+
+                            let timeList = nextProps.countersHistory[counterKey][objHash].timeList;
+                            let valueList = nextProps.countersHistory[counterKey][objHash].valueList;
+
+                            for (let j=0; j<timeList.length; j++) {
+                                let row = {};
+                                row.time = Number(timeList[j]);
+                                row.data = {};
+                                row.data[objHash] = {
+                                    objHash : objHash,
+                                    value : valueList[j]
+                                };
+
+                                counters[counterKey].push(row);
+                            }
+                        }
+
+                        counters[counterKey].sort(function(a,b) {
+                            return a.time - b.time;
+                        });
+
+                        this.historyInit[counterKey] = true;
+                    }
+                }
+            } else {
+                let counterKey = nextProps.box.option.counterKey;
+                if (!counters[counterKey]) {
+                    counters[counterKey] = [];
+                }
+                counters[counterKey].push({
+                    time: nextProps.time,
+                    data: nextProps.counters[counterKey]
+                });
+            }
+
+        }
 
         if (nextProps.counters && nextProps.time !== this.lastCountersTime) {
 
@@ -59,8 +108,6 @@ class LineChart extends Component {
 
             let endTime = nextProps.time;
             let startTime = nextProps.time - (1000 * 60 * 10);
-
-            let counters = Object.assign(this.state.counters);
 
             if (Array.isArray(nextProps.box.option)) {
                 for (let i = 0; i < nextProps.box.option.length; i++) {
@@ -80,6 +127,7 @@ class LineChart extends Component {
                 if (!counters[counterKey]) {
                     counters[counterKey] = [];
                 }
+
                 counters[counterKey].push({
                     time: nextProps.time,
                     data: nextProps.counters[counterKey]
@@ -135,11 +183,6 @@ class LineChart extends Component {
             if (this.graph.autoMaxY > this.graph.maxY) {
                 this.graph.maxY = this.graph.autoMaxY;
             }
-
-            /*if (maxY > this.graph.maxY) {
-                this.graph.maxY = maxY;
-            }*/
-
 
             let noData = true;
             if (Array.isArray(nextProps.box.option)) {
@@ -262,9 +305,10 @@ class LineChart extends Component {
     drawObjectLine = (obj, option, counterKey, isMulti, colorScale, cnt) => {
         var that = this;
 
+        
         if (isMulti) {
             for (let j = 0; j < option.multiValue.length; j++) {
-                let valueLine = d3.line().curve(d3.curveMonotoneX)
+                let valueLine = d3.line().curve(d3.curveCatmullRom)
                     .defined(function (d) {
                         let objData = (d.data && d.data[obj.objHash] && d.data[obj.objHash].value) ? d.data[obj.objHash].value : null;
                         return objData && !isNaN(objData[j]);
@@ -304,7 +348,7 @@ class LineChart extends Component {
 
             }
         } else {
-            let valueLine = d3.line().curve(d3.curveMonotoneX)
+            let valueLine = d3.line().curve(d3.curveCatmullRom)
                 .defined(function (d) {
                     let objData = d.data ? d.data[obj.objHash] : null;
                     return objData && !isNaN(objData.value);
@@ -438,12 +482,21 @@ class LineChart extends Component {
             for (let j = 0; j < thisOption.multiValue.length; j++) {
                 let circleKey = "circle-" + obj.objHash + "_" + thisOption.counterKey + "_" + thisOption.multiValue[j];
                 if (tooltip.timeValue === that.state.counters[counterKey][dataIndex].time) {
+                    let unit = that.state.counters[counterKey][dataIndex].data[obj.objHash].unit;
+                    if (unit === undefined) {
+                        unit = that.state.counters[counterKey][that.state.counters[counterKey].length - 1].data[obj.objHash].unit;
+                    }
+
+                    if (!unit) {
+                        unit = "";
+                    }
+
                     tooltip.lines.push({
                         instanceName: obj.objName,
                         circleKey: circleKey,
                         metricName: thisOption.title + "(" + thisOption.multiValue[j] + ")",
                         value: (Math.round(that.state.counters[counterKey][dataIndex].data[obj.objHash].value[j] * 10) / 10),
-                        displayValue: (Math.round(that.state.counters[counterKey][dataIndex].data[obj.objHash].value[j] * 10) / 10) + " " + that.state.counters[counterKey][dataIndex].data[obj.objHash].unit,
+                        displayValue: (Math.round(that.state.counters[counterKey][dataIndex].data[obj.objHash].value[j] * 10) / 10) + " " + unit,
                         color: colorScale[cnt]
                     });
                 } else {
@@ -455,13 +508,22 @@ class LineChart extends Component {
         } else {
 
             let circleKey = "circle-" + obj.objHash + "_" + thisOption.counterKey;
+            let unit = that.state.counters[counterKey][dataIndex].data[obj.objHash].unit;
+            if (unit === undefined) {
+                unit = that.state.counters[counterKey][that.state.counters[counterKey].length - 1].data[obj.objHash].unit;
+            }
+
+            if (!unit) {
+                unit = "";
+            }
+
             if (tooltip.timeValue === that.state.counters[counterKey][dataIndex].time) {
                 tooltip.lines.push({
                     instanceName: obj.objName,
                     circleKey: circleKey,
                     metricName: thisOption.title,
                     value: obj.objHash && that.state.counters[counterKey][dataIndex].data[obj.objHash] ? (Math.round(that.state.counters[counterKey][dataIndex].data[obj.objHash].value * 10) / 10) : null,
-                    displayValue: obj.objHash && that.state.counters[counterKey][dataIndex].data[obj.objHash] ? (Math.round(that.state.counters[counterKey][dataIndex].data[obj.objHash].value * 10) / 10) + " " + that.state.counters[counterKey][dataIndex].data[obj.objHash].unit : null,
+                    displayValue: obj.objHash && that.state.counters[counterKey][dataIndex].data[obj.objHash] ? (Math.round(that.state.counters[counterKey][dataIndex].data[obj.objHash].value * 10) / 10) + " " + unit : null,
                     color: colorScale[cnt]
                 });
             } else {

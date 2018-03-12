@@ -100,7 +100,7 @@ class Box extends Component {
                             {type === "xlogBar" && <XLogBar visible={this.props.visible} layoutChangeTime={this.props.layoutChangeTime} box={this.props.box} data={this.props.data} />}
                             {type === "xlog" && <XLog visible={this.props.visible} layoutChangeTime={this.props.layoutChangeTime} box={this.props.box} data={this.props.data} config={this.props.config} />}
                             {type === "visitor" && <Visitor visible={this.props.visible} layoutChangeTime={this.props.layoutChangeTime} visitor={this.props.visitor} box={this.props.box} />}
-                            {type === "counter" && <LineChart visible={this.props.visible} layoutChangeTime={this.props.layoutChangeTime} time={this.props.counters.time} box={this.props.box} counters={this.props.counters.data} setTitle={this.setTitle} removeTitle={this.removeTitle} showTooltip={this.showTooltip} hideTooltip={this.hideTooltip} />}
+                            {type === "counter" && <LineChart visible={this.props.visible} layoutChangeTime={this.props.layoutChangeTime} time={this.props.counters.time} box={this.props.box} counters={this.props.counters.data} countersHistory={this.props.countersHistory} setTitle={this.setTitle} removeTitle={this.removeTitle} showTooltip={this.showTooltip} hideTooltip={this.hideTooltip} />}
                             {this.state.tooltip.show && <Tooltip tooltip={this.state.tooltip}/>}
                         </div>
                     </div>

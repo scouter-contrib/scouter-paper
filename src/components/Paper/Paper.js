@@ -59,6 +59,8 @@ class Paper extends Component {
                 time: null,
                 data: null
             },
+            /* counters past data */
+            countersHistory: {},
             fixedControl: false,
             visible : true
         };
@@ -111,8 +113,6 @@ class Paper extends Component {
         this.setState({
             visible : document.visibilityState === 'visible' ? true : false
         });
-
-        console.log(document.visibilityState === 'visible' ? true : false);
     };
 
     getXLog = () => {
@@ -171,26 +171,38 @@ class Paper extends Component {
         var that = this;
         if (this.props.instances && this.props.instances.length > 0) {
             let counterKeyMap = {};
+            let counterHistoryKeyMap = {};
 
             for (let i = 0; i < this.state.boxes.length; i++) {
                 let option = this.state.boxes[i].option;
+
                 if (Array.isArray(option)) {
                     for (let j = 0; j < option.length; j++) {
                         let innerOption = option[j];
                         if (innerOption.type === "counter") {
                             counterKeyMap[innerOption.counterKey] = true;
+                            if (!innerOption.multiValue) {
+                                counterHistoryKeyMap[innerOption.counterKey] = true;
+                            }
                         }
                     }
                 } else {
                     if (option && option.type === "counter") {
                         counterKeyMap[option.counterKey] = true;
+                        if (!option.multiValue) {
+                            counterHistoryKeyMap[option.counterKey] = true;
+                        }
                     }
-
                 }
             }
             let counterKeys = [];
             for (let attr in counterKeyMap) {
                 counterKeys.push(attr);
+            }
+
+            let counterHistoryKeys = [];
+            for (let attr in counterHistoryKeyMap) {
+                counterHistoryKeys.push(attr);
             }
 
             if (!counterKeys) {
@@ -201,8 +213,49 @@ class Paper extends Component {
                 return false;
             }
 
-
             let instancesAndHosts = this.props.instances.concat(this.props.hosts);
+
+            // 데이터를 조회한적이 없는 경우, 과거 10분 데이터를 가져온다.
+            for (let i=0; i<counterHistoryKeys.length; i++) {
+                let counterKey = counterHistoryKeys[i];
+
+                if (!this.state.countersHistory[counterKey]) {
+                    let now = (new Date()).getTime();
+                    let ten = 1000 * 60 * 10;
+                    this.props.addRequest();
+                    jQuery.ajax({
+                        method: "GET",
+                        async: true,
+                        url: getHttpProtocol(this.props.config) + '/scouter/v1/counter/' + counterKey + '?objHashes=' + JSON.stringify(instancesAndHosts.map((obj) => {
+                            return Number(obj.objHash);
+                        })) + "&startTimeMillis=" + (now - ten) + "&endTimeMillis=" + now,
+                        xhrFields: getWithCredentials(that.props.config),
+                        beforeSend: function (xhr) {
+                            setAuthHeader(xhr, that.props.config, that.props.user);
+                        }
+                    }).done((msg) => {
+                        let counterHIstory = {};
+                        if (msg.result) {
+                            for (let i = 0; i < msg.result.length; i++) {
+                                let counter = msg.result[i];
+                                counterHIstory[counter.objHash] = {};
+                                counterHIstory[counter.objHash].timeList = counter.timeList;
+                                counterHIstory[counter.objHash].valueList = counter.valueList;
+                            }
+                        }
+
+                        let countersHistory = Object.assign(this.state.countersHistory);
+                        countersHistory[counterKey] = counterHIstory;
+
+                        this.setState({
+                            countersHistory: countersHistory
+                        });
+
+                    }).fail((xhr, textStatus, errorThrown) => {
+                        errorHandler(xhr, textStatus, errorThrown, this.props);
+                    });
+                }
+            }
 
             let params = JSON.stringify(counterKeys);
             params = params.replace(/"/gi, "");
@@ -708,7 +761,7 @@ class Paper extends Component {
                                 <button className="box-control box-layout-remove-btn last" onClick={this.removePaper.bind(null, box.key)}><i className="fa fa-times-circle-o" aria-hidden="true"></i></button>
                                 {box.option && (box.option.length > 1 || box.option.config ) && <button className="box-control box-layout-config-btn" onClick={this.toggleConfig.bind(null, box.key)}><i className="fa fa-cog" aria-hidden="true"></i></button>}
                                 {box.config && <BoxConfig box={box} setOptionValues={this.setOptionValues} setOptionClose={this.setOptionClose} removeMetrics={this.removeMetrics}/>}
-                                <Box visible={this.state.visible} setOption={this.setOption} box={box} data={this.state.data} config={this.props.config} visitor={this.state.visitor} counters={this.state.counters} layoutChangeTime={this.state.layoutChangeTime}/>
+                                <Box visible={this.state.visible} setOption={this.setOption} box={box} data={this.state.data} config={this.props.config} visitor={this.state.visitor} counters={this.state.counters} countersHistory={this.state.countersHistory} layoutChangeTime={this.state.layoutChangeTime}/>
                             </div>
                         )
                     })}
