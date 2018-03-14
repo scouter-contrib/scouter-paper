@@ -4,13 +4,15 @@ import './Menu.css';
 import {InstanceInfo, InstanceSelector} from "../../components";
 import {connect} from 'react-redux';
 import {withRouter} from 'react-router-dom';
-
+import LayoutManagerButton from "./LayoutManagerButton/LayoutManagerButton";
+import LayoutManager from "./LayoutManager/LayoutManager";
 class Menu extends Component {
 
     constructor(props) {
         super(props);
         this.state = {
             selector: false,
+            layoutManager : false,
             menu : null
         };
     }
@@ -28,7 +30,11 @@ class Menu extends Component {
         });
     };
 
-
+    toggleLayoutManagerVisible = () => {
+        this.setState({
+            layoutManager: !this.state.layoutManager
+        });
+    };
 
     menuClick = (name, e) => {
         if (this.state.menu !== name) {
@@ -82,9 +88,12 @@ class Menu extends Component {
                         </NavLink>
                     }
                     <InstanceInfo className="menu-instance-selector" toggleSelectorVisible={this.toggleSelectorVisible}/>
+                    <LayoutManagerButton className="layout-manager-selector" toggleLayoutManagerVisible={this.toggleLayoutManagerVisible}/>
                 </div>
                 <div className="bar"></div>
                 <InstanceSelector visible={this.state.selector} toggleSelectorVisible={this.toggleSelectorVisible}/>
+                <LayoutManager visible={this.state.layoutManager} toggleLayoutManagerVisible={this.toggleLayoutManagerVisible}/>
+
             </div>
         );
     }

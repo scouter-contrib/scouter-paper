@@ -8,6 +8,7 @@ export const SET_CONFIG = 'SET_CONFIG';
 export const SET_USER_ID = 'SET_USER_ID';
 export const ADD_REQUEST = 'ADD_REQUEST';
 export const SET_SELECTION = 'SET_SELECTION';
+export const SET_TEMPLATE = 'SET_TEMPLATE';
 
 export function setConfig(config) {
     return {
@@ -82,4 +83,14 @@ export function setSelection(selection) {
         selection : selection
     };
 }
+
+export function setTemplate(boxes, layouts) {
+    return {
+        type: SET_TEMPLATE,
+        boxes : boxes,
+        layouts : layouts
+    };
+}
+
+
 

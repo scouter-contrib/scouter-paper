@@ -67,6 +67,18 @@ class Paper extends Component {
         };
     }
 
+    componentWillReceiveProps(nextProps) {
+        if (JSON.stringify(nextProps.template) !== JSON.stringify(this.props.template)) {
+            if (JSON.stringify(nextProps.template.boxes) !== JSON.stringify(this.state.boxes) || JSON.stringify(nextProps.template.layouts) !== JSON.stringify(this.state.layouts)) {
+                this.setState({
+                    layouts: nextProps.template.layouts,
+                    layoutChangeTime: (new Date()).getTime(),
+                    boxes: nextProps.template.boxes,
+                });
+            }
+        }
+    }
+
     getLatestData() {
         this.getXLog();
         this.getVisitor();
@@ -791,7 +803,8 @@ let mapStateToProps = (state) => {
         instances: state.target.instances,
         selection: state.target.selection,
         config: state.config,
-        user: state.user
+        user: state.user,
+        template: state.template
     };
 };
 

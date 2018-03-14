@@ -1,4 +1,4 @@
-import {ADD_REQUEST, SET_CONFIG, SET_USER_ID, SET_TARGET, SET_INSTANCES, PUSH_MESSAGE, SET_CONTROL_VISIBILITY, CLEAR_ALL_MESSAGE, SET_BG_COLOR, SET_SELECTION} from '../actions';
+import {ADD_REQUEST, SET_CONFIG, SET_USER_ID, SET_TARGET, SET_INSTANCES, PUSH_MESSAGE, SET_CONTROL_VISIBILITY, CLEAR_ALL_MESSAGE, SET_BG_COLOR, SET_SELECTION, SET_TEMPLATE} from '../actions';
 import {combineReducers} from 'redux';
 
 const configState = {
@@ -150,6 +150,7 @@ const target = (state = targetState, action) => {
     }
 };
 
+
 const requestState = {
     time : null
 };
@@ -223,6 +224,21 @@ const style = (state = styleState, action) => {
     }
 };
 
+const templateState = {
+    boxes: null,
+    layouts : null
+};
+
+const template = (state = templateState, action) => {
+    switch (action.type) {
+
+        case SET_TEMPLATE:
+            return Object.assign({}, state, {boxes : action.boxes, layouts: action.layouts});
+        default:
+            return state;
+    }
+};
+
 const scouterApp = combineReducers({
     target,
     user,
@@ -230,7 +246,8 @@ const scouterApp = combineReducers({
     control,
     style,
     config,
-    request
+    request,
+    template
 });
 
 export default scouterApp;

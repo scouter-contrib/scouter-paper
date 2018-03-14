@@ -1,0 +1,23 @@
+.layout-manager-button > div {
+    background-color: rgba(0, 0, 0, 0.2);
+    padding: 5px 10px;
+    border-radius: 5px;
+    cursor: pointer;
+    font-size: 9px;
+    -webkit-touch-callout: none;
+    -webkit-user-select: none;
+    -khtml-user-select: none;
+    -moz-user-select: none;
+    -ms-user-select: none;
+    user-select: none;
+    z-index: 50;
+    position: relative;
+}
+
+@media screen and (max-width: 600px) {
+    .layout-manager-button > div {
+        padding: 4px 5px;
+        font-size: 8px;
+        border-radius: 3px;
+    }
+}

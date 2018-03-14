@@ -482,9 +482,17 @@ class LineChart extends Component {
             for (let j = 0; j < thisOption.multiValue.length; j++) {
                 let circleKey = "circle-" + obj.objHash + "_" + thisOption.counterKey + "_" + thisOption.multiValue[j];
                 if (that.state.counters[counterKey][dataIndex].time) {
+
+                    if (!that.state.counters[counterKey][dataIndex].data) {
+                        break;
+                    }
+
                     let unit = that.state.counters[counterKey][dataIndex].data[obj.objHash].unit;
+
                     if (unit === undefined) {
-                        unit = that.state.counters[counterKey][that.state.counters[counterKey].length - 1].data[obj.objHash].unit;
+                        if (that.state.counters[counterKey][that.state.counters[counterKey].length - 1].data) {
+                            unit = that.state.counters[counterKey][that.state.counters[counterKey].length - 1].data[obj.objHash].unit;
+                        }
                     }
 
                     if (!unit) {
@@ -508,9 +516,17 @@ class LineChart extends Component {
         } else {
 
             let circleKey = "circle-" + obj.objHash + "_" + thisOption.counterKey;
+
+            if (!that.state.counters[counterKey][dataIndex].data) {
+                return cnt;
+            }
+
             let unit = that.state.counters[counterKey][dataIndex].data[obj.objHash].unit;
+
             if (unit === undefined) {
-                unit = that.state.counters[counterKey][that.state.counters[counterKey].length - 1].data[obj.objHash].unit;
+                if (that.state.counters[counterKey][that.state.counters[counterKey].length - 1].data) {
+                    unit = that.state.counters[counterKey][that.state.counters[counterKey].length - 1].data[obj.objHash].unit;
+                }
             }
 
             if (!unit) {

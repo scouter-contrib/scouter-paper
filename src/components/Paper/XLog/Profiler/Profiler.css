@@ -8,6 +8,7 @@
     bottom: 0;
     z-index: 51;
     font-size: 8px;
+    padding: 0 10px;
 }
 
 .xlog-profiler > div {

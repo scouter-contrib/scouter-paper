@@ -158,6 +158,14 @@
     margin-right: 10px;
 }
 
+.layout-manager-selector {
+    display: inline-block;
+    padding-top : 10px;
+    font-size: 10px;
+    float: right;
+    margin-right: 10px;
+}
+
 
 
 @media screen and (max-width: 600px) {
