@@ -481,7 +481,7 @@ class LineChart extends Component {
 
             for (let j = 0; j < thisOption.multiValue.length; j++) {
                 let circleKey = "circle-" + obj.objHash + "_" + thisOption.counterKey + "_" + thisOption.multiValue[j];
-                if (tooltip.timeValue === that.state.counters[counterKey][dataIndex].time) {
+                if (that.state.counters[counterKey][dataIndex].time) {
                     let unit = that.state.counters[counterKey][dataIndex].data[obj.objHash].unit;
                     if (unit === undefined) {
                         unit = that.state.counters[counterKey][that.state.counters[counterKey].length - 1].data[obj.objHash].unit;
@@ -517,7 +517,7 @@ class LineChart extends Component {
                 unit = "";
             }
 
-            if (tooltip.timeValue === that.state.counters[counterKey][dataIndex].time) {
+            if (that.state.counters[counterKey][dataIndex].time) {
                 tooltip.lines.push({
                     instanceName: obj.objName,
                     circleKey: circleKey,
