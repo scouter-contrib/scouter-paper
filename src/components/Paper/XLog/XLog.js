@@ -1,9 +1,13 @@
 import React, {Component} from 'react';
 import './XLog.css';
 import * as d3 from "d3";
-import Profiler from "./Profiler/Profiler";
+
 import XLogPreviewer from "./XLogPreviewer/XLogPreviewer";
 import * as common from "../../../common/common";
+
+import {connect} from 'react-redux';
+import {setSelection} from '../../../actions';
+import {withRouter} from 'react-router-dom';
 
 const XLOG_ELAPSED = 'xlogElapsed';
 
@@ -37,13 +41,7 @@ class XLog extends Component {
 
         this.state = {
             elapsed: common.getLocalSettingData(XLOG_ELAPSED, 2000),
-            xlog: [],
-            selection: {
-                x1: null,
-                x2: null,
-                y1: null,
-                y2: null
-            }
+            xlog: []
         }
     }
 
@@ -331,14 +329,13 @@ class XLog extends Component {
                     maxTime = Infinity;
                 }
 
-                that.setState({
-                    selection: {
-                        x1: startTime.getTime(),
-                        x2: endTime.getTime(),
-                        y1: minTime,
-                        y2: maxTime
-                    }
+                that.props.setSelection({
+                    x1: startTime.getTime(),
+                    x2: endTime.getTime(),
+                    y1: minTime,
+                    y2: maxTime
                 });
+
 
                 setTimeout(() => {
                     d3.select(".selection").attr("x", 0).attr("y", 0).attr("width", 0).attr("height", 0);
@@ -349,8 +346,8 @@ class XLog extends Component {
 
         // 브러쉬 (XLOG)
         this.graph.normalBrush = document.createElement("canvas");
-        this.graph.normalBrush.width = this.props.config.xlog.normal.rows;
-        this.graph.normalBrush.height = this.props.config.xlog.normal.columns;
+        this.graph.normalBrush.width = this.props.config.xlog.normal.columns;
+        this.graph.normalBrush.height = this.props.config.xlog.normal.rows;
         let normalContext = this.graph.normalBrush.getContext("2d");
 
         normalContext.globalAlpha = Number(this.props.config.xlog.normal.opacity);
@@ -358,14 +355,14 @@ class XLog extends Component {
             for (let j = 0; j < this.props.config.xlog.normal.columns; j++) {
                 if (this.props.config.xlog.normal.fills["D_" + i + "_" + j] && this.props.config.xlog.normal.fills["D_" + i + "_" + j].color !== "transparent") {
                     normalContext.fillStyle = this.props.config.xlog.normal.fills["D_" + i + "_" + j].color;
-                    normalContext.fillRect(i, j, 1, 1);
+                    normalContext.fillRect(j, i, 1, 1);
                 }
             }
         }
 
         this.graph.errorBrush = document.createElement("canvas");
-        this.graph.errorBrush.width = this.props.config.xlog.error.rows;
-        this.graph.errorBrush.height = this.props.config.xlog.error.columns;
+        this.graph.errorBrush.height = this.props.config.xlog.error.rows;
+        this.graph.errorBrush.width = this.props.config.xlog.error.columns;
         let errorContext = this.graph.errorBrush.getContext("2d");
 
         errorContext.globalAlpha = Number(this.props.config.xlog.error.opacity);
@@ -373,7 +370,7 @@ class XLog extends Component {
             for (let j = 0; j < this.props.config.xlog.error.columns; j++) {
                 if (this.props.config.xlog.error.fills["D_" + i + "_" + j] && this.props.config.xlog.error.fills["D_" + i + "_" + j].color !== "transparent") {
                     errorContext.fillStyle = this.props.config.xlog.error.fills["D_" + i + "_" + j].color;
-                    errorContext.fillRect(i, j, 1, 1);
+                    errorContext.fillRect(j, i, 1, 1);
                 }
             }
         }
@@ -408,11 +405,17 @@ class XLog extends Component {
                 {this.props.box.values.showPreview === "Y" &&
                 <XLogPreviewer secondStepTimestamp={this.props.data.secondStepTimestamp} secondStepXlogs={this.props.data.secondStepXlogs} width={this.graph.preview.width} margin={this.graph.margin} maxElapsed={this.state.elapsed}/>
                 }
-                <Profiler selection={this.state.selection} xlogs={this.props.data.xlogs}/>
             </div>
         );
     }
 }
 
 
-export default XLog;
+let mapDispatchToProps = (dispatch) => {
+    return {
+        setSelection: (selection) => dispatch(setSelection(selection))
+    };
+};
+
+XLog = connect(undefined, mapDispatchToProps)(XLog);
+export default withRouter(XLog);

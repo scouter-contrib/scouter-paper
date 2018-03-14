@@ -1,18 +1,23 @@
 .xlog-profiler {
-    position: absolute;
+    position: fixed;
     background-color: rgba(0, 0, 0, 0.5);
-    background-color: white;
     color: #333;
-    top: 10px;
-    left: 10px;
-    right: 10px;
-    bottom: 10px;
-    z-index: 5;
-    border-radius: 3px;
+    top: 0;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    z-index: 51;
     font-size: 8px;
-    border: 1px solid rgba(0, 0, 0, 0.3);
-    box-shadow: 0 0 10px #CCC;
+}
 
+.xlog-profiler > div {
+    max-width: 1600px;
+    position: relative;
+    background-color: white;
+    width: 100%;
+    height: calc(100% - 20px);
+    margin: 10px auto;
+    border: 1px solid #333;
 }
 
 .xlog-profiler .close-btn {

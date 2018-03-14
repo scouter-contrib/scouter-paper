@@ -1,4 +1,4 @@
-import {ADD_REQUEST, SET_CONFIG, SET_USER_ID, SET_TARGET, SET_INSTANCES, PUSH_MESSAGE, SET_CONTROL_VISIBILITY, CLEAR_ALL_MESSAGE, SET_BG_COLOR} from '../actions';
+import {ADD_REQUEST, SET_CONFIG, SET_USER_ID, SET_TARGET, SET_INSTANCES, PUSH_MESSAGE, SET_CONTROL_VISIBILITY, CLEAR_ALL_MESSAGE, SET_BG_COLOR, SET_SELECTION} from '../actions';
 import {combineReducers} from 'redux';
 
 const configState = {
@@ -121,7 +121,13 @@ const user = (state = userState, action) => {
 
 const targetState = {
     hosts : [],
-    instances: []
+    instances: [],
+    selection : {
+        x1: null,
+        x2: null,
+        y1: null,
+        y2: null
+    }
 };
 
 const target = (state = targetState, action) => {
@@ -134,6 +140,10 @@ const target = (state = targetState, action) => {
             return Object.assign({}, state, {
                 hosts: action.hosts,
                 instances: action.instances
+            });
+        case SET_SELECTION:
+            return Object.assign({}, state, {
+                selection: action.selection
             });
         default:
             return state;

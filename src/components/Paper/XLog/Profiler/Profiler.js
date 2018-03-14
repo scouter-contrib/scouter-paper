@@ -49,6 +49,7 @@ class Profiler extends Component {
     }
 
     shouldComponentUpdate(nextProps, nextState) {
+
         if (JSON.stringify(nextProps.selection) !== JSON.stringify(this.props.selection)) {
             return true;
         }
@@ -106,7 +107,6 @@ class Profiler extends Component {
                 show: false
             });
         } else {
-
             if (JSON.stringify(nextProps.selection) !== JSON.stringify(this.props.selection)) {
                 let x1 = nextProps.selection.x1;
                 let x2 = nextProps.selection.x2;
@@ -310,33 +310,35 @@ class Profiler extends Component {
 
         return (
             <div className={"xlog-profiler " + (this.state.show ? ' ' : 'hidden ') + (selectRow ? 'select-row' : '')}>
-                <div className="profile-list scrollbar" onMouseEnter={this.mouseListEnter}
-                     onMouseLeave={this.mouseListLeave}>
-                    <ProfileList txid={this.state.txid} xlogs={this.state.xlogs} rowClick={this.rowClick}/>
-                </div>
-                <div className={"profile-steps " + (selectRow ? 'select-row' : '')}>
-                    <div className="profile-steps-control">
-                        <div className={"profile-control-btn " + (this.state.summary ? 'active' : '')}
-                             onClick={this.toggleSummary}>SUMMARY
-                        </div>
-                        <div className={"profile-control-btn " + (this.state.bind ? 'active' : '')}
-                             onClick={this.toggleBind}>BIND
-                        </div>
-                        <div className={"profile-control-btn " + (this.state.wrap ? 'active' : '')}
-                             onClick={this.toggleWrap}>WRAP
-                        </div>
-                        <div className={"profile-control-btn " + (this.state.gap ? 'active' : '')}
-                             onClick={this.toggleGap}>GAP
-                        </div>
-                        <div className={"profile-control-btn " + (this.state.formatter ? 'active' : '')}
-                             onClick={this.toggleFormatter}>FORMATTER
-                        </div>
-                        <div onClick={this.close} className="close-btn"></div>
+                <div>
+                    <div className="profile-list scrollbar" onMouseEnter={this.mouseListEnter}
+                         onMouseLeave={this.mouseListLeave}>
+                        <ProfileList txid={this.state.txid} xlogs={this.state.xlogs} rowClick={this.rowClick}/>
                     </div>
-                    <div className="profile-steps-content scrollbar">
-                        <SingleProfile txid={this.state.txid} profile={this.state.profile} steps={this.state.steps}
-                                       summary={this.state.summary} bind={this.state.bind} wrap={this.state.wrap}
-                                       gap={this.state.gap} formatter={this.state.formatter}/>
+                    <div className={"profile-steps " + (selectRow ? 'select-row' : '')}>
+                        <div className="profile-steps-control">
+                            <div className={"profile-control-btn " + (this.state.summary ? 'active' : '')}
+                                 onClick={this.toggleSummary}>SUMMARY
+                            </div>
+                            <div className={"profile-control-btn " + (this.state.bind ? 'active' : '')}
+                                 onClick={this.toggleBind}>BIND
+                            </div>
+                            <div className={"profile-control-btn " + (this.state.wrap ? 'active' : '')}
+                                 onClick={this.toggleWrap}>WRAP
+                            </div>
+                            <div className={"profile-control-btn " + (this.state.gap ? 'active' : '')}
+                                 onClick={this.toggleGap}>GAP
+                            </div>
+                            <div className={"profile-control-btn " + (this.state.formatter ? 'active' : '')}
+                                 onClick={this.toggleFormatter}>FORMATTER
+                            </div>
+                            <div onClick={this.close} className="close-btn"></div>
+                        </div>
+                        <div className="profile-steps-content scrollbar">
+                            <SingleProfile txid={this.state.txid} profile={this.state.profile} steps={this.state.steps}
+                                           summary={this.state.summary} bind={this.state.bind} wrap={this.state.wrap}
+                                           gap={this.state.gap} formatter={this.state.formatter}/>
+                        </div>
                     </div>
                 </div>
             </div>

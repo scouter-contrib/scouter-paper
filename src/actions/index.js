@@ -7,6 +7,7 @@ export const SET_BG_COLOR = 'SET_BG_COLOR';
 export const SET_CONFIG = 'SET_CONFIG';
 export const SET_USER_ID = 'SET_USER_ID';
 export const ADD_REQUEST = 'ADD_REQUEST';
+export const SET_SELECTION = 'SET_SELECTION';
 
 export function setConfig(config) {
     return {
@@ -72,6 +73,13 @@ export function setBgColor(color) {
 export function addRequest() {
     return {
         type: ADD_REQUEST
+    };
+}
+
+export function setSelection(selection) {
+    return {
+        type: SET_SELECTION,
+        selection : selection
     };
 }
 

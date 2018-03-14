@@ -8,6 +8,7 @@ import {Responsive, WidthProvider} from "react-grid-layout";
 import {Box, BoxConfig, PaperControl} from "../../components";
 import jQuery from "jquery";
 import {getData, setData, getHttpProtocol, errorHandler, getWithCredentials, setAuthHeader} from '../../common/common';
+import Profiler from "./XLog/Profiler/Profiler";
 
 const ResponsiveReactGridLayout = WidthProvider(Responsive);
 
@@ -778,6 +779,7 @@ class Paper extends Component {
                     </div>
                 </div>
                 }
+                <Profiler selection={this.props.selection} xlogs={this.state.data.xlogs} startTime={this.state.data.startTime}/>
             </div>
         );
     }
@@ -787,6 +789,7 @@ let mapStateToProps = (state) => {
     return {
         hosts: state.target.hosts,
         instances: state.target.instances,
+        selection: state.target.selection,
         config: state.config,
         user: state.user
     };
