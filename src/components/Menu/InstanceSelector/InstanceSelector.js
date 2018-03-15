@@ -79,19 +79,16 @@ class InstanceSelector extends Component {
                                 instances = msg.result;
 
                                 if (instances) {
-                                    let host = null;
-                                    for (let i=0; i<instances.length; i++) {
-                                        if (instances[i].objFamily === 'host') {
-                                            host = instances[i];
-                                            break;
-                                        }
-                                    }
+                                    const hosts = {};
+                                    instances.filter((o) => o.objFamily === 'host').forEach((o) => {
+                                        hosts[o.objName] = o;
+                                    });
 
-                                    for (let i=0; i<instances.length; i++) {
-                                        if (instances[i].objFamily === 'javaee') {
-                                            instances[i].host = host;
-                                        }
-                                    }
+                                    instances.filter((o) => o.objFamily === 'javaee').forEach((o) => {
+                                        let instanceName = o.objName;
+                                        let hostName = instanceName.substring(0, instanceName.lastIndexOf('/'));
+                                        o.host = hosts[hostName];
+                                    });
                                 }
 
                                 if (instances && instances.length > 0) {
@@ -210,19 +207,17 @@ class InstanceSelector extends Component {
         }).done((msg) => {
             if (msg.result) {
                 // find host
-                let host = null;
-                for (let i=0; i<msg.result.length; i++) {
-                    if (msg.result[i].objFamily === 'host') {
-                        host = msg.result[i];
-                        break;
-                    }
-                }
+                const instances = msg.result;
+                const hosts = {};
+                instances.filter((o) => o.objFamily === 'host').forEach((o) => {
+                    hosts[o.objName] = o;
+                });
 
-                for (let i=0; i<msg.result.length; i++) {
-                    if (msg.result[i].objFamily === 'javaee') {
-                        msg.result[i].host = host;
-                    }
-                }
+                instances.filter((o) => o.objFamily === 'javaee').forEach((o) => {
+                    let instanceName = o.objName;
+                    let hostName = instanceName.substring(0, instanceName.lastIndexOf('/'));
+                    o.host = hosts[hostName];
+                });
             }
 
             this.setState({
