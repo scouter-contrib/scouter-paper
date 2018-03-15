@@ -251,9 +251,11 @@ class Paper extends Component {
                         if (msg.result) {
                             for (let i = 0; i < msg.result.length; i++) {
                                 let counter = msg.result[i];
-                                counterHIstory[counter.objHash] = {};
-                                counterHIstory[counter.objHash].timeList = counter.timeList;
-                                counterHIstory[counter.objHash].valueList = counter.valueList;
+                                if(counter.valueList.length > 0) {
+                                    counterHIstory[counter.objHash] = {};
+                                    counterHIstory[counter.objHash].timeList = counter.timeList;
+                                    counterHIstory[counter.objHash].valueList = counter.valueList;
+                                }
                             }
                         }
 
