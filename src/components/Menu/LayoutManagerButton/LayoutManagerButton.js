@@ -7,7 +7,7 @@ class LayoutManagerButton extends Component {
 
     render() {
         return (
-            <div className={"layout-manager-button " + this.props.className}>
+            <div className={"layout-manager-button " + this.props.className + " " + (this.props.selected ? "selected" : "")}>
                 <div onClick={this.props.toggleLayoutManagerVisible}>LAYOUT</div>
             </div>
         );

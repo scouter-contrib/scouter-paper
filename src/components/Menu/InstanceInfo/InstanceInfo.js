@@ -7,7 +7,7 @@ class InstanceInfo extends Component {
 
     render() {
         return (
-            <div className={"instance-info " + this.props.className}>
+            <div className={"instance-info " + this.props.className + " " + (this.props.selected ? "selected" : "")}>
                 <div onClick={this.props.toggleSelectorVisible}>{this.props.instances.length} INSTANCES</div>
             </div>
         );

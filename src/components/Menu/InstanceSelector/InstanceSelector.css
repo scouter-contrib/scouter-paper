@@ -40,7 +40,7 @@
 .instance-selector .instance-selector-content {
     display: table;
     width: 100%;
-    height: calc(100% - 46px);
+    height: calc(100% - 40px);
     table-layout: fixed;
 }
 
@@ -51,8 +51,31 @@
     height: 100%;
 }
 
+.instance-selector .instance-selector-content > div > div {
+    height: 100%;
+    position: relative;
+}
+
 .instance-selector .instance-selector-content .title {
     text-align: center;
+    position: absolute;
+    top : 0;
+    text-align: center;
+    width: 100%;
+    height: 20px;
+}
+
+.instance-selector .instance-selector-content .list-content {
+    height: calc(100% - 20px);
+    position: absolute;
+    top : 20px;
+    overflow-y: auto;
+    width: 100%;
+    line-height: 0;
+}
+
+.instance-selector .instance-selector-content .list-content > div {
+    line-height: 100%;
 }
 
 .instance-selector .instance-selector-content .title > div {
@@ -71,49 +94,50 @@
     font-size: 10px;
 }
 
-.instance-selector .host-list > div.host {
+.instance-selector .host-list  div.host {
     padding: 12px 8px;
     cursor: pointer;
     border-bottom: 1px solid rgba(0, 0, 0, 0.2);
 }
 
-.instance-selector .host-list > div.host .host-selected-count {
+.instance-selector .host-list  div.host .host-selected-count {
     float: right;
 }
 
-.instance-selector .host-list > div.host:hover {
+.instance-selector .host-list  div.host:hover {
     background-color: rgba(0, 0, 0, 0.1);
 }
 
-.instance-selector .host-list > div.host.active {
+.instance-selector .host-list  div.host.active {
     background-color: rgba(0, 0, 0, 0.3);
 }
 
-.instance-selector .host-list > div.host.first {
+.instance-selector .host-list  div.host.first {
     border-top: 1px solid rgba(0, 0, 0, 0.2);
-    margin-top: 10px;
+
 }
 
 .instance-selector .instance-list {
     font-size: 10px;
 }
 
-.instance-selector .instance-list > div.instance {
+
+
+.instance-selector .instance-list div.instance {
     padding: 12px 8px;
     cursor: pointer;
     border-bottom: 1px solid rgba(0, 0, 0, 0.2);
 }
 
-.instance-selector .instance-list > div.instance.first {
+.instance-selector .instance-list  div.instance.first {
     border-top: 1px solid rgba(0, 0, 0, 0.2);
-    margin-top: 10px;
 }
 
-.instance-selector .instance-list > div.instance:hover {
+.instance-selector .instance-list  div.instance:hover {
     background-color: rgba(0, 0, 0, 0.1);
 }
 
-.instance-selector .instance-list > div.instance.selected {
+.instance-selector .instance-list  div.instance.selected {
     background-color: rgba(0, 0, 0, 0.3);
 }
 
@@ -122,6 +146,8 @@
     padding: 10px 10px 8px;
     text-align: right;
     font-size: 10px;
+    height: 40px;
+    box-sizing: border-box;
 }
 
 @media screen and (max-width: 700px) {

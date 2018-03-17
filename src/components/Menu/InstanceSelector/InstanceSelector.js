@@ -1,6 +1,13 @@
 import React, {Component} from 'react';
 import './InstanceSelector.css';
-import {addRequest, pushMessage, setTarget, setInstances, clearAllMessage, setControlVisibility} from '../../../actions';
+import {
+    addRequest,
+    pushMessage,
+    setTarget,
+    setInstances,
+    clearAllMessage,
+    setControlVisibility
+} from '../../../actions';
 import {connect} from 'react-redux';
 import jQuery from "jquery";
 import {withRouter} from 'react-router-dom';
@@ -56,7 +63,9 @@ class InstanceSelector extends Component {
                     if (instancesParam) {
                         urlInstanceObjHashes = instancesParam.split(",");
                         if (urlInstanceObjHashes) {
-                            urlInstanceObjHashes = urlInstanceObjHashes.map((d) => {return Number(d)});
+                            urlInstanceObjHashes = urlInstanceObjHashes.map((d) => {
+                                return Number(d)
+                            });
                         }
                     }
 
@@ -75,7 +84,7 @@ class InstanceSelector extends Component {
                                 beforeSend: function (xhr) {
                                     setAuthHeader(xhr, props.config, props.user);
                                 }
-                            }).done(function(msg) {
+                            }).done(function (msg) {
                                 instances = msg.result;
 
                                 if (instances) {
@@ -114,7 +123,7 @@ class InstanceSelector extends Component {
                                         });
                                     })
                                 }
-                            }).fail(function(xhr, textStatus, errorThrown) {
+                            }).fail(function (xhr, textStatus, errorThrown) {
                                 errorHandler(xhr, textStatus, errorThrown, that.props);
                             });
                         });
@@ -125,14 +134,14 @@ class InstanceSelector extends Component {
 
                             let selectedInstanceMap = {};
 
-                            for (let i=0; i<selectedInstances.length; i++) {
+                            for (let i = 0; i < selectedInstances.length; i++) {
                                 selectedInstanceMap[selectedInstances[i].objHash] = selectedInstances[i];
                             }
 
                             this.setState({
                                 servers: servers,
-                                instances : instances,
-                                activeServerId : activeServerId,
+                                instances: instances,
+                                activeServerId: activeServerId,
                                 selectedInstances: selectedInstanceMap
                             });
 
@@ -157,7 +166,7 @@ class InstanceSelector extends Component {
         }
     };
 
-    componentWillReceiveProps(nextProps){
+    componentWillReceiveProps(nextProps) {
 
         this.setTargetFromUrl(nextProps);
 
@@ -190,10 +199,8 @@ class InstanceSelector extends Component {
     }
 
     onServerClick = (serverId) => {
-        var that = this;
-        this.setState({
-            activeServerId: serverId
-        });
+        let that = this;
+
 
         this.props.addRequest();
         jQuery.ajax({
@@ -206,6 +213,11 @@ class InstanceSelector extends Component {
             },
         }).done((msg) => {
             if (msg.result) {
+
+                that.setState({
+                    activeServerId: serverId
+                });
+
                 // find host
                 const instances = msg.result;
                 const hosts = {};
@@ -286,7 +298,9 @@ class InstanceSelector extends Component {
 
             this.props.history.push({
                 pathname: '/paper',
-                search: '?instances=' + instances.map((d) => {return d.objHash})
+                search: '?instances=' + instances.map((d) => {
+                    return d.objHash
+                })
             });
 
             this.props.toggleSelectorVisible();
@@ -302,32 +316,48 @@ class InstanceSelector extends Component {
     render() {
         return (
             <div className={"instance-selector-bg " + (this.props.visible ? "" : "hidden")}>
-            <div className="instance-selector">
-                <div className="instance-selector-content">
-                    <div className="host-list">
-                        <div className="title">
-                            <div>SERVER</div>
+                <div className="instance-selector">
+                    <div className="instance-selector-content">
+                        <div className="host-list">
+                            <div>
+                                <div className="title">
+                                    <div>SERVER</div>
+                                </div>
+                                <div className="list-content scrollbar">
+                                    {this.state.servers && this.state.servers.map((host, i) => {
+                                            return (<div
+                                                className={'host ' + (i === 0 ? 'first ' : ' ') + (host.id === this.state.activeServerId ? 'active ' : ' ')}
+                                                key={i}
+                                                onClick={this.onServerClick.bind(this, host.id)}>{host.name}{host.selectedInstanceCount > 0 &&
+                                            <span
+                                                className="host-selected-count">{host.selectedInstanceCount}</span>}</div>)
+                                        }
+                                    )}
+                                </div>
+                            </div>
                         </div>
-                        {this.state.servers && this.state.servers.map((host, i) => {
-                                return (<div className={'host ' + (i === 0 ? 'first ' : ' ') + (host.id === this.state.activeServerId ? 'active ' : ' ')} key={i} onClick={this.onServerClick.bind(this, host.id)}>{host.name}{host.selectedInstanceCount > 0 && <span className="host-selected-count">{host.selectedInstanceCount}</span>}</div>)
-                            }
-                        )}
+                        <div className="instance-list">
+                            <div>
+                                <div className="title">
+                                    <div>INSTANCES</div>
+                                </div>
+                                <div className="list-content scrollbar">
+                                    {this.state.instances && this.state.instances.filter((instance) => {
+                                        return instance.objFamily === 'javaee';
+                                    }).map((instance, i) => {
+                                        return (<div key={i}
+                                                     className={"instance " + (i === 0 ? 'first ' : ' ') + (!(!this.state.selectedInstances[instance.objHash]) ? "selected" : " ")}
+                                                     onClick={this.instanceClick.bind(this, instance)}>{instance.objName}</div>)
+                                    })}
+                                </div>
+                            </div>
+                        </div>
                     </div>
-                    <div className="instance-list">
-                        <div className="title">
-                            <div>INSTANCES</div>
-                        </div>
-                        {this.state.instances && this.state.instances.filter((instance) => {
-                            return instance.objFamily === 'javaee';
-                        }).map((instance, i) => {
-                            return (<div key={i} className={"instance " +  (i === 0 ? 'first ' : ' ') + (!(!this.state.selectedInstances[instance.objHash]) ? "selected" : " ")} onClick={this.instanceClick.bind(this, instance)}>{instance.objName}</div>)
-                        })}
+                    <div className="buttons">
+                        <button onClick={this.cancelClick}>CANCEL</button>
+                        <button onClick={this.setInstances}>APPLY</button>
                     </div>
                 </div>
-                <div className="buttons">
-                    <button onClick={this.cancelClick}>CANCEL</button><button onClick={this.setInstances}>APPLY</button>
-                </div>
-            </div>
             </div>
         );
     }

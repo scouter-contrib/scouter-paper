@@ -26,12 +26,14 @@ class Menu extends Component {
 
     toggleSelectorVisible = () => {
         this.setState({
-            selector: !this.state.selector
+            selector: !this.state.selector,
+            layoutManager: !this.state.selector ? false : this.state.layoutManager
         });
     };
 
     toggleLayoutManagerVisible = () => {
         this.setState({
+            selector: !this.state.layoutManager ? false : this.state.selector,
             layoutManager: !this.state.layoutManager
         });
     };
@@ -87,8 +89,8 @@ class Menu extends Component {
                             </div>
                         </NavLink>
                     }
-                    <InstanceInfo className="menu-instance-selector" toggleSelectorVisible={this.toggleSelectorVisible}/>
-                    <LayoutManagerButton className="layout-manager-selector" toggleLayoutManagerVisible={this.toggleLayoutManagerVisible}/>
+                    <InstanceInfo className="menu-instance-selector" selected={this.state.selector} toggleSelectorVisible={this.toggleSelectorVisible}/>
+                    <LayoutManagerButton className="layout-manager-selector" selected={this.state.layoutManager}  toggleLayoutManagerVisible={this.toggleLayoutManagerVisible}/>
                 </div>
                 <div className="bar"></div>
                 <InstanceSelector visible={this.state.selector} toggleSelectorVisible={this.toggleSelectorVisible}/>

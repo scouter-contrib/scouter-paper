@@ -1,10 +1,10 @@
 .layout-manager-bg {
     position: fixed;
-    top : 0;
-    left : 0;
+    top: 0;
+    left: 0;
     right: 0;
     bottom: 0;
-    background-color: rgba(0,0,0,0.3);
+    background-color: rgba(0, 0, 0, 0.3);
     z-index: 30;
 }
 
@@ -26,6 +26,7 @@
     -moz-user-select: none;
     -ms-user-select: none;
     user-select: none;
+    font-size: 10px;
 }
 
 .layout-manager > div {
@@ -37,14 +38,49 @@
     user-select: none;
 }
 
+.layout-manager > div.content-ilst {
+    height: 100%;
+    height: calc(100% - 60px);
+    overflow-y: auto;
+    margin-top: 20px;
+}
+
+.layout-manager .title {
+    text-align: center;
+    position: absolute;
+    top: 0;
+    text-align: center;
+    width: 100%;
+    height: 20px;
+}
+
+.layout-manager .title > div {
+    display: inline-block;
+    padding: 8px 8px;
+    background-color: rgba(0, 0, 0, 0.2);
+    margin: 0;
+    line-height: 0;
+    font-size: 10px;
+}
 
 .layout-manager .buttons {
     background-color: rgba(0, 0, 0, 0.1);
     padding: 10px 10px 8px;
     text-align: right;
     font-size: 10px;
-
+    height: 40px;
+    box-sizing: border-box;
 }
+
+.layout-manager .buttons button {
+    float: right;
+}
+
+.layout-manager .buttons button.save-btn,
+.layout-manager .buttons button.delete-btn {
+    float: left;
+}
+
 .layout-manager ul {
     list-style: none;
     padding: 0;
@@ -52,12 +88,73 @@
 }
 
 .layout-manager ul li {
-    padding: 10px;
     cursor: pointer;
+    border-bottom: 1px solid rgba(0, 0, 0, 0.2);
+}
+
+.layout-manager ul li > div {
+    line-height: 0;
+}
+
+.layout-manager ul li span {
+    display: inline-block;
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    box-sizing: border-box;
+    padding: 8px;
+    line-height: 100%;
+}
+
+.layout-manager ul li .no {
+    width: 25px;
+}
+
+.layout-manager ul li .done-btn,
+.layout-manager ul li .edit-btn {
+    width: 60px;
+    text-align: center;
+    display: none;
+}
+
+.layout-manager ul li .done-btn:hover,
+.layout-manager ul li .edit-btn:hover {
+    color: #FFD700;
+}
+
+.layout-manager ul li:hover .done-btn,
+.layout-manager ul li:hover .edit-btn {
+    display: inline-block;
+}
+
+.layout-manager ul li .name {
+    width: calc(100% - 85px);
+}
+
+.layout-manager ul li .name.edit {
+    padding: 0 5px;
+}
+
+.layout-manager ul li input {
+    padding: 0 5px;
+    font-size: 10px;
+    width: 100%;
+    line-height: 0;
+    border-radius: 3px;
+    border: none;
+    box-sizing: border-box;
+}
+
+.layout-manager ul li input * {
+    padding: 0;
+}
+
+.layout-manager ul li:first-child {
+    border-top: 1px solid rgba(0, 0, 0, 0.2);
 }
 
 .layout-manager ul li.selected {
-    background-color: rgba(0,0,0,0.3);
+    background-color: rgba(0, 0, 0, 0.3);
 }
 
 @media screen and (max-width: 700px) {

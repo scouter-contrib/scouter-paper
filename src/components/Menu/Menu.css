@@ -180,13 +180,17 @@
         top: -7px;
     }
 
+    .layout-manager-selector,
     .menu-instance-selector {
         padding-top : 6px;
     }
 
+    .layout-manager-selector,
     .menu-instance-selector {
         margin-right: 5px;
     }
+
+
 
     .menu .menu-item.right {
         margin-right: 5px;

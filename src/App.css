@@ -28,7 +28,7 @@ select {
 button {
     padding: 0;
     line-height: 100%;
-    padding: 8px 10px;
+    padding: 6px 8px;
     background-color: #FFD700;
     border : none;
     color: #333;
@@ -36,6 +36,7 @@ button {
     margin: 0 2px;
     outline: none;
     border-radius: 1px;
+    font-size: 10px;
 }
 
 button:hover {
