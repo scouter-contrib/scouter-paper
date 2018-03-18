@@ -17,6 +17,9 @@ class Paper extends Component {
 
     constructor(props) {
         super(props);
+        this.counterHistoriesLoaded = {};
+        this.counterReady = false;
+
         let layouts = getData("layouts");
         let boxes = getData("boxes");
 
@@ -180,8 +183,7 @@ class Paper extends Component {
     };
 
     getCounter = () => {
-
-        var that = this;
+        const that = this;
         if (this.props.instances && this.props.instances.length > 0) {
             let counterKeyMap = {};
             let counterHistoryKeyMap = {};
@@ -229,10 +231,12 @@ class Paper extends Component {
             let instancesAndHosts = this.props.instances.concat(this.props.hosts);
 
             // 데이터를 조회한적이 없는 경우, 과거 10분 데이터를 가져온다.
-            for (let i=0; i<counterHistoryKeys.length; i++) {
+            for (let i = 0; i < counterHistoryKeys.length; i++) {
                 let counterKey = counterHistoryKeys[i];
 
-                if (!this.state.countersHistory[counterKey]) {
+                if (!this.counterHistoriesLoaded[counterKey]) {
+                    this.counterHistoriesLoaded[counterKey] = false;
+
                     let now = (new Date()).getTime();
                     let ten = 1000 * 60 * 10;
                     this.props.addRequest();
@@ -247,67 +251,74 @@ class Paper extends Component {
                             setAuthHeader(xhr, that.props.config, that.props.user);
                         }
                     }).done((msg) => {
-                        let counterHIstory = {};
+                        this.counterHistoriesLoaded[counterKey] = true;
+
+                        let counterHistory = {};
                         if (msg.result) {
                             for (let i = 0; i < msg.result.length; i++) {
                                 let counter = msg.result[i];
                                 if(counter.valueList.length > 0) {
-                                    counterHIstory[counter.objHash] = {};
-                                    counterHIstory[counter.objHash].timeList = counter.timeList;
-                                    counterHIstory[counter.objHash].valueList = counter.valueList;
+                                    counterHistory[counter.objHash] = {};
+                                    counterHistory[counter.objHash].timeList = counter.timeList;
+                                    counterHistory[counter.objHash].valueList = counter.valueList;
                                 }
                             }
                         }
 
                         let countersHistory = Object.assign(this.state.countersHistory);
-                        countersHistory[counterKey] = counterHIstory;
-
+                        countersHistory[counterKey] = counterHistory;
                         this.setState({
                             countersHistory: countersHistory
                         });
 
                     }).fail((xhr, textStatus, errorThrown) => {
+                        this.counterHistoriesLoaded[counterKey] = true;
                         errorHandler(xhr, textStatus, errorThrown, this.props);
                     });
                 }
             }
 
-            let params = JSON.stringify(counterKeys);
-            params = params.replace(/"/gi, "");
-            this.props.addRequest();
-            jQuery.ajax({
-                method: "GET",
-                async: true,
-                url: getHttpProtocol(this.props.config) + '/scouter/v1/counter/realTime/' + params + '?objHashes=' + JSON.stringify(instancesAndHosts.map((obj) => {
-                    return Number(obj.objHash);
-                })),
-                xhrFields: getWithCredentials(that.props.config),
-                beforeSend: function (xhr) {
-                    setAuthHeader(xhr, that.props.config, that.props.user);
-                }
-            }).done((msg) => {
-                let map = {};
-
-                for (let i = 0; i < counterKeys.length; i++) {
-                    map[counterKeys[i]] = {};
-                }
-
-                if (msg.result) {
-                    for (let i = 0; i < msg.result.length; i++) {
-                        let counter = msg.result[i];
-                        map[counter.name][counter.objHash] = counter;
+            if(!this.counterReady) {
+                this.counterReady = counterKeys.every((key) => this.counterHistoriesLoaded[key]);
+            }
+            if(this.counterReady) {
+                let params = JSON.stringify(counterKeys);
+                params = params.replace(/"/gi, "");
+                this.props.addRequest();
+                jQuery.ajax({
+                    method: "GET",
+                    async: true,
+                    url: getHttpProtocol(this.props.config) + '/scouter/v1/counter/realTime/' + params + '?objHashes=' + JSON.stringify(instancesAndHosts.map((obj) => {
+                        return Number(obj.objHash);
+                    })),
+                    xhrFields: getWithCredentials(that.props.config),
+                    beforeSend: function (xhr) {
+                        setAuthHeader(xhr, that.props.config, that.props.user);
                     }
-                }
+                }).done((msg) => {
+                    let map = {};
 
-                this.setState({
-                    counters: {
-                        time: (new Date()).getTime(),
-                        data: map
+                    for (let i = 0; i < counterKeys.length; i++) {
+                        map[counterKeys[i]] = {};
                     }
+
+                    if (msg.result) {
+                        for (let i = 0; i < msg.result.length; i++) {
+                            let counter = msg.result[i];
+                            map[counter.name][counter.objHash] = counter;
+                        }
+                    }
+
+                    this.setState({
+                        counters: {
+                            time: (new Date()).getTime(),
+                            data: map
+                        }
+                    });
+                }).fail((xhr, textStatus, errorThrown) => {
+                    errorHandler(xhr, textStatus, errorThrown, this.props);
                 });
-            }).fail((xhr, textStatus, errorThrown) => {
-                errorHandler(xhr, textStatus, errorThrown, this.props);
-            });
+            }
         }
     };
 
@@ -565,6 +576,14 @@ class Paper extends Component {
             boxes: [],
             layouts: {},
             layoutChangeTime: (new Date()).getTime()
+        });
+    };
+
+    setCounterHistoryLoaded = (counterName) => {
+        const countersHistory = this.state.countersHistory;
+        countersHistory[counterName].loaded = true;
+        this.setState({
+            countersHistory: countersHistory
         });
     };
 

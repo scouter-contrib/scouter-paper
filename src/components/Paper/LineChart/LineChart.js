@@ -53,51 +53,59 @@ class LineChart extends Component {
     }
 
     componentWillReceiveProps(nextProps) {
+
+        //inner function
+        function loadHistoryCounter(counterKey) {
+            counters[counterKey] = counters[counterKey] || [];
+            const timeKeyRow = {};
+            for (let objHash in nextProps.countersHistory[counterKey]) {
+
+                let timeList = nextProps.countersHistory[counterKey][objHash].timeList;
+                let valueList = nextProps.countersHistory[counterKey][objHash].valueList;
+
+                for (let j = 0; j < timeList.length; j++) {
+                    let row = {};
+                    row.time = parseInt(timeList[j] / 2000, 10) * 2000;
+                    row.data = {};
+                    row.data[objHash] = {
+                        objHash: objHash,
+                        value: valueList[j]
+                    };
+
+                    if (!timeKeyRow[row.time]) {
+                        timeKeyRow[row.time] = row;
+                    } else {
+                        timeKeyRow[row.time].data[objHash] = {
+                            objHash: objHash,
+                            value: valueList[j]
+                        };
+                    }
+                }
+            }
+            for(const timeKey in timeKeyRow) {
+                counters[counterKey].push(timeKeyRow[timeKey]);
+            }
+        }
+
         let counters = Object.assign(this.state.counters);
         if (nextProps.countersHistory) {
             if (Array.isArray(nextProps.box.option)) {
                 for (let i = 0; i < nextProps.box.option.length; i++) {
                     let counterKey = nextProps.box.option[i].counterKey;
-                    if (!counters[counterKey]) {
-                        counters[counterKey] = [];
-                    }
 
-                    if (nextProps.countersHistory[counterKey] && !this.historyInit[counterKey]) {
-
-                        for (let objHash in nextProps.countersHistory[counterKey]) {
-
-                            let timeList = nextProps.countersHistory[counterKey][objHash].timeList;
-                            let valueList = nextProps.countersHistory[counterKey][objHash].valueList;
-
-                            for (let j=0; j<timeList.length; j++) {
-                                let row = {};
-                                row.time = Number(timeList[j]);
-                                row.data = {};
-                                row.data[objHash] = {
-                                    objHash : objHash,
-                                    value : valueList[j]
-                                };
-
-                                counters[counterKey].push(row);
-                            }
+                    if (nextProps.countersHistory[counterKey]) {
+                        if(this.historyInit[counterKey]) {
+                            continue;
+                        } else {
+                            this.historyInit[counterKey] = true;
                         }
 
-                        counters[counterKey].sort(function(a,b) {
-                            return a.time - b.time;
-                        });
-
-                        this.historyInit[counterKey] = true;
+                        loadHistoryCounter(counterKey);
                     }
                 }
             } else {
                 let counterKey = nextProps.box.option.counterKey;
-                if (!counters[counterKey]) {
-                    counters[counterKey] = [];
-                }
-                counters[counterKey].push({
-                    time: nextProps.time,
-                    data: nextProps.counters[counterKey]
-                });
+                loadHistoryCounter(counterKey);
             }
 
         }
@@ -112,10 +120,7 @@ class LineChart extends Component {
             if (Array.isArray(nextProps.box.option)) {
                 for (let i = 0; i < nextProps.box.option.length; i++) {
                     let counterKey = nextProps.box.option[i].counterKey;
-                    if (!counters[counterKey]) {
-                        counters[counterKey] = [];
-                    }
-
+                    counters[counterKey] = counters[counterKey] || [];
                     counters[counterKey].push({
                         time: nextProps.time,
                         data: nextProps.counters[counterKey]
@@ -124,30 +129,25 @@ class LineChart extends Component {
                 }
             } else {
                 let counterKey = nextProps.box.option.counterKey;
-                if (!counters[counterKey]) {
-                    counters[counterKey] = [];
-                }
-
+                counters[counterKey] = counters[counterKey] || [];
                 counters[counterKey].push({
                     time: nextProps.time,
                     data: nextProps.counters[counterKey]
                 });
             }
 
-            for (let attr in counters) {
+            for (let counterKey in counters) {
                 let overIndex = -1;
-                for (let i = 0; i < counters[attr].length; i++) {
-                    if (counters[attr][i].time < startTime) {
+                for (let i = 0; i < counters[counterKey].length; i++) {
+                    if (counters[counterKey][i].time < startTime) {
                         overIndex = i;
-                    }
-
-                    if (counters[attr][i].time >= startTime) {
+                    } else {
                         break;
                     }
                 }
 
                 if (overIndex > -1) {
-                    counters[attr].splice(0, overIndex + 1);
+                    counters[counterKey].splice(0, overIndex + 1);
                 }
             }
 
@@ -517,12 +517,11 @@ class LineChart extends Component {
 
             let circleKey = "circle-" + obj.objHash + "_" + thisOption.counterKey;
 
-            if (!that.state.counters[counterKey][dataIndex].data) {
+            if (!that.state.counters[counterKey][dataIndex].data || !that.state.counters[counterKey][dataIndex].data[obj.objHash]) {
                 return cnt;
             }
 
             let unit = that.state.counters[counterKey][dataIndex].data[obj.objHash].unit;
-
             if (unit === undefined) {
                 if (that.state.counters[counterKey][that.state.counters[counterKey].length - 1].data) {
                     unit = that.state.counters[counterKey][that.state.counters[counterKey].length - 1].data[obj.objHash].unit;
