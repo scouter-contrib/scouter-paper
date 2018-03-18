@@ -85,6 +85,7 @@ class LineChart extends Component {
             for(const timeKey in timeKeyRow) {
                 counters[counterKey].push(timeKeyRow[timeKey]);
             }
+            counters[counterKey].sort((a,b) => a.time - b.time);
         }
 
         let counters = Object.assign(this.state.counters);
