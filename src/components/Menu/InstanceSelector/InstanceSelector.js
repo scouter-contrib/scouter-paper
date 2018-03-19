@@ -88,6 +88,8 @@ class InstanceSelector extends Component {
                                 instances = msg.result;
 
                                 if (instances) {
+                                    instances.sort((a, b) => a.objName < b.objName ? -1 : 1);
+
                                     const hosts = {};
                                     instances.filter((o) => o.objFamily === 'host').forEach((o) => {
                                         hosts[o.objName] = o;
@@ -218,18 +220,22 @@ class InstanceSelector extends Component {
                     activeServerId: serverId
                 });
 
-                // find host
                 const instances = msg.result;
-                const hosts = {};
-                instances.filter((o) => o.objFamily === 'host').forEach((o) => {
-                    hosts[o.objName] = o;
-                });
+                if (instances) {
+                    instances.sort((a, b) => a.objName < b.objName ? -1 : 1);
 
-                instances.filter((o) => o.objFamily === 'javaee').forEach((o) => {
-                    let instanceName = o.objName;
-                    let hostName = instanceName.substring(0, instanceName.lastIndexOf('/'));
-                    o.host = hosts[hostName];
-                });
+                    // find host
+                    const hosts = {};
+                    instances.filter((o) => o.objFamily === 'host').forEach((o) => {
+                        hosts[o.objName] = o;
+                    });
+
+                    instances.filter((o) => o.objFamily === 'javaee').forEach((o) => {
+                        let instanceName = o.objName;
+                        let hostName = instanceName.substring(0, instanceName.lastIndexOf('/'));
+                        o.host = hosts[hostName];
+                    });
+                }
             }
 
             this.setState({
