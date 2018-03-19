@@ -2,8 +2,6 @@ import {ADD_REQUEST, SET_CONFIG, SET_USER_ID, SET_TARGET, SET_INSTANCES, PUSH_ME
 import {combineReducers} from 'redux';
 
 const configState = {
-
-
     protocol: window.location.protocol.replace(":", ""),
     address: window.location.hostname,
     port: 6188,
@@ -87,6 +85,25 @@ const configState = {
                 }
             }
         }
+    },
+    fonts : [
+        {val : "Bungee",name : "Bungee", generic: "cursive", type : "display"},
+        {val : "Righteous",name : "Righteous", generic : "cursive", type : "display"},
+        {val : "Mina",name : "Mina", generic : "sans-serif", type : "sans-serif"},
+        {val : "Nanum Gothic",name : "Nanum Gothic", generic : "sans-serif", type : "sans-serif"},
+        {val : "Noto Sans",name : "Noto Sans", generic : "sans-serif", type : "sans-serif"},
+        {val : "Nanum Gothic Coding",name : "Nanum Gothic Coding", generic : "monospace", type : "monospace"},
+        {val : "Cousine",name : "Cousine", generic : "monospace", type : "monospace"},
+        {val : "Space Mono",name : "Space Mono", generic : "monospace", type : "monospace"},
+        {val : "Kavivanar",name : "Kavivanar", generic : "cursive", type : "Handwriting"},
+        {val : "Handlee",name : "Handlee", generic : "cursive", type : "Handwriting"}],
+    fontSetting : {
+        basic : "Righteous",
+        menu : "Bungee",
+        axis : "Bungee",
+        tooltip : "Bungee",
+        profiler : "Cousine",
+
     }
 };
 

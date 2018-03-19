@@ -153,9 +153,14 @@
     border-top: 1px solid rgba(0, 0, 0, 0.2);
 }
 
+.layout-manager ul li:hover {
+    background-color: rgba(0, 0, 0, 0.1);
+}
+
 .layout-manager ul li.selected {
     background-color: rgba(0, 0, 0, 0.3);
 }
+
 
 @media screen and (max-width: 700px) {
     .layout-manager {

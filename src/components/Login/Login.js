@@ -15,8 +15,8 @@ class Login extends Component {
 
         this.state = {
             control: {
-                id: "admin",
-                password: "admin",
+                id: "",
+                password: "",
                 message: null
             }
         };

@@ -2,6 +2,27 @@ import React, {Component} from 'react';
 import './SingleProfile.css';
 import {getDate} from '../../../../../common/common';
 import sqlFormatter from "sql-formatter";
+import HashedMessageStep from "./HashedMessageStep/HashedMessageStep";
+import MethodStep from "./Sql3Step/Sql3Step";
+import SqlStep from "./SqlStep/SqlStep";
+import MessageStep from "./MessageStep/MessageStep";
+import SocketStep from "./SocketStep/SocketStep";
+import ApiCallStep from "./ApiCallStep/ApiCallStep";
+import ApiCall2Step from "./ApiCall2Step/ApiCall2Step";
+import ThreadSubmitStep from "./ThreadSubmitStep/ThreadSubmitStep";
+import Sql2Step from "./Sql2Step/Sql2Step";
+import Sql3Step from "./Sql3Step/Sql3Step";
+import Method2Step from "./Method2Step/Method2Step";
+import MethodSumStep from "./MethodSumStep/MethodSumStep";
+import DumpStep from "./DumpStep/DumpStep";
+import DispatchStep from "./DispatchStep/DispatchStep";
+import ThreadCallPossibleStep from "./ThreadCallPossibleStep/ThreadCallPossibleStep";
+import ParameterizedMessageStep from "./ParameterizedMessageStep/ParameterizedMessageStep";
+import SqlSumStep from "./SqlSumStep/SqlSumStep";
+import MessageSumStep from "./MessageSumStep/MessageSumStep";
+import SocketSumStep from "./SocketSumStep/SocketSumStep";
+import ApiCallSumStep from "./ApiCallSumStep/ApiCallSumStep";
+import ControlStep from "./ControlStep/ControlStep";
 
 const profileMetas = [
     {
@@ -271,26 +292,6 @@ class SingleProfile extends Component {
                         }
                         beforeEndTime = stepEndTime;
 
-                        let sql = "";
-                        if (row.step.stepType === "16") {
-                            if (this.props.bind) {
-                                let params = row.step.param.split(",");
-                                for (let i=0; i<params.length; i++) {
-                                    params[i] = "<span class='param'>" + params[i] + "</span>";
-                                }
-                                sql = sqlFormatter.format(row.mainValue, {
-                                    params: params,
-                                    indent: "  "
-                                });
-                            } else {
-                                sql = sqlFormatter.format(row.mainValue, {
-                                    indent: "  "
-                                });
-                            }
-
-                            sql = '<span class="prefix">' + row.step.xtypePrefix + '</span>' + sql;
-                        }
-
                         return (
                             <div className="step-div" key={i}>
                                 {(this.props.gap && gap > 0) && <div className="gap-time">
@@ -298,30 +299,29 @@ class SingleProfile extends Component {
                                     <div>{gap} ms</div>
                                     <div className="arrow"><i className="fa fa-angle-down" aria-hidden="true"></i></div>
                                 </div>}
-                                {row.step.stepType === "9" &&
-                                <div className="step hashed-message">
-                                    {row.step.time > -1 &&
-                                    <div className="general">
-                                        <span className="index">{this.zeroPadding(row.step.index, 5)}</span>
-                                        <span className="type">MSG</span>
-                                        <span className="start-time">{getDate(new Date(stepStartTime), 2)}</span>
-                                        <span className="elapsed">{row.step.time} ms</span>
-                                        <span className="value">#{row.step.value}</span>
-                                    </div>
-                                    }
-                                    <div className="message-content">{row.mainValue}</div>
-                                </div>}
-                                {row.step.stepType === "16" &&
-                                <div className="step sql">
-                                    <div className="general">
-                                        <span className="index">{this.zeroPadding(row.step.index, 5)}</span>
-                                        <span className="type">SQL</span>
-                                        <span className="start-time">{getDate(new Date(stepStartTime),2)}</span>
-                                        <span className="elapsed">{row.step.elapsed} ms</span>
-                                    </div>
-                                    <div className={"sql-statement " + (this.props.formatter ? 'formatter' : '')} dangerouslySetInnerHTML={{__html: sql}}></div>
-                                    <div className="sql-param">[{row.step.param}]</div>
-                                </div>}
+                                {row.step.stepType === "1" && <MethodStep startTime={startTime} row={row}/>}
+                                {row.step.stepType === "10" && <Method2Step startTime={startTime} row={row}/>}
+                                {row.step.stepType === "2" && <SqlStep startTime={startTime} row={row}/>}
+                                {row.step.stepType === "8" && <Sql2Step startTime={startTime} row={row}/>}
+                                {row.step.stepType === "16" && <Sql3Step formatter={this.props.formatter} bind={this.props.bind} startTime={startTime} row={row}/>}
+                                {row.step.stepType === "3" && <MessageStep startTime={startTime} row={row}/>}
+                                {row.step.stepType === "5" && <SocketStep startTime={startTime} row={row}/>}
+                                {row.step.stepType === "6" && <ApiCallStep startTime={startTime} row={row}/>}
+                                {row.step.stepType === "15" && <ApiCall2Step startTime={startTime} row={row}/>}
+                                {row.step.stepType === "7" && <ThreadSubmitStep startTime={startTime} row={row}/>}
+                                {row.step.stepType === "9" && <HashedMessageStep startTime={startTime} row={row}/>}
+                                {row.step.stepType === "17" && <ParameterizedMessageStep startTime={startTime} row={row}/>}
+                                {row.step.stepType === "12" && <DumpStep startTime={startTime} row={row}/>}
+                                {row.step.stepType === "13" && <DispatchStep startTime={startTime} row={row}/>}
+                                {row.step.stepType === "14" && <ThreadCallPossibleStep startTime={startTime} row={row}/>}
+
+                                {row.step.stepType === "11" && <MethodSumStep startTime={startTime} row={row}/>}
+                                {row.step.stepType === "21" && <SqlSumStep startTime={startTime} row={row}/>}
+                                {row.step.stepType === "31" && <MessageSumStep startTime={startTime} row={row}/>}
+                                {row.step.stepType === "42" && <SocketSumStep startTime={startTime} row={row}/>}
+                                {row.step.stepType === "43" && <ApiCallSumStep startTime={startTime} row={row}/>}
+                                {row.step.stepType === "99" && <ControlStep startTime={startTime} row={row}/>}
+
                                 {!found &&
                                 <div className="step others">{row.mainValue}</div>
                                 }

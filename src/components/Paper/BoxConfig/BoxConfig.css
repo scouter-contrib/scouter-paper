@@ -16,7 +16,15 @@
     height: calc(100% - 10px);
     width: calc(100% - 10px);
     padding: 10px 0;
-    font-family: 'Bungee';
+
+
+
+
+
+
+
+
+
     line-height: 0;
     font-size: 9px;
     display: table;
@@ -62,7 +70,12 @@
 
 .box-config .box-config-item label {
     color: white;
-    font-family: 'Bungee';
+
+
+
+
+
+
     line-height: 100%;
     width: 100px;
     display: inline-block;

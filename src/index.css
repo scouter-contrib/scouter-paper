@@ -1,33 +1,4 @@
-@import url('https://fonts.googleapis.com/css?family=Bungee|Ubuntu');
-
-@font-face {
-    font-family: 'NanumBarunGothic';
-    font-style: normal;
-    font-weight: 400;
-    src: url('./fonts/nanum/NanumBarunGothic.ttf');
-}
-
-@font-face {
-    font-family: 'NanumGothic';
-    font-style: normal;
-    font-weight: 400;
-    src: url('./fonts/nanum/NanumGothic.ttf');
-}
-
-@font-face {
-    font-family: 'NanumSquareL';
-    font-style: normal;
-    font-weight: 400;
-    src: url('./fonts/nanum/NanumSquareL.ttf');
-}
-
-@font-face {
-    font-family: 'NanumGothic';
-    font-style: normal;
-    font-weight: 400;
-    src: url('./fonts/nanum/NanumGothic.ttf');
-}
-
+@import url('https://fonts.googleapis.com/css?family=Bungee|Righteous|Mina|Nanum+Gothic|Noto+Sans|Nanum+Gothic+Coding|Cousine|Space+Mono|Handlee|Kavivanar');
 
 html {
     background: #207ce5;
@@ -36,13 +7,7 @@ html {
 body {
     margin: 0;
     padding: 0;
-    font-family: 'Bungee', 'NanumBarunGothic', sans-serif;
-    background-color: #EEE;
     background: #207ce5;
-    _background: #207ce5;
-    _background: -moz-linear-gradient(top, #207ce5 0%, #499bea 100%);
-    _background: -webkit-linear-gradient(top, #207ce5 0%, #499bea 100%);
-    _background: linear-gradient(to bottom, #207ce5 0%, #499bea 100%);
     _filter: progid:DXImageTransform.Microsoft.gradient(startColorstr='#207ce5', endColorstr='#499bea', GradientType=0);
 }
 
@@ -59,7 +24,7 @@ body {
     outline: none;
     cursor: pointer;
     background-color: white;
-    border : 1px solid #BBB;
+    border: 1px solid #BBB;
 }
 
 .btn:hover {
@@ -76,20 +41,18 @@ body {
     user-select: none; /* Non-prefixed version, currently supported by Chrome and Opera */
 }
 
-
 .scrollbar::-webkit-scrollbar {
     width: 7px;
     height: 7px;
 }
 
 .scrollbar::-webkit-scrollbar-track {
-    -webkit-box-shadow: 0 0 6px rgba(0,0,0,0.4);
+    -webkit-box-shadow: 0 0 6px rgba(0, 0, 0, 0.4);
 }
 
 .scrollbar::-webkit-scrollbar-thumb {
-    background-color: rgba(0,0,0,0.4);
+    background-color: rgba(0, 0, 0, 0.4);
 }
-
 
 body::-webkit-scrollbar {
     width: 7px;
@@ -97,11 +60,11 @@ body::-webkit-scrollbar {
 }
 
 body::-webkit-scrollbar-track {
-    -webkit-box-shadow: 0 0 6px rgba(0,0,0,0.4);
+    -webkit-box-shadow: 0 0 6px rgba(0, 0, 0, 0.4);
 }
 
 body::-webkit-scrollbar-thumb {
-    background-color: rgba(0,0,0,0.4);
+    background-color: rgba(0, 0, 0, 0.4);
     background-color: #FCDC3B;
 }
 

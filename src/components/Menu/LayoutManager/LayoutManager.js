@@ -147,15 +147,10 @@ class LayoutManager extends Component {
     };
 
     updateClick = (no) => {
-        console.log(no);
-        console.log(this.state.editText);
         let templates = Object.assign(this.state.templates);
         for (let i=0; i<templates.length; i++) {
             let template = templates[i];
-
-
             if (template.no === no) {
-                console.log(2222);
                 template.name = this.state.editText;
                 this.setState({
                     templates : templates,
@@ -168,8 +163,6 @@ class LayoutManager extends Component {
             }
         }
     };
-
-
 
     onTextChange = (event) => {
         this.setState({

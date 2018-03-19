@@ -26,7 +26,7 @@ const browser = detect();
 const support = (browser.name !== "ie" && browser.name !== "edge");
 
 
-if(browser.os.toUpperCase() === "MAC OS") {
+if (browser.os.toUpperCase() === "MAC OS") {
     document.querySelector("#root").classList.add("mac");
 }
 
@@ -77,6 +77,43 @@ class App extends Component {
         });
     };
 
+    getFontGeneric = (val) => {
+        for (let i=0; i<this.props.config.fonts.length; i++) {
+            if (val === this.props.config.fonts[i].val) {
+                return this.props.config.fonts[i].generic;
+            }
+        };
+
+        return "";
+    };
+
+    setFontSetting = (fontSetting) => {
+        let styles = document.querySelectorAll("style.custom-css");
+        for (let i = 0; i < styles.length; i++) {
+            styles[i].remove();
+        }
+        let css = document.createElement("style");
+        css.classList.add("custom-css");
+        css.type = "text/css";
+        css.innerHTML = "";
+        this.getFontGeneric(fontSetting.basic);
+        css.innerHTML += "html,body,svg text,input,select,button { font-family: '" + fontSetting.basic + "'," + this.getFontGeneric(fontSetting.basic) + "; }";
+        css.innerHTML += ".layout-manager .content-ilst { font-family: '" + fontSetting.basic + "'," + this.getFontGeneric(fontSetting.basic) + "; }";
+        css.innerHTML += ".instance-selector .list-content { font-family: '" + fontSetting.basic  + "'," + this.getFontGeneric(fontSetting.basic) + "; }";
+        css.innerHTML += "svg text { font-family: '" + fontSetting.axis + "'," + this.getFontGeneric(fontSetting.axis) + "; }";
+        css.innerHTML += ".tooltip { font-family: '" + fontSetting.tooltip + "'," + this.getFontGeneric(fontSetting.tooltip) + "; }";
+        css.innerHTML += ".xlog-profiler { font-family: '" + fontSetting.profiler + "'," + this.getFontGeneric(fontSetting.profiler) + "; }";
+        css.innerHTML += ".menu-div { font-family: '" + fontSetting.menu + "'," + this.getFontGeneric(fontSetting.menu) + "; }";
+
+        document.body.appendChild(css);
+    };
+
+    componentWillReceiveProps(nextProps) {
+        if (JSON.stringify(this.props.config.fontSetting) !== JSON.stringify(nextProps.config.fontSetting)) {
+            this.setFontSetting(nextProps.config.fontSetting);
+        }
+    };
+
     componentWillMount() {
         let config = null;
         let str = localStorage.getItem("config");
@@ -105,6 +142,8 @@ class App extends Component {
     }
 
     componentDidMount() {
+        this.setFontSetting(this.props.config.fontSetting);
+        this.setFontSetting(this.props.config.fontSetting);
     }
 
     componentDidUpdate(prevProps, prevState) {

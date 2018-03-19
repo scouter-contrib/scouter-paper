@@ -2,6 +2,7 @@
     padding: 5px 0 0;
     position: relative;
     background-color: #207ce5;
+    font-family: 'Bungee';
 }
 
 .menu-div .bar {
@@ -109,7 +110,6 @@
     user-select: none;
 }
 
-
 .menu .menu-item .icon {
     position: absolute;
     top: 0px;
@@ -152,7 +152,7 @@
 
 .menu-instance-selector {
     display: inline-block;
-    padding-top : 10px;
+    padding-top: 10px;
     font-size: 10px;
     float: right;
     margin-right: 10px;
@@ -160,13 +160,11 @@
 
 .layout-manager-selector {
     display: inline-block;
-    padding-top : 10px;
+    padding-top: 10px;
     font-size: 10px;
     float: right;
     margin-right: 10px;
 }
-
-
 
 @media screen and (max-width: 600px) {
     .menu a.menu-item {
@@ -182,15 +180,13 @@
 
     .layout-manager-selector,
     .menu-instance-selector {
-        padding-top : 6px;
+        padding-top: 6px;
     }
 
     .layout-manager-selector,
     .menu-instance-selector {
         margin-right: 5px;
     }
-
-
 
     .menu .menu-item.right {
         margin-right: 5px;

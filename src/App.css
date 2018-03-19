@@ -6,7 +6,6 @@ html, body {
     -webkit-transition: background-color 2s; /* Safari */
     transition: background-color 2s;
     color: #333;
-    font-family: 'Bungee';
     line-height: 100%;
 }
 
@@ -17,7 +16,6 @@ html, body {
 input,
 select,
 button {
-    font-family: 'Bungee';
     font-size: 12px;
 }
 
@@ -30,7 +28,7 @@ button {
     line-height: 100%;
     padding: 6px 8px;
     background-color: #FFD700;
-    border : none;
+    border: none;
     color: #333;
     cursor: pointer;
     margin: 0 2px;
@@ -40,6 +38,15 @@ button {
 }
 
 button:hover {
-    background-color: rgba(0,0,0,0.6);
+    background-color: rgba(0, 0, 0, 0.6);
     background-color: #EEC900;
+}
+
+html,
+body,
+svg text,
+input,
+select,
+button {
+    font-family: 'Righteous';
 }

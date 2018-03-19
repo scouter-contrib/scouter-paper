@@ -11,92 +11,7 @@ class Settings extends Component {
         super(props);
 
         this.state = {
-            config: {
-                protocol: window.location.protocol.replace(":", ""),
-                address: window.location.hostname,
-                port: 6188,
-                interval: 2000,
-                numberFormat: "999,999.00",
-                dateFormat: "YYYY-MM-DD",
-                timeFormat: "HH:MM:SS",
-                minuteFormat: "HH:MM",
-                authentification : {
-                    type : "bearer",
-                    timeout : 1000 * 60 * 60 * 24
-                },
-                xlog: {
-                    normal: {
-                        rows: 5,
-                        columns: 5,
-                        opacity : 0.7,
-                        sampling : 100,
-                        fills: {
-                            D_0_2: {
-                                color: "#0062B1"
-                            },
-                            D_1_2: {
-                                color: "#0062B1"
-                            },
-                            D_2_0: {
-                                color: "#0062B1"
-                            },
-                            D_2_1: {
-                                color: "#0062B1"
-                            },
-                            D_2_2: {
-                                color: "#0062B1"
-                            },
-                            D_2_3: {
-                                color: "#0062B1"
-                            },
-                            D_2_4: {
-                                color: "#0062B1"
-                            },
-                            D_3_2: {
-                                color: "#0062B1"
-                            },
-                            D_4_2: {
-                                color: "#0062B1"
-                            }
-                        }
-                    },
-                    error: {
-                        rows: 5,
-                        columns: 5,
-                        opacity : 0.7,
-                        sampling : 100,
-                        fills: {
-                            D_0_2: {
-                                color: "#9F0500"
-                            },
-                            D_1_2: {
-                                color: "#9F0500"
-                            },
-                            D_2_0: {
-                                color: "#9F0500"
-                            },
-                            D_2_1: {
-                                color: "#9F0500"
-                            },
-                            D_2_2: {
-                                color: "#9F0500"
-                            },
-                            D_2_3: {
-                                color: "#9F0500"
-                            },
-                            D_2_4: {
-                                color: "#9F0500"
-                            },
-                            D_3_2: {
-                                color: "#9F0500"
-                            },
-                            D_4_2: {
-                                color: "#9F0500"
-                            }
-                        }
-                    }
-                }
-            },
+            config: null,
             selected : {
                 normal : {
                     cellId : null,
@@ -129,6 +44,16 @@ class Settings extends Component {
 
         let config = this.state.config;
         config.authentification[attr] = event.target.value;
+
+        this.setState({
+            config: config
+        });
+    };
+
+    onChangeFont = (attr, event) => {
+
+        let config = this.state.config;
+        config.fontSetting[attr] = event.target.value;
 
         this.setState({
             config: config
@@ -319,11 +244,16 @@ class Settings extends Component {
     };
 
     render() {
-
-        let normalDotSetting = this.getXLogDraw("normal");
-        let errorDotSetting = this.getXLogDraw("error");
+        let normalDotSetting = [];
+        let errorDotSetting = [];
+        if (this.state.config) {
+            normalDotSetting = this.getXLogDraw("normal");
+            errorDotSetting = this.getXLogDraw("error");
+        }
 
         return (
+            <div>
+            {this.state.config &&
             <div className={"settings " + (this.state.edit ? 'editable' : '')}>
                 <div className="forms">
                     <div className="category first">
@@ -393,6 +323,71 @@ class Settings extends Component {
                                 <input type="text" readOnly={!this.state.edit} onChange={this.onChangeSession.bind(this, "timeout")} value={this.state.config.authentification.timeout} placeholder="SESSION TIME (MS)" />
                             </div>
                         </div>}
+                    </div>
+                    <div className="category">
+                        <div>FONTS CONFIGURATION</div>
+                    </div>
+                    <div className="setting-box auth-info">
+                        <div className="row">
+                            <div className="label">
+                                <div>BASIC FONT</div>
+                            </div>
+                            <div className="input">
+                                <select value={this.state.config.fontSetting.basic} onChange={this.onChangeFont.bind(this, "basic")} disabled={!this.state.edit}>
+                                    {this.state.config.fonts.filter((d) => {return d.val !== "Bungee"}).map((d, i) => {
+                                        return <option key={i} style={{fontFamily : d.val, fontSize : "14px"}} value={d.val}>{d.name}, {d.generic}</option>
+                                    })}
+                                </select>
+                            </div>
+                        </div>
+                        <div className="row">
+                            <div className="label">
+                                <div>MENU FONT</div>
+                            </div>
+                            <div className="input">
+                                <select value={this.state.config.fontSetting.menu} onChange={this.onChangeFont.bind(this, "menu")} disabled={!this.state.edit}>
+                                    {this.state.config.fonts.filter((d) => {return d.type === "display"}).map((d, i) => {
+                                        return <option key={i} style={{fontFamily : d.val, fontSize : "14px"}} value={d.val}>{d.name}, {d.generic}</option>
+                                    })}
+                                </select>
+                            </div>
+                        </div>
+                        <div className="row">
+                            <div className="label">
+                                <div>CHART AXIS FONT</div>
+                            </div>
+                            <div className="input">
+                                <select value={this.state.config.fontSetting.axis} onChange={this.onChangeFont.bind(this, "axis")} disabled={!this.state.edit}>
+                                    {this.state.config.fonts.map((d, i) => {
+                                        return <option key={i} style={{fontFamily : d.val, fontSize : "14px"}} value={d.val}>{d.name}, {d.generic}</option>
+                                    })}
+                                </select>
+                            </div>
+                        </div>
+                        <div className="row">
+                            <div className="label">
+                                <div>CHART TOOLTIP FONT</div>
+                            </div>
+                            <div className="input">
+                                <select value={this.state.config.fontSetting.tooltip} onChange={this.onChangeFont.bind(this, "tooltip")} disabled={!this.state.edit}>
+                                    {this.state.config.fonts.map((d, i) => {
+                                        return <option key={i} style={{fontFamily : d.val, fontSize : "14px"}} value={d.val}>{d.name}, {d.generic}</option>
+                                    })}
+                                </select>
+                            </div>
+                        </div>
+                        <div className="row">
+                            <div className="label">
+                                <div>XLOG PROFILER FONT</div>
+                            </div>
+                            <div className="input">
+                                <select value={this.state.config.fontSetting.profiler} onChange={this.onChangeFont.bind(this, "profiler")} disabled={!this.state.edit}>
+                                    {this.state.config.fonts.map((d, i) => {
+                                        return <option key={i} style={{fontFamily : d.val, fontSize : "14px"}} value={d.val}>{d.name}, {d.generic}</option>
+                                    })}
+                                </select>
+                            </div>
+                        </div>
                     </div>
                     <div className="category">
                         <div>DATA FORMAT CONFIGURATION</div>
@@ -561,7 +556,7 @@ class Settings extends Component {
                     <button onClick={this.editClick}>EDIT</button>
                 </div>
                 }
-            </div>
+            </div>}</div>
         );
     }
 }
