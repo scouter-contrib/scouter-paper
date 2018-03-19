@@ -3,6 +3,8 @@
     height: 100%;
     height: calc(100% - 51px);
     position: relative;
+    padding: 10px;
+    box-sizing: border-box;
 }
 
 .login-wrapper > div {
@@ -28,8 +30,14 @@
     box-sizing: border-box;
     border-radius: 2px;
     box-shadow: 0 0 5px #333;
-
 }
+
+@media screen and (max-width: 400px) {
+    .login-wrapper .login-box {
+        width: 100%;
+    }
+}
+
 
 .login-wrapper input {
     background-color: transparent;
