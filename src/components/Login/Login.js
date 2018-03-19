@@ -91,6 +91,18 @@ class Login extends Component {
         });
     };
 
+    handleKeyPress = (event) => {
+        if(event.key == 'Enter'){
+            this.login();
+        }
+    };
+
+    handleIdKeyPress = (event) => {
+        if(event.key == 'Enter'){
+            this.refs.password.focus();
+        }
+    };
+
     render() {
         return (
             <div className="login-wrapper">
@@ -101,10 +113,10 @@ class Login extends Component {
                             <div className="logo-div"><img alt="scouter-logo" className="logo" src={logo}/></div>
                             <div className="product">SCOUTER PAPER</div>
                             <div>
-                                <input type="text" placeholder="ID" value={this.state.control.id} onChange={this.handleChange.bind(this, "id")}/>
+                                <input type="text" placeholder="ID" value={this.state.control.id} onChange={this.handleChange.bind(this, "id")} onKeyPress={this.handleIdKeyPress} />
                             </div>
                             <div>
-                                <input type="password" placeholder="PASSWORD" value={this.state.control.password} onChange={this.handleChange.bind(this, "password")}/>
+                                <input ref="password" type="password" placeholder="PASSWORD" value={this.state.control.password} onChange={this.handleChange.bind(this, "password")} onKeyPress={this.handleKeyPress} />
                             </div>
                             <div className="login-btn">
                                 <button onClick={this.login}>LOGIN</button>
