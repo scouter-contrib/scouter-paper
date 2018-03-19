@@ -473,6 +473,7 @@ class LineChart extends Component {
             cnt++;
         }
 
+
         return cnt;
     };
 
@@ -570,6 +571,9 @@ class LineChart extends Component {
         this.graph.overlay = this.graph.svg.append("rect").attr("class", "tooltip-overlay").attr("width", this.graph.width).attr("height", this.graph.height);
 
         this.graph.overlay.on("mouseover", function () {
+            let l = that.refs.lineChartRoot.parentNode.parentNode.parentNode.parentNode.parentNode;
+            l.style.zIndex = 100;
+
             let hoverLine = that.graph.focus.select("line.x-hover-line");
             if (hoverLine.size() > 0) {
                 hoverLine.style("display", "block");
@@ -616,6 +620,9 @@ class LineChart extends Component {
             that.props.showTooltip();
         });
         this.graph.overlay.on("mouseout", function () {
+
+            let l = that.refs.lineChartRoot.parentNode.parentNode.parentNode.parentNode.parentNode;
+            l.style.zIndex = 0;
 
             let hoverLine = that.graph.focus.select("line.x-hover-line");
             if (hoverLine.size() > 0) {
@@ -710,6 +717,7 @@ class LineChart extends Component {
             }
 
             let xPosition = that.graph.x(tooltip.timeValue);
+
             if (tooltip.timeValue) {
                 hoverLine.attr("x1", xPosition);
                 hoverLine.attr("x2", xPosition);
@@ -758,7 +766,7 @@ class LineChart extends Component {
 
     render() {
         return (
-            <div className="line-chart-wrapper">
+            <div className="line-chart-wrapper" ref="lineChartRoot">
                 <div className="line-chart" ref="lineChart"></div>
                 <div className="axis-button axis-up noselect" onClick={this.axisUp} onMouseDown={this.stopProgation}>+
                 </div>
