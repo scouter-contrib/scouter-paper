@@ -88,8 +88,10 @@
     padding-right: 0;
 }
 
-.settings .forms .row:nth-child(3n),
-.settings .forms .row:nth-child(4n) {
+.settings .forms .row:nth-child(3),
+.settings .forms .row:nth-child(4),
+.settings .forms .row:nth-child(5),
+.settings .forms .row:nth-child(6) {
     padding-top: 15px;
 }
 
