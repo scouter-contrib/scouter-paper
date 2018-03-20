@@ -51,7 +51,7 @@ body {
 }
 
 .scrollbar::-webkit-scrollbar-thumb {
-    background-color: rgba(0, 0, 0, 0.4);
+    background-color: #333;
 }
 
 body::-webkit-scrollbar {
