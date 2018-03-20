@@ -1,0 +1,40 @@
+/* GENERAL */
+.xlog-steps .general {
+    background-color: #EEE;
+    padding: 0;
+}
+
+.xlog-steps .general > span {
+    display: inline-block;
+    padding: 4px 4px;
+    box-sizing: border-box;
+    line-height: 100%;
+}
+
+.xlog-steps .general .index {
+    width: 60px;
+    padding: 2px 0;
+    text-align: center;
+}
+
+.xlog-steps .general .type {
+    text-align: center;
+    width: 60px;
+    background-color: #DDD;
+}
+
+.xlog-steps .general .start-time {
+    text-align: center;
+    width: 150px;
+}
+
+.xlog-steps .general .elapsed {
+    width: 80px;
+    text-align: right;
+    background-color: #DDD;
+}
+
+.xlog-steps .general .value {
+    width: 60px;
+    text-align: right;
+}
