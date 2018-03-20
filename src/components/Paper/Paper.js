@@ -453,6 +453,7 @@ class Paper extends Component {
     }
 
     onLayoutChange(layout, layouts) {
+
         let boxes = this.state.boxes;
         boxes.forEach((box) => {
             layout.forEach((l) => {

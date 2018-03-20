@@ -220,6 +220,11 @@ class LineChart extends Component {
             });
         }
 
+        if (this.props.layoutChangeTime !== nextProps.layoutChangeTime) {
+            this.graphResize();
+            this.draw();
+        }
+
     }
 
     componentDidUpdate = (prevProps, prevState) => {
