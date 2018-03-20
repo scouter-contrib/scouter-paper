@@ -8,6 +8,7 @@ import {getDate, getHttpProtocol, errorHandler, getWithCredentials, setAuthHeade
 import SingleProfile from "./SingleProfile/SingleProfile";
 import ProfileList from "./ProfileList/ProfileList";
 import _ from "lodash";
+import {disableBodyScroll, enableBodyScroll, clearAllBodyScrollLocks} from 'body-scroll-lock';
 
 const xlogMaxSelectionCount = 200;
 
@@ -20,14 +21,13 @@ class Profiler extends Component {
             xlogs: [],
             last: null,
             txid: null,
-            enter: false,
             profile: null,
             steps: null,
             summary: true,
             bind: true,
-            wrap: true,
+            wrap: false,
             gap: true,
-            formatter: true
+            formatter: false
         }
     }
 
@@ -63,10 +63,6 @@ class Profiler extends Component {
         }
 
         if (nextState.txid !== this.state.txid) {
-            return true;
-        }
-
-        if (nextState.enter !== this.state.enter) {
             return true;
         }
 
@@ -113,6 +109,16 @@ class Profiler extends Component {
                 let y1 = nextProps.selection.y1;
                 let y2 = nextProps.selection.y2;
                 this.getList(x1, x2, y1, y2);
+            }
+        }
+    }
+
+    componentDidUpdate(prevProps, prevState) {
+        if (this.state.show !== prevState.show) {
+            if (this.state.show) {
+                disableBodyScroll(document.querySelector("body"));
+            } else {
+                enableBodyScroll(document.querySelector("body"));
             }
         }
     }
@@ -184,7 +190,6 @@ class Profiler extends Component {
             xlogs: [],
             last: null,
             txid: null,
-            enter: false,
             profile: null,
             steps: null
         });
@@ -201,8 +206,7 @@ class Profiler extends Component {
             });
         } else {
             this.setState({
-                txid: xlog.txid,
-                enter: false
+                txid: xlog.txid
             });
         }
 
@@ -259,18 +263,6 @@ class Profiler extends Component {
         });
     }
 
-    mouseListEnter = () => {
-        this.setState({
-            enter: true
-        });
-    };
-
-    mouseListLeave = () => {
-        this.setState({
-            enter: false
-        });
-    };
-
     toggleSummary = () => {
         this.setState({
             summary: !this.state.summary
@@ -303,41 +295,36 @@ class Profiler extends Component {
     };
 
     render() {
-        let selectRow = (this.state.txid ? true : false);
-        if (this.state.enter) {
-            selectRow = false;
-        }
-
         return (
-            <div className={"xlog-profiler " + (this.state.show ? ' ' : 'hidden ') + (selectRow ? 'select-row' : '')}>
+            <div className={"xlog-profiler " + (this.state.show ? ' ' : 'hidden')}>
                 <div>
-                    <div className="profile-list scrollbar" onMouseEnter={this.mouseListEnter}
-                         onMouseLeave={this.mouseListLeave}>
-                        <ProfileList txid={this.state.txid} xlogs={this.state.xlogs} rowClick={this.rowClick}/>
-                    </div>
-                    <div className={"profile-steps " + (selectRow ? 'select-row' : '')}>
-                        <div className="profile-steps-control">
-                            <div className={"profile-control-btn " + (this.state.summary ? 'active' : '')}
-                                 onClick={this.toggleSummary}>SUMMARY
-                            </div>
-                            <div className={"profile-control-btn " + (this.state.bind ? 'active' : '')}
-                                 onClick={this.toggleBind}>BIND
-                            </div>
-                            <div className={"profile-control-btn " + (this.state.wrap ? 'active' : '')}
-                                 onClick={this.toggleWrap}>WRAP
-                            </div>
-                            <div className={"profile-control-btn " + (this.state.gap ? 'active' : '')}
-                                 onClick={this.toggleGap}>GAP
-                            </div>
-                            <div className={"profile-control-btn " + (this.state.formatter ? 'active' : '')}
-                                 onClick={this.toggleFormatter}>FORMATTER
-                            </div>
-                            <div onClick={this.close} className="close-btn"></div>
+                    <div className="profiler-layout left">
+                        <div className="summary">
+                            <div className="title">PROFILER</div>
+                            <div className="list-summary">{this.state.xlogs.length} ROWS</div>
                         </div>
-                        <div className="profile-steps-content scrollbar">
-                            <SingleProfile txid={this.state.txid} profile={this.state.profile} steps={this.state.steps}
-                                           summary={this.state.summary} bind={this.state.bind} wrap={this.state.wrap}
-                                           gap={this.state.gap} formatter={this.state.formatter}/>
+                        <div className="profile-list scrollbar">
+                            <ProfileList txid={this.state.txid} xlogs={this.state.xlogs} rowClick={this.rowClick}/>
+                        </div>
+                    </div>
+                    <div className="profiler-layout right">
+                        <div className="summary">
+                            <div className="title">DETAIL</div>
+                            <div className="list-summary">{this.state.txid ? 'TXID : ' + this.state.txid : 'NO PROFILE SELECTED'}</div>
+                            <div className="profile-steps-control noselect">
+                                <div className={"profile-control-btn " + (this.state.summary ? 'active' : '')} onClick={this.toggleSummary}>{this.state.summary ? <i className="fa fa-check-circle"></i> : <i className="fa fa-circle-o"></i>} SUMMARY</div>
+                                <div className={"profile-control-btn " + (this.state.bind ? 'active' : '')} onClick={this.toggleBind}>{this.state.bind ? <i className="fa fa-check-circle"></i> : <i className="fa fa-circle-o"></i>} BIND</div>
+                                <div className={"profile-control-btn " + (this.state.wrap ? 'active' : '')} onClick={this.toggleWrap}>{this.state.wrap ? <i className="fa fa-check-circle"></i> : <i className="fa fa-circle-o"></i>} WRAP</div>
+                                <div className={"profile-control-btn " + (this.state.gap ? 'active' : '')} onClick={this.toggleGap}>{this.state.gap ? <i className="fa fa-check-circle"></i> : <i className="fa fa-circle-o"></i>} GAP</div>
+                                <div className={"profile-control-btn " + (this.state.formatter ? 'active' : '')} onClick={this.toggleFormatter}>{this.state.formatter ? <i className="fa fa-check-circle"></i> : <i className="fa fa-circle-o"></i>} FORMATTER</div>
+                            </div>
+                            <div className="close-btn" onClick={this.close}></div>
+                        </div>
+                        <div className={"profile-steps"}>
+                            <div className="profile-steps-content scrollbar">
+                                {this.state.txid && <SingleProfile txid={this.state.txid} profile={this.state.profile} steps={this.state.steps} summary={this.state.summary} bind={this.state.bind} wrap={this.state.wrap} gap={this.state.gap} formatter={this.state.formatter}/>}
+                                {!this.state.txid && <div className="no-profile"><div>NO PROFILE SELECTED</div></div>}
+                                </div>
                         </div>
                     </div>
                 </div>

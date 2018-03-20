@@ -23,6 +23,18 @@ export function options() {
                 }
             }
         },
+
+        /*{
+                text: "Active Speed",
+                mode: "nonexclusive",
+                type: "counter",
+                title: "Active Speed",
+                counterKey : "ActiveSpeed",
+                multiValue : ["L", "M", "S"],
+                objectType : "instance"
+            },*/
+
+
         flash: {
             icon: "fa-ellipsis-h",
             mode: "exclusive",
@@ -98,15 +110,6 @@ export function options() {
                 type: "counter",
                 title: "TPS",
                 counterKey : "TPS",
-                objectType : "instance"
-            },
-            {
-                text: "Active Speed",
-                mode: "nonexclusive",
-                type: "counter",
-                title: "Active Speed",
-                counterKey : "ActiveSpeed",
-                multiValue : ["L", "M", "S"],
                 objectType : "instance"
             },
             {
@@ -238,15 +241,6 @@ export function options() {
                 type: "counter",
                 title: "GC Time",
                 counterKey : "GcTime",
-                objectType : "instance"
-            },
-            {
-                text: "Heap Total Usage",
-                mode: "nonexclusive",
-                type: "counter",
-                title: "Heap Total Usage",
-                counterKey : "HeapTotUsage",
-                multiValue : ["MAX", "USED"],
                 objectType : "instance"
             },
             {

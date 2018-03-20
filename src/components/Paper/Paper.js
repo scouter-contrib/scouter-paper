@@ -191,21 +191,12 @@ class Paper extends Component {
             for (let i = 0; i < this.state.boxes.length; i++) {
                 let option = this.state.boxes[i].option;
 
-                if (Array.isArray(option)) {
+                if (option && option.length > 0) {
                     for (let j = 0; j < option.length; j++) {
                         let innerOption = option[j];
                         if (innerOption.type === "counter") {
                             counterKeyMap[innerOption.counterKey] = true;
-                            if (!innerOption.multiValue) {
-                                counterHistoryKeyMap[innerOption.counterKey] = true;
-                            }
-                        }
-                    }
-                } else {
-                    if (option && option.type === "counter") {
-                        counterKeyMap[option.counterKey] = true;
-                        if (!option.multiValue) {
-                            counterHistoryKeyMap[option.counterKey] = true;
+                            counterHistoryKeyMap[innerOption.counterKey] = true;
                         }
                     }
                 }
@@ -600,7 +591,6 @@ class Paper extends Component {
                         type: option.type,
                         config: option.config,
                         counterKey: option.counterKey,
-                        multiValue: option.multiValue,
                         objectType: option.objectType
                     };
                 } else {
@@ -617,6 +607,7 @@ class Paper extends Component {
                     for (let i = 0; i < box.option.length; i++) {
                         if (box.option[i].counterKey === option.counterKey) {
                             duplicated = true;
+                            break;
                         }
                     }
 
@@ -627,7 +618,6 @@ class Paper extends Component {
                             config: option.config,
                             counterKey: option.counterKey,
                             title: option.title,
-                            multiValue: option.multiValue,
                             objectType: option.objectType
                         });
                     }

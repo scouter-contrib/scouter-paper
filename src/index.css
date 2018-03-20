@@ -47,7 +47,7 @@ body {
 }
 
 .scrollbar::-webkit-scrollbar-track {
-    -webkit-box-shadow: 0 0 6px rgba(0, 0, 0, 0.4);
+
 }
 
 .scrollbar::-webkit-scrollbar-thumb {
@@ -60,7 +60,7 @@ body::-webkit-scrollbar {
 }
 
 body::-webkit-scrollbar-track {
-    -webkit-box-shadow: 0 0 6px rgba(0, 0, 0, 0.4);
+
 }
 
 body::-webkit-scrollbar-thumb {

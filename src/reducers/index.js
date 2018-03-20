@@ -102,7 +102,7 @@ const configState = {
         menu : "Bungee",
         axis : "Bungee",
         tooltip : "Righteous",
-        profiler : "Cousine"
+        profiler : "Righteous"
     }
 };
 

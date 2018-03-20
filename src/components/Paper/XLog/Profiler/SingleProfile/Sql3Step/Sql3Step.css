@@ -1,7 +1,8 @@
 /* SQL */
-
 .xlog-steps .sql3-step .sql-statement {
-    padding: 5px;
+    padding: 10px;
+    line-height: 140%;
+    color: #0000C3;
 }
 
 .xlog-steps .sql3-step .sql-statement .prefix {
@@ -26,25 +27,7 @@
 }
 
 .xlog-steps .sql3-step .sql-param {
-    padding: 0 5px 5px;
-}
-
-.xlog-steps .step {
-    white-space: nowrap;
-    text-align: justify;
-}
-
-.xlog-steps.wrap .step {
-    white-space: normal;
-    word-break: break-all;
-}
-
-.xlog-steps .gap-time {
-    text-align: center;
-}
-
-.xlog-steps .gap-time .arrow {
-    font-size: 12px;
+    padding: 0 10px 10px;
 }
 
 

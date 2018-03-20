@@ -21,6 +21,7 @@
 
 .xlog-profile-list > div.row.error.active {
     color : #FF030D;
+    color : #FF82AB;
 }
 
 .xlog-profile-list > div:hover {
@@ -28,11 +29,16 @@
 }
 
 .xlog-profile-list > div.header.row {
-    background-color: #DDD;
+    background-color: #F2F2F2;
+
 }
 
 .xlog-profile-list > div:first-child > span {
     border-top: 1px solid #CCC;
+}
+
+.xlog-profile-list > div.header:first-child > span {
+    border-top: none;
 }
 
 .xlog-profile-list > div > span {
@@ -40,9 +46,15 @@
     line-height: 100%;
     vertical-align: middle;
     white-space: nowrap;
-    padding: 4px;
+    padding: 10px;
     border-bottom: 1px solid #CCC;
 }
+
+.xlog-profile-list > div.header > span {
+    border-bottom: none;
+}
+
+
 .xlog-profile-list > div > span.apicallCount,
 .xlog-profile-list > div > span.apicallTime,
 .xlog-profile-list > div > span.elapsed,

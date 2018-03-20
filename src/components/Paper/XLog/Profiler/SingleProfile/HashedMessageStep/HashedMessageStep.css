@@ -1,8 +1,37 @@
 /* HASHED MESSAGE */
 .xlog-steps .hashed-message {
-    padding: 5px 0;
+
 }
 
 .xlog-steps .hashed-message .message-content {
-    padding: 5px 2px;
+    color: #28AE7B;
+    display: table;
+    width: 100%;
+    table-layout: fixed;
+}
+
+.xlog-steps .hashed-message .message-content > div {
+    display: table-cell;
+    vertical-align: middle;
+}
+
+.xlog-steps .hashed-message .message-content > div.tag {
+    width: 50px;
+    text-align: center;
+}
+
+.xlog-steps .hashed-message .message-content span {
+    padding: 15px 5px;
+    display: inline-block;
+    text-align: center;
+}
+
+.xlog-steps .hashed-message .message-content .type-tag {
+    background-color: #28AE7B;
+    color: white;
+    border-radius: 5px;
+    padding: 2px 5px;
+    font-size: 10px;
+    width: 40px;
+    box-sizing: border-box;
 }

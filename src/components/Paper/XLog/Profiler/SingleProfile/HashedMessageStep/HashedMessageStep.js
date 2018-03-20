@@ -16,7 +16,7 @@ class HashedMessageStep extends Component {
                     <span className="value">#{this.props.row.step.value}</span>
                 </div>
                 }
-                <div className="message-content">{this.props.row.mainValue}</div>
+                <div className="message-content">{this.props.row.step.time < 0 &&<div className="tag"><span className="type-tag">MSG</span></div>}<div><span>{this.props.row.mainValue}</span></div></div>
             </div>)
     }
 }

@@ -1,7 +1,5 @@
 import React, {Component} from 'react';
 import './SingleProfile.css';
-import {getDate} from '../../../../../common/common';
-import sqlFormatter from "sql-formatter";
 import HashedMessageStep from "./HashedMessageStep/HashedMessageStep";
 import MethodStep from "./Sql3Step/Sql3Step";
 import SqlStep from "./SqlStep/SqlStep";
@@ -258,6 +256,7 @@ class SingleProfile extends Component {
         let beforeEndTime;
         return (
             <div className='single-profile'>
+                <div className="sub-title">GENERAL INFO</div>
                 <div className={"xlog-data " + (this.props.wrap ? 'wrap' : '')}>
                     {this.props.profile && profileMetas && profileMetas.map((meta, i) => {
                         if (this.props.summary) {
@@ -278,9 +277,7 @@ class SingleProfile extends Component {
                         }
                     })}
                 </div>
-                {(this.props.steps && this.props.steps.length > 0) &&
-                <div className="line"></div>
-                }
+                <div className="sub-title">PROFILE STEP</div>
                 <div className={"xlog-steps " + (this.props.wrap ? 'wrap' : '')}>
                     {this.props.steps && this.props.steps.map((row, i) => {
                         let found = row.step.stepType === "9" || row.step.stepType === "16";
@@ -293,28 +290,33 @@ class SingleProfile extends Component {
                         beforeEndTime = stepEndTime;
 
                         return (
-                            <div className="step-div" key={i}>
+                            <div className={"step-div " + (gap>0 ? ' has-gab ' : '') + (this.props.gap ? ' show-gab ' : '') + ("step-type-" + row.step.stepType)} key={i}>
                                 {(this.props.gap && gap > 0) && <div className="gap-time">
-                                    <div className="arrow"><i className="fa fa-angle-up" aria-hidden="true"></i></div>
-                                    <div>{gap} ms</div>
-                                    <div className="arrow"><i className="fa fa-angle-down" aria-hidden="true"></i></div>
+                                    <div>
+                                        <div className="arrow"><i className="fa fa-angle-up" aria-hidden="true"></i></div>
+                                        <div>{gap} ms</div>
+                                        <div className="arrow"><i className="fa fa-angle-down" aria-hidden="true"></i></div>
+                                    </div>
                                 </div>}
+                                {row.step.stepType === "9" && <HashedMessageStep startTime={startTime} row={row}/>}
+                                {row.step.stepType === "16" && <Sql3Step formatter={this.props.formatter} bind={this.props.bind} startTime={startTime} row={row}/>}
+
+
+
                                 {row.step.stepType === "1" && <MethodStep startTime={startTime} row={row}/>}
                                 {row.step.stepType === "10" && <Method2Step startTime={startTime} row={row}/>}
                                 {row.step.stepType === "2" && <SqlStep startTime={startTime} row={row}/>}
                                 {row.step.stepType === "8" && <Sql2Step startTime={startTime} row={row}/>}
-                                {row.step.stepType === "16" && <Sql3Step formatter={this.props.formatter} bind={this.props.bind} startTime={startTime} row={row}/>}
+
                                 {row.step.stepType === "3" && <MessageStep startTime={startTime} row={row}/>}
                                 {row.step.stepType === "5" && <SocketStep startTime={startTime} row={row}/>}
                                 {row.step.stepType === "6" && <ApiCallStep startTime={startTime} row={row}/>}
                                 {row.step.stepType === "15" && <ApiCall2Step startTime={startTime} row={row}/>}
                                 {row.step.stepType === "7" && <ThreadSubmitStep startTime={startTime} row={row}/>}
-                                {row.step.stepType === "9" && <HashedMessageStep startTime={startTime} row={row}/>}
                                 {row.step.stepType === "17" && <ParameterizedMessageStep startTime={startTime} row={row}/>}
                                 {row.step.stepType === "12" && <DumpStep startTime={startTime} row={row}/>}
                                 {row.step.stepType === "13" && <DispatchStep startTime={startTime} row={row}/>}
                                 {row.step.stepType === "14" && <ThreadCallPossibleStep startTime={startTime} row={row}/>}
-
                                 {row.step.stepType === "11" && <MethodSumStep startTime={startTime} row={row}/>}
                                 {row.step.stepType === "21" && <SqlSumStep startTime={startTime} row={row}/>}
                                 {row.step.stepType === "31" && <MessageSumStep startTime={startTime} row={row}/>}

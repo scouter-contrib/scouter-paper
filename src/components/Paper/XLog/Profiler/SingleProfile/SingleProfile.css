@@ -1,5 +1,20 @@
 .single-profile {
+    padding: 20px;
+    font-size: 12px;
+}
+
+.single-profile .sub-title {
     padding: 10px;
+    border-radius: 3px 3px 0 0;
+    background-color: #EEE;
+    background-color: #333;
+    color: white;
+    display: block;
+    border: 1px solid #333;
+}
+
+.single-profile div.xlog-data {
+    margin-bottom: 20px;
 }
 
 .single-profile div.xlog-data > div {
@@ -10,19 +25,17 @@
 }
 
 .single-profile div.xlog-data span {
-    padding: 2px 4px;
+    padding: 10px;
     display: inline-block;
     box-sizing: border-box;
-    margin-bottom: 2px;
     display: table-cell;
 }
 
 .single-profile div.xlog-data > div {
-    margin-bottom: 2px;
 }
 
 .single-profile div.xlog-data span.label {
-    width: 75px;
+    width: 80px;
     background-color: #EEE;
 }
 
@@ -46,15 +59,46 @@
 }
 
 .xlog-steps .step-div {
+    margin-top: 10px;
+}
 
+.xlog-steps .step-div.has-gab.show-gab {
+    margin-top: 0;
 }
 
 .xlog-steps .step {
     padding: 0;
-    _border-top: 1px solid #CCC;
-    _border-bottom: 1px solid #CCC;
-    margin: 5px 0;
+    white-space: nowrap;
+    text-align: justify;
+    border: 1px solid #DDD;
+    border-radius: 2px;
 }
+
+
+
+.xlog-steps.wrap .step {
+    white-space: normal;
+    word-break: break-all;
+}
+
+.xlog-steps .gap-time {
+    text-align: center;
+}
+
+.xlog-steps .gap-time > div {
+    display: inline-block;
+    padding: 5px 10px;
+    background-color: #DDD;
+    border-radius: 5px;
+    margin: 10px 0;
+}
+
+.xlog-steps .gap-time .arrow {
+    font-size: 12px;
+}
+
+
+
 
 /* GENERAL */
 .xlog-steps .general {
@@ -62,7 +106,7 @@
     padding: 0;
 }
 
-.xlog-steps .general >  span {
+.xlog-steps .general > span {
     display: inline-block;
     padding: 4px 4px;
     box-sizing: border-box;
@@ -83,11 +127,11 @@
 
 .xlog-steps .general .start-time {
     text-align: center;
-    width: 120px;
+    width: 150px;
 }
 
 .xlog-steps .general .elapsed {
-    width: 60px;
+    width: 80px;
     text-align: right;
     background-color: #DDD;
 }
