@@ -4,7 +4,6 @@ import StepGeneral from "../StepGeneral/StepGeneral";
 
 class ApiCall2Step extends Component {
     render() {
-
         return (
             <div className="step hashed-message">
                 {this.props.row.step.time > -1 &&

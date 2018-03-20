@@ -130,10 +130,8 @@ class XLog extends Component {
 
                 if (x > 0) {
                     if (Number(d.error)) {
-                        console.log(1);
                         context.drawImage(this.graph.errorBrush, x - gabX, y - gabY, this.graph.errorBrush.width, this.graph.errorBrush.height);
                     } else {
-                        console.log(2);
                         context.drawImage(this.graph.normalBrush, x - gabX, y - gabY, this.graph.normalBrush.width, this.graph.normalBrush.height);
                     }
                 }
