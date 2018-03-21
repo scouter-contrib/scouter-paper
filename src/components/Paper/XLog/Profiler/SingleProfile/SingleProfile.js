@@ -297,6 +297,7 @@ class SingleProfile extends Component {
 
 
 
+
                                 {row.step.stepType === "1" && <MethodStep startTime={startTime} row={row}/>}
                                 {row.step.stepType === "10" && <Method2Step startTime={startTime} row={row}/>}
                                 {row.step.stepType === "2" && <SqlStep startTime={startTime} row={row}/>}
