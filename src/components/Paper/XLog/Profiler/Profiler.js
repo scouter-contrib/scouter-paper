@@ -24,6 +24,7 @@ class Profiler extends Component {
             profile: null,
             steps: null,
             summary: true,
+            indent: true,
             bind: true,
             wrap: false,
             gap: true,
@@ -75,6 +76,10 @@ class Profiler extends Component {
         }
 
         if (nextState.summary !== this.state.summary) {
+            return true;
+        }
+
+        if (nextState.indent !== this.state.indent) {
             return true;
         }
 
@@ -269,6 +274,12 @@ class Profiler extends Component {
         });
     };
 
+    toggleIndent = () => {
+        this.setState({
+            indent: !this.state.indent
+        });
+    };
+
     toggleBind = () => {
         this.setState({
             bind: !this.state.bind
@@ -313,6 +324,7 @@ class Profiler extends Component {
                             <div className="list-summary">{this.state.txid ? 'TXID : ' + this.state.txid : 'NO PROFILE SELECTED'}</div>
                             <div className="profile-steps-control noselect">
                                 <div className={"profile-control-btn " + (this.state.summary ? 'active' : '')} onClick={this.toggleSummary}>{this.state.summary ? <i className="fa fa-check-circle"></i> : <i className="fa fa-circle-o"></i>} SUMMARY</div>
+                                <div className={"profile-control-btn " + (this.state.indent ? 'active' : '')} onClick={this.toggleIndent}>{this.state.indent ? <i className="fa fa-check-circle"></i> : <i className="fa fa-circle-o"></i>} INDENT</div>
                                 <div className={"profile-control-btn " + (this.state.bind ? 'active' : '')} onClick={this.toggleBind}>{this.state.bind ? <i className="fa fa-check-circle"></i> : <i className="fa fa-circle-o"></i>} BIND</div>
                                 <div className={"profile-control-btn " + (this.state.wrap ? 'active' : '')} onClick={this.toggleWrap}>{this.state.wrap ? <i className="fa fa-check-circle"></i> : <i className="fa fa-circle-o"></i>} WRAP</div>
                                 <div className={"profile-control-btn " + (this.state.gap ? 'active' : '')} onClick={this.toggleGap}>{this.state.gap ? <i className="fa fa-check-circle"></i> : <i className="fa fa-circle-o"></i>} GAP</div>
@@ -322,7 +334,7 @@ class Profiler extends Component {
                         </div>
                         <div className={"profile-steps"}>
                             <div className="profile-steps-content scrollbar">
-                                {this.state.txid && <SingleProfile txid={this.state.txid} profile={this.state.profile} steps={this.state.steps} summary={this.state.summary} bind={this.state.bind} wrap={this.state.wrap} gap={this.state.gap} formatter={this.state.formatter}/>}
+                                {this.state.txid && <SingleProfile txid={this.state.txid} profile={this.state.profile} steps={this.state.steps} summary={this.state.summary} indent={this.state.indent} bind={this.state.bind} wrap={this.state.wrap} gap={this.state.gap} formatter={this.state.formatter}/>}
                                 {!this.state.txid && <div className="no-profile"><div>NO PROFILE SELECTED</div></div>}
                                 </div>
                         </div>

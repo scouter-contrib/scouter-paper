@@ -58,14 +58,6 @@
     width: 100%;
 }
 
-.xlog-steps .step-div {
-    margin-top: 10px;
-}
-
-.xlog-steps .step-div.has-gab.show-gab {
-    margin-top: 0;
-}
-
 .xlog-steps .step {
     padding: 0;
     white-space: nowrap;
@@ -81,18 +73,3 @@
     word-break: break-all;
 }
 
-.xlog-steps .gap-time {
-    text-align: center;
-}
-
-.xlog-steps .gap-time > div {
-    display: inline-block;
-    padding: 5px 10px;
-    background-color: #DDD;
-    border-radius: 5px;
-    margin: 10px 0;
-}
-
-.xlog-steps .gap-time .arrow {
-    font-size: 12px;
-}

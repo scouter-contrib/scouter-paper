@@ -1,0 +1,24 @@
+.step-div {
+    margin-top: 10px;
+    width: 100%;
+}
+
+.step-div.has-gab.show-gab {
+    margin-top: 0;
+}
+
+.step-div .gap-time {
+    text-align: center;
+}
+
+.step-div .gap-time > div {
+    display: inline-block;
+    padding: 5px 10px;
+    background-color: #DDD;
+    border-radius: 5px;
+    margin: 10px 0;
+}
+
+.step-div .gap-time .arrow {
+    font-size: 12px;
+}

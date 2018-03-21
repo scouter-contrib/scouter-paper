@@ -21,6 +21,7 @@ import MessageSumStep from "./MessageSumStep/MessageSumStep";
 import SocketSumStep from "./SocketSumStep/SocketSumStep";
 import ApiCallSumStep from "./ApiCallSumStep/ApiCallSumStep";
 import ControlStep from "./ControlStep/ControlStep";
+import Step from "./Step/Step";
 
 const profileMetas = [
     {
@@ -280,7 +281,6 @@ class SingleProfile extends Component {
                 <div className="sub-title">PROFILE STEP</div>
                 <div className={"xlog-steps " + (this.props.wrap ? 'wrap' : '')}>
                     {this.props.steps && this.props.steps.map((row, i) => {
-                        let found = row.step.stepType === "9" || row.step.stepType === "16";
                         let stepStartTime = Number(startTime) + Number(row.step.start_time);
                         let stepEndTime = startTime + Number(row.step.start_time) + Number(row.step.elapsed);
                         let gap = 0;
@@ -290,14 +290,8 @@ class SingleProfile extends Component {
                         beforeEndTime = stepEndTime;
 
                         return (
-                            <div className={"step-div " + (gap>0 ? ' has-gab ' : '') + (this.props.gap ? ' show-gab ' : '') + ("step-type-" + row.step.stepType)} key={i}>
-                                {(this.props.gap && gap > 0) && <div className="gap-time">
-                                    <div>
-                                        <div className="arrow"><i className="fa fa-angle-up" aria-hidden="true"></i></div>
-                                        <div>{gap} ms</div>
-                                        <div className="arrow"><i className="fa fa-angle-down" aria-hidden="true"></i></div>
-                                    </div>
-                                </div>}
+                            <Step gap={gap} showGap={this.props.gap} indent={row.step.indent} applyIndent={this.props.indent}>
+
                                 {row.step.stepType === "9" && <HashedMessageStep startTime={startTime} row={row}/>}
                                 {row.step.stepType === "16" && <Sql3Step formatter={this.props.formatter} bind={this.props.bind} startTime={startTime} row={row}/>}
 
@@ -323,11 +317,7 @@ class SingleProfile extends Component {
                                 {row.step.stepType === "42" && <SocketSumStep startTime={startTime} row={row}/>}
                                 {row.step.stepType === "43" && <ApiCallSumStep startTime={startTime} row={row}/>}
                                 {row.step.stepType === "99" && <ControlStep startTime={startTime} row={row}/>}
-
-                                {!found &&
-                                <div className="step others">{row.mainValue}</div>
-                                }
-                            </div>)
+                            </Step>)
                     })}
                 </div>
             </div>
