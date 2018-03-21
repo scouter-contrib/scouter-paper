@@ -4,10 +4,11 @@ import {addRequest, setControlVisibility, pushMessage} from '../../../../actions
 import {withRouter} from 'react-router-dom';
 import {connect} from 'react-redux';
 import jQuery from "jquery";
-import {getDate, getHttpProtocol, errorHandler, getWithCredentials, setAuthHeader} from '../../../../common/common';
+import {getHttpProtocol, errorHandler, getWithCredentials, setAuthHeader} from '../../../../common/common';
 import SingleProfile from "./SingleProfile/SingleProfile";
 import ProfileList from "./ProfileList/ProfileList";
 import _ from "lodash";
+import moment from "moment";
 import {disableBodyScroll, enableBodyScroll, clearAllBodyScrollLocks} from 'body-scroll-lock';
 
 const xlogMaxSelectionCount = 200;
@@ -139,7 +140,7 @@ class Profiler extends Component {
             return;
         }
 
-        let date = getDate(new Date(x1), 1);
+        let date = moment(new Date(x1)).format("YYYYMMDD");
         this.props.addRequest();
         jQuery.ajax({
             method: "GET",
@@ -221,7 +222,7 @@ class Profiler extends Component {
         jQuery.ajax({
             method: "GET",
             async: true,
-            url: getHttpProtocol(this.props.config) + '/scouter/v1/xlog-data/' + getDate(new Date(Number(xlog.endTime)), 1) + "/" + xlog.txid,
+            url: getHttpProtocol(this.props.config) + '/scouter/v1/xlog-data/' + moment(new Date(Number(xlog.endTime))).format("YYYYMMDD") + "/" + xlog.txid,
             xhrFields: getWithCredentials(that.props.config),
             beforeSend: function (xhr) {
                 setAuthHeader(xhr, that.props.config, that.props.user);
@@ -239,7 +240,7 @@ class Profiler extends Component {
         jQuery.ajax({
             method: "GET",
             async: true,
-            url: getHttpProtocol(this.props.config) + '/scouter/v1/profile-data/' + getDate(new Date(Number(xlog.endTime)), 1) + "/" + xlog.txid,
+            url: getHttpProtocol(this.props.config) + '/scouter/v1/profile-data/' + moment(new Date(Number(xlog.endTime))).format("YYYYMMDD") + "/" + xlog.txid,
             xhrFields: getWithCredentials(that.props.config),
             beforeSend: function (xhr) {
                 setAuthHeader(xhr, that.props.config, that.props.user);

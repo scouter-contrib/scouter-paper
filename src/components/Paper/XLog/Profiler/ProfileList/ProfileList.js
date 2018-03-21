@@ -1,6 +1,7 @@
 import React, {Component} from 'react';
 import './ProfileList.css';
-import {getDate} from '../../../../../common/common';
+import Moment from 'react-moment';
+import 'moment-timezone';
 
 const layout = [
     {
@@ -151,9 +152,9 @@ class ProfileList extends Component {
             if (meta.type === "ms") {
                 return <span className={className} key={j}>{row[meta.key]} ms</span>
             } else if (meta.type === "date") {
-                return <span className={className} key={j}>{getDate(new Date(Number(row[meta.key])), 2)}</span>
+                return <span className={className} key={j}><Moment date={new Date(Number(row[meta.key]))} format="YYYY-MM-DD" ></Moment></span>
             } else if (meta.type === "time") {
-                return <span className={className} key={j}>{getDate(new Date(Number(row[meta.key])), 3)}</span>
+                return <span className={className} key={j}><Moment date={new Date(Number(row[meta.key]))} format="YYYY-MM-DD HH:mm:ss" ></Moment></span>
             } else {
                 return <span className={className} key={j}>{row[meta.key]}</span>
             }
