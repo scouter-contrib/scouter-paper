@@ -20,7 +20,7 @@ class ApiCallStep extends Component {
             <div className="step api-call-step">
                 <StepGeneral startTime={this.props.startTime} row={this.props.row} elapsed={this.props.row.step.elapsed} type="API"/>
                 {(isNaN(this.props.row.step.error) || Number(this.props.row.step.error) > 0) && <Error row={this.props.row}></Error>}
-                <div className="message-content">{this.props.row.step.address} {this.props.row.step.opt ? this.props.row.step.opt : ''}</div>
+                <div className="message-content">{this.props.row.step.async === 1 ? '[async]' : ''}{this.props.row.mainValue} {this.props.row.step.opt == '1' ? 'addr:' + this.props.row.step.addr : ''}</div>
             </div>)
     }
 }
