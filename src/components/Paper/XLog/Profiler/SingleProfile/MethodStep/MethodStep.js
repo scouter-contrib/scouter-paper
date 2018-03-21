@@ -1,18 +1,22 @@
 import React, {Component} from 'react';
-import './HashedMessageStep.css';
+import './MethodStep.css';
 import StepGeneral from "../StepGeneral/StepGeneral";
 
-class HashedMessageStep extends Component {
+// scouter.lang.step.MethodStep
+/*
+    public int hash;
+	public int elapsed;
+	public int cputime;
+ */
+class MethodStep extends Component {
     render() {
-
         return (
-            <div className="step hashed-message">
-                {this.props.row.step.time > -1 &&
-                <StepGeneral startTime={this.props.startTime} row={this.props.row} elapsed={this.props.row.step.time} type="MSG"/>
-                }
+            <div className="step method-step">
+                <StepGeneral startTime={this.props.startTime} row={this.props.row} elapsed={this.props.row.step.elapsed} type="METHOD"/>
                 <div className="message-content">{this.props.row.mainValue}</div>
-            </div>)
+            </div>
+        )
     }
 }
 
-export default HashedMessageStep;
+export default MethodStep;

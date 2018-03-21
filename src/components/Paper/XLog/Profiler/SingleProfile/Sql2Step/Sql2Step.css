@@ -1,0 +1,35 @@
+.sql2-step .sql-statement {
+    padding: 10px;
+    line-height: 140%;
+    color: #0000C3;
+}
+
+.sql2-step .sql-statement .prefix {
+    color: darkgreen;
+}
+
+.sql2-step .sql-statement .param {
+    color: #207ce5;
+}
+
+.sql2-step .sql-statement {
+    white-space: nowrap;
+}
+
+.sql2-step .sql-statement {
+    white-space: normal;
+    word-break: break-all;
+}
+
+.sql2-step .sql-statement.formatter {
+    white-space: pre;
+}
+
+.sql2-step .sql-param {
+    padding: 0 10px 10px;
+}
+
+
+
+
+

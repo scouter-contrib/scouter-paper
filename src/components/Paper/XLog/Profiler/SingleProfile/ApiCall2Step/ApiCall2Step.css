@@ -1,0 +1,12 @@
+.api-call2-step .message-content {
+    padding: 15px 5px;
+    color: #FCB514;
+}
+
+.api-call2-step .message-content > span {
+
+}
+
+.api-call2-step .message-content span.async-tag {
+    margin-right: 5px;
+}

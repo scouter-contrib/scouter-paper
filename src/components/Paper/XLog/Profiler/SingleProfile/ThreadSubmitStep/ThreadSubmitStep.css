@@ -1,0 +1,12 @@
+.thread-submit-step .message-content {
+    padding: 15px 5px;
+    color: #FCB514;
+}
+
+.thread-submit-step .message-content > span {
+
+}
+
+.thread-submit-step .message-content span.async-tag {
+    margin-right: 5px;
+}

@@ -2,7 +2,23 @@ import React, {Component} from 'react';
 import './Sql3Step.css';
 import StepGeneral from "../StepGeneral/StepGeneral";
 import sqlFormatter from "sql-formatter";
+import Error from "../Error/Error";
+//scouter.lang.step.SqlStep2
+/*
+    //scouter.lang.step.SqlStep
+    public int hash;
+	public int elapsed;
+	public int cputime;
+	public String param;
+	public int error;
 
+	//scouter.lang.step.SqlStep2
+	public byte xtype;
+	getXtypePrefix
+
+	//scouter.lang.step.SqlStep3
+	public int updated; -> StepGeneral
+ */
 class Sql3Step extends Component {
     render() {
 
@@ -28,6 +44,7 @@ class Sql3Step extends Component {
         return (
             <div className="step sql3-step">
                 <StepGeneral startTime={this.props.startTime} row={this.props.row} elapsed={this.props.row.step.elapsed} type="SQL"/>
+                {(isNaN(this.props.row.step.error) || Number(this.props.row.step.error) > 0) && <Error row={this.props.row}></Error>}
                 <div className={"sql-statement " + (this.props.formatter ? 'formatter' : '')} dangerouslySetInnerHTML={{__html: sql}}></div>
                 <div className="sql-param">[{this.props.row.step.param}]</div>
             </div>)

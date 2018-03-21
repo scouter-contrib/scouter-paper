@@ -1,7 +1,7 @@
 import React, {Component} from 'react';
 import './SingleProfile.css';
 import HashedMessageStep from "./HashedMessageStep/HashedMessageStep";
-import MethodStep from "./Sql3Step/Sql3Step";
+import MethodStep from "./MethodStep/MethodStep";
 import SqlStep from "./SqlStep/SqlStep";
 import MessageStep from "./MessageStep/MessageStep";
 import SocketStep from "./SocketStep/SocketStep";
@@ -290,32 +290,46 @@ class SingleProfile extends Component {
                         beforeEndTime = stepEndTime;
 
                         return (
-                            <Step gap={gap} showGap={this.props.gap} indent={row.step.indent} applyIndent={this.props.indent}>
+                            <Step gap={gap} showGap={this.props.gap} indent={row.step.indent} applyIndent={this.props.indent} key={i}>
 
                                 {row.step.stepType === "9" && <HashedMessageStep startTime={startTime} row={row}/>}
+                                /* ERROR 있는 경우 데이터 및 테스트 필요 */
                                 {row.step.stepType === "16" && <Sql3Step formatter={this.props.formatter} bind={this.props.bind} startTime={startTime} row={row}/>}
-
-
-
-
-                                {row.step.stepType === "1" && <MethodStep startTime={startTime} row={row}/>}
-                                {row.step.stepType === "10" && <Method2Step startTime={startTime} row={row}/>}
+                                /* 테스트 못함 */
                                 {row.step.stepType === "2" && <SqlStep startTime={startTime} row={row}/>}
+                                /* 테스트 못함 */
                                 {row.step.stepType === "8" && <Sql2Step startTime={startTime} row={row}/>}
-
+                                /* 테스트 못함 */
+                                {row.step.stepType === "1" && <MethodStep startTime={startTime} row={row}/>}
+                                /* 테스트 못함 */
+                                {row.step.stepType === "10" && <Method2Step startTime={startTime} row={row}/>}
+                                /* 테스트 못함 */
                                 {row.step.stepType === "3" && <MessageStep startTime={startTime} row={row}/>}
+                                /* 테스트 못함 */
                                 {row.step.stepType === "5" && <SocketStep startTime={startTime} row={row}/>}
+                                /* 테스트 못함 */
                                 {row.step.stepType === "6" && <ApiCallStep startTime={startTime} row={row}/>}
+                                /* 테스트 못함 */
                                 {row.step.stepType === "15" && <ApiCall2Step startTime={startTime} row={row}/>}
+                                /* 테스트 못함 */
                                 {row.step.stepType === "7" && <ThreadSubmitStep startTime={startTime} row={row}/>}
+                                /* 테스트 못함 */
                                 {row.step.stepType === "17" && <ParameterizedMessageStep startTime={startTime} row={row}/>}
+                                /* 테스트 못함 */
                                 {row.step.stepType === "12" && <DumpStep startTime={startTime} row={row}/>}
+                                /* 테스트 못함 */
                                 {row.step.stepType === "13" && <DispatchStep startTime={startTime} row={row}/>}
+                                /* 테스트 못함 */
                                 {row.step.stepType === "14" && <ThreadCallPossibleStep startTime={startTime} row={row}/>}
+                                /* 테스트 못함 */
                                 {row.step.stepType === "11" && <MethodSumStep startTime={startTime} row={row}/>}
+                                /* 테스트 못함 */
                                 {row.step.stepType === "21" && <SqlSumStep startTime={startTime} row={row}/>}
+                                /* 테스트 못함 */
                                 {row.step.stepType === "31" && <MessageSumStep startTime={startTime} row={row}/>}
+                                /* 테스트 못함 */
                                 {row.step.stepType === "42" && <SocketSumStep startTime={startTime} row={row}/>}
+                                /* 테스트 못함 */
                                 {row.step.stepType === "43" && <ApiCallSumStep startTime={startTime} row={row}/>}
                                 {row.step.stepType === "99" && <ControlStep startTime={startTime} row={row}/>}
                             </Step>)

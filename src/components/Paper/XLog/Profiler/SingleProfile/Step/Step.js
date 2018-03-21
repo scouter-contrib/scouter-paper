@@ -9,7 +9,7 @@ class Step extends Component {
         }
 
         return (
-            <div className={"step-div " + (this.props.gap > 0 ? ' has-gab ' : '') + (this.props.showGab ? ' show-gab ' : '')} style={{marginLeft : indent + "px"}} >
+            <div className={"step-div " + (this.props.gap > 0 ? ' has-gab ' : '') + (this.props.showGap ? ' show-gab ' : '')} style={{marginLeft : indent + "px"}} >
                 {(this.props.showGap && this.props.gap > 0) && <div className="gap-time">
                     <div>
                         <div className="arrow"><i className="fa fa-angle-up" aria-hidden="true"></i></div>

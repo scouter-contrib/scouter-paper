@@ -1,0 +1,36 @@
+/* SQL */
+.sql-step .sql-statement {
+    padding: 10px;
+    line-height: 140%;
+    color: #0000C3;
+}
+
+.sql-step .sql-statement .prefix {
+    color: darkgreen;
+}
+
+.sql-step .sql-statement .param {
+    color: #207ce5;
+}
+
+.sql-step .sql-statement {
+    white-space: nowrap;
+}
+
+.sql-step .sql-statement {
+    white-space: normal;
+    word-break: break-all;
+}
+
+.sql-step .sql-statement.formatter {
+    white-space: pre;
+}
+
+.sql-step .sql-param {
+    padding: 0 10px 10px;
+}
+
+
+
+
+

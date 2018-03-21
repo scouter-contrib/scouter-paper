@@ -1,0 +1,11 @@
+.step-error {
+    padding: 10px 10px 0;
+}
+
+.step-error > span {
+    background-color : #FF030D;
+    color: white;
+    padding: 2px 4px;
+    font-size: 10px;
+    display: inline-block;
+}

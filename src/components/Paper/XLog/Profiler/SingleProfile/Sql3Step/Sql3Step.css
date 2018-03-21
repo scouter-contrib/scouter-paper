@@ -1,32 +1,31 @@
-/* SQL */
-.xlog-steps .sql3-step .sql-statement {
+.sql3-step .sql-statement {
     padding: 10px;
     line-height: 140%;
     color: #0000C3;
 }
 
-.xlog-steps .sql3-step .sql-statement .prefix {
+.sql3-step .sql-statement .prefix {
     color: darkgreen;
 }
 
-.xlog-steps .sql3-step .sql-statement .param {
+.sql3-step .sql-statement .param {
     color: #207ce5;
 }
 
-.xlog-steps .sql3-step .sql-statement {
+.sql3-step .sql-statement {
     white-space: nowrap;
 }
 
-.xlog-steps.wrap .sql3-step .sql-statement {
+.sql3-step .sql-statement {
     white-space: normal;
     word-break: break-all;
 }
 
-.xlog-steps.wrap .sql3-step .sql-statement.formatter {
+.sql3-step .sql-statement.formatter {
     white-space: pre;
 }
 
-.xlog-steps .sql3-step .sql-param {
+.sql3-step .sql-param {
     padding: 0 10px 10px;
 }
 
