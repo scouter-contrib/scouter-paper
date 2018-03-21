@@ -17,7 +17,7 @@
     white-space: nowrap;
 }
 
-.sql-step .sql-statement {
+.xlog-steps.wrap .sql-step .sql-statement {
     white-space: normal;
     word-break: break-all;
 }
