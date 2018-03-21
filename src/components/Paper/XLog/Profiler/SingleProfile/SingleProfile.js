@@ -22,6 +22,8 @@ import SocketSumStep from "./SocketSumStep/SocketSumStep";
 import ApiCallSumStep from "./ApiCallSumStep/ApiCallSumStep";
 import ControlStep from "./ControlStep/ControlStep";
 import Step from "./Step/Step";
+import Moment from 'react-moment';
+import 'moment-timezone';
 
 const profileMetas = [
     {
@@ -259,23 +261,16 @@ class SingleProfile extends Component {
             <div className='single-profile'>
                 <div className="sub-title">GENERAL INFO</div>
                 <div className={"xlog-data " + (this.props.wrap ? 'wrap' : '')}>
-                    {this.props.profile && profileMetas && profileMetas.map((meta, i) => {
-                        if (this.props.summary) {
-                            if (meta.show) {
-                                return <div key={i}>
-                                    <span className="label">{meta.name}</span>
-                                    <span className="data">{this.props.profile[meta.key]}</span>
-                                </div>
-
-                            } else {
-                                return undefined;
-                            }
-                        } else {
-                            return <div key={i}>
-                                <span className="label">{meta.name}</span>
-                                <span className="data">{this.props.profile[meta.key]}</span>
-                            </div>
-                        }
+                    {this.props.profile && profileMetas && profileMetas.filter((d) => {return this.props.summary ? d.show : true}).map((meta, i) => {
+                        return <div key={i}>
+                            <span className="label">{meta.name}</span>
+                            <span className="data">
+                                {meta.type === "datetime" && <Moment date={new Date(Number(this.props.profile[meta.key]))} format="YYYY-MM-DD HH:mm:ss" ></Moment>}
+                                {meta.type === "ms" && this.props.profile[meta.key] + " ms"}
+                                {meta.type === "bytes" && this.props.profile[meta.key] + " bytes"}
+                                {(meta.type !== "datetime" && meta.type !== "ms" && meta.type !== "bytes") && this.props.profile[meta.key]}
+                            </span>
+                        </div>
                     })}
                 </div>
                 <div className="sub-title">PROFILE STEP</div>
