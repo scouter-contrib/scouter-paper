@@ -10,8 +10,10 @@ class MessageStep extends Component {
     render() {
         return (
             <div className="step message-step">
-                <StepGeneral startTime={this.props.startTime} row={this.props.row} elapsed={undefined} type="MSG"/>
-                <div className="message-content">{this.props.row.mainValue ? this.props.row.mainValue : this.props.row.step.message}</div>
+                <div className="message-content">
+                    <div className="tag"><span className="type-tag">MSG</span></div>
+                    <div><span>{this.props.row.step.message}</span></div>
+                </div>
             </div>)
     }
 }

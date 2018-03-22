@@ -31,12 +31,9 @@ class ParameterizedMessageStep extends Component {
         }
 
         return (
-            <div className="step parameterized-meesage-step">
-                {this.props.row.step.time > -1 &&
-                <StepGeneral startTime={this.props.startTime} row={this.props.row} elapsed={this.props.row.step.elapsed} type="MSG"/>
-                }
-                <div className="message-content">{level ? level + ")" : ''}{this.props.row.mainValue}</div>
-                <div className="message-param">[{this.props.row.step.paramString}]</div>
+            <div className="step parameterized-message-step">
+                <StepGeneral startTime={this.props.startTime} row={this.props.row} elapsed={this.props.row.step.elapsed} type="CUSTOM"/>
+                <div className={"message-content " + this.props.row.step.level.toLowerCase()}>{this.props.row.mainValue}</div>
             </div>)
     }
 }

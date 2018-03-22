@@ -2,3 +2,7 @@
     color: #5B59BA;
     padding: 15px 5px;
 }
+
+.method-step .message-content .gray {
+    color: #AAAAAA;
+}

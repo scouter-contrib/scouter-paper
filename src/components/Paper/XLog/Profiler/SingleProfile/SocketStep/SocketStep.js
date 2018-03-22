@@ -18,7 +18,7 @@ class SocketStep extends Component {
                 <StepGeneral startTime={this.props.startTime} row={this.props.row} elapsed={this.props.row.step.elapsed} type="SOCKET"/>
                 {(isNaN(this.props.row.step.error) || Number(this.props.row.step.error) > 0) && <Error row={this.props.row}></Error>}
                 <div className="message-content">
-                    <span>{this.props.row.step.ipaddr}:{this.props.row.step.port}</span>
+                    <span>[Connect] {this.props.row.mainValue}:{this.props.row.step.port}</span>
                 </div>
             </div>)
     }

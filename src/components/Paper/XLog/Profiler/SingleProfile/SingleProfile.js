@@ -298,7 +298,7 @@ class SingleProfile extends Component {
                                 {row.step.stepType === "15" && <ApiCall2Step startTime={startTime} row={row}/>}
                                 {row.step.stepType === "7" && <ThreadSubmitStep startTime={startTime} row={row}/>}
                                 {row.step.stepType === "17" && <ParameterizedMessageStep startTime={startTime} row={row}/>}
-                                {row.step.stepType === "12" && <DumpStep startTime={startTime} row={row}/>}
+                                {row.step.stepType === "12" && <DumpStep  formatter={this.props.formatter} startTime={startTime} row={row}/>}
                                 {row.step.stepType === "13" && <DispatchStep startTime={startTime} row={row}/>}
                                 {row.step.stepType === "14" && <ThreadCallPossibleStep startTime={startTime} row={row}/>}
                                 {row.step.stepType === "11" && <MethodSumStep startTime={startTime} row={row}/>}

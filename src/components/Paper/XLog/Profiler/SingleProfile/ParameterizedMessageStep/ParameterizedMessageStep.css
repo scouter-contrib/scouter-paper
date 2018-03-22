@@ -1,8 +1,24 @@
-.parameterized-meesage-step .message-content {
+.parameterized-message-step .message-content {
     color: #28AE7B;
     padding: 15px 5px;
 }
 
-.parameterized-meesage-step .message-param {
+.parameterized-message-step .message-param {
     padding: 0 10px 10px;
+}
+
+.parameterized-message-step .message-content.debug {
+    color: #9696B4;
+}
+.parameterized-message-step .message-content.info {
+    color: #7878B4;
+}
+.parameterized-message-step .message-content.warn {
+    color: #EE8C14;
+}
+.parameterized-message-step .message-content.error {
+    color: #FF6464;
+}
+.parameterized-message-step .message-content.fatal {
+    color: #FF0000;
 }

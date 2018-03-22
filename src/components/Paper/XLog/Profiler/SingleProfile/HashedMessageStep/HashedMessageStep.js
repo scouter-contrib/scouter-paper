@@ -12,12 +12,9 @@ class HashedMessageStep extends Component {
     render() {
         return (
             <div className="step hashed-message">
-                {this.props.row.step.time > -1 &&
-                <StepGeneral startTime={this.props.startTime} row={this.props.row} elapsed={this.props.row.step.time} type="MSG"/>
-                }
-                <div className="message-content">{this.props.row.step.time < 0 &&
-                <div className="tag"><span className="type-tag">MSG</span></div>}
-                    <div><span>{this.props.row.mainValue}</span></div>
+                <div className="message-content">
+                    <div className="tag"><span className="type-tag">MSG</span></div>
+                    <div><span>{this.props.row.mainValue} {this.props.row.step.time >= 0 && '#' + this.props.row.step.value + ' ' + this.props.row.step.time + 'ms'}</span></div>
                 </div>
             </div>)
     }
