@@ -29,7 +29,7 @@ class Profiler extends Component {
             bind: true,
             wrap: false,
             gap: true,
-            formatter: true
+            formatter: false
         }
     }
 
