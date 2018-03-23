@@ -13,6 +13,8 @@ import jQuery from "jquery";
 import {withRouter} from 'react-router-dom';
 import {getHttpProtocol, errorHandler, getWithCredentials, setAuthHeader} from '../../../common/common';
 import 'url-search-params-polyfill';
+import ServerDate from '../../../common/ServerDate'
+import * as common from '../../../common/common'
 
 class InstanceSelector extends Component {
 
@@ -76,6 +78,9 @@ class InstanceSelector extends Component {
                         let instances = [];
                         let activeServerId = null;
                         servers.forEach((server) => {
+                            //일단 단일 서버로 가정하고 서버 시간과 맞춘다.
+                            common.setServerTimeGap(Number(server.serverTime) - new Date().valueOf());
+
                             jQuery.ajax({
                                 method: "GET",
                                 async: false,
