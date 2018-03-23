@@ -1,6 +1,7 @@
 import React, {Component} from 'react';
 import './XLogPreviewer.css';
 import * as d3 from "d3";
+import ServerDate from "../../../../common/ServerDate";
 
 class XLogPreviewer extends Component {
     secondStepTimestamp = null;
@@ -69,7 +70,7 @@ class XLogPreviewer extends Component {
         }
 
         let interval = 5000;
-        let now = (new Date()).getTime();
+        let now = (new ServerDate()).getTime();
         let divs = this.refs.xlogMover.querySelectorAll("div");
         divs.forEach((div) => {
             let endTime = div.getAttribute("data-end-time");
@@ -85,7 +86,7 @@ class XLogPreviewer extends Component {
                 let exist = base.querySelector("[data-txid='" + xlog.txid + "']");
                 if (!exist) {
                     let div = document.createElement("div");
-                    let now = (new Date()).getTime();
+                    let now = (new ServerDate()).getTime();
                     let delay = 2000 - ((now - xlog.endTime));
                     if (delay < 0) {
                         delay = 100;

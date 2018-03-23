@@ -9,6 +9,7 @@ import {Box, BoxConfig, PaperControl} from "../../components";
 import jQuery from "jquery";
 import {getData, setData, getHttpProtocol, errorHandler, getWithCredentials, setAuthHeader} from '../../common/common';
 import Profiler from "./XLog/Profiler/Profiler";
+import ServerDate from "../../common/ServerDate";
 
 const ResponsiveReactGridLayout = WidthProvider(Responsive);
 
@@ -32,7 +33,7 @@ class Paper extends Component {
         }
 
         let range = 1000 * 60 * 10;
-        let endTime = (new Date()).getTime();
+        let endTime = (new ServerDate()).getTime();
         let startTime = endTime - range;
 
         this.state = {
@@ -158,7 +159,7 @@ class Paper extends Component {
         var that = this;
         if (this.props.instances && this.props.instances.length > 0) {
             this.props.addRequest();
-            let time = (new Date()).getTime();
+            let time = (new ServerDate()).getTime();
             jQuery.ajax({
                 method: "GET",
                 async: true,
@@ -228,7 +229,7 @@ class Paper extends Component {
                 if (!this.counterHistoriesLoaded[counterKey]) {
                     this.counterHistoriesLoaded[counterKey] = false;
 
-                    let now = (new Date()).getTime();
+                    let now = (new ServerDate()).getTime();
                     let ten = 1000 * 60 * 10;
                     this.props.addRequest();
                     jQuery.ajax({
@@ -302,7 +303,7 @@ class Paper extends Component {
 
                     this.setState({
                         counters: {
-                            time: (new Date()).getTime(),
+                            time: (new ServerDate()).getTime(),
                             data: map
                         }
                     });
@@ -321,7 +322,7 @@ class Paper extends Component {
 
         let result = (JSON.parse(msg)).result;
 
-        let now = (new Date()).getTime();
+        let now = (new ServerDate()).getTime();
 
         let datas = null;
         if (Number(this.props.config.xlog.normal.sampling) !== 100 || Number(this.props.config.xlog.error.sampling) !== 100) {
@@ -363,7 +364,7 @@ class Paper extends Component {
         data.tempXlogs = tempXlogs;
         data.lastRequestTime = now;
 
-        let endTime = (new Date()).getTime();
+        let endTime = (new ServerDate()).getTime();
         let startTime = endTime - this.state.data.range;
 
         let firstStepStartTime = this.state.data.lastRequestTime - 1000;

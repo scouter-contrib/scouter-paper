@@ -100,7 +100,7 @@ export function zeroPadding(n, p, c) {
 
 let serverTimeGap = 0;
 export function setServerTimeGap(millis) {
-    setServerTimeGap = millis;
+    serverTimeGap = millis;
 }
 export function getServerTimeGap() {
     return serverTimeGap;

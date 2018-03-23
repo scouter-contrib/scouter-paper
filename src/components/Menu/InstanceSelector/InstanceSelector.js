@@ -43,7 +43,6 @@ class InstanceSelector extends Component {
 
         var that = this;
         if (!this.init && ((props.user && props.user.id) || authMethod === "none")) {
-            this.init = true;
 
             this.props.addRequest();
             jQuery.ajax({
@@ -55,9 +54,13 @@ class InstanceSelector extends Component {
                     setAuthHeader(xhr, props.config, props.user);
                 }
             }).done((msg) => {
-
                 if (msg && msg.result) {
+                    that.init = true;
                     let servers = msg.result;
+                    //현재 멀티서버와 연결된 scouter webapp은 지원하지 않으므로 일단 단일 서버로 가정하고 마지막 서버 시간과 맞춘다.
+                    servers.forEach((server) => {
+                        common.setServerTimeGap(Number(server.serverTime) - new Date().valueOf());
+                    });
 
                     // GET INSTANCES INFO FROM URL IF EXISTS
                     let instancesParam = new URLSearchParams(this.props.location.search).get('instances');
@@ -223,6 +226,7 @@ class InstanceSelector extends Component {
 
                 that.setState({
                     activeServerId: serverId
+
                 });
 
                 const instances = msg.result;
