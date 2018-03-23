@@ -1,4 +1,8 @@
 .dump-step .message-content {
-    color: #333;
-    padding: 15px 5px;
+    color: #999;
+    padding: 9px 5px;
+}
+
+.dump-step .message-content.formatter {
+    white-space: pre;
 }

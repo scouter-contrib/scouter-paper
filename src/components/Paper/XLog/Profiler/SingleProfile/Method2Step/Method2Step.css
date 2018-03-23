@@ -1,4 +1,8 @@
 .method2-step .message-content {
     color: #5B59BA;
-    padding: 15px 5px;
+    padding: 9px 5px;
+}
+
+.method2-step .message-content .gray {
+    color: #AAAAAA;
 }

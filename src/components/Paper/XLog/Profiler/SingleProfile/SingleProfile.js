@@ -276,8 +276,8 @@ class SingleProfile extends Component {
                 <div className="sub-title">PROFILE STEP</div>
                 <div className={"xlog-steps " + (this.props.wrap ? 'wrap' : '')}>
                     {this.props.steps && this.props.steps.map((row, i) => {
-                        let stepStartTime = Number(startTime) + Number(row.step.start_time);
-                        let stepEndTime = startTime + Number(row.step.start_time) + Number(row.step.elapsed);
+                        let stepStartTime = startTime + Number(row.step.start_time);
+                        let stepEndTime = startTime + Number(row.step.start_time) + Number(row.step.elapsed || 0);
                         let gap = 0;
                         if (beforeEndTime) {
                             gap = Number(stepStartTime) - Number(beforeEndTime);
@@ -298,7 +298,7 @@ class SingleProfile extends Component {
                                 {row.step.stepType === "15" && <ApiCall2Step startTime={startTime} row={row}/>}
                                 {row.step.stepType === "7" && <ThreadSubmitStep startTime={startTime} row={row}/>}
                                 {row.step.stepType === "17" && <ParameterizedMessageStep startTime={startTime} row={row}/>}
-                                {row.step.stepType === "12" && <DumpStep startTime={startTime} row={row}/>}
+                                {row.step.stepType === "12" && <DumpStep  formatter={this.props.formatter} startTime={startTime} row={row}/>}
                                 {row.step.stepType === "13" && <DispatchStep startTime={startTime} row={row}/>}
                                 {row.step.stepType === "14" && <ThreadCallPossibleStep startTime={startTime} row={row}/>}
                                 {row.step.stepType === "11" && <MethodSumStep startTime={startTime} row={row}/>}

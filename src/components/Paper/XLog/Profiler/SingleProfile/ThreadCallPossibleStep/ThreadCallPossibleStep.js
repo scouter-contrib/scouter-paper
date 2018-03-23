@@ -16,18 +16,24 @@ class ThreadCallPossibleStep extends Component {
 
         let status = "";
         if (Number(this.props.row.step.threaded) === 0) {
-            status = "[NONE THREAD DISPATCHING]";
+            status = null;
         }
 
         if (Number(this.props.row.step.threaded) === 1) {
-            status = "pTHREAD DISPATCHING]";
+            status = "[THREAD DISPATCHING]";
         }
 
-        return (
-            <div className="step thread-call-possible-step">
-                <StepGeneral startTime={this.props.startTime} row={this.props.row} elapsed={this.props.row.step.elapsed} type="THREAD CALL"/>
-                <div className="message-content">{status}{this.props.row.step.nameTemp}</div>
-            </div>)
+        if(status) {
+            return (
+                <div className="step thread-call-possible-step">
+                    <StepGeneral startTime={this.props.startTime} row={this.props.row} elapsed={this.props.row.step.elapsed} type="THREAD CALL"/>
+                    <div className="message-content">{status} {this.props.row.mainValue}</div>
+                </div>)
+        } else {
+            return (
+                <div></div>
+            )
+        }
     }
 }
 

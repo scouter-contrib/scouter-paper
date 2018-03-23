@@ -29,7 +29,7 @@ class Profiler extends Component {
             bind: true,
             wrap: false,
             gap: true,
-            formatter: true
+            formatter: false
         }
     }
 
@@ -231,33 +231,46 @@ class Profiler extends Component {
             this.setState({
                 profile: msg.result
             });
-        }).fail((xhr, textStatus, errorThrown) => {
-            errorHandler(xhr, textStatus, errorThrown, this.props);
-        });
 
-        // XLOG DATA
-        this.props.addRequest();
-        jQuery.ajax({
-            method: "GET",
-            async: true,
-            url: getHttpProtocol(this.props.config) + '/scouter/v1/profile-data/' + moment(new Date(Number(xlog.endTime))).format("YYYYMMDD") + "/" + xlog.txid,
-            xhrFields: getWithCredentials(that.props.config),
-            beforeSend: function (xhr) {
-                setAuthHeader(xhr, that.props.config, that.props.user);
-            }
-        }).done((msg) => {
-            const orderedSteps = _.orderBy(msg.result, (e) => Number(e.step.order), ['asc']);
-            this.addIndentPropertyTo(orderedSteps);
+            // Profile Data
+            this.props.addRequest();
+            jQuery.ajax({
+                method: "GET",
+                async: true,
+                url: getHttpProtocol(this.props.config) + '/scouter/v1/profile-data/' + moment(new Date(Number(xlog.endTime))).format("YYYYMMDD") + "/" + xlog.txid,
+                xhrFields: getWithCredentials(that.props.config),
+                beforeSend: function (xhr) {
+                    setAuthHeader(xhr, that.props.config, that.props.user);
+                }
+            }).done((msg) => {
+                const orderedSteps = _.orderBy(msg.result, (e) => Number(e.step.order), ['asc']);
+                this.addIndentPropertyTo(orderedSteps);
 
-            this.setState({
-                steps: orderedSteps
+                const eos = {
+                    mainValue: "end of service",
+                    additionalValueList: [],
+                    step: {
+                        parent: "-1",
+                        index: orderedSteps.length + 1,
+                        start_time: this.state.profile.elapsed,
+                        start_cpu: "0",
+                        message: "end of service",
+                        stepType: "3",
+                        order: orderedSteps.length + 1,
+                        stepTypeName: "MESSAGE"
+                    }
+                };
+                orderedSteps.push(eos);
+                this.setState({
+                    steps: orderedSteps
+                });
+
+            }).fail((xhr, textStatus, errorThrown) => {
+                errorHandler(xhr, textStatus, errorThrown, this.props);
             });
-
         }).fail((xhr, textStatus, errorThrown) => {
             errorHandler(xhr, textStatus, errorThrown, this.props);
         });
-
-
     };
 
     addIndentPropertyTo(orderedSteps) {

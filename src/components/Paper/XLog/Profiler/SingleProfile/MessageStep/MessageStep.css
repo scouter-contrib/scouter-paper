@@ -1,4 +1,29 @@
 .message-step .message-content {
     color: #28AE7B;
-    padding: 15px 5px;
+}
+
+.xlog-steps .message-step .message-content > div {
+    display: table-cell;
+    vertical-align: middle;
+}
+
+.xlog-steps .message-step .message-content > div.tag {
+    width: 50px;
+    text-align: center;
+}
+
+.xlog-steps .message-step .message-content span {
+    padding: 9px 5px;
+    display: inline-block;
+    text-align: center;
+}
+
+.xlog-steps .message-step .message-content .type-tag {
+    background-color: #28AE7B;
+    color: white;
+    border-radius: 5px;
+    padding: 2px 5px;
+    font-size: 10px;
+    width: 40px;
+    box-sizing: border-box;
 }

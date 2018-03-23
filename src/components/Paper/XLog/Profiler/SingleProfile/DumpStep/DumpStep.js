@@ -18,13 +18,8 @@ class DumpStep extends Component {
         return (
             <div className="step dump-step">
                 <StepGeneral startTime={this.props.startTime} row={this.props.row} elapsed={undefined} type="DUMP"/>
-                <div className="message-content">{this.props.row.step.threadId}</div>
-                <div className="message-content">{this.props.row.step.threadName}</div>
-                <div className="message-content">{this.props.row.step.threadState}</div>
-                <div className="message-content">{this.props.row.step.lockOwnerId}</div>
-                <div className="message-content">{this.props.row.step.lockName}</div>
-                <div className="message-content">{this.props.row.step.lockOwnerName}</div>
-                <div className="message-content">{this.props.row.mainValue}</div>
+                <div className="message-content">{this.props.row.step.threadState} ID:{this.props.row.step.threadId} {this.props.row.step.threadName}</div>
+                <div className={"message-content " + (this.props.formatter ? 'formatter' : '')} >{this.props.row.additionalValueList.length > 0 ? this.props.row.additionalValueList.join('\n') : ''}</div>
             </div>)
     }
 }

@@ -97,3 +97,11 @@ export function zeroPadding(n, p, c) {
     var pad = new Array(1 + p).join(pad_char);
     return (pad + n).slice(-pad.length);
 }
+
+let serverTimeGap = 0;
+export function setServerTimeGap(millis) {
+    serverTimeGap = millis;
+}
+export function getServerTimeGap() {
+    return serverTimeGap;
+}

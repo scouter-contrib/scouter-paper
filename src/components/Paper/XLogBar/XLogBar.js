@@ -1,5 +1,6 @@
 import React, {Component} from 'react';
 import './XLogBar.css';
+import ServerDate from "../../../common/ServerDate";
 
 class XLogBar extends Component {
 
@@ -54,7 +55,7 @@ class XLogBar extends Component {
 
         let interval = 1000;
 
-        let now = (new Date()).getTime();
+        let now = (new ServerDate()).getTime();
         let divs = this.refs.xlogBar.querySelectorAll("div");
         divs.forEach((div) => {
             let endTime = div.getAttribute("data-end-time");
@@ -91,7 +92,7 @@ class XLogBar extends Component {
                 let exist = base.querySelector("[data-txid='" + xlog.txid + "']");
                 if (!exist) {
                     let div = document.createElement("div");
-                    let now = (new Date()).getTime();
+                    let now = (new ServerDate()).getTime();
                     let delay = interval - ((now - xlog.endTime));
                     if (delay < 0) {
                         delay = 100;

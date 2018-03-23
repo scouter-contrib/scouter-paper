@@ -3,6 +3,7 @@ import './LineChart.css';
 import {connect} from 'react-redux';
 import {withRouter} from 'react-router-dom';
 import * as d3 from "d3";
+import ServerDate from "../../../common/ServerDate";
 
 class LineChart extends Component {
 
@@ -20,8 +21,8 @@ class LineChart extends Component {
         x: null,
         y: null,
         path: null,
-        startTime: (new Date()).getTime() - (1000 * 60 * 10),
-        endTime: (new Date()).getTime(),
+        startTime: (new ServerDate()).getTime() - (1000 * 60 * 10),
+        endTime: (new ServerDate()).getTime(),
         timeFormat: "%H:%M",
         fullTimeFormat: "%Y-%m-%d %H:%M:%S",
         xAxisWidth: 70,
@@ -211,8 +212,8 @@ class LineChart extends Component {
                 noData: noData
             });
         } else {
-            let startTime = (new Date()).getTime() - (1000 * 60 * 10);
-            let endTime = (new Date()).getTime();
+            let startTime = (new ServerDate()).getTime() - (1000 * 60 * 10);
+            let endTime = (new ServerDate()).getTime();
 
             this.setState({
                 startTime: startTime,
