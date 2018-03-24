@@ -29,7 +29,9 @@ class Profiler extends Component {
             bind: true,
             wrap: false,
             gap: true,
-            formatter: false
+            formatter: false,
+            listWidth : 40,
+            smallScreen : false
         }
     }
 
@@ -53,6 +55,14 @@ class Profiler extends Component {
     shouldComponentUpdate(nextProps, nextState) {
 
         if (JSON.stringify(nextProps.selection) !== JSON.stringify(this.props.selection)) {
+            return true;
+        }
+
+        if (this.state.listWidth !== nextState.listWidth) {
+            return true;
+        }
+
+        if (this.state.smallScreen !== nextState.smallScreen) {
             return true;
         }
 
@@ -103,6 +113,29 @@ class Profiler extends Component {
         return false;
     }
 
+
+    updateDimensions = () => {
+        let width = document.querySelector("body").clientWidth;
+        let smallScreen = false;
+        if (width < 801) {
+            smallScreen = true;
+        }
+
+        if (this.state.smallScreen !== smallScreen) {
+            this.setState({
+                smallScreen : smallScreen
+            })
+        }
+    };
+
+    componentDidMount() {
+        window.addEventListener("resize", this.updateDimensions);
+    }
+
+    componentWillUnmount() {
+        window.removeEventListener("resize", this.updateDimensions);
+    }
+
     componentWillReceiveProps(nextProps) {
 
         if (nextProps.selection.x1 === null || nextProps.selection.x2 === null || nextProps.selection.y1 === null || nextProps.selection.y2 === null) {
@@ -129,6 +162,8 @@ class Profiler extends Component {
             }
         }
     }
+
+
 
     getList = (x1, x2, y1, y2) => {
         var that = this;
@@ -329,23 +364,85 @@ class Profiler extends Component {
         });
     };
 
+    changeListWidth = (e) => {
+        let listWidth = this.state.listWidth;
+
+        if (e === "min") {
+            listWidth = 0;
+        }
+
+        if (e === "max") {
+            listWidth = 100;
+        }
+
+        if (e === "small") {
+            listWidth -= 20;
+
+            if (listWidth < 0) {
+                listWidth = 0;
+            }
+        }
+
+        if (e === "big") {
+            listWidth += 20;
+
+            if (listWidth > 100) {
+                listWidth = 100;
+            }
+        }
+
+        this.setState({
+            listWidth : listWidth
+        });
+    };
+
+    clearTxId = () => {
+        this.setState({
+            txid: null
+        });
+    };
+
     render() {
+
+        let leftStyle = {};
+        let rightStyle = {};
+        if (this.state.smallScreen) {
+            if (this.state.txid) {
+                leftStyle = {width : "100%", display : "none"};
+                rightStyle= {width : "100%", display : "inline-block"};
+            } else {
+                leftStyle = {width : "100%", display : "inline-block"};
+                rightStyle= {width : "100%", display : "none"};
+            }
+        } else {
+            leftStyle = {width : this.state.listWidth + "%", display : this.state.listWidth === 0 ? "none" : "inline-block"};
+            rightStyle = {width : (100 - this.state.listWidth) + "%", display : this.state.listWidth === 100 ? "none" : "inline-block"}
+        }
+
         return (
             <div className={"xlog-profiler " + (this.state.show ? ' ' : 'hidden')}>
                 <div>
-                    <div className="profiler-layout left">
+                    <div className="size-control-btns">
+                        <button onClick={this.changeListWidth.bind(this, "min")}><i className="fa fa-angle-double-left icon-1"></i></button>
+                        <button onClick={this.changeListWidth.bind(this, "small")}><i className="fa fa-angle-left icon-2"></i></button>
+                        <button onClick={this.changeListWidth.bind(this, "big")}><i className="fa fa-angle-right icon-3"></i></button>
+                        <button onClick={this.changeListWidth.bind(this, "max")}><i className="fa fa-angle-double-right icon-4"></i></button>
+                        <div className="close-btn" onClick={this.close}></div>
+                    </div>
+                    <div className="profiler-layout left" style={leftStyle}>
                         <div className="summary">
                             <div className="title">PROFILER</div>
                             <div className="list-summary">{this.state.xlogs.length} ROWS</div>
+                            <div className="close-btn" onClick={this.close}></div>
                         </div>
                         <div className="profile-list scrollbar">
                             <ProfileList txid={this.state.txid} xlogs={this.state.xlogs} rowClick={this.rowClick}/>
                         </div>
                     </div>
-                    <div className="profiler-layout right">
+                    <div className="profiler-layout right" style={rightStyle}>
                         <div className="summary">
-                            <div className="title">DETAIL</div>
-                            <div className="list-summary">{this.state.txid ? 'TXID : ' + this.state.txid : 'NO PROFILE SELECTED'}</div>
+                            {this.state.smallScreen && <div onClick={this.clearTxId.bind(this)} className="profile-list-btn"><i class="fa fa-chevron-circle-left"></i></div>}
+                            <div className="title">DETAIL <span className="selected-info">({this.state.txid ? 'TXID : ' + this.state.txid : 'NO PROFILE SELECTED'})</span></div>
                             <div className="profile-steps-control noselect">
                                 <div className={"profile-control-btn " + (this.state.summary ? 'active' : '')} onClick={this.toggleSummary}>{this.state.summary ? <i className="fa fa-check-circle"></i> : <i className="fa fa-circle-o"></i>} SUMMARY</div>
                                 <div className={"profile-control-btn " + (this.state.indent ? 'active' : '')} onClick={this.toggleIndent}>{this.state.indent ? <i className="fa fa-check-circle"></i> : <i className="fa fa-circle-o"></i>} INDENT</div>

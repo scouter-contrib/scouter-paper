@@ -39,8 +39,8 @@
     cursor: pointer;
     box-sizing: border-box;
     position: absolute;
-    top : 7px;
-    right : 5px;
+    top: 7px;
+    right: 5px;
 }
 
 .xlog-profiler .close-btn:before,
@@ -70,19 +70,26 @@
 }
 
 .xlog-profiler .profiler-layout {
-    height: 100%;
+    height: calc(100% - 30px);
     box-sizing: border-box;
     display: inline-block;
     padding: 0;
     float: left;
+    -webkit-transition: width 0.3s; /* Safari */
+    transition: width 0.3s;
 }
 
 .xlog-profiler .left {
     width: 40%;
-    border-right : 4px solid #207ce5;
-    _border-right : 4px solid white;
-    border-right : 1px solid #333;
+    border-right: 4px solid #207ce5;
+    _border-right: 4px solid white;
+    border-right: 1px solid #333;
     border-radius: 2px 0 0 0;
+}
+
+.xlog-profiler .right .close-btn,
+.xlog-profiler .left .close-btn {
+    display: none;
 }
 
 .xlog-profiler .right {
@@ -91,7 +98,7 @@
 }
 
 .xlog-profiler .profiler-layout .summary {
-    height: 60px;
+    min-height: 60px;
     background-color: #0EBFE9;
     background-color: #3A66A7;
     background-color: #666;
@@ -105,14 +112,83 @@
     padding: 15px 15px 10px;
 }
 
+.xlog-profiler .profiler-layout.right .summary .title {
+    padding: 15px 15px 7px;
+}
+
+.xlog-profiler .profiler-layout .summary .title .selected-info {
+    font-size: 10px;
+}
+
 .xlog-profiler .profiler-layout .summary .list-summary {
     padding: 0 15px 10px;
+}
+
+.xlog-profiler .profiler-layout.right .summary .list-summary {
+    display: inline-block;
+}
+
+.xlog-profiler .size-control-btns {
+    background-color: #333;
+    padding: 4px 8px;
+    width: 100%;
+    box-sizing: border-box;
+    height: 30px;
+    position: relative;
+}
+
+.xlog-profiler .size-control-btns .close-btn {
+    position: absolute;
+    top : 5px;
+    right : 5px;
+}
+
+.xlog-profiler .size-control-btns > button {
+    background-color: transparent;
+    background-color: rgba(0, 0, 0, 0.3);
+    width: 20px;
+    height: 20px;
+    border-radius: 50%;
+    color: white;
+    padding: 0;
+    margin: 0 2px 0 0;
+    font-size: 12px;
+    text-align: center;
+    position: relative;
+}
+
+.xlog-profiler .size-control-btns > button:last-child {
+    margin-right: 0;
+}
+
+.xlog-profiler .size-control-btns > button:hover {
+    background-color: rgba(0, 0, 0, 0.5);
+}
+
+.xlog-profiler .size-control-btns > button i {
+    position: absolute;
+    top: 4px;
+}
+
+.xlog-profiler .size-control-btns > button i.icon-1 {
+    left: 6px;
+}
+
+.xlog-profiler .size-control-btns > button i.icon-2 {
+    left: 7px;
+}
+
+.xlog-profiler .size-control-btns > button i.icon-3 {
+    left: 8px;
+}
+
+.xlog-profiler .size-control-btns > button i.icon-4 {
+    left: 7px;
 }
 
 .xlog-profiler .profiler-layout.right .summary {
     background-color: #444;
 }
-
 
 .xlog-profiler .profile-list {
     width: 100%;
@@ -132,27 +208,24 @@
 
 .xlog-profiler .profile-steps-control {
     box-sizing: border-box;
-    position: absolute;
-    right : 40px;
-    top : 20px;
+    display: inline-block;
+    padding: 0 10px;
 }
 
 .xlog-profiler .profile-steps-control .profile-control-btn {
     display: inline-block;
     box-sizing: border-box;
-    padding: 6px 8px;
+    padding: 2px 4px;
     cursor: pointer;
-    margin-left: 5px;
-    border-radius: 5px;
+    margin-left: 3px;
+    border-radius: 3px;
     color: white;
-}
-
-.xlog-profiler .profile-steps-control .profile-control-btn:hover {
-
+    font-size: 8px;
+    margin-bottom: 5px;
 }
 
 .xlog-profiler .profile-steps-control .profile-control-btn.active {
-    background-color: rgba(0,0,0,0.2);
+    background-color: rgba(0, 0, 0, 0.2);
     background-color: #FFE600;
     color: black;
 }
@@ -186,3 +259,55 @@
     content: '>';
 }
 
+@media screen and (max-width: 800px) {
+
+    .xlog-profiler {
+        padding: 0 10px;
+    }
+
+    .xlog-profiler > div {
+        height: calc(100% - 20px);
+        margin: 10px auto;
+
+    }
+
+    .xlog-profiler .size-control-btns {
+        display: none;
+    }
+
+    .xlog-profiler .right .close-btn,
+    .xlog-profiler .left .close-btn {
+        display: inline-block;
+    }
+
+    .xlog-profiler .profiler-layout.right .summary .title {
+        padding: 15px 0 7px;
+        margin-left: 40px;
+    }
+
+    .xlog-profiler .profile-steps-control {
+        margin-left: 40px;
+        padding: 0 0px;
+    }
+
+    .xlog-profiler .profile-list-btn {
+        position: absolute;
+        top: 0;
+        left: 0;
+        font-size: 24px;
+        padding-top: 17px;
+        text-align: center;
+        width: 40px;
+        box-sizing: border-box;
+        cursor: pointer;
+    }
+
+    .xlog-profiler .profile-list-btn:hover {
+        color: #FFE600;
+    }
+
+    .xlog-profiler .profile-steps-control .profile-control-btn:first-child {
+        margin-left: 0;
+    }
+
+}
