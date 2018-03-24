@@ -19,13 +19,13 @@
 
 .xlog-steps .general .type {
     text-align: center;
-    width: 60px;
+    width: 100px;
     background-color: #DDD;
 }
 
 .xlog-steps .general .start-time {
     text-align: center;
-    width: 160px;
+    width: 165px;
 }
 
 .xlog-steps .general .elapsed {
