@@ -228,12 +228,12 @@
 
 }
 
-.xlog-normal-dot {
+.xlog-dot-item {
     display: inline-block;
     line-height: 0;
 }
 
-.xlog-normal-dot .xlog-dot-rows .xlog-dot-columns {
+.xlog-dot-item .xlog-dot-rows .xlog-dot-columns {
     width: 20px;
     height: 20px;
     background-color: rgba(0, 0, 0, 0.1);
@@ -243,20 +243,20 @@
     border-bottom: none;
 }
 
-.settings.editable .xlog-normal-dot .xlog-dot-rows .xlog-dot-columns {
+.settings.editable .xlog-dot-item .xlog-dot-rows .xlog-dot-columns {
     cursor: pointer;
 
 }
 
-.xlog-normal-dot .xlog-dot-rows .xlog-dot-columns.last {
+.xlog-dot-item .xlog-dot-rows .xlog-dot-columns.last {
     border-right: 1px solid rgba(0, 0, 0, 0.2);
 }
 
-.xlog-normal-dot .xlog-dot-rows.last .xlog-dot-columns {
+.xlog-dot-item .xlog-dot-rows.last .xlog-dot-columns {
     border-bottom: 1px solid rgba(0, 0, 0, 0.2);
 }
 
-.xlog-normal-dot .xlog-dot-rows .xlog-dot-columns.selected {
+.xlog-dot-item .xlog-dot-rows .xlog-dot-columns.selected {
     border: 1px solid black;
 }
 

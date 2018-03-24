@@ -117,8 +117,6 @@ class XLog extends Component {
     draw = (xlogs) => {
         if (this.refs.xlogViewer && xlogs) {
             let context = d3.select(this.refs.xlogViewer).select("canvas").node().getContext("2d");
-            let gabX = Math.floor(this.graph.normalBrush.width / 2);
-            let gabY = Math.floor(this.graph.normalBrush.height / 2);
             xlogs.forEach((d, i) => {
 
                 let x = this.graph.x(d.endTime);
@@ -130,9 +128,15 @@ class XLog extends Component {
 
                 if (x > 0) {
                     if (Number(d.error)) {
-                        context.drawImage(this.graph.errorBrush, x - gabX, y - gabY, this.graph.errorBrush.width, this.graph.errorBrush.height);
+                        context.drawImage(this.graph.errorBrush, x - this.graph.errorBrush.gabX, y - this.graph.errorBrush.gabY, this.graph.errorBrush.width, this.graph.errorBrush.height);
                     } else {
-                        context.drawImage(this.graph.normalBrush, x - gabX, y - gabY, this.graph.normalBrush.width, this.graph.normalBrush.height);
+                        // TODO : check async condition
+                        if (false) {
+                            context.drawImage(this.graph.asyncBrush, x - this.graph.asyncBrush.gabX, y - this.graph.asyncBrush.gabY, this.graph.asyncBrush.width, this.graph.asyncBrush.height);
+                        } else {
+                            context.drawImage(this.graph.normalBrush, x - this.graph.normalBrush.gabX, y - this.graph.normalBrush.gabY, this.graph.normalBrush.width, this.graph.normalBrush.height);
+                        }
+
                     }
                 }
             });
@@ -354,6 +358,9 @@ class XLog extends Component {
         this.graph.normalBrush = document.createElement("canvas");
         this.graph.normalBrush.width = this.props.config.xlog.normal.columns;
         this.graph.normalBrush.height = this.props.config.xlog.normal.rows;
+        this.graph.normalBrush.gabX = Math.floor(this.graph.normalBrush.width / 2);
+        this.graph.normalBrush.gabY = Math.floor(this.graph.normalBrush.height / 2);
+
         let normalContext = this.graph.normalBrush.getContext("2d");
 
         normalContext.globalAlpha = Number(this.props.config.xlog.normal.opacity);
@@ -366,9 +373,28 @@ class XLog extends Component {
             }
         }
 
+        this.graph.asyncBrush = document.createElement("canvas");
+        this.graph.asyncBrush.width = this.props.config.xlog.async.columns;
+        this.graph.asyncBrush.height = this.props.config.xlog.async.rows;
+        this.graph.asyncBrush.gabX = Math.floor(this.graph.asyncBrush.width / 2);
+        this.graph.asyncBrush.gabY = Math.floor(this.graph.asyncBrush.height / 2);
+        let asyncContext = this.graph.asyncBrush.getContext("2d");
+
+        asyncContext.globalAlpha = Number(this.props.config.xlog.async.opacity);
+        for (let i = 0; i < this.props.config.xlog.async.rows; i++) {
+            for (let j = 0; j < this.props.config.xlog.async.columns; j++) {
+                if (this.props.config.xlog.async.fills["D_" + i + "_" + j] && this.props.config.xlog.async.fills["D_" + i + "_" + j].color !== "transparent") {
+                    asyncContext.fillStyle = this.props.config.xlog.async.fills["D_" + i + "_" + j].color;
+                    asyncContext.fillRect(j, i, 1, 1);
+                }
+            }
+        }
+
         this.graph.errorBrush = document.createElement("canvas");
         this.graph.errorBrush.height = this.props.config.xlog.error.rows;
         this.graph.errorBrush.width = this.props.config.xlog.error.columns;
+        this.graph.errorBrush.gabX = Math.floor(this.graph.errorBrush.width / 2);
+        this.graph.errorBrush.gabY = Math.floor(this.graph.errorBrush.height / 2);
         let errorContext = this.graph.errorBrush.getContext("2d");
 
         errorContext.globalAlpha = Number(this.props.config.xlog.error.opacity);

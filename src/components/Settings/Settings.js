@@ -17,6 +17,10 @@ class Settings extends Component {
                     cellId : null,
                     color : "white"
                 },
+                async : {
+                    cellId : null,
+                    color : "white"
+                },
                 error : {
                     cellId : null,
                     color : "white"
@@ -82,6 +86,10 @@ class Settings extends Component {
                         cellId : null,
                         color : "white"
                     },
+                    async : {
+                        cellId : null,
+                        color : "white"
+                    },
                     error : {
                         cellId : null,
                         color : "white"
@@ -101,6 +109,10 @@ class Settings extends Component {
                         cellId : null,
                         color : "white"
                     },
+                    async : {
+                        cellId : null,
+                        color : "white"
+                    },
                     error : {
                         cellId : null,
                         color : "white"
@@ -115,6 +127,10 @@ class Settings extends Component {
             edit: true,
             selected : {
                 normal : {
+                    cellId : null,
+                    color : "white"
+                },
+                async : {
                     cellId : null,
                     color : "white"
                 },
@@ -214,6 +230,36 @@ class Settings extends Component {
         }
     };
 
+    asyncColorChange = (color, event) => {
+
+        if (!this.state.edit) {
+            return;
+        }
+
+        let cellId = this.state.selected.async.cellId;
+        let selected = this.state.selected;
+        if (cellId) {
+            let config = this.state.config;
+            if (config.xlog.async.fills[cellId]) {
+                if (color.hex === "transparent") {
+                    delete config.xlog.async.fills[cellId];
+                } else {
+                    config.xlog.async.fills[cellId].color = color.hex;
+                }
+            } else {
+                config.xlog.async.fills[cellId] = {};
+                config.xlog.async.fills[cellId].color = color.hex;
+            }
+
+            selected.async.color = color.hex;
+
+            this.setState({
+                config : config,
+                selected : selected
+            });
+        }
+    };
+
     errorColorChange = (color, event) => {
 
         if (!this.state.edit) {
@@ -222,13 +268,14 @@ class Settings extends Component {
 
         let cellId = this.state.selected.error.cellId;
         let selected = this.state.selected;
-
         if (cellId) {
             let config = this.state.config;
             if (config.xlog.error.fills[cellId]) {
-
-
-                config.xlog.error.fills[cellId].color = color.hex;
+                if (color.hex === "transparent") {
+                    delete config.xlog.error.fills[cellId];
+                } else {
+                    config.xlog.error.fills[cellId].color = color.hex;
+                }
             } else {
                 config.xlog.error.fills[cellId] = {};
                 config.xlog.error.fills[cellId].color = color.hex;
@@ -245,9 +292,11 @@ class Settings extends Component {
 
     render() {
         let normalDotSetting = [];
+        let asyncDotSetting = [];
         let errorDotSetting = [];
         if (this.state.config) {
             normalDotSetting = this.getXLogDraw("normal");
+            asyncDotSetting = this.getXLogDraw("async");
             errorDotSetting = this.getXLogDraw("error");
         }
 
@@ -457,6 +506,31 @@ class Settings extends Component {
                         </div>
                         <div className="row ">
                             <div className="label">
+                                <div>DOT SIZE (ASYNC)</div>
+                            </div>
+                            <div className="input xlog-option">
+                                <div className="xlog-label">ROWS</div>
+                                <select value={this.state.config.xlog.async.rows} onChange={this.onXLogOptionChange.bind(this, "async", "rows")} disabled={!this.state.edit}>
+                                    <option>3</option><option>4</option><option>5</option><option>6</option><option>7</option><option>8</option>
+                                </select>
+                                <div className="xlog-label second">COLUMNS</div>
+                                <select value={this.state.config.xlog.async.columns} onChange={this.onXLogOptionChange.bind(this, "async", "columns")} disabled={!this.state.edit}>
+                                    <option>3</option><option>4</option><option>5</option><option>6</option><option>7</option><option>8</option>
+                                </select>
+                            </div>
+                            <div className="input xlog-option last">
+                                <div className="xlog-label">OPACITY</div>
+                                <select value={this.state.config.xlog.async.opacity} onChange={this.onXLogOptionChange.bind(this, "async", "opacity")} disabled={!this.state.edit}>
+                                    <option>0.1</option><option>0.2</option><option>0.3</option><option>0.4</option><option>0.5</option><option>0.6</option><option>0.7</option><option>0.8</option><option>0.9</option><option>1</option>
+                                </select>
+                                <div className="xlog-label second">SAMPLING</div>
+                                <select value={this.state.config.xlog.async.sampling} onChange={this.onXLogOptionChange.bind(this, "async", "sampling")} disabled={!this.state.edit}>
+                                    <option value="10">10%</option><option value="20">20%</option><option value="30">30%</option><option value="40">40%</option><option value="50">50%</option><option value="60">60%</option><option value="70">70%</option><option value="80">80%</option><option value="90">90%</option><option value="100">100%</option>
+                                </select>
+                            </div>
+                        </div>
+                        <div className="row ">
+                            <div className="label">
                                 <div>DOT SIZE (ERROR)</div>
                             </div>
                             <div className="input xlog-option">
@@ -487,7 +561,7 @@ class Settings extends Component {
                             <div className="input">
                                 <div className="xlog-dot-config">
                                     <div className="xlog-dot-config-left" style={{width : ((this.state.config.xlog.normal.columns * 20) + 20) + "px"}}>
-                                        <div className="xlog-normal-dot">
+                                        <div className="xlog-dot-item">
                                             {normalDotSetting.map((d, i) => {
                                                 return <div key={i} className={"xlog-dot-rows " + ((normalDotSetting.length - 1) === i ? 'last' : '')}>
                                                     {d.columns.map((c, j) => {
@@ -513,12 +587,43 @@ class Settings extends Component {
                         </div>
                         <div className="row">
                             <div className="label">
+                                <div>XLOG DOT (ASYNC)</div>
+                            </div>
+                            <div className="input">
+                                <div className="xlog-dot-config">
+                                    <div className="xlog-dot-config-left" style={{width : ((this.state.config.xlog.async.columns * 20) + 20) + "px"}}>
+                                        <div className="xlog-dot-item">
+                                            {asyncDotSetting.map((d, i) => {
+                                                return <div key={i} className={"xlog-dot-rows " + ((asyncDotSetting.length - 1) === i ? 'last' : '')}>
+                                                    {d.columns.map((c, j) => {
+                                                        let cellId = "D_" + i + "_" + j;
+                                                        let fill = this.state.config.xlog.async.fills[cellId];
+                                                        let color = "transparent";
+                                                        if (fill) {
+                                                            color = fill.color;
+                                                        }
+                                                        let selected = (this.state.selected["async"].cellId === cellId);
+                                                        return <div key={j} onClick={this.selectXLogCell.bind(null, "async", cellId)} className={"xlog-dot-columns " + (selected ? 'selected ' : ' ') + (((d.columns.length - 1) === j) ? 'last ' : ' ')} style={{backgroundColor: color}}></div>
+                                                    })}
+                                                </div>
+                                            })}
+                                        </div>
+                                    </div>
+                                    <div className="xlog-config-controller">
+                                        <CompactPicker colors={colors} color={ this.state.selected.async.color } onChange={this.asyncColorChange}/>
+                                        <div className="disabled-wrapper"></div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                        <div className="row">
+                            <div className="label">
                                 <div>XLOG DOT (ERROR)</div>
                             </div>
                             <div className="input">
                                 <div className="xlog-dot-config">
                                     <div className="xlog-dot-config-left" style={{width : ((this.state.config.xlog.error.columns * 20) + 20) + "px"}}>
-                                        <div className="xlog-normal-dot">
+                                        <div className="xlog-dot-item">
                                             {errorDotSetting.map((d, i) => {
                                                 return <div key={i} className={"xlog-dot-rows " + ((errorDotSetting.length - 1) === i ? 'last' : '')}>
                                                     {d.columns.map((c, j) => {

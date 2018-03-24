@@ -50,6 +50,41 @@ const configState = {
                 }
             }
         },
+        async: {
+            rows: 5,
+            columns: 5,
+            opacity : 0.7,
+            sampling : 100,
+            fills: {
+                D_0_2: {
+                    color: "#888"
+                },
+                D_1_2: {
+                    color: "#888"
+                },
+                D_2_0: {
+                    color: "#888"
+                },
+                D_2_1: {
+                    color: "#888"
+                },
+                D_2_2: {
+                    color: "#888"
+                },
+                D_2_3: {
+                    color: "#888"
+                },
+                D_2_4: {
+                    color: "#888"
+                },
+                D_3_2: {
+                    color: "#888"
+                },
+                D_4_2: {
+                    color: "#888"
+                }
+            }
+        },
         error: {
             rows: 5,
             columns: 5,
