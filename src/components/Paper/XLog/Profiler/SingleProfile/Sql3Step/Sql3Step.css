@@ -16,13 +16,18 @@
     white-space: nowrap;
 }
 
+.sql3-step .sql-statement.formatter {
+    white-space: pre;
+}
+
 .xlog-steps.wrap .sql3-step .sql-statement {
     white-space: normal;
     word-break: break-all;
 }
 
 .xlog-steps.wrap .sql3-step .sql-statement.formatter {
-    white-space: pre;
+    white-space: pre-line;
+    word-break: break-all;
 }
 
 .sql3-step .sql-param {

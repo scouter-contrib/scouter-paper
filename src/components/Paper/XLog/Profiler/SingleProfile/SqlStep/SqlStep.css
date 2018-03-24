@@ -1,4 +1,3 @@
-/* SQL */
 .sql-step .sql-statement {
     padding: 10px;
     line-height: 140%;
@@ -17,13 +16,18 @@
     white-space: nowrap;
 }
 
+.sql-step .sql-statement.formatter {
+    white-space: pre;
+}
+
 .xlog-steps.wrap .sql-step .sql-statement {
     white-space: normal;
     word-break: break-all;
 }
 
 .xlog-steps.wrap .sql-step .sql-statement.formatter {
-    white-space: pre;
+    white-space: pre-line;
+    word-break: break-all;
 }
 
 .sql-step .sql-param {
