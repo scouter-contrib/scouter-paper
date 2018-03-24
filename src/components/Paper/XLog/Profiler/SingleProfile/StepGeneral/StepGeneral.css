@@ -1,6 +1,6 @@
 /* GENERAL */
 .xlog-steps .general {
-    background-color: #EEE;
+    background-color: #DDD;
     padding: 0;
 }
 
@@ -20,7 +20,8 @@
 .xlog-steps .general .type {
     text-align: center;
     width: 100px;
-    background-color: #DDD;
+    background-color: #EEE;
+
 }
 
 .xlog-steps .general .start-time {
@@ -31,10 +32,10 @@
 .xlog-steps .general .elapsed {
     width: 80px;
     text-align: right;
-    background-color: #DDD;
+    background-color: #EEE;
 }
 
 .xlog-steps .general .value {
-    width: 60px;
-    text-align: right;
+    text-align: left;
+    margin-left: 10px;
 }
