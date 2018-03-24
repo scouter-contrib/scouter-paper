@@ -9,7 +9,7 @@ import SingleProfile from "./SingleProfile/SingleProfile";
 import ProfileList from "./ProfileList/ProfileList";
 import _ from "lodash";
 import moment from "moment";
-import {disableBodyScroll, enableBodyScroll, clearAllBodyScrollLocks} from 'body-scroll-lock';
+import {disableBodyScroll, enableBodyScroll} from 'body-scroll-lock';
 
 const xlogMaxSelectionCount = 200;
 
@@ -104,6 +104,7 @@ class Profiler extends Component {
     }
 
     componentWillReceiveProps(nextProps) {
+
         if (nextProps.selection.x1 === null || nextProps.selection.x2 === null || nextProps.selection.y1 === null || nextProps.selection.y2 === null) {
             this.setState({
                 show: false
@@ -132,13 +133,22 @@ class Profiler extends Component {
     getList = (x1, x2, y1, y2) => {
         var that = this;
         let allXLogs = that.props.xlogs;
-        const filtered = _(allXLogs)
+        let newXLogs = that.props.newXLogs;
+
+        const filtered1 = _(allXLogs)
             .filter(x => x1 <= x.endTime * 1 && x.endTime * 1 <= x2 && y1 <= x.elapsed * 1 && x.elapsed * 1 <= y2)
             .take(xlogMaxSelectionCount).value();
 
-        if (filtered.length === 0) {
+        const filtered2 = _(newXLogs)
+            .filter(x => x1 <= x.endTime * 1 && x.endTime * 1 <= x2 && y1 <= x.elapsed * 1 && x.elapsed * 1 <= y2)
+            .take(xlogMaxSelectionCount).value();
+
+
+        if (filtered1.length === 0 && filtered2.length === 0) {
             return;
         }
+
+        let filtered = [].concat(filtered1, filtered2);
 
         let date = moment(new Date(x1)).format("YYYYMMDD");
         this.props.addRequest();

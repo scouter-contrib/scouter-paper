@@ -341,19 +341,9 @@ class Paper extends Component {
                         return false;
                     }
                 }
-            }).map((d) => {
-                d["_custom"] = {
-                    p: false
-                };
-                return d;
-            });
+            })
         } else {
-            datas = result.xlogs.map((d) => {
-                d["_custom"] = {
-                    p: false
-                };
-                return d;
-            });
+            datas = result.xlogs;
         }
 
         let tempXlogs = this.state.data.tempXlogs.concat(datas);
@@ -370,7 +360,7 @@ class Paper extends Component {
         let firstStepStartTime = this.state.data.lastRequestTime - 1000;
         let secondStepStartTime = firstStepStartTime - 5000;
 
-        this.removeOverTimeXLogFrom(tempXlogs, startTime);
+        this.removeOverTimeXLogFrom(data.tempXlogs, startTime);
         if (!this.state.visible) {
             this.setState({
                 data: data
@@ -804,7 +794,7 @@ class Paper extends Component {
                     </div>
                 </div>
                 }
-                <Profiler selection={this.props.selection} xlogs={this.state.data.xlogs} startTime={this.state.data.startTime}/>
+                <Profiler selection={this.props.selection} newXLogs={this.state.data.newXLogs} xlogs={this.state.data.xlogs} startTime={this.state.data.startTime}/>
             </div>
         );
     }

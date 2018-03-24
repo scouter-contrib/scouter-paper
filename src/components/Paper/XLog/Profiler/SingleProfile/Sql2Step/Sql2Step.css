@@ -21,7 +21,7 @@
     word-break: break-all;
 }
 
-.sql2-step .sql-statement.formatter {
+.xlog-steps.wrap .sql2-step .sql-statement.formatter {
     white-space: pre;
 }
 

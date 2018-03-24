@@ -13,7 +13,6 @@ import jQuery from "jquery";
 import {withRouter} from 'react-router-dom';
 import {getHttpProtocol, errorHandler, getWithCredentials, setAuthHeader} from '../../../common/common';
 import 'url-search-params-polyfill';
-import ServerDate from '../../../common/ServerDate'
 import * as common from '../../../common/common'
 
 class InstanceSelector extends Component {
