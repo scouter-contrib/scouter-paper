@@ -26,7 +26,7 @@
 }
 
 .xlog-steps.wrap .sql-step .sql-statement.formatter {
-    white-space: pre-line;
+    white-space: pre-wrap;
     word-break: break-all;
 }
 
