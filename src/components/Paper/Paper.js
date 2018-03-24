@@ -583,6 +583,7 @@ class Paper extends Component {
                         type: option.type,
                         config: option.config,
                         counterKey: option.counterKey,
+                        title: option.title,
                         objectType: option.objectType
                     };
                 } else {
