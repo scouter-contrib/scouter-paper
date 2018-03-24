@@ -97,13 +97,13 @@ class App extends Component {
         css.type = "text/css";
         css.innerHTML = "";
         this.getFontGeneric(fontSetting.basic);
-        css.innerHTML += "html,body,svg text,input,select,button { font-family: '" + fontSetting.basic + "'," + this.getFontGeneric(fontSetting.basic) + "; }";
-        css.innerHTML += ".layout-manager .content-ilst { font-family: '" + fontSetting.basic + "'," + this.getFontGeneric(fontSetting.basic) + "; }";
-        css.innerHTML += ".instance-selector .list-content { font-family: '" + fontSetting.basic  + "'," + this.getFontGeneric(fontSetting.basic) + "; }";
-        css.innerHTML += "svg text { font-family: '" + fontSetting.axis + "'," + this.getFontGeneric(fontSetting.axis) + "; }";
-        css.innerHTML += ".tooltip { font-family: '" + fontSetting.tooltip + "'," + this.getFontGeneric(fontSetting.tooltip) + "; }";
-        css.innerHTML += ".xlog-profiler { font-family: '" + fontSetting.profiler + "'," + this.getFontGeneric(fontSetting.profiler) + "; }";
-        css.innerHTML += ".menu-div { font-family: '" + fontSetting.menu + "'," + this.getFontGeneric(fontSetting.menu) + "; }";
+        css.innerHTML += "html,body,svg text,input,select,button { font-family: '" + fontSetting.basic + "','Nanum Gothic'," + this.getFontGeneric(fontSetting.basic) + "; }";
+        css.innerHTML += ".layout-manager .content-ilst { font-family: '" + fontSetting.basic + "','Nanum Gothic'," + this.getFontGeneric(fontSetting.basic) + "; }";
+        css.innerHTML += ".instance-selector .list-content { font-family: '" + fontSetting.basic  + "','Nanum Gothic'," + this.getFontGeneric(fontSetting.basic) + "; }";
+        css.innerHTML += "svg text { font-family: '" + fontSetting.axis + "','Nanum Gothic'," + this.getFontGeneric(fontSetting.axis) + "; }";
+        css.innerHTML += ".tooltip { font-family: '" + fontSetting.tooltip + "','Nanum Gothic'," + this.getFontGeneric(fontSetting.tooltip) + "; }";
+        css.innerHTML += ".xlog-profiler { font-family: '" + fontSetting.profiler + "','Nanum Gothic'," + this.getFontGeneric(fontSetting.profiler) + "; }";
+        css.innerHTML += ".menu-div { font-family: '" + fontSetting.menu + "','Nanum Gothic'," + this.getFontGeneric(fontSetting.menu) + "; }";
 
         document.body.appendChild(css);
     };
@@ -142,7 +142,6 @@ class App extends Component {
     }
 
     componentDidMount() {
-        this.setFontSetting(this.props.config.fontSetting);
         this.setFontSetting(this.props.config.fontSetting);
     }
 
