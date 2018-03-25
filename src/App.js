@@ -18,7 +18,7 @@ import {setConfig, addRequest, clearAllMessage, setControlVisibility, setUserId,
 import {detect} from 'detect-browser';
 import Unsupport from "./components/Unsupport/Unsupport";
 import jQuery from "jquery";
-import {errorHandler} from './common/common';
+import {errorHandler, mergeDeep} from './common/common';
 import Home from "./components/Home/Home";
 
 const browser = detect();
@@ -119,7 +119,7 @@ class App extends Component {
         let str = localStorage.getItem("config");
         if (str) {
             config = JSON.parse(str);
-            config = Object.assign(this.props.config, config); //for added config's properties on later versions.
+            config = mergeDeep(this.props.config, config); //for added config's properties on later versions.
             this.props.setConfig(config);
             localStorage.setItem("config", JSON.stringify(config));
         } else {
