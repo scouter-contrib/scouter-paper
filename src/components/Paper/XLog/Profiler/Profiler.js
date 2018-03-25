@@ -186,6 +186,8 @@ class Profiler extends Component {
         let filtered = [].concat(filtered1, filtered2);
 
         let date = moment(new Date(x1)).format("YYYYMMDD");
+
+        this.props.setControlVisibility("Loading", true);
         this.props.addRequest();
         jQuery.ajax({
             method: "GET",
@@ -232,6 +234,8 @@ class Profiler extends Component {
 
         }).fail((xhr, textStatus, errorThrown) => {
             errorHandler(xhr, textStatus, errorThrown, this.props);
+        }).always(() => {
+            this.props.setControlVisibility("Loading", false);
         });
     };
 
@@ -263,6 +267,7 @@ class Profiler extends Component {
 
 
         // XLOG DATA
+        this.props.setControlVisibility("Loading", true);
         this.props.addRequest();
         jQuery.ajax({
             method: "GET",
@@ -312,9 +317,12 @@ class Profiler extends Component {
 
             }).fail((xhr, textStatus, errorThrown) => {
                 errorHandler(xhr, textStatus, errorThrown, this.props);
+            }).always(() => {
+                this.props.setControlVisibility("Loading", false);
             });
         }).fail((xhr, textStatus, errorThrown) => {
             errorHandler(xhr, textStatus, errorThrown, this.props);
+            this.props.setControlVisibility("Loading", false);
         });
     };
 
