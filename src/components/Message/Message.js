@@ -43,7 +43,7 @@ class Message extends Component {
         this.props.clearAllMessage();
         this.props.setControlVisibility("Message", false);
         const unauthorizedMessages = _.filter(this.props.messages, (m) => m.category === "unauthorized");
-        if(unauthorizedMessages) {
+        if(unauthorizedMessages && unauthorizedMessages.length > 0) {
             this.props.history.push('/Login');
         }
     };
