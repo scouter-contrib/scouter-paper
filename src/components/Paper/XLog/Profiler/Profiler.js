@@ -449,7 +449,7 @@ class Profiler extends Component {
                     </div>
                     <div className="profiler-layout right" style={rightStyle}>
                         <div className="summary">
-                            {this.state.smallScreen && <div onClick={this.clearTxId.bind(this)} className="profile-list-btn"><i class="fa fa-chevron-circle-left"></i></div>}
+                            {this.state.smallScreen && <div onClick={this.clearTxId.bind(this)} className="profile-list-btn"><i className="fa fa-chevron-circle-left"></i></div>}
                             <div className="title">DETAIL <span className="selected-info">({this.state.txid ? 'TXID : ' + this.state.txid : 'NO PROFILE SELECTED'})</span></div>
                             <div className="profile-steps-control noselect">
                                 <div className={"profile-control-btn " + (this.state.summary ? 'active' : '')} onClick={this.toggleSummary}>{this.state.summary ? <i className="fa fa-check-circle"></i> : <i className="fa fa-circle-o"></i>} SUMMARY</div>

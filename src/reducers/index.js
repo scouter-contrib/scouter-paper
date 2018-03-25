@@ -248,7 +248,7 @@ const message = (state = messageState, action) => {
             messages.push({
                 category : action.category,
                 title : action.title,
-                content : action.content,
+                content : action.content
             });
 
             return Object.assign({}, state, {messages : messages});

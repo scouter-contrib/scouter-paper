@@ -41,8 +41,8 @@ class InstanceSelector extends Component {
         }
 
         var that = this;
-        if (!this.init && ((props.user && props.user.id) || authMethod === "none")) {
 
+        if (!this.init) {
             this.props.addRequest();
             jQuery.ajax({
                 method: "GET",
