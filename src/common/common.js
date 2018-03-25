@@ -60,7 +60,7 @@ export function errorHandler(xhr, textStatus, errorThrown, props) {
     if (xhr.readyState === 4) {
         if (xhr.responseJSON) {
             if (xhr.responseJSON.resultCode === "401") {
-                props.pushMessage("error", "ERROR - " + xhr.responseJSON.resultCode, xhr.responseJSON.message);
+                props.pushMessage("unauthorized", "ERROR - " + xhr.responseJSON.resultCode, xhr.responseJSON.message);
                 props.setControlVisibility("Message", true);
             } else {
                 props.pushMessage("error", "ERROR - " + xhr.responseJSON.resultCode, xhr.responseJSON.message);

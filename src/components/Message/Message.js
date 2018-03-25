@@ -2,7 +2,8 @@ import React, {Component} from 'react';
 import './Message.css';
 import {connect} from 'react-redux';
 import {clearAllMessage, setControlVisibility} from '../../actions';
-
+import {withRouter} from 'react-router-dom';
+import _ from "lodash";
 
 class Message extends Component {
 
@@ -41,6 +42,10 @@ class Message extends Component {
     done = () => {
         this.props.clearAllMessage();
         this.props.setControlVisibility("Message", false);
+        const unauthorizedMessages = _.filter(this.props.messages, (m) => m.category === "unauthorized");
+        if(unauthorizedMessages) {
+            this.props.history.push('/Login');
+        }
     };
 
     render() {
@@ -93,4 +98,4 @@ let mapDispatchToProps = (dispatch) => {
 
 Message = connect(mapStateToProps, mapDispatchToProps)(Message);
 
-export default Message;
+export default withRouter(Message);
