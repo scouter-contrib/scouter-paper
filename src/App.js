@@ -128,12 +128,7 @@ class App extends Component {
         let user = localStorage.getItem("user");
         if (user) {
             user = JSON.parse(user);
-            let now = (new Date()).getTime();
-            if (config && config.authentification.timeout < (now - user.time)) {
-                localStorage.removeItem("user");
-            } else {
-                this.info(user, config);
-            }
+            this.info(user, config);
         }
 
         if (!user && config && config.authentification.type === "none") {

@@ -31,14 +31,12 @@ class InstanceSelector extends Component {
     }
 
     componentDidMount() {
-        this.setTargetFromUrl(this.props);
+        if (this.props.user && this.props.user.id) {
+            this.setTargetFromUrl(this.props);
+        }
     }
 
     setTargetFromUrl = (props) => {
-        let authMethod = "bearer";
-        if (props.config && props.config.authentification) {
-            authMethod = props.config.authentification.type;
-        }
 
         var that = this;
 
@@ -176,10 +174,9 @@ class InstanceSelector extends Component {
     };
 
     componentWillReceiveProps(nextProps) {
-
-        this.setTargetFromUrl(nextProps);
-
-
+        if (nextProps.user.id) {
+            this.setTargetFromUrl(nextProps);
+        }
     }
 
     getServers = () => {
