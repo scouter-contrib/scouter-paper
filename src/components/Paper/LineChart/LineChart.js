@@ -4,6 +4,7 @@ import {connect} from 'react-redux';
 import {withRouter} from 'react-router-dom';
 import * as d3 from "d3";
 import ServerDate from "../../../common/ServerDate";
+import InstanceColor from "../../../common/InstanceColor";
 
 class LineChart extends Component {
 
@@ -271,6 +272,7 @@ class LineChart extends Component {
 
         if (init) {
             this.graph.svg.insert("g", ":first-child").attr("class", "axis-x").attr("transform", "translate(0," + this.graph.height + ")").call(d3.axisBottom(this.graph.x).tickFormat(d3.timeFormat(this.graph.timeFormat)).ticks(xAxisCount));
+            this.graph.svg.insert("g", ":first-child").attr("class", "axis-x").attr("transform", "translate(0," + this.graph.height + ")").call(d3.axisBottom(this.graph.x).tickFormat(d3.timeFormat(this.graph.timeFormat)).ticks(xAxisCount));
             this.graph.svg.insert("g", ":first-child").attr("class", "grid-x").style("stroke-dasharray", "5 5").style("opacity", "0.3").attr("transform", "translate(0," + this.graph.height + ")").call(d3.axisBottom(this.graph.x).tickSize(-this.graph.height).tickFormat("").ticks(xAxisCount));
         } else {
             this.graph.svg.select(".axis-y").transition().duration(500).call(d3.axisLeft(this.graph.y).tickFormat(d3.format(".0s")).ticks(yAxisCount));
@@ -310,7 +312,21 @@ class LineChart extends Component {
     };
 
     drawObjectLine = (obj, option, counterKey, colorScale, cnt) => {
-        var that = this;
+        if(!option) return;
+
+        const that = this;
+        let pathClass = "line-" + obj.objHash + "-" + counterKey;
+        let path = this.graph.svg.selectAll("path." + pathClass);
+
+        if (path.size() < 1) {
+            path = this.graph.svg.insert("path", ":first-child").attr("class", pathClass).style("stroke", colorScale[cnt]);
+            this.props.setTitle(counterKey, option.title, colorScale[cnt]);
+        } else {
+            path.style("stroke", colorScale[cnt]);
+            this.props.setTitle(counterKey, option.title, colorScale[cnt]);
+            let circleKey = "circle-" + obj.objHash + "_" + counterKey;
+            that.graph.focus.select("circle." + circleKey).attr("stroke", colorScale[cnt]);
+        }
 
         let valueLine = d3.line().curve(d3.curveCatmullRom)
             .defined(function (d) {
@@ -329,25 +345,8 @@ class LineChart extends Component {
                 }
             });
 
-        let pathClass = "line-" + obj.objHash + "-" + counterKey;
-
-        let path = this.graph.svg.selectAll("path." + pathClass);
-        if (option && path.size() < 1) {
-            path = this.graph.svg.insert("path", ":first-child").attr("class", pathClass).style("stroke", colorScale[cnt]);
-            this.props.setTitle(counterKey, option.title, colorScale[cnt]);
-        } else {
-            if (option) {
-                path.style("stroke", colorScale[cnt]);
-                this.props.setTitle(counterKey, option.title, colorScale[cnt]);
-                let circleKey = "circle-" + obj.objHash + "_" + counterKey;
-                that.graph.focus.select("circle." + circleKey).attr("stroke", colorScale[cnt]);
-            }
-        }
-
-        if (option) {
-            path.data([that.state.counters[counterKey]]).attr("d", valueLine);
-            cnt++;
-        }
+        path.data([that.state.counters[counterKey]]).attr("d", valueLine);
+        cnt++;
 
 
         return cnt;
@@ -362,7 +361,6 @@ class LineChart extends Component {
 
             this.graphAxis(this.graph.width, this.graph.height, false);
             if (this.props.instances) {
-                let colorScale = d3.schemeCategory10;
                 let cnt = 0;
                 for (let counterKey in this.state.counters) {
 
@@ -385,13 +383,13 @@ class LineChart extends Component {
 
                     if (thisOption && thisOption.objectType === "instance") {
                         for (let i = 0; i < this.props.instances.length; i++) {
-                            cnt = this.drawObjectLine(that.props.instances[i], thisOption, counterKey, colorScale, cnt);
+                            cnt = this.drawObjectLine(that.props.instances[i], thisOption, counterKey, InstanceColor.getInstanceColors(), cnt);
                         }
                     }
 
                     if (thisOption && thisOption.objectType === "host") {
                         for (let i = 0; i < this.props.hosts.length; i++) {
-                            cnt = this.drawObjectLine(that.props.hosts[i], thisOption, counterKey, colorScale, cnt);
+                            cnt = this.drawObjectLine(that.props.hosts[i], thisOption, counterKey, InstanceColor.getHostColors(), cnt);
                         }
                     }
                 }
@@ -482,7 +480,6 @@ class LineChart extends Component {
                 hoverLine.style("display", "block");
             }
 
-            let colorScale = d3.schemeCategory10;
             let cnt = 0;
 
             for (let counterKey in that.state.counters) {
@@ -502,14 +499,14 @@ class LineChart extends Component {
 
                 if (thisOption.objectType === "instance") {
                     for (let i = 0; i < that.props.instances.length; i++) {
-                        that.mouseOverObject(that.props.instances[i], thisOption, colorScale[cnt]);
+                        that.mouseOverObject(that.props.instances[i], thisOption, InstanceColor.getInstanceColors()[cnt]);
                         cnt++;
                     }
                 }
 
                 if (thisOption.objectType === "host") {
                     for (let i = 0; i < that.props.hosts.length; i++) {
-                        that.mouseOverObject(that.props.hosts[i], thisOption, colorScale[cnt]);
+                        that.mouseOverObject(that.props.hosts[i], thisOption, InstanceColor.getHostColors()[cnt]);
                         cnt++;
                     }
                 }
@@ -565,7 +562,6 @@ class LineChart extends Component {
             let x0 = that.graph.x.invert(xPos);
             let timeFormat = d3.timeFormat(that.graph.fullTimeFormat);
 
-            let colorScale = d3.schemeCategory10;
             let cnt = 0;
             for (let counterKey in that.state.counters) {
                 let thisOption = null;
@@ -596,7 +592,7 @@ class LineChart extends Component {
 
                 if (thisOption.objectType === "instance") {
                     for (let i = 0; i < that.props.instances.length; i++) {
-                        let done = that.mouseMoveObject(that.props.instances[i], thisOption, counterKey, dataIndex, colorScale[cnt], tooltip);
+                        let done = that.mouseMoveObject(that.props.instances[i], thisOption, counterKey, dataIndex, InstanceColor.getInstanceColors()[cnt], tooltip);
                         if (done) {
                             cnt++;
                         }
@@ -606,7 +602,7 @@ class LineChart extends Component {
 
                 if (thisOption.objectType === "host") {
                     for (let i = 0; i < that.props.hosts.length; i++) {
-                        let done = that.mouseMoveObject(that.props.hosts[i], thisOption, counterKey, dataIndex, colorScale[cnt], tooltip);
+                        let done = that.mouseMoveObject(that.props.hosts[i], thisOption, counterKey, dataIndex, InstanceColor.getHostColors()[cnt], tooltip);
                         if (done) {
                             cnt++;
                         }

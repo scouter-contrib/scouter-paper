@@ -47,11 +47,6 @@ class Profiler extends Component {
         document.addEventListener("keydown", this.keyDown.bind(this));
     }
 
-
-    componentWillUnmount() {
-        document.removeEventListener("keydown", this.keyDown.bind(this));
-    }
-
     shouldComponentUpdate(nextProps, nextState) {
 
         if (JSON.stringify(nextProps.selection) !== JSON.stringify(this.props.selection)) {
