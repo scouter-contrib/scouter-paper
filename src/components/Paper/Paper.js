@@ -528,7 +528,6 @@ class Paper extends Component {
 
         let layouts = this.state.layouts;
 
-
         for (let unit in layouts) {
             if (layouts[unit] && layouts[unit].length > 0) {
                 layouts[unit].forEach((layout, i) => {
@@ -545,6 +544,9 @@ class Paper extends Component {
             layouts: layouts,
             layoutChangeTime: (new Date()).getTime()
         });
+
+        setData("layouts", layouts);
+        setData("boxes", boxes);
     };
 
     clearLayout = () => {
@@ -715,7 +717,6 @@ class Paper extends Component {
                 }
             }
         });
-
 
         this.setState({
             boxes: boxes

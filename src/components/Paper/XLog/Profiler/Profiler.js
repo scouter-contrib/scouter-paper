@@ -43,13 +43,14 @@ class Profiler extends Component {
         }
     };
 
-    componentWillMount() {
-        document.addEventListener("keydown", this.keyDown.bind(this));
+    componentDidMount() {
+        window.addEventListener("resize", this.updateDimensions);
+        window.addEventListener("keydown", this.keyDown.bind(this));
     }
 
-
     componentWillUnmount() {
-        document.removeEventListener("keydown", this.keyDown.bind(this));
+        window.removeEventListener("resize", this.updateDimensions);
+        window.removeEventListener("keydown", this.keyDown.bind(this));
     }
 
     shouldComponentUpdate(nextProps, nextState) {
@@ -127,14 +128,6 @@ class Profiler extends Component {
             })
         }
     };
-
-    componentDidMount() {
-        window.addEventListener("resize", this.updateDimensions);
-    }
-
-    componentWillUnmount() {
-        window.removeEventListener("resize", this.updateDimensions);
-    }
 
     componentWillReceiveProps(nextProps) {
 
