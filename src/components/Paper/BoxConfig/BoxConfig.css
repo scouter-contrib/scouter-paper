@@ -1,34 +1,18 @@
 .box-config {
     position: absolute;
-
     background-color: rgba(0, 0, 0, 0.8);
     background-color: black;
     background-color: #104E8B;
-
-
-
-
-
-
-
     top: 5px;
     left: 5px;
     height: calc(100% - 10px);
     width: calc(100% - 10px);
-    padding: 10px 0;
-
-
-
-
-
-
-
-
-
+    padding: 8px 0;
     line-height: 0;
     font-size: 9px;
     display: table;
     z-index: 3;
+    box-sizing: border-box;
 }
 
 .box-config input,
@@ -50,9 +34,9 @@
 }
 
 .box-config .box-config-item {
-    padding: 2px 0 10px;
+    padding: 2px 0 5px;
     width: 50%;
-    height: 46px;
+    _height: 46px;
     display: inline-block;
     position: relative;
     vertical-align: top;
@@ -71,11 +55,6 @@
 .box-config .box-config-item label {
     color: white;
 
-
-
-
-
-
     line-height: 100%;
     width: 100px;
     display: inline-block;
@@ -85,7 +64,7 @@
 .box-config .box-config-item input[type=text],
 .box-config .box-config-item select {
     width: calc(100% - 120px);
-    padding: 0 5px;
+    padding: 5px;
     outline: none;
     border-radius: 3px;
     border: none;
@@ -129,6 +108,7 @@
     font-size: 8px;
     padding: 2px 20px;
 }
+
 .box-config .exclusive-options-title {
     text-align: center;
     padding: 10px;
@@ -139,13 +119,18 @@
     line-height: 100%;
     color: white;
     padding: 10px;
+    display: none;
+}
+
+.box-config .exclusive-options.show {
+    display: block;
 }
 
 .box-config .exclusive-options .metric-option {
     display: inline-block;
     background-color: white;
     color: #333;
-    border: 1px solid rgba(0,0,0,0.5);
+    border: 1px solid rgba(0, 0, 0, 0.5);
     margin-right: 5px;
     border-radius: 3px;
 }
@@ -153,7 +138,7 @@
 .box-config .exclusive-options .metric-option span {
     padding: 7px;
     display: inline-block;
-    border-right: 1px solid rgba(0,0,0,0.5);
+    border-right: 1px solid rgba(0, 0, 0, 0.5);
 }
 
 .box-config .exclusive-options .metric-option.removed span {

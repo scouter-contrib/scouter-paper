@@ -525,6 +525,7 @@ class Paper extends Component {
     };
 
     removePaper = (key) => {
+
         let boxes = this.state.boxes;
         boxes.forEach((box, i) => {
             if (box.key === key) {
@@ -760,18 +761,14 @@ class Paper extends Component {
                             <div>
                                 <h3>NO PAPER</h3>
                                 <ol>
-                                    <li>CLICK [<i className="fa fa-plus-circle" aria-hidden="true"></i>] BUTTON TO ADD
-                                        PAPER
-                                    </li>
+                                    <li>CLICK [<i className="fa fa-plus-circle" aria-hidden="true"></i>] BUTTON TO ADD PAPER</li>
                                     <li>AND DRAG METRIC TO PAPER</li>
                                 </ol>
                             </div>
                         </div>
                     </div>
                 </div>}
-                <ResponsiveReactGridLayout className="layout" cols={{lg: 12, md: 10, sm: 6, xs: 4, xxs: 2}}
-                                           layouts={this.state.layouts} rowHeight={30}
-                                           onLayoutChange={(layout, layouts) => this.onLayoutChange(layout, layouts)}>
+                <ResponsiveReactGridLayout className="layout" cols={{lg: 12, md: 10, sm: 6, xs: 4, xxs: 2}} layouts={this.state.layouts} rowHeight={30} onLayoutChange={(layout, layouts) => this.onLayoutChange(layout, layouts)}>
                     {this.state.boxes.map((box, i) => {
                         return (
                             <div className="box-layout" key={box.key} data-grid={box.layout}>

@@ -11,8 +11,7 @@ const configState = {
     timeFormat: "HH:MM:SS",
     minuteFormat: "HH:MM",
     authentification : {
-        type : "bearer",
-        timeout : 1000 * 60 * 60 * 24
+        type : "bearer"
     },
     xlog: {
         normal: {

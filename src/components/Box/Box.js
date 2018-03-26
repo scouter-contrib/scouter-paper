@@ -48,6 +48,11 @@ class Box extends Component {
     onDrop(data) {
         if (data) {
             let option = JSON.parse(data.metric);
+            if (option.mode === "exclusive") {
+                this.setState({
+                    titles : {}
+                });
+            }
             this.props.setOption(this.props.box.key, option);
         }
     }
