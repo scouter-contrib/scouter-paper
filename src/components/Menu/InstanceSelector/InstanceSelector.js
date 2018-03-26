@@ -35,14 +35,16 @@ class InstanceSelector extends Component {
     }
 
     setTargetFromUrl = (props) => {
-        let authMethod = "bearer";
-        if (props.config && props.config.authentification) {
-            authMethod = props.config.authentification.type;
+        if (props.config.authentification && props.config.authentification.type === 'bearer') {
+            if (!props.user || !props.user.token) {
+                return;
+            }
         }
 
-        var that = this;
+        const that = this;
 
         if (!this.init) {
+
             this.props.addRequest();
             jQuery.ajax({
                 method: "GET",
