@@ -244,12 +244,6 @@ const profileMetas = [
 
 class SingleProfile extends Component {
 
-    zeroPadding(n, p, c) {
-        var pad_char = typeof c !== 'undefined' ? c : '0';
-        var pad = new Array(1 + p).join(pad_char);
-        return (pad + n).slice(-pad.length);
-    }
-
     render() {
         let startTime;
         if (this.props.profile) {

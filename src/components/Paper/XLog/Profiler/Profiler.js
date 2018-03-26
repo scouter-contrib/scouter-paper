@@ -166,7 +166,7 @@ class Profiler extends Component {
 
 
     getList = (x1, x2, y1, y2) => {
-        var that = this;
+        let that = this;
         let allXLogs = that.props.xlogs;
         let newXLogs = that.props.newXLogs;
 
@@ -253,7 +253,7 @@ class Profiler extends Component {
 
     rowClick = (xlog) => {
 
-        var that = this;
+        let that = this;
 
         if (this.state.txid === xlog.txid) {
             this.setState({

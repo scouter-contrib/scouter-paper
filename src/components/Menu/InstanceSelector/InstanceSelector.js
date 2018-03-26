@@ -38,7 +38,7 @@ class InstanceSelector extends Component {
 
     setTargetFromUrl = (props) => {
 
-        var that = this;
+        let that = this;
 
         if (!this.init) {
             this.props.addRequest();
@@ -180,7 +180,7 @@ class InstanceSelector extends Component {
     }
 
     getServers = () => {
-        var that = this;
+        let that = this;
         this.props.addRequest();
         jQuery.ajax({
             method: "GET",

@@ -24,7 +24,6 @@ select {
 }
 
 button {
-    padding: 0;
     line-height: 100%;
     padding: 6px 8px;
     background-color: #FFD700;
@@ -48,5 +47,5 @@ svg text,
 input,
 select,
 button {
-    font-family: 'Righteous';
+    font-family: 'Righteous', sans-serif;
 }

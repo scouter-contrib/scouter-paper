@@ -82,7 +82,7 @@ class App extends Component {
             if (val === this.props.config.fonts[i].val) {
                 return this.props.config.fonts[i].generic;
             }
-        };
+        }
 
         return "";
     };
