@@ -290,7 +290,7 @@ class XLog extends Component {
 
         // 드래그 셀렉트
         svg.append("g").append("rect").attr("class", "selection").attr("opacity", 0.2);
-        let that = this;
+
         let dragBehavior = d3.drag()
             .on("drag", function () {
                 let p = d3.mouse(this);
