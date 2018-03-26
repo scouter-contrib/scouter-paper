@@ -523,7 +523,9 @@ class LineChart extends Component {
         this.graph.overlay.on("mouseout", function () {
 
             let l = that.refs.lineChartRoot.parentNode.parentNode.parentNode.parentNode.parentNode;
-            l.style.zIndex = 0;
+            l.style.zIndex = 5;
+
+
 
             let hoverLine = that.graph.focus.select("line.x-hover-line");
             if (hoverLine.size() > 0) {
