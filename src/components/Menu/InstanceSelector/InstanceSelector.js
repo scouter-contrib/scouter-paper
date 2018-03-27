@@ -312,6 +312,9 @@ class InstanceSelector extends Component {
             this.props.pushMessage("info", "NO MONITORING TARGET", "At least one instance must be selected");
             this.props.setControlVisibility("Message", true);
         } else {
+            AgentColor.setHosts(hosts);
+            AgentColor.setInstances(instances);
+
             this.props.setTarget(hosts, instances);
             this.props.setControlVisibility("TargetSelector", false);
 
