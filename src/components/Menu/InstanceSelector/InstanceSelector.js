@@ -14,6 +14,7 @@ import {withRouter} from 'react-router-dom';
 import {getHttpProtocol, errorHandler, getWithCredentials, setAuthHeader} from '../../../common/common';
 import 'url-search-params-polyfill';
 import * as common from '../../../common/common'
+import AgentColor from "../../../common/InstanceColor";
 
 class InstanceSelector extends Component {
 
@@ -156,6 +157,8 @@ class InstanceSelector extends Component {
                                 selectedInstances: selectedInstanceMap
                             });
 
+                            AgentColor.setHosts(selectedHosts);
+                            AgentColor.setInstances(selectedInstances);
                             this.props.setTarget(selectedHosts, selectedInstances);
 
                         } else {
