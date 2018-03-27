@@ -46,11 +46,7 @@ class LineChart extends Component {
     }
 
     shouldComponentUpdate() {
-        if (this.props.visible) {
-            return true;
-        } else {
-            return false;
-        }
+        return !!this.props.visible;
     }
 
     componentWillReceiveProps(nextProps) {
@@ -310,7 +306,7 @@ class LineChart extends Component {
     };
 
     drawObjectLine = (obj, option, counterKey, colorScale, cnt) => {
-        var that = this;
+        let that = this;
 
         let valueLine = d3.line().curve(d3.curveCatmullRom)
             .defined(function (d) {
@@ -410,7 +406,7 @@ class LineChart extends Component {
     };
 
     mouseOverObject = (obj, thisOption, color) => {
-        var that = this;
+        let that = this;
         let r = 3;
 
         let circleKey = "circle-" + obj.objHash + "_" + thisOption.counterKey;
@@ -421,7 +417,7 @@ class LineChart extends Component {
     };
 
     mouseMoveObject = (obj, thisOption, counterKey, dataIndex, color, tooltip) => {
-        var that = this;
+        let that = this;
 
         let circleKey = "circle-" + obj.objHash + "_" + thisOption.counterKey;
 

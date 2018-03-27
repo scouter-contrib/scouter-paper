@@ -37,16 +37,10 @@ class InstanceSelector extends Component {
     }
 
     setTargetFromUrl = (props) => {
-        if (props.config.authentification && props.config.authentification.type === 'bearer') {
-            if (!props.user || !props.user.token) {
-                return;
-            }
-        }
 
-        const that = this;
+        let that = this;
 
         if (!this.init) {
-
             this.props.addRequest();
             jQuery.ajax({
                 method: "GET",
@@ -186,7 +180,7 @@ class InstanceSelector extends Component {
     }
 
     getServers = () => {
-        var that = this;
+        let that = this;
         this.props.addRequest();
         jQuery.ajax({
             method: "GET",

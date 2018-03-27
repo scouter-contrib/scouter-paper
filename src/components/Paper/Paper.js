@@ -103,7 +103,7 @@ class Paper extends Component {
         document.addEventListener('visibilitychange', this.visibilitychange.bind(this));
 
         this.setState({
-            visible : document.visibilityState === 'visible' ? true : false
+            visible : document.visibilityState === 'visible'
         });
     }
 
@@ -114,7 +114,7 @@ class Paper extends Component {
         document.removeEventListener('visibilitychange', this.visibilitychange.bind(this));
     }
 
-    scroll = (e) => {
+    scroll = () => {
         if (document.documentElement.scrollTop > 60) {
             this.setState({
                 fixedControl: true
@@ -126,14 +126,14 @@ class Paper extends Component {
         }
     };
 
-    visibilitychange = (e) => {
+    visibilitychange = () => {
         this.setState({
-            visible : document.visibilityState === 'visible' ? true : false
+            visible : document.visibilityState === 'visible'
         });
     };
 
     getXLog = () => {
-        var that = this;
+        let that = this;
         if (this.props.instances && this.props.instances.length > 0) {
             this.props.addRequest();
             jQuery.ajax({
@@ -156,7 +156,7 @@ class Paper extends Component {
     };
 
     getVisitor = () => {
-        var that = this;
+        let that = this;
         if (this.props.instances && this.props.instances.length > 0) {
             this.props.addRequest();
             let time = (new ServerDate()).getTime();
@@ -329,17 +329,9 @@ class Paper extends Component {
             datas = result.xlogs.filter((d) => {
 
                 if (Number(d.error)) {
-                    if (Math.round(Math.random() * 100) > (100 - this.props.config.xlog.error.sampling)) {
-                        return true;
-                    } else {
-                        return false;
-                    }
+                    return Math.round(Math.random() * 100) > (100 - this.props.config.xlog.error.sampling);
                 } else {
-                    if (Math.round(Math.random() * 100) > (100 - this.props.config.xlog.normal.sampling)) {
-                        return true;
-                    } else {
-                        return false;
-                    }
+                    return Math.round(Math.random() * 100) > (100 - this.props.config.xlog.normal.sampling);
                 }
             })
         } else {
@@ -536,7 +528,6 @@ class Paper extends Component {
 
         let layouts = this.state.layouts;
 
-
         for (let unit in layouts) {
             if (layouts[unit] && layouts[unit].length > 0) {
                 layouts[unit].forEach((layout, i) => {
@@ -553,6 +544,9 @@ class Paper extends Component {
             layouts: layouts,
             layoutChangeTime: (new Date()).getTime()
         });
+
+        setData("layouts", layouts);
+        setData("boxes", boxes);
     };
 
     clearLayout = () => {
@@ -560,14 +554,6 @@ class Paper extends Component {
             boxes: [],
             layouts: {},
             layoutChangeTime: (new Date()).getTime()
-        });
-    };
-
-    setCounterHistoryLoaded = (counterName) => {
-        const countersHistory = this.state.countersHistory;
-        countersHistory[counterName].loaded = true;
-        this.setState({
-            countersHistory: countersHistory
         });
     };
 
@@ -732,7 +718,6 @@ class Paper extends Component {
             }
         });
 
-
         this.setState({
             boxes: boxes
         });
@@ -741,7 +726,7 @@ class Paper extends Component {
     };
 
     render() {
-        let instanceSelected = this.props.instances.length > 0 ? true : false;
+        let instanceSelected = this.props.instances.length > 0;
 
         if (instanceSelected) {
             document.querySelector("body").style.overflow = "auto";

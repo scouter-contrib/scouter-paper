@@ -33,26 +33,9 @@ class Visitor extends Component {
             let visitors = this.state.visitors.slice(0);
             visitors.push(nextProps.visitor);
 
-            if (false) {
-                if (visitors.length > 0) {
-                    let lastestTime = visitors[visitors.length - 1].time;
-                    let overflowIndex = -1;
-                    for (let i = (visitors.length - 1); i >= 0; i--) {
-                        if (lastestTime - visitors[i].time > (this.props.box.values.range * 1000)) {
-                            overflowIndex = i;
-                            break;
-                        }
-                    }
-
-                    if (overflowIndex > 0) {
-                        visitors.splice(0, (overflowIndex + 1));
-                    }
-                }
-            } else {
-                if (visitors.length > this.props.box.values.range) {
-                    let overflowCnt = visitors.length - this.props.box.values.range;
-                    visitors.splice(0, overflowCnt);
-                }
+            if (visitors.length > this.props.box.values.range) {
+                let overflowCnt = visitors.length - this.props.box.values.range;
+                visitors.splice(0, overflowCnt);
             }
 
             let maxY = d3.max(this.state.visitors, function (d) {
@@ -148,11 +131,7 @@ class Visitor extends Component {
     }
 
     shouldComponentUpdate() {
-        if(this.props.visible) {
-            return true;
-        } else {
-            return false;
-        }
+        return this.props.visible;
     }
 
     graphResize = () => {

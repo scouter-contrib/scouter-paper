@@ -8,8 +8,6 @@ import 'url-search-params-polyfill';
 
 class LayoutManager extends Component {
 
-    init = false;
-
     constructor(props) {
         super(props);
         this.state = {

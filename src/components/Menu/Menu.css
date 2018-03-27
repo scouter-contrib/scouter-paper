@@ -2,7 +2,7 @@
     padding: 5px 0 0;
     position: relative;
     background-color: #207ce5;
-    font-family: 'Bungee';
+    font-family: 'Bungee', sans-serif;
 }
 
 .menu-div .bar {
@@ -10,7 +10,7 @@
     left: 0;
     width: 100%;
     height: 4px;
-    bottom: 0px;
+    bottom: 0;
     background-color: rgba(0, 0, 0, 0.1);
 }
 
@@ -33,13 +33,10 @@
     cursor: pointer;
     -webkit-touch-callout: none;
     -webkit-user-select: none;
-    -khtml-user-select: none;
     -moz-user-select: none;
     -ms-user-select: none;
     user-select: none;
     width: 80px;
-    text-align: center;
-
 }
 
 .menu div.logo a {
@@ -104,7 +101,6 @@
     text-decoration: none;
     -webkit-touch-callout: none;
     -webkit-user-select: none;
-    -khtml-user-select: none;
     -moz-user-select: none;
     -ms-user-select: none;
     user-select: none;
@@ -112,17 +108,13 @@
 
 .menu .menu-item .icon {
     position: absolute;
-    top: 0px;
+    top: 0;
     left: 0;
     width: 100%;
     text-align: center;
     box-sizing: border-box;
     opacity: 0;
     transition: opacity 0.3s;
-}
-
-.menu .menu-item .login-icon {
-
 }
 
 .menu .menu-item.right {

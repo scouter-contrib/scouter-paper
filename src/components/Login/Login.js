@@ -47,7 +47,7 @@ class Login extends Component {
 
 
     logout = () => {
-        document.cookie = 'JSESSIONID=; expires=Thu, 01 Jan 1970 00:00:01 GMT;';
+        document["cookie"] = 'JSESSIONID=; expires=Thu, 01 Jan 1970 00:00:01 GMT;';
         this.props.setUserId(null, null, null);
         localStorage.removeItem("user");
     };

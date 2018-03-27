@@ -12,10 +12,6 @@ body {
 }
 
 .btn {
-    border: none;
-    _background-color: #c6463d;
-    _background-color: #3B6AA0;
-    _color: white;
     padding: 5px 10px 7px;
     margin-left: 5px;
     font-size: 12px;
@@ -35,7 +31,6 @@ body {
 .noselect {
     -webkit-touch-callout: none; /* iOS Safari */
     -webkit-user-select: none; /* Safari */
-    -khtml-user-select: none; /* Konqueror HTML */
     -moz-user-select: none; /* Firefox */
     -ms-user-select: none; /* Internet Explorer/Edge */
     user-select: none; /* Non-prefixed version, currently supported by Chrome and Opera */
@@ -71,7 +66,6 @@ body::-webkit-scrollbar-thumb {
 .noselect {
     -webkit-touch-callout: none; /* iOS Safari */
     -webkit-user-select: none; /* Safari */
-    -khtml-user-select: none; /* Konqueror HTML */
     -moz-user-select: none; /* Firefox */
     -ms-user-select: none; /* Internet Explorer/Edge */
     user-select: none;
