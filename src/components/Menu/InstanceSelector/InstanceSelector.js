@@ -14,6 +14,7 @@ import {withRouter} from 'react-router-dom';
 import {getHttpProtocol, errorHandler, getWithCredentials, setAuthHeader} from '../../../common/common';
 import 'url-search-params-polyfill';
 import * as common from '../../../common/common'
+import AgentColor from "../../../common/InstanceColor";
 
 class InstanceSelector extends Component {
 
@@ -143,6 +144,8 @@ class InstanceSelector extends Component {
 
                         // LUCKY! FIND ALL INSTANCE
                         if (urlInstanceObjHashes.length === selectedInstances.length) {
+                            selectedInstances.sort((a, b) => a.objName < b.objName ? -1 : 1);
+                            selectedHosts && selectedHosts.sort((a, b) => a.objName < b.objName ? -1 : 1);
 
                             let selectedInstanceMap = {};
 
@@ -157,6 +160,8 @@ class InstanceSelector extends Component {
                                 selectedInstances: selectedInstanceMap
                             });
 
+                            AgentColor.setHosts(selectedHosts);
+                            AgentColor.setInstances(selectedInstances);
                             this.props.setTarget(selectedHosts, selectedInstances);
 
                         } else {
@@ -309,6 +314,12 @@ class InstanceSelector extends Component {
             this.props.pushMessage("info", "NO MONITORING TARGET", "At least one instance must be selected");
             this.props.setControlVisibility("Message", true);
         } else {
+            instances && instances.sort((a, b) => a.objName < b.objName ? -1 : 1);
+            hosts && hosts.sort((a, b) => a.objName < b.objName ? -1 : 1);
+
+            AgentColor.setHosts(hosts);
+            AgentColor.setInstances(instances);
+
             this.props.setTarget(hosts, instances);
             this.props.setControlVisibility("TargetSelector", false);
 

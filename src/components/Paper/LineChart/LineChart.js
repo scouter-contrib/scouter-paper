@@ -4,6 +4,7 @@ import {connect} from 'react-redux';
 import {withRouter} from 'react-router-dom';
 import * as d3 from "d3";
 import ServerDate from "../../../common/ServerDate";
+import InstanceColor from "../../../common/InstanceColor";
 
 class LineChart extends Component {
 
@@ -305,8 +306,20 @@ class LineChart extends Component {
         this.props.removeTitle(counterKey);
     };
 
-    drawObjectLine = (obj, option, counterKey, colorScale, cnt) => {
-        let that = this;
+    drawObjectLine = (obj, option, counterKey, color) => {
+        const that = this;
+        let pathClass = "line-" + obj.objHash + "-" + counterKey;
+        let path = this.graph.svg.selectAll("path." + pathClass);
+
+        if (path.size() < 1) {
+            path = this.graph.svg.insert("path", ":first-child").attr("class", pathClass).style("stroke", color);
+            this.props.setTitle(counterKey, option.title, color);
+        } else {
+            path.style("stroke", color);
+            this.props.setTitle(counterKey, option.title, color);
+            let circleKey = "circle-" + obj.objHash + "_" + counterKey;
+            that.graph.focus.select("circle." + circleKey).attr("stroke", color);
+        }
 
         let valueLine = d3.line().curve(d3.curveCatmullRom)
             .defined(function (d) {
@@ -325,28 +338,7 @@ class LineChart extends Component {
                 }
             });
 
-        let pathClass = "line-" + obj.objHash + "-" + counterKey;
-
-        let path = this.graph.svg.selectAll("path." + pathClass);
-        if (option && path.size() < 1) {
-            path = this.graph.svg.insert("path", ":first-child").attr("class", pathClass).style("stroke", colorScale[cnt]);
-            this.props.setTitle(counterKey, option.title, colorScale[cnt]);
-        } else {
-            if (option) {
-                path.style("stroke", colorScale[cnt]);
-                this.props.setTitle(counterKey, option.title, colorScale[cnt]);
-                let circleKey = "circle-" + obj.objHash + "_" + counterKey;
-                that.graph.focus.select("circle." + circleKey).attr("stroke", colorScale[cnt]);
-            }
-        }
-
-        if (option) {
-            path.data([that.state.counters[counterKey]]).attr("d", valueLine);
-            cnt++;
-        }
-
-
-        return cnt;
+        path.data([that.state.counters[counterKey]]).attr("d", valueLine);
     };
 
 
@@ -358,8 +350,9 @@ class LineChart extends Component {
 
             this.graphAxis(this.graph.width, this.graph.height, false);
             if (this.props.instances) {
-                let colorScale = d3.schemeCategory10;
-                let cnt = 0;
+                let instanceMetricCount = {};
+                let hostMetricCount = {};
+
                 for (let counterKey in this.state.counters) {
 
                     let thisOption = null;
@@ -381,13 +374,23 @@ class LineChart extends Component {
 
                     if (thisOption && thisOption.objectType === "instance") {
                         for (let i = 0; i < this.props.instances.length; i++) {
-                            cnt = this.drawObjectLine(that.props.instances[i], thisOption, counterKey, colorScale, cnt);
+                            const obj = that.props.instances[i];
+                            if(!instanceMetricCount[obj.objHash]) {
+                                instanceMetricCount[obj.objHash] = 0;
+                            }
+                            const color = InstanceColor.getInstanceColors()[obj.objHash][instanceMetricCount[obj.objHash]++%2===0 ? 'main' : 'sub'];
+                            this.drawObjectLine(obj, thisOption, counterKey, color);
                         }
                     }
 
                     if (thisOption && thisOption.objectType === "host") {
                         for (let i = 0; i < this.props.hosts.length; i++) {
-                            cnt = this.drawObjectLine(that.props.hosts[i], thisOption, counterKey, colorScale, cnt);
+                            const obj = that.props.hosts[i];
+                            if(!hostMetricCount[obj.objHash]) {
+                                hostMetricCount[obj.objHash] = 0;
+                            }
+                            const color = InstanceColor.getHostColors()[obj.objHash][hostMetricCount[obj.objHash]++%2===0 ? 'main' : 'sub'];
+                            this.drawObjectLine(obj, thisOption, counterKey, color);
                         }
                     }
                 }
@@ -427,8 +430,9 @@ class LineChart extends Component {
 
         let unit = that.state.counters[counterKey][dataIndex].data[obj.objHash].unit;
         if (unit === undefined) {
-            if (that.state.counters[counterKey][that.state.counters[counterKey].length - 1].data) {
-                unit = that.state.counters[counterKey][that.state.counters[counterKey].length - 1].data[obj.objHash].unit;
+            const objData = that.state.counters[counterKey][that.state.counters[counterKey].length - 1].data[obj.objHash];
+            if (objData) {
+                unit = objData.unit;
             }
         }
 
@@ -478,9 +482,8 @@ class LineChart extends Component {
                 hoverLine.style("display", "block");
             }
 
-            let colorScale = d3.schemeCategory10;
-            let cnt = 0;
-
+            let instanceMetricCount = {};
+            let hostMetricCount = {};
             for (let counterKey in that.state.counters) {
 
                 let thisOption = null;
@@ -498,15 +501,23 @@ class LineChart extends Component {
 
                 if (thisOption.objectType === "instance") {
                     for (let i = 0; i < that.props.instances.length; i++) {
-                        that.mouseOverObject(that.props.instances[i], thisOption, colorScale[cnt]);
-                        cnt++;
+                        const obj = that.props.instances[i];
+                        if(!instanceMetricCount[obj.objHash]) {
+                            instanceMetricCount[obj.objHash] = 0;
+                        }
+                        const color = InstanceColor.getInstanceColors()[obj.objHash][instanceMetricCount[obj.objHash]++%2===0 ? 'main' : 'sub'];
+                        that.mouseOverObject(that.props.instances[i], thisOption, color);
                     }
                 }
 
                 if (thisOption.objectType === "host") {
                     for (let i = 0; i < that.props.hosts.length; i++) {
-                        that.mouseOverObject(that.props.hosts[i], thisOption, colorScale[cnt]);
-                        cnt++;
+                        const obj = that.props.hosts[i];
+                        if(!hostMetricCount[obj.objHash]) {
+                            hostMetricCount[obj.objHash] = 0;
+                        }
+                        const color = InstanceColor.getHostColors()[obj.objHash][hostMetricCount[obj.objHash]++%2===0 ? 'main' : 'sub'];
+                        that.mouseOverObject(that.props.hosts[i], thisOption, color);
                     }
                 }
 
@@ -563,8 +574,9 @@ class LineChart extends Component {
             let x0 = that.graph.x.invert(xPos);
             let timeFormat = d3.timeFormat(that.graph.fullTimeFormat);
 
-            let colorScale = d3.schemeCategory10;
-            let cnt = 0;
+            let instanceMetricCount = {};
+            let hostMetricCount = {};
+
             for (let counterKey in that.state.counters) {
                 let thisOption = null;
                 for (let j = 0; j < that.props.box.option.length; j++) {
@@ -594,20 +606,23 @@ class LineChart extends Component {
 
                 if (thisOption.objectType === "instance") {
                     for (let i = 0; i < that.props.instances.length; i++) {
-                        let done = that.mouseMoveObject(that.props.instances[i], thisOption, counterKey, dataIndex, colorScale[cnt], tooltip);
-                        if (done) {
-                            cnt++;
+                        const obj = that.props.instances[i];
+                        if(!instanceMetricCount[obj.objHash]) {
+                            instanceMetricCount[obj.objHash] = 0;
                         }
-
+                        const color = InstanceColor.getInstanceColors()[obj.objHash][instanceMetricCount[obj.objHash]++%2===0 ? 'main' : 'sub'];
+                        that.mouseMoveObject(that.props.instances[i], thisOption, counterKey, dataIndex, color, tooltip);
                     }
                 }
 
                 if (thisOption.objectType === "host") {
                     for (let i = 0; i < that.props.hosts.length; i++) {
-                        let done = that.mouseMoveObject(that.props.hosts[i], thisOption, counterKey, dataIndex, colorScale[cnt], tooltip);
-                        if (done) {
-                            cnt++;
+                        const obj = that.props.hosts[i];
+                        if(!hostMetricCount[obj.objHash]) {
+                            hostMetricCount[obj.objHash] = 0;
                         }
+                        const color = InstanceColor.getHostColors()[obj.objHash][hostMetricCount[obj.objHash]++%2===0 ? 'main' : 'sub'];
+                        that.mouseMoveObject(that.props.hosts[i], thisOption, counterKey, dataIndex, color, tooltip);
                     }
                 }
             }
