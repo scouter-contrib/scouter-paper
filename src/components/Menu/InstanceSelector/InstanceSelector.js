@@ -31,8 +31,13 @@ class InstanceSelector extends Component {
     }
 
     componentDidMount() {
-        if (this.props.user && this.props.user.id) {
+        const config = this.props.config;
+        if (config.authentification.type !== "bearer") {
             this.setTargetFromUrl(this.props);
+        } else {
+            if (this.props.config || (this.props.user && this.props.user.id)) {
+                this.setTargetFromUrl(this.props);
+            }
         }
     }
 
