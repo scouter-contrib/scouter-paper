@@ -144,6 +144,14 @@ const layout = [
     },
 ];
 
+const xlogTypes = {
+    "WEB_SERVICE": 0,
+    "APP_SERVICE": 1,
+    "BACK_THREAD": 2,
+    "ASYNCSERVLET_DISPATCHED_SERVICE": 3,
+    "BACK_THREAD2": 4
+};
+
 class ProfileList extends Component {
 
     getRow = (row, i) => {
@@ -175,6 +183,9 @@ class ProfileList extends Component {
                 <div className="row header">{this.getHeader()}</div>
                 {this.props.xlogs && this.props.xlogs.map((xlog, i) => {
                     let rowClass = (xlog.error ? 'error' : '');
+                    const xtype = xlogTypes[xlog.xlogType];
+                    rowClass += xtype && xtype >= 2 && xtype <= 4 ? ' async' : '';
+
                     return <div onClick={this.props.rowClick.bind(this, xlog)} key={i} className={"row " + rowClass + ' ' + (this.props.txid === xlog.txid ? 'active' : '')}>{this.getRow(xlog, i)}</div>;
                 })}
             </div>

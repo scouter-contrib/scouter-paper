@@ -9,8 +9,16 @@
     cursor: pointer;
 }
 
+.xlog-profile-list > div.row.async {
+    color: #AAAAAA;
+}
+
 .xlog-profile-list > div.row.error {
     color: #FF030D;
+}
+
+.xlog-profile-list > div.row.error.async {
+    color: #FF8787;
 }
 
 .xlog-profile-list > div.row.active {
