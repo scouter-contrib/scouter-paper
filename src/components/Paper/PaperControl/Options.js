@@ -252,6 +252,14 @@ export function options() {
                 objectType : "instance"
             },
             {
+                text: "Heap Total",
+                mode: "nonexclusive",
+                type: "counter",
+                title: "Heap Total",
+                counterKey : "HeapTotal",
+                objectType : "instance"
+            },
+            {
                 text: "CPU Time",
                 mode: "nonexclusive",
                 type: "counter",
