@@ -1,3 +1,11 @@
+### SCOUTER PAPER
+> 스카우터 페이퍼(SCOUTER PAPER)는 JAVA APM 도구인 SCOUTER(https://github.com/scouter-project)의 성능 데이터를 웹 브라우저를 통해 모니터링 하기 위한 웹 클라이언트 프로그램입니다.
+```
+npm intall
+```
+- npm install
+- <span font="Conso></span> 
+
 스카우터 페이퍼
 빌드
 npm run start
