@@ -54,7 +54,6 @@
     background-color: white;
     border-radius: 2px;
     box-shadow: 0 0 5px #666;
-
 }
 
 @media screen and (max-width: 600px) {
@@ -82,6 +81,18 @@
     display: inline-block;
     width: 50%;
     padding-right: 20px;
+}
+
+.settings .forms .dot-box {
+    display: table;
+}
+
+.settings .forms .dot-group {
+    display: table-row;
+}
+.settings .forms .row.dot-row {
+    display: table-cell;
+    vertical-align: middle;
 }
 
 .settings .forms .row:nth-child(2n) {
@@ -112,6 +123,17 @@
 
     .settings .forms .row:first-child {
         padding-top: 0;
+    }
+
+    .settings .forms .dot-box {
+        display: block;
+    }
+
+    .settings .forms .dot-group {
+        display: block;
+    }
+    .settings .forms .row.dot-row {
+        display: block;
     }
 }
 

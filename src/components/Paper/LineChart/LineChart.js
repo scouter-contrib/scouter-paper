@@ -47,11 +47,7 @@ class LineChart extends Component {
     }
 
     shouldComponentUpdate() {
-        if (this.props.visible) {
-            return true;
-        } else {
-            return false;
-        }
+        return !!this.props.visible;
     }
 
     componentWillReceiveProps(nextProps) {
@@ -414,7 +410,7 @@ class LineChart extends Component {
     };
 
     mouseOverObject = (obj, thisOption, color) => {
-        var that = this;
+        let that = this;
         let r = 3;
 
         let circleKey = "circle-" + obj.objHash + "_" + thisOption.counterKey;
@@ -425,7 +421,7 @@ class LineChart extends Component {
     };
 
     mouseMoveObject = (obj, thisOption, counterKey, dataIndex, color, tooltip) => {
-        var that = this;
+        let that = this;
 
         let circleKey = "circle-" + obj.objHash + "_" + thisOption.counterKey;
 
@@ -539,7 +535,9 @@ class LineChart extends Component {
         this.graph.overlay.on("mouseout", function () {
 
             let l = that.refs.lineChartRoot.parentNode.parentNode.parentNode.parentNode.parentNode;
-            l.style.zIndex = 0;
+            l.style.zIndex = 5;
+
+
 
             let hoverLine = that.graph.focus.select("line.x-hover-line");
             if (hoverLine.size() > 0) {

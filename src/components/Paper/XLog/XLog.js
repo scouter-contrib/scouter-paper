@@ -230,6 +230,7 @@ class XLog extends Component {
     };
 
     graphInit = () => {
+        let that = this;
         let box = this.refs.xlogViewer.parentNode.parentNode.parentNode;
         if (this.props.box.values.showPreview === "Y") {
             this.graph.width = box.offsetWidth - this.graph.margin.left - this.graph.preview.width;
@@ -265,7 +266,7 @@ class XLog extends Component {
         }
 
         svg.append("g").attr("class", "axis-y").call(d3.axisLeft(this.graph.y).tickFormat(function (e) {
-            if (this.state && this.state.elapsed < 1000) {
+            if (that.state && that.state.elapsed < 1000) {
                 return (e / 1000).toFixed(2) + "s";
             } else {
                 return (e / 1000).toFixed(1) + "s";
@@ -289,16 +290,16 @@ class XLog extends Component {
 
         // 드래그 셀렉트
         svg.append("g").append("rect").attr("class", "selection").attr("opacity", 0.2);
-        let that = this;
-        var dragBehavior = d3.drag()
+
+        let dragBehavior = d3.drag()
             .on("drag", function () {
-                var p = d3.mouse(this);
-                var x = p[0] < that.graph.originX ? p[0] : that.graph.originX;
-                var y = p[1] < that.graph.originY ? p[1] : that.graph.originY;
+                let p = d3.mouse(this);
+                let x = p[0] < that.graph.originX ? p[0] : that.graph.originX;
+                let y = p[1] < that.graph.originY ? p[1] : that.graph.originY;
 
                 // 가로가 그래프 범위 안에 있도록
                 x = x > 0 ? x : 0;
-                var width = 0;
+                let width = 0;
                 if (p[0] > that.graph.originX) {
                     width = Math.abs(p[0] - that.graph.originX);
                 } else {
@@ -311,7 +312,7 @@ class XLog extends Component {
 
                 // 세로가 그래프 범위 안에 있도록
                 y = y > 0 ? y : 0;
-                var height = 0;
+                let height = 0;
                 if (p[1] > that.graph.originY) {
                     height = Math.abs(p[1] - that.graph.originY);
                 } else {
@@ -325,7 +326,7 @@ class XLog extends Component {
                 d3.select(".selection").attr("x", x).attr("y", y).attr("width", width).attr("height", height);
             })
             .on("start", function () {
-                var p = d3.mouse(this);
+                let p = d3.mouse(this);
                 that.graph.originX = p[0];
                 that.graph.originY = p[1];
                 d3.select(".selection").attr("x", that.graph.originX).attr("y", that.graph.originY).attr("width", 0).attr("height", 0);

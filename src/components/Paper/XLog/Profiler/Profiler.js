@@ -43,8 +43,14 @@ class Profiler extends Component {
         }
     };
 
-    componentWillMount() {
-        document.addEventListener("keydown", this.keyDown.bind(this));
+    componentDidMount() {
+        window.addEventListener("resize", this.updateDimensions);
+        window.addEventListener("keydown", this.keyDown.bind(this));
+    }
+
+    componentWillUnmount() {
+        window.removeEventListener("resize", this.updateDimensions);
+        window.removeEventListener("keydown", this.keyDown.bind(this));
     }
 
     shouldComponentUpdate(nextProps, nextState) {
@@ -123,14 +129,6 @@ class Profiler extends Component {
         }
     };
 
-    componentDidMount() {
-        window.addEventListener("resize", this.updateDimensions);
-    }
-
-    componentWillUnmount() {
-        window.removeEventListener("resize", this.updateDimensions);
-    }
-
     componentWillReceiveProps(nextProps) {
 
         if (nextProps.selection.x1 === null || nextProps.selection.x2 === null || nextProps.selection.y1 === null || nextProps.selection.y2 === null) {
@@ -161,7 +159,7 @@ class Profiler extends Component {
 
 
     getList = (x1, x2, y1, y2) => {
-        var that = this;
+        let that = this;
         let allXLogs = that.props.xlogs;
         let newXLogs = that.props.newXLogs;
 
@@ -248,7 +246,7 @@ class Profiler extends Component {
 
     rowClick = (xlog) => {
 
-        var that = this;
+        let that = this;
 
         if (this.state.txid === xlog.txid) {
             this.setState({

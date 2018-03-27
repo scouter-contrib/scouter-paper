@@ -13,10 +13,26 @@ private static char delimETX = 3;
  */
 class ParameterizedMessageStep extends Component {
     render() {
+        let level = "";
+        if (Number(this.props.row.step.level) === 0) {
+            level = "DEBUG";
+        }
+
+        if (Number(this.props.row.step.level) === 1) {
+            level = "INFO";
+        }
+
+        if (Number(this.props.row.step.level) === 2) {
+            level = "WARN";
+        }
+
+        if (Number(this.props.row.step.level) === 3) {
+            level = "ERROR";
+        }
         return (
             <div className="step parameterized-message-step">
                 <StepGeneral startTime={this.props.startTime} row={this.props.row} elapsed={this.props.row.step.elapsed} type="CUSTOM"/>
-                <div className={"message-content " + this.props.row.step.level.toLowerCase()}>{this.props.row.mainValue}</div>
+                <div className={"message-content " + this.props.row.step.level.toLowerCase()}>{level && level + "]"}{this.props.row.mainValue}</div>
             </div>)
     }
 }

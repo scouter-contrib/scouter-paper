@@ -99,8 +99,6 @@
 
 .xlog-profiler .profiler-layout .summary {
     min-height: 60px;
-    background-color: #0EBFE9;
-    background-color: #3A66A7;
     background-color: #666;
     box-sizing: border-box;
     color: white;
@@ -144,7 +142,6 @@
 }
 
 .xlog-profiler .size-control-btns > button {
-    background-color: transparent;
     background-color: rgba(0, 0, 0, 0.3);
     width: 20px;
     height: 20px;

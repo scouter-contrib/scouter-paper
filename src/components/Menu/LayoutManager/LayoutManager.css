@@ -22,7 +22,6 @@
     padding: 0;
     -webkit-touch-callout: none;
     -webkit-user-select: none;
-    -khtml-user-select: none;
     -moz-user-select: none;
     -ms-user-select: none;
     user-select: none;
@@ -32,14 +31,12 @@
 .layout-manager > div {
     -webkit-touch-callout: none;
     -webkit-user-select: none;
-    -khtml-user-select: none;
     -moz-user-select: none;
     -ms-user-select: none;
     user-select: none;
 }
 
 .layout-manager > div.content-ilst {
-    height: 100%;
     height: calc(100% - 60px);
     overflow-y: auto;
     margin-top: 20px;
@@ -49,7 +46,6 @@
     text-align: center;
     position: absolute;
     top: 0;
-    text-align: center;
     width: 100%;
     height: 20px;
 }
@@ -136,13 +132,14 @@
 }
 
 .layout-manager ul li input {
-    padding: 0 5px;
+    padding: 6px;
     font-size: 10px;
     width: 100%;
     line-height: 0;
     border-radius: 3px;
     border: none;
     box-sizing: border-box;
+    outline: none;
 }
 
 .layout-manager ul li input * {

@@ -93,8 +93,8 @@ export function setAuthHeader(xhr, config, user) {
 }
 
 export function zeroPadding(n, p, c) {
-    var pad_char = typeof c !== 'undefined' ? c : '0';
-    var pad = new Array(1 + p).join(pad_char);
+    let pad_char = typeof c !== 'undefined' ? c : '0';
+    let pad = new Array(1 + p).join(pad_char);
     return (pad + n).slice(-pad.length);
 }
 
@@ -109,7 +109,7 @@ export function getServerTimeGap() {
 /**
  * Simple object check.
  * @param item
- * @returns {boolean}
+ * @returns {*|boolean}
  */
 export function isObject(item) {
     return (item && typeof item === 'object' && !Array.isArray(item));
@@ -118,7 +118,8 @@ export function isObject(item) {
 /**
  * Deep merge two objects.
  * @param target
- * @param ...sources
+ * @param sources
+ * @returns {*}
  */
 export function mergeDeep(target, ...sources) {
     if (!sources.length) return target;

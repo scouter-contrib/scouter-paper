@@ -1,6 +1,5 @@
 import React, {Component} from 'react';
 import './HashedMessageStep.css';
-import StepGeneral from "../StepGeneral/StepGeneral";
 
 //scouter.lang.step.HashedMessageStep
 /*

@@ -32,20 +32,21 @@ class InstanceSelector extends Component {
     }
 
     componentDidMount() {
-        this.setTargetFromUrl(this.props);
+        const config = this.props.config;
+        if (config.authentification.type !== "bearer") {
+            this.setTargetFromUrl(this.props);
+        } else {
+            if (this.props.config || (this.props.user && this.props.user.id)) {
+                this.setTargetFromUrl(this.props);
+            }
+        }
     }
 
     setTargetFromUrl = (props) => {
-        if (props.config.authentification && props.config.authentification.type === 'bearer') {
-            if (!props.user || !props.user.token) {
-                return;
-            }
-        }
 
-        const that = this;
+        let that = this;
 
         if (!this.init) {
-
             this.props.addRequest();
             jQuery.ajax({
                 method: "GET",
@@ -181,14 +182,13 @@ class InstanceSelector extends Component {
     };
 
     componentWillReceiveProps(nextProps) {
-
-        this.setTargetFromUrl(nextProps);
-
-
+        if (nextProps.user.id) {
+            this.setTargetFromUrl(nextProps);
+        }
     }
 
     getServers = () => {
-        var that = this;
+        let that = this;
         this.props.addRequest();
         jQuery.ajax({
             method: "GET",
