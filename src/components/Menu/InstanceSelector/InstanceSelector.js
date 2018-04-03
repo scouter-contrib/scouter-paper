@@ -216,8 +216,6 @@ class InstanceSelector extends Component {
 
     onServerClick = (serverId) => {
         let that = this;
-
-
         this.props.addRequest();
         jQuery.ajax({
             method: "GET",

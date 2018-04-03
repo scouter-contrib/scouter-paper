@@ -327,7 +327,7 @@ class Settings extends Component {
                             </div>
                             <div className="row">
                                 <div className="label">
-                                    <div>POST</div>
+                                    <div>PORT</div>
                                 </div>
                                 <div className="input">
                                     <input type="text" readOnly={!this.state.edit} onChange={this.onChange.bind(this, "port")} value={this.state.config.port} placeholder="SCOUTER WEBAPP SERVER PORT (DEFAULT 6188)" />

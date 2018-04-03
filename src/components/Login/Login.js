@@ -5,7 +5,7 @@ import {addRequest, clearAllMessage, setControlVisibility, pushMessage, setUserI
 import jQuery from "jquery";
 import {withRouter} from 'react-router-dom';
 import TimeAgo from 'react-timeago'
-import {errorHandler} from '../../common/common';
+import {errorHandler, getWithCredentials} from '../../common/common';
 import logo from '../../img/scouter.png';
 
 class Login extends Component {
@@ -61,29 +61,52 @@ class Login extends Component {
             }
         };
 
+        let action = "";
+        if (this.props.config.authentification.type === "cookie") {
+            action = "/scouter/v1/user/login";
+        } else {
+            action = "/scouter/v1/user/loginGetToken";
+        }
+
         this.props.setControlVisibility("Loading", true);
         this.props.addRequest();
 
         jQuery.ajax({
             method: "POST",
-            url: this.props.config.protocol + "://" + this.props.config.address + ":" + this.props.config.port + "/scouter/v1/user/loginGetToken",
+            url: this.props.config.protocol + "://" + this.props.config.address + ":" + this.props.config.port + action,
+            xhrFields: getWithCredentials(this.props.config),
             data: JSON.stringify(condition),
             contentType: "application/json; charset=UTF-8",
             processData: false
         }).done((msg) => {
-            if (msg.result.success) {
-                let user = {
-                    id : this.state.control.id,
-                    token : msg.result.bearerToken,
-                    time : (new Date()).getTime()
-                };
-                localStorage.setItem("user", JSON.stringify(user));
-                this.props.setUserId(this.state.control.id, msg.result.bearerToken, (new Date()).getTime());
+            if (this.props.config.authentification.type === "cookie") {
+                if (msg.status === "200") {
+                    let user = {
+                        id : this.state.control.id,
+                        time : (new Date()).getTime()
+                    };
+                    this.props.setUserId(this.state.control.id, null, (new Date()).getTime());
+                } else {
+                    this.setState({
+                        message: "LOGIN FAILED"
+                    });
+                }
             } else {
-                this.setState({
-                    message: "LOGIN FAILED"
-                });
+                if (msg.result.success) {
+                    let user = {
+                        id : this.state.control.id,
+                        token : msg.result.bearerToken,
+                        time : (new Date()).getTime()
+                    };
+                    localStorage.setItem("user", JSON.stringify(user));
+                    this.props.setUserId(this.state.control.id, msg.result.bearerToken, (new Date()).getTime());
+                } else {
+                    this.setState({
+                        message: "LOGIN FAILED"
+                    });
+                }
             }
+
         }).fail((xhr, textStatus, errorThrown) => {
             errorHandler(xhr, textStatus, errorThrown, this.props);
         }).always(() => {

@@ -80,7 +80,7 @@ export function errorHandler(xhr, textStatus, errorThrown, props) {
 
 export function getWithCredentials(config) {
     return {
-        withCredentials: (config.authentification && config.authentification.type === "token")
+        withCredentials: (config.authentification && config.authentification.type === "cookie")
     }
 }
 
