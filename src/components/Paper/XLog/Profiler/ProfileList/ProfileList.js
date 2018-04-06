@@ -1,7 +1,9 @@
 import React, {Component} from 'react';
 import './ProfileList.css';
-import Moment from 'react-moment';
-import 'moment-timezone';
+import {connect} from 'react-redux';
+import {withRouter} from 'react-router-dom';
+import * as d3 from "d3";
+import numeral from "numeral";
 
 const layout = [
     {
@@ -28,7 +30,8 @@ const layout = [
     },*/
     {
         key: "apicallCount",
-        name: "API CALL COUNT"
+        name: "API CALL COUNT",
+        type: "number"
     },
     {
         key: "apicallTime",
@@ -37,7 +40,8 @@ const layout = [
     },
     {
         key: "sqlCount",
-        name: "SQL COUNT"
+        name: "SQL COUNT",
+        type: "number"
     },
     {
         key: "sqlTime",
@@ -75,7 +79,8 @@ const layout = [
     },
     {
         key: "allocatedMemory", // on xlog data api
-        name: "KBYTES"
+        name: "Memory",
+        type: "kbytes"
     },
     /*{
         key: "objHash",
@@ -154,15 +159,29 @@ const xlogTypes = {
 
 class ProfileList extends Component {
 
+    dateFormat = null;
+    fullTimeFormat = null;
+
+    componentDidMount() {
+        this.dateFormat = this.props.config.dateFormat;
+        this.fullTimeFormat = this.props.config.dateFormat + " " + this.props.config.timeFormat;
+    }
+
+
+
     getRow = (row, i) => {
         return layout.map((meta, j) => {
             let className = meta.key;
-            if (meta.type === "ms") {
-                return <span className={className} key={j}>{row[meta.key]} ms</span>
+            if (meta.type === "number") {
+                return <span className={className} key={j}>{numeral(row[meta.key]).format(this.props.config.numberFormat)}</span>
+            } else if (meta.type === "ms") {
+                return <span className={className} key={j}>{numeral(row[meta.key]).format(this.props.config.numberFormat)} ms</span>
             } else if (meta.type === "date") {
-                return <span className={className} key={j}><Moment date={new Date(Number(row[meta.key]))} format="YYYY-MM-DD" ></Moment></span>
+                return <span className={className} key={j}>{d3.timeFormat(this.dateFormat)(new Date(Number(row[meta.key])))}</span>
             } else if (meta.type === "time") {
-                return <span className={className} key={j}><Moment date={new Date(Number(row[meta.key]))} format="YYYY-MM-DD HH:mm:ss" ></Moment></span>
+                return <span className={className} key={j}>{d3.timeFormat(this.fullTimeFormat)(new Date(Number(row[meta.key])))}</span>
+            } else if (meta.type === "kbytes") {
+                return <span className={className} key={j}>{numeral(row[meta.key]).format(this.props.config.numberFormat + "b")}</span>
             } else {
                 return <span className={className} key={j}>{row[meta.key]}</span>
             }
@@ -194,4 +213,11 @@ class ProfileList extends Component {
     }
 }
 
-export default ProfileList;
+let mapStateToProps = (state) => {
+    return {
+        config: state.config
+    };
+};
+
+ProfileList = connect(mapStateToProps, undefined)(ProfileList);
+export default withRouter(ProfileList);

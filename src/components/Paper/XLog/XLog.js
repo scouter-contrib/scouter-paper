@@ -72,6 +72,7 @@ class XLog extends Component {
     }
 
     componentDidMount() {
+        this.graph.timeFormat = this.props.config.minuteFormat;
         this.graphInit();
     }
 
@@ -118,7 +119,6 @@ class XLog extends Component {
         if (this.refs.xlogViewer && xlogs) {
             let context = d3.select(this.refs.xlogViewer).select("canvas").node().getContext("2d");
             xlogs.forEach((d, i) => {
-
                 let x = this.graph.x(d.endTime);
                 let y = this.graph.y(d.elapsed);
 
@@ -444,6 +444,12 @@ class XLog extends Component {
     }
 }
 
+let mapStateToProps = (state) => {
+    return {
+        config: state.config,
+        user: state.user
+    };
+};
 
 let mapDispatchToProps = (dispatch) => {
     return {
@@ -451,5 +457,5 @@ let mapDispatchToProps = (dispatch) => {
     };
 };
 
-XLog = connect(undefined, mapDispatchToProps)(XLog);
+XLog = connect(mapStateToProps, mapDispatchToProps)(XLog);
 export default withRouter(XLog);

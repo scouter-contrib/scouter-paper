@@ -78,7 +78,7 @@ class App extends Component {
     };
 
     getFontGeneric = (val) => {
-        for (let i=0; i<this.props.config.fonts.length; i++) {
+        for (let i = 0; i < this.props.config.fonts.length; i++) {
             if (val === this.props.config.fonts[i].val) {
                 return this.props.config.fonts[i].generic;
             }
@@ -99,7 +99,7 @@ class App extends Component {
         this.getFontGeneric(fontSetting.basic);
         css.innerHTML += "html,body,svg text,input,select,button { font-family: '" + fontSetting.basic + "','Nanum Gothic'," + this.getFontGeneric(fontSetting.basic) + "; }";
         css.innerHTML += ".layout-manager .content-ilst { font-family: '" + fontSetting.basic + "','Nanum Gothic'," + this.getFontGeneric(fontSetting.basic) + "; }";
-        css.innerHTML += ".instance-selector .list-content { font-family: '" + fontSetting.basic  + "','Nanum Gothic'," + this.getFontGeneric(fontSetting.basic) + "; }";
+        css.innerHTML += ".instance-selector .list-content { font-family: '" + fontSetting.basic + "','Nanum Gothic'," + this.getFontGeneric(fontSetting.basic) + "; }";
         css.innerHTML += "svg text { font-family: '" + fontSetting.axis + "','Nanum Gothic'," + this.getFontGeneric(fontSetting.axis) + "; }";
         css.innerHTML += ".tooltip { font-family: '" + fontSetting.tooltip + "','Nanum Gothic'," + this.getFontGeneric(fontSetting.tooltip) + "; }";
         css.innerHTML += ".xlog-profiler { font-family: '" + fontSetting.profiler + "','Nanum Gothic'," + this.getFontGeneric(fontSetting.profiler) + "; }";
@@ -125,10 +125,19 @@ class App extends Component {
         } else {
             config = this.props.config;
         }
+
         let user = localStorage.getItem("user");
         if (user) {
             user = JSON.parse(user);
             this.info(user, config);
+        }
+
+        if (user && config.authentification && config.authentification.type === "bearer") {
+            this.props.setUserId(user.id, user.token, user.time);
+        }
+
+        if (user && config.authentification && config.authentification.type === "cookie") {
+            this.props.setUserId(user.id, null, user.time);
         }
 
         if (!user && config && config.authentification.type === "none") {

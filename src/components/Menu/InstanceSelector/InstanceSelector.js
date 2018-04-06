@@ -346,7 +346,7 @@ class InstanceSelector extends Component {
                         <div className="host-list">
                             <div>
                                 <div className="title">
-                                    <div>SERVER</div>
+                                    <div>SERVERS</div>
                                 </div>
                                 <div className="list-content scrollbar">
                                     {this.state.servers && this.state.servers.map((host, i) => {
