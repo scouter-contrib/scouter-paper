@@ -6,10 +6,10 @@ const configState = {
     address: window.location.hostname,
     port: 6188,
     interval: 2000,
-    numberFormat: "999,999.00",
-    dateFormat: "YYYY-MM-DD",
-    timeFormat: "HH:MM:SS",
-    minuteFormat: "HH:MM",
+    numberFormat: "0,0",
+    dateFormat: "%Y-%m-%d",
+    timeFormat: "%H:%M:%S",
+    minuteFormat: "%H:%M",
     authentification : {
         type : "bearer"
     },

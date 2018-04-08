@@ -306,7 +306,7 @@ class Settings extends Component {
                 <div className={"settings " + (this.state.edit ? 'editable' : '')}>
                     <div className="forms">
                         <div className="category first">
-                            <div>SCOUTER SERVER INFO</div>
+                            <div>SCOUTER WEB API SERVER INFO</div>
                         </div>
                         <div className="setting-box">
                             <div className="row">
@@ -327,10 +327,22 @@ class Settings extends Component {
                             </div>
                             <div className="row">
                                 <div className="label">
-                                    <div>POST</div>
+                                    <div>PORT</div>
                                 </div>
                                 <div className="input">
                                     <input type="text" readOnly={!this.state.edit} onChange={this.onChange.bind(this, "port")} value={this.state.config.port} placeholder="SCOUTER WEBAPP SERVER PORT (DEFAULT 6188)" />
+                                </div>
+                            </div>
+                            <div className="row">
+                                <div className="label">
+                                    <div>AUTHENTIFICATION TYPE</div>
+                                </div>
+                                <div className="input">
+                                    <select value={this.state.config.authentification.type} onChange={this.onChangeSession.bind(this, "type")} disabled={!this.state.edit}>
+                                        <option value="bearer">token (bearer)</option>
+                                        <option value="cookie">cookie</option>
+                                        <option value="none">N/A</option>
+                                    </select>
                                 </div>
                             </div>
                         </div>
@@ -340,27 +352,10 @@ class Settings extends Component {
                         <div className="setting-box">
                             <div className="row">
                                 <div className="label">
-                                    <div>INTERVAL</div>
+                                    <div>INTERVAL (ms)</div>
                                 </div>
                                 <div className="input">
                                     <input type="text" readOnly={!this.state.edit} onChange={this.onChange.bind(this, "interval")} value={this.state.config.interval} placeholder="POLLING INTERVAL (MS)" />
-                                </div>
-                            </div>
-                        </div>
-                        <div className="category">
-                            <div>AUTHENTIFICATION CONFIGURATION</div>
-                        </div>
-                        <div className="setting-box auth-info">
-                            <div className="row">
-                                <div className="label">
-                                    <div>TYPE</div>
-                                </div>
-                                <div className="input">
-                                    <select value={this.state.config.authentification.type} onChange={this.onChangeSession.bind(this, "type")} disabled={!this.state.edit}>
-                                        <option value="bearer">token (bearer)</option>
-                                        <option value="cookie">cookie</option>
-                                        <option value="none">N/A</option>
-                                    </select>
                                 </div>
                             </div>
                         </div>
@@ -438,7 +433,7 @@ class Settings extends Component {
                                     <div>NUMBER FORMAT</div>
                                 </div>
                                 <div className="input">
-                                    <input type="text" readOnly={!this.state.edit} onChange={this.onChange.bind(this, "numberFormat")} value={this.state.config.numberFormat} placeholder="999,999,00" />
+                                    <input type="text" readOnly={!this.state.edit} onChange={this.onChange.bind(this, "numberFormat")} value={this.state.config.numberFormat} placeholder="0,0" />
                                 </div>
                             </div>
                             <div className="row">
@@ -446,7 +441,7 @@ class Settings extends Component {
                                     <div>DATE FORMAT</div>
                                 </div>
                                 <div className="input">
-                                    <input type="text" readOnly={!this.state.edit} onChange={this.onChange.bind(this, "dateFormat")} value={this.state.config.dateFormat} placeholder="YYYY-MM-DD" />
+                                    <input type="text" readOnly={!this.state.edit} onChange={this.onChange.bind(this, "dateFormat")} value={this.state.config.dateFormat} placeholder="%Y-%m-%d" />
                                 </div>
                             </div>
                             <div className="row ">
@@ -454,7 +449,7 @@ class Settings extends Component {
                                     <div>TIME FORMAT</div>
                                 </div>
                                 <div className="input">
-                                    <input type="text" readOnly={!this.state.edit} onChange={this.onChange.bind(this, "timeFormat")} value={this.state.config.timeFormat} placeholder="HH:MM:SS" />
+                                    <input type="text" readOnly={!this.state.edit} onChange={this.onChange.bind(this, "timeFormat")} value={this.state.config.timeFormat} placeholder="%H:%M:%S" />
                                 </div>
                             </div>
                             <div className="row last">
@@ -462,7 +457,7 @@ class Settings extends Component {
                                     <div>MINUTES FORMAT</div>
                                 </div>
                                 <div className="input">
-                                    <input type="text" readOnly={!this.state.edit} onChange={this.onChange.bind(this, "minuteFormat")} value={this.state.config.minuteFormat}  placeholder="HH:MM" />
+                                    <input type="text" readOnly={!this.state.edit} onChange={this.onChange.bind(this, "minuteFormat")} value={this.state.config.minuteFormat}  placeholder="%H:%M" />
                                 </div>
                             </div>
                         </div>
@@ -473,7 +468,7 @@ class Settings extends Component {
                             <div className="dot-group">
                                 <div className="row dot-row">
                                     <div className="label">
-                                        <div>DOT SIZE (NORMAL)</div>
+                                        <div>XLOG (NORMAL)</div>
                                     </div>
                                     <div className="input xlog-option">
                                         <div className="xlog-label">ROWS</div>
@@ -498,7 +493,7 @@ class Settings extends Component {
                                 </div>
                                 <div className="row dot-row">
                                     <div className="label">
-                                        <div>XLOG DOT (NORMAL)</div>
+                                        <div>XLOG (NORMAL)</div>
                                     </div>
                                     <div className="input">
                                         <div className="xlog-dot-config">
@@ -531,7 +526,7 @@ class Settings extends Component {
                             <div className="dot-group">
                                 <div className="row dot-row">
                                     <div className="label">
-                                        <div>DOT SIZE (ASYNC)</div>
+                                        <div>XLOG (ASYNC)</div>
                                     </div>
                                     <div className="input xlog-option">
                                         <div className="xlog-label">ROWS</div>
@@ -556,7 +551,7 @@ class Settings extends Component {
                                 </div>
                                 <div className="row dot-row">
                                     <div className="label">
-                                        <div>XLOG DOT (ASYNC)</div>
+                                        <div>XLOG (ASYNC)</div>
                                     </div>
                                     <div className="input">
                                         <div className="xlog-dot-config">
@@ -589,7 +584,7 @@ class Settings extends Component {
                             <div className="dot-group">
                                 <div className="row dot-row">
                                     <div className="label">
-                                        <div>DOT SIZE (ERROR)</div>
+                                        <div>XLOG (ERROR)</div>
                                     </div>
                                     <div className="input xlog-option">
                                         <div className="xlog-label">ROWS</div>
@@ -614,7 +609,7 @@ class Settings extends Component {
                                 </div>
                                 <div className="row dot-row">
                                     <div className="label">
-                                        <div>XLOG DOT (ERROR)</div>
+                                        <div>XLOG (ERROR)</div>
                                     </div>
                                     <div className="input">
                                         <div className="xlog-dot-config">

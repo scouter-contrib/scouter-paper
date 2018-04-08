@@ -5,6 +5,8 @@ import {withRouter} from 'react-router-dom';
 import * as d3 from "d3";
 import ServerDate from "../../../common/ServerDate";
 import InstanceColor from "../../../common/InstanceColor";
+import numeral from "numeral";
+
 
 class LineChart extends Component {
 
@@ -43,6 +45,8 @@ class LineChart extends Component {
     }
 
     componentDidMount() {
+        this.graph.timeFormat = this.props.config.minuteFormat;
+        this.graph.fullTimeFormat = this.props.config.dateFormat + " " + this.props.config.timeFormat;
         this.graphInit();
     }
 
@@ -440,13 +444,14 @@ class LineChart extends Component {
             unit = "";
         }
 
+
         if (that.state.counters[counterKey][dataIndex].time) {
             tooltip.lines.push({
                 instanceName: obj.objName,
                 circleKey: circleKey,
                 metricName: thisOption.title,
                 value: obj.objHash && that.state.counters[counterKey][dataIndex].data[obj.objHash] ? (Math.round(that.state.counters[counterKey][dataIndex].data[obj.objHash].value * 10) / 10) : null,
-                displayValue: obj.objHash && that.state.counters[counterKey][dataIndex].data[obj.objHash] ? (Math.round(that.state.counters[counterKey][dataIndex].data[obj.objHash].value * 10) / 10) + " " + unit : null,
+                displayValue: obj.objHash && that.state.counters[counterKey][dataIndex].data[obj.objHash] ? numeral((Math.round(that.state.counters[counterKey][dataIndex].data[obj.objHash].value * 10) / 10)).format(this.props.config.numberFormat) + " " + unit : null,
                 color: color
             });
         } else {
@@ -702,7 +707,8 @@ class LineChart extends Component {
 let mapStateToProps = (state) => {
     return {
         hosts: state.target.hosts,
-        instances: state.target.instances
+        instances: state.target.instances,
+        config: state.config
     };
 };
 

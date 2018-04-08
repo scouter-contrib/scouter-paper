@@ -22,8 +22,10 @@ import SocketSumStep from "./SocketSumStep/SocketSumStep";
 import ApiCallSumStep from "./ApiCallSumStep/ApiCallSumStep";
 import ControlStep from "./ControlStep/ControlStep";
 import Step from "./Step/Step";
-import Moment from 'react-moment';
-import 'moment-timezone';
+import {connect} from 'react-redux';
+import {withRouter} from 'react-router-dom';
+import * as d3 from "d3";
+import numeral from "numeral";
 
 const profileMetas = [
     {
@@ -244,6 +246,14 @@ const profileMetas = [
 
 class SingleProfile extends Component {
 
+    dateFormat = null;
+    fullTimeFormat = null;
+
+    componentDidMount() {
+        this.dateFormat = this.props.config.dateFormat;
+        this.fullTimeFormat = this.props.config.dateFormat + " " + this.props.config.timeFormat;
+    }
+
     render() {
         let startTime;
         if (this.props.profile) {
@@ -259,10 +269,11 @@ class SingleProfile extends Component {
                         return <div key={i}>
                             <span className="label">{meta.name}</span>
                             <span className="data">
-                                {meta.type === "datetime" && <Moment date={new Date(Number(this.props.profile[meta.key]))} format="YYYY-MM-DD HH:mm:ss" ></Moment>}
-                                {meta.type === "ms" && this.props.profile[meta.key] + " ms"}
-                                {meta.type === "bytes" && this.props.profile[meta.key] + " bytes"}
-                                {(meta.type !== "datetime" && meta.type !== "ms" && meta.type !== "bytes") && this.props.profile[meta.key]}
+                                {meta.type === "datetime" && d3.timeFormat(this.fullTimeFormat)(new Date(Number(this.props.profile[meta.key])))}
+                                {meta.type === "ms" && numeral(this.props.profile[meta.key]).format(this.props.config.numberFormat)+ " ms"}
+                                {meta.type === "bytes" && numeral(this.props.profile[meta.key]).format(this.props.config.numberFormat + "b")}
+                                {meta.type === "number" && numeral(this.props.profile[meta.key]).format(this.props.config.numberFormat)}
+                                {(meta.type !== "datetime" && meta.type !== "ms" && meta.type !== "bytes" && meta.type !== "number") && this.props.profile[meta.key]}
                             </span>
                         </div>
                     })}
@@ -309,4 +320,11 @@ class SingleProfile extends Component {
     }
 }
 
-export default SingleProfile;
+let mapStateToProps = (state) => {
+    return {
+        config: state.config
+    };
+};
+
+SingleProfile = connect(mapStateToProps, undefined)(SingleProfile);
+export default withRouter(SingleProfile);
