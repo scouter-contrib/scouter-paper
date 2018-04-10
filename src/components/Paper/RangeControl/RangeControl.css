@@ -1,0 +1,341 @@
+.range-controls {
+    padding: 6px;
+    font-size: 12px;
+    color: white;
+    background-color: #0D4F8B;
+    background-color: #1874CD;
+    box-sizing: border-box;
+    position: absolute;
+    z-index: 20;
+    top: 90px;
+    left: 18px;
+    margin: 0;
+    width: 425px;
+    height: 84px;
+    border: 1px solid rgba(0, 0, 0, 0.4);
+    _border-radius: 0 5px 5px 5px;
+    display: none;
+}
+
+.range-controls.fixed {
+    position: fixed;
+    top: 28px;
+    left: 8px;
+}
+
+@media screen and (max-width: 600px) {
+    .range-controls {
+        width: calc(100% - 36px);
+        top: 85px;
+    }
+
+    .range-controls.fixed {
+        position: fixed;
+        width: calc(100% - 16px);
+        top: 28px;
+        left: 8px;
+    }
+}
+
+.range-controls .close-btn {
+    display: inline-block;
+    width: 12px;
+    height: 12px;
+    cursor: pointer;
+    box-sizing: border-box;
+    position: absolute;
+    top: 5px;
+    right: 5px;
+}
+
+.range-controls .close-btn:before,
+.range-controls .close-btn:after {
+    content: '';
+    position: absolute;
+    height: 1px;
+    width: 90%;
+    top: 50%;
+    left: 0;
+    margin-top: -1px;
+    background: white;
+    box-sizing: border-box;
+}
+
+.range-controls .close-btn:hover:before,
+.range-controls .close-btn:hover:after {
+    background: #FFE600;
+}
+
+.range-controls .close-btn:before {
+    transform: rotate(45deg);
+}
+
+.range-controls .close-btn:after {
+    transform: rotate(-45deg);
+}
+
+.range-controls .time-type {
+    font-size: 8px;
+    display: block;
+    margin-bottom: 5px;
+}
+
+.range-controls .time-type > div {
+    display: inline-block;
+    padding: 3px 5px;
+    border: 1px solid rgba(0, 0, 0, 0.3);
+    cursor: pointer;
+    width: 50px;
+    text-align: center;
+    box-sizing: border-box;
+}
+
+.range-controls .time-type > div.real-time {
+    border-radius: 3px 0 0 3px;
+    border-right: none;
+}
+
+.range-controls .time-type > div.search-time {
+    border-radius: 0 3px 3px 0;
+    border-left: none;
+}
+
+.range-controls .time-type > div.selected {
+    background-color: #FFCC11;
+    color: #333;
+}
+
+.range-controls.visible {
+    display: block;
+}
+
+.time-controller {
+    display: table;
+    height: 25px;
+}
+
+.time-controller > div {
+    display: table-cell;
+    vertical-align: middle;
+    height: 100%;
+    position: relative;
+}
+
+.time-controller > div .desc-label {
+    font-size: 8px;
+    position: absolute;
+    top: -5px;
+    left: 0;
+    right: 0;
+    text-align: right;
+    width: 100%;
+}
+
+.time-controller > div .desc-label span {
+    display: inline-block;
+    width: 12px;
+    height: 12px;
+    box-sizing: border-box;
+    border-radius: 50%;
+    background-color: #555;
+    text-align: center;
+}
+
+.range-controls > div {
+    display: inline-block;
+
+}
+
+.range-controls .range-time-control {
+    text-align: center;
+    padding: 5px;
+    border: none;
+    outline: none;
+    box-sizing: border-box;
+    border-radius: 1px;
+    height: 26px;
+}
+
+.range-controls .span-separator {
+    width: 2px;
+}
+
+.range-controls .rage-date {
+    width: 80px;
+    margin-right: 2px;
+}
+
+.range-controls .rage-hours {
+    margin-right: 2px;
+}
+
+.range-controls .rage-hours,
+.range-controls .rage-minute {
+    width: 45px;
+}
+
+.range-controls input[type=number]:hover::-webkit-inner-spin-button {
+    width: 5px;
+}
+
+.range-controls .span-range {
+    width: 200px;
+    position: relative;
+}
+
+@media screen and (max-width: 600px) {
+    .range-controls .span-range {
+        width: 400px;
+    }
+}
+
+.range-controls .span-range .span-range-right-bg {
+    position: absolute;
+    top: 0;
+    right: -10px;
+    width: 10px;
+    background-color: #eeeeee;
+    height: 100%;
+}
+
+.range-controls .span-range .input-range {
+    height: 100%;
+    height: 26px;
+}
+
+.range-controls .search-btn {
+    font-size: 10px;
+    background-color: #FFCC11;
+    color: #333;
+    padding: 6px 6px;
+    margin-left: 12px;
+    border-radius: 3px;
+    border: 1px solid rgba(0, 0, 0, 0.3);
+}
+
+.range-controls .search-btn.disabled {
+    background-color: #999;
+}
+
+.input-range__label {
+    _display: none;
+}
+
+.input-range__track {
+    transition: none;
+    border-radius: 0;
+}
+
+.input-range__track--background {
+    margin-top: 0;
+    top: 0;
+    height: 100%;
+}
+
+.input-range__track--active {
+    height: 100%;
+    background-color: rgba(0, 0, 0, 0.3);
+    border-radius: 0;
+
+}
+
+.input-range__slider-container {
+    height: 100%;
+    top: 0;
+    width: 10px;
+    transition: none;
+}
+
+.input-range--disabled .input-range__slider {
+    border: none;
+}
+
+.input-range__label--min {
+    display: none;
+}
+
+.input-range__label--max {
+    display: none;
+}
+
+.input-range__label--value {
+    top: -23px;
+    left: -50%;
+    font-family: "Righteous" !important;
+    color: #333;
+    background-color: white;
+    padding: 2px 4px;
+    border-radius: 3px;
+    box-sizing: border-box;
+    text-align: center;
+    border: 1px solid rgba(0, 0, 0, 0.2);
+}
+
+.input-range--disabled .input-range__label--value {
+    display: none;
+}
+
+.input-range__label--value .input-range__label-container {
+    left: 0;
+}
+
+.input-range__slider {
+    border-radius: 0;
+    top: 0;
+    height: 100%;
+    margin-top: 0;
+    margin-left: 0;
+    width: 100%;
+    border: none;
+    left: 0;
+    background-color: #FFCC11;
+}
+
+.input-range__slider:active {
+    transform: none;
+}
+
+.range-controls .selected-time {
+    margin-top: 2px;
+    text-align: right;
+    display: block;
+}
+
+.range-controls .selected-time.disabled {
+    opacity: 0.3;
+}
+
+.range-controls .selected-time > div {
+    display: inline-block;
+    background-color: rgba(0, 0, 0, 0.2);
+    padding: 2px 4px;
+    font-size: 8px;
+}
+
+.range-controls .selected-time > div.move-before,
+.range-controls .selected-time > div.move-after {
+    margin-right: 5px;
+    padding: 1px 6px;
+    border-radius: 2px;
+    background-color: white;
+    color: #333;
+    cursor: pointer;
+}
+
+.range-controls .selected-time > div.move-before:hover,
+.range-controls .selected-time > div.move-after:hover {
+    background-color: #EEE;
+}
+
+.range-controls .selected-time > div.end-time {
+    margin-left: 5px;
+}
+
+.range-controls .selected-time .start-time,
+.range-controls .selected-time .end-time {
+    width: 80px;
+    box-sizing: border-box;
+    text-align: center;
+}
+
+

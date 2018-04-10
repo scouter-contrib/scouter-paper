@@ -81,10 +81,6 @@ class Login extends Component {
         }).done((msg) => {
             if (this.props.config.authentification.type === "cookie") {
                 if (msg.status === "200") {
-                    let user = {
-                        id : this.state.control.id,
-                        time : (new Date()).getTime()
-                    };
                     this.props.setUserId(this.state.control.id, null, (new Date()).getTime());
                 } else {
                     this.setState({

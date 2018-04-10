@@ -45,6 +45,22 @@
     box-sizing: border-box;
 }
 
+.papers-controls .paper-control.live {
+    color: #AAA;
+}
+
+.papers-controls .paper-control.live.realtime {
+    background-color: #FFCC11;
+    color: #333;
+}
+
+.papers-controls .paper-control .live {
+    font-size: 8px;
+    position: relative;
+    top: -2px;
+
+}
+
 .papers-controls .paper-control.multi-control {
     position: relative;
     top: -2px;
@@ -166,3 +182,6 @@
     font-size: 8px !important;
     padding: 4px 8px !important;
 }
+
+
+
