@@ -160,23 +160,81 @@ class Profiler extends Component {
 
     getList = (x1, x2, y1, y2) => {
         let that = this;
+
+
+        let aday = 1000 * 60 * 60 * 24;
+        let startDayTime = moment(x1).hours(0).minutes(0).seconds(0).milliseconds(0).valueOf();
+        let days = Math.ceil(((x2-1000) - startDayTime) / aday);
+
+        if (days > 1) {
+            this.setState({
+                xlogs: []
+            });
+
+            for (let i=0; i<days; i++) {
+                let splitFrom;
+                let splitTo;
+                if (i === 0) {
+                    splitFrom = moment(x1).add(i, 'days').valueOf();
+                    splitTo = moment(x1).add(i+1, 'days').hours(0).minutes(0).seconds(0).milliseconds(0).valueOf();
+                } else if (i === (days - 1)) {
+                    splitFrom = moment(x1).add(i, 'days').hours(0).minutes(0).seconds(0).milliseconds(0).valueOf();
+                    splitTo = moment(x2);
+                } else {
+                    splitFrom = moment(x1).add(i, 'days').hours(0).minutes(0).seconds(0).milliseconds(0).valueOf();
+                    splitTo = moment(x1).add(i+1, 'days').hours(0).minutes(0).seconds(0).milliseconds(0).valueOf();
+                }
+
+                this.getListData(splitFrom, splitTo, y1, y2, true);
+            }
+
+        } else {
+            this.getListData(x1, x2, y1, y2, false);
+        }
+    }
+
+
+    // TODO 날자별로 쪼개야함
+    // TODO search의 경우, 마지막 newXLogs가 allXLogs에 들어 있는 문제 있음
+    getListData = (x1, x2, y1, y2, append) => {
+        let that = this;
         let allXLogs = that.props.xlogs;
         let newXLogs = that.props.newXLogs;
 
-        const filtered1 = _(allXLogs)
-            .filter(x => x1 <= x.endTime * 1 && x.endTime * 1 <= x2 && y1 <= x.elapsed * 1 && x.elapsed * 1 <= y2)
-            .take(xlogMaxSelectionCount).value();
 
-        const filtered2 = _(newXLogs)
-            .filter(x => x1 <= x.endTime * 1 && x.endTime * 1 <= x2 && y1 <= x.elapsed * 1 && x.elapsed * 1 <= y2)
-            .take(xlogMaxSelectionCount).value();
+        let filtered = [];
 
+        if (this.props.realtime) {
+            let filtered1 = _(allXLogs)
+                .filter(x => x1 <= x.endTime * 1 && x.endTime * 1 <= x2 && y1 <= x.elapsed * 1 && x.elapsed * 1 <= y2)
+                .take(xlogMaxSelectionCount).value();
 
-        if (filtered1.length === 0 && filtered2.length === 0) {
-            return;
+            let last =  xlogMaxSelectionCount - filtered1.length;
+            let filtered2 = [];
+            if (last > 0) {
+                filtered2 = _(newXLogs)
+                    .filter(x => x1 <= x.endTime * 1 && x.endTime * 1 <= x2 && y1 <= x.elapsed * 1 && x.elapsed * 1 <= y2)
+                    .take(xlogMaxSelectionCount).value();
+            }
+
+            if (filtered1.length === 0 && filtered2.length === 0) {
+                return;
+            }
+
+            filtered = [].concat(filtered1, filtered2);
+
+        } else {
+            const filtered1 = _(allXLogs)
+                .filter(x => x1 <= x.endTime * 1 && x.endTime * 1 <= x2 && y1 <= x.elapsed * 1 && x.elapsed * 1 <= y2)
+                .take(xlogMaxSelectionCount).value();
+
+            if (filtered1.length === 0) {
+                return;
+            }
+
+            filtered = filtered1;
+
         }
-
-        let filtered = [].concat(filtered1, filtered2);
 
         let date = moment(new Date(x1)).format("YYYYMMDD");
 
@@ -201,7 +259,7 @@ class Profiler extends Component {
                     instanceMap[this.props.instances[i].objHash] = this.props.instances[i].objName;
                 }
 
-                let xlogs = [];
+                let xlogs = (append ? this.state.xlogs : []);
                 for (let i = 0; i < list.length; i++) {
                     let xlog = list[i];
                     let elapsed = Number(xlog.elapsed);
