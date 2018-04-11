@@ -15,13 +15,16 @@ class RangeControl extends Component {
         super(props);
 
         let now = moment();
-        now.subtract(1, "hours");
+        now.subtract(10, "minutes");
         this.state = {
             date: now,
             hours: now.hours(),
             minutes : now.minutes(),
             value: 10,
-            realtime : true
+            realtime : true,
+            longTerm : false,
+            range : 60,
+            step : 5
         };
         this.handleChange = this.dateChange.bind(this);
     }
@@ -70,6 +73,30 @@ class RangeControl extends Component {
 
         this.props.changeRealtime(type === "realtime");
     };
+
+    changeLongTerm = () => {
+        if (this.state.longTerm) {
+
+            this.setState({
+                longTerm: false,
+                range : 60,
+                step : 5,
+                value : this.state.value > 60 ? 60 : this.state.value
+            });
+
+            this.props.changeLongTerm(false);
+        } else {
+            this.setState({
+                longTerm: true,
+                range : 2880,
+                step : 30,
+                value : this.state.value < 30 ? 30 : this.state.value
+            });
+
+            this.props.changeLongTerm(true);
+        }
+    };
+
 
     moveAndSearch = (type) => {
         let value = this.state.value;
@@ -131,6 +158,7 @@ class RangeControl extends Component {
                 <div className="time-type">
                     <div onClick={this.changeTimeType.bind(this, "realtime")} className={"time-type-item real-time " + (this.state.realtime ? "selected" : "")}>REALTIME</div>
                     <div onClick={this.changeTimeType.bind(this, "search")} className={"time-type-item search-time " + (!this.state.realtime ? "selected" : "")}>SEARCH</div>
+                    <div onClick={this.changeLongTerm.bind(this)} className={"time-type-item longterm-time " + (this.state.longTerm ? "selected " : " ") + (this.state.realtime ? "disabled" : "")}>48H</div>
                 </div>
                 <div className="time-controller">
                     <div>
@@ -155,10 +183,10 @@ class RangeControl extends Component {
                     <div className="span-range">
                         <div className="span-range-right-bg"></div>
                         <InputRange
-                            maxValue={60}
+                            maxValue={this.state.range}
                             minValue={10}
                             value={this.state.value}
-                            step={1}
+                            step={this.state.step}
                             disabled={this.state.realtime}
                             formatLabel={value => {
                                 let hours = Math.floor(value / 60);

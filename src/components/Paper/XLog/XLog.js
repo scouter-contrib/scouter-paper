@@ -36,6 +36,7 @@ class XLog extends Component {
     lastStartTime = null;
     lastEndTime = null;
     lastPastTimestamp = null;
+    lastPageCnt = null;
 
     constructor(props) {
         super(props);
@@ -66,6 +67,10 @@ class XLog extends Component {
         }
 
         if (this.lastPastTimestamp !== nextProps.pastTimestamp) {
+            return true;
+        }
+
+        if (this.lastPastTimestamp === nextProps.pastTimestamp && this.lastPageCnt !== nextProps.pageCnt) {
             return true;
         }
 
@@ -102,11 +107,13 @@ class XLog extends Component {
             this.lastPastTimestamp = this.props.pastTimestamp;
             this.clear();
             this.redraw();
+        } else if (this.lastPastTimestamp === this.props.pastTimestamp && this.lastPageCnt !== this.props.pageCnt) {
+            this.lastPageCnt = this.props.pageCnt;
+            this.draw(this.props.data.newXLogs);
         } else {
             this.draw(this.props.data.newXLogs);
         }
     };
-
 
     graphResize = () => {
         let box = this.refs.xlogViewer.parentNode.parentNode.parentNode;
