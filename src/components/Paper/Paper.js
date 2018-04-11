@@ -10,6 +10,8 @@ import jQuery from "jquery";
 import {getData, setData, getHttpProtocol, errorHandler, getWithCredentials, setAuthHeader} from '../../common/common';
 import Profiler from "./XLog/Profiler/Profiler";
 import ServerDate from "../../common/ServerDate";
+import RangeControl from "./RangeControl/RangeControl";
+import moment from 'moment';
 
 const ResponsiveReactGridLayout = WidthProvider(Responsive);
 
@@ -57,6 +59,8 @@ class Paper extends Component {
                 maxElapsed: 2000,
                 lastRequestTime: null
             },
+
+            pastTimestamp: null,
             /* visitor */
             visitor: {},
             /* counters */
@@ -66,8 +70,15 @@ class Paper extends Component {
             },
             /* counters past data */
             countersHistory: {},
+            countersHistoryTimestamp: null,
+            countersHistoryFrom: null,
+            countersHistoryTo: null,
             fixedControl: false,
-            visible : true
+            visible: true,
+            rangeControl: false,
+
+            /* realtime */
+            realtime: true
         };
     }
 
@@ -83,18 +94,11 @@ class Paper extends Component {
         }
     }
 
-    getLatestData() {
-        this.getXLog();
-        this.getVisitor();
-        this.getCounter();
-
-        this.dataRefreshTimer = setTimeout(() => {
-            this.getLatestData();
-        }, this.props.config.interval);
-    }
-
     componentDidMount() {
-        this.getLatestData();
+        if (this.state.realtime) {
+            this.getLatestData();
+        }
+
         setTimeout(() => {
             window.dispatchEvent(new Event('resize'));
         }, 1000);
@@ -103,7 +107,7 @@ class Paper extends Component {
         document.addEventListener('visibilitychange', this.visibilitychange.bind(this));
 
         this.setState({
-            visible : document.visibilityState === 'visible'
+            visible: document.visibilityState === 'visible'
         });
     }
 
@@ -113,6 +117,56 @@ class Paper extends Component {
         document.removeEventListener("scroll", this.scroll.bind(this));
         document.removeEventListener('visibilitychange', this.visibilitychange.bind(this));
     }
+
+    getLatestData(clear) {
+        if (clear) {
+            // SEARCH 옵션으로 한번이라도 조회했다면 지우고 다시
+            if (this.state.pastTimestamp) {
+                this.getXLog(true);
+            } else {
+                // SEARCH에서 다시 REALTIME인 경우 이어서
+                this.getXLog();
+            }
+        } else {
+            this.getXLog();
+        }
+
+        this.getVisitor();
+        this.getCounter();
+
+        this.dataRefreshTimer = setTimeout(() => {
+            this.getLatestData();
+        }, this.props.config.interval);
+
+    }
+
+    changeRealtime = (realtime) => {
+
+        this.setState({
+            realtime: realtime
+        });
+
+        if (realtime) {
+            this.setState({
+                countersHistoryFrom: null,
+                countersHistoryTo: null
+            });
+
+            this.counterHistoriesLoaded = {};
+            this.getLatestData(true);
+        } else {
+            this.setState({
+                countersHistory: {}
+            });
+            clearInterval(this.dataRefreshTimer);
+            this.dataRefreshTimer = null;
+        }
+    };
+
+    search = (from, to) => {
+        this.getCounterHistory(from, to);
+        this.getXLogHistory(from, to);
+    };
 
     scroll = () => {
         if (document.documentElement.scrollTop > 60) {
@@ -128,11 +182,21 @@ class Paper extends Component {
 
     visibilitychange = () => {
         this.setState({
-            visible : document.visibilityState === 'visible'
+            visible: document.visibilityState === 'visible'
         });
     };
 
-    getXLog = () => {
+    sampling = (data) => {
+        return data.filter((d) => {
+            if (Number(d.error)) {
+                return Math.round(Math.random() * 100) > (100 - this.props.config.xlog.error.sampling);
+            } else {
+                return Math.round(Math.random() * 100) > (100 - this.props.config.xlog.normal.sampling);
+            }
+        })
+    };
+
+    getXLog = (clear) => {
         let that = this;
         if (this.props.instances && this.props.instances.length > 0) {
             this.props.addRequest();
@@ -140,7 +204,7 @@ class Paper extends Component {
                 method: "GET",
                 async: true,
                 dataType: 'text',
-                url: getHttpProtocol(this.props.config) + '/scouter/v1/xlog/realTime/' + this.state.data.offset1 + '/' + this.state.data.offset2 + '?objHashes=' + JSON.stringify(this.props.instances.map((instance) => {
+                url: getHttpProtocol(this.props.config) + '/scouter/v1/xlog/realTime/' + (clear ? 0 : this.state.data.offset1) + '/' + (clear ? 0 : this.state.data.offset2) + '?objHashes=' + JSON.stringify(this.props.instances.map((instance) => {
                     return Number(instance.objHash);
                 })),
                 xhrFields: getWithCredentials(that.props.config),
@@ -148,9 +212,154 @@ class Paper extends Component {
                     setAuthHeader(xhr, that.props.config, that.props.user);
                 }
             }).done((msg) => {
-                this.tick(msg);
+
+                if (!msg) {
+                    return;
+                }
+
+                let result = (JSON.parse(msg)).result;
+
+                let now = (new ServerDate()).getTime();
+
+                let datas = null;
+                if (Number(this.props.config.xlog.normal.sampling) !== 100 || Number(this.props.config.xlog.error.sampling) !== 100) {
+                    datas = this.sampling(result.xlogs);
+                } else {
+                    datas = result.xlogs;
+                }
+
+                let tempXlogs = this.state.data.tempXlogs.concat(datas);
+                let data = this.state.data;
+
+                data.offset1 = result.xlogLoop;
+                data.offset2 = result.xlogIndex;
+                data.tempXlogs = tempXlogs;
+                data.lastRequestTime = now;
+
+                let endTime = (new ServerDate()).getTime();
+                let startTime = endTime - this.state.data.range;
+
+                let firstStepStartTime = this.state.data.lastRequestTime - 1000;
+                let secondStepStartTime = firstStepStartTime - 5000;
+
+                this.removeOverTimeXLogFrom(data.tempXlogs, startTime);
+                if (!this.state.visible) {
+                    this.setState({
+                        data: data
+                    });
+                    return;
+                }
+
+                let xlogs = this.state.data.xlogs;
+                let newXLogs = this.state.data.newXLogs;
+                let firstStepXlogs = this.state.data.firstStepXlogs;
+                let secondStepXlogs = this.state.data.secondStepXlogs;
+                let lastStepXlogs = [];
+
+                for (let i = 0; i < secondStepXlogs.length; i++) {
+                    let d = secondStepXlogs[i];
+                    if (d.endTime >= firstStepStartTime) {
+                        firstStepXlogs.push(secondStepXlogs.splice(i, 1)[0]);
+                    } else if (d.endTime >= secondStepStartTime && d.endTime < firstStepStartTime) {
+
+                    } else {
+                        lastStepXlogs.push(secondStepXlogs.splice(i, 1)[0]);
+                    }
+                }
+
+
+                for (let i = 0; i < firstStepXlogs.length; i++) {
+                    let d = firstStepXlogs[i];
+                    if (d.endTime >= firstStepStartTime) {
+
+                    } else if (d.endTime >= secondStepStartTime && d.endTime < firstStepStartTime) {
+                        secondStepXlogs.push(firstStepXlogs.splice(i, 1)[0]);
+                    } else {
+                        lastStepXlogs.push(firstStepXlogs.splice(i, 1)[0]);
+                    }
+                }
+
+                for (let i = 0; i < tempXlogs.length; i++) {
+                    let d = tempXlogs[i];
+                    if (d.endTime >= firstStepStartTime) {
+                        firstStepXlogs.push(d);
+                    } else if (d.endTime >= secondStepStartTime && d.endTime < firstStepStartTime) {
+                        secondStepXlogs.push(d);
+                    } else {
+                        lastStepXlogs.push(d);
+                    }
+                }
+
+                xlogs = xlogs.concat(newXLogs);
+                newXLogs = lastStepXlogs;
+
+                this.removeOverTimeXLogFrom(xlogs, startTime);
+
+                data.tempXlogs = [];
+                data.firstStepXlogs = firstStepXlogs;
+                data.firstStepTimestamp = now;
+                data.secondStepXlogs = secondStepXlogs;
+                data.secondStepTimestamp = now;
+                data.xlogs = xlogs;
+                data.newXLogs = newXLogs;
+                data.startTime = startTime;
+                data.endTime = endTime;
+                data.pastTimestamp = null;
+                this.setState({
+                    data: data
+                });
+
             }).fail((xhr, textStatus, errorThrown) => {
                 errorHandler(xhr, textStatus, errorThrown, this.props);
+            });
+        }
+    };
+
+    getXLogHistory = (from, to) => {
+        let that = this;
+        if (this.props.instances && this.props.instances.length > 0) {
+
+            let data = this.state.data;
+            let now = (new ServerDate()).getTime();
+            data.lastRequestTime = now;
+            data.tempXlogs = [];
+            data.newXLogs = [];
+            data.xlogs = [];
+            data.startTime = from;
+            data.endTime = to;
+
+            for (let i = 0; i < this.props.instances.length; i++) {
+                this.props.addRequest();
+                jQuery.ajax({
+                    method: "GET",
+                    async: false,
+                    dataType: 'text',
+                    url: getHttpProtocol(this.props.config) + "/scouter/v1/xlog/search/" + moment(from).format("YYYYMMDD") + "?startTimeMillis=" + from + '&endTimeMillis=' + to + '&objHash=' + this.props.instances[i].objHash,
+                    xhrFields: getWithCredentials(that.props.config),
+                    beforeSend: function (xhr) {
+                        setAuthHeader(xhr, that.props.config, that.props.user);
+                    }
+                }).done((msg) => {
+                    if (!msg) {
+                        return;
+                    }
+                    let result = (JSON.parse(msg)).result;
+                    let xlogs = null;
+                    if (Number(this.props.config.xlog.normal.sampling) !== 100 || Number(this.props.config.xlog.error.sampling) !== 100) {
+                        xlogs = this.sampling(result.xlogs);
+                    } else {
+                        xlogs = result;
+                    }
+                    data.xlogs = data.xlogs.concat(xlogs);
+                }).fail((xhr, textStatus, errorThrown) => {
+                    errorHandler(xhr, textStatus, errorThrown, this.props);
+                });
+            }
+
+            // pastTimestamp가 변하면 XLOG를 모두 새로 그린다. (실시간은 null)
+            this.setState({
+                data: data,
+                pastTimestamp: now
             });
         }
     };
@@ -185,9 +394,10 @@ class Paper extends Component {
 
     getCounter = () => {
         const that = this;
+
+        this.getCounterHistory(null, null, true);
         if (this.props.instances && this.props.instances.length > 0) {
             let counterKeyMap = {};
-            let counterHistoryKeyMap = {};
 
             for (let i = 0; i < this.state.boxes.length; i++) {
                 let option = this.state.boxes[i].option;
@@ -197,23 +407,14 @@ class Paper extends Component {
                         let innerOption = option[j];
                         if (innerOption.type === "counter") {
                             counterKeyMap[innerOption.counterKey] = true;
-                            counterHistoryKeyMap[innerOption.counterKey] = true;
                         }
                     }
                 }
             }
+
             let counterKeys = [];
             for (let attr in counterKeyMap) {
                 counterKeys.push(attr);
-            }
-
-            let counterHistoryKeys = [];
-            for (let attr in counterHistoryKeyMap) {
-                counterHistoryKeys.push(attr);
-            }
-
-            if (!counterKeys) {
-                return;
             }
 
             if (counterKeys.length < 1) {
@@ -222,58 +423,11 @@ class Paper extends Component {
 
             let instancesAndHosts = this.props.instances.concat(this.props.hosts);
 
-            // 데이터를 조회한적이 없는 경우, 과거 10분 데이터를 가져온다.
-            for (let i = 0; i < counterHistoryKeys.length; i++) {
-                let counterKey = counterHistoryKeys[i];
-
-                if (!this.counterHistoriesLoaded[counterKey]) {
-                    this.counterHistoriesLoaded[counterKey] = false;
-
-                    let now = (new ServerDate()).getTime();
-                    let ten = 1000 * 60 * 10;
-                    this.props.addRequest();
-                    jQuery.ajax({
-                        method: "GET",
-                        async: true,
-                        url: getHttpProtocol(this.props.config) + '/scouter/v1/counter/' + counterKey + '?objHashes=' + JSON.stringify(instancesAndHosts.map((obj) => {
-                            return Number(obj.objHash);
-                        })) + "&startTimeMillis=" + (now - ten) + "&endTimeMillis=" + now,
-                        xhrFields: getWithCredentials(that.props.config),
-                        beforeSend: function (xhr) {
-                            setAuthHeader(xhr, that.props.config, that.props.user);
-                        }
-                    }).done((msg) => {
-                        this.counterHistoriesLoaded[counterKey] = true;
-
-                        let counterHistory = {};
-                        if (msg.result) {
-                            for (let i = 0; i < msg.result.length; i++) {
-                                let counter = msg.result[i];
-                                if(counter.valueList.length > 0) {
-                                    counterHistory[counter.objHash] = {};
-                                    counterHistory[counter.objHash].timeList = counter.timeList;
-                                    counterHistory[counter.objHash].valueList = counter.valueList;
-                                }
-                            }
-                        }
-
-                        let countersHistory = Object.assign(this.state.countersHistory);
-                        countersHistory[counterKey] = counterHistory;
-                        this.setState({
-                            countersHistory: countersHistory
-                        });
-
-                    }).fail((xhr, textStatus, errorThrown) => {
-                        this.counterHistoriesLoaded[counterKey] = true;
-                        errorHandler(xhr, textStatus, errorThrown, this.props);
-                    });
-                }
-            }
-
-            if(!this.counterReady) {
+            if (!this.counterReady) {
                 this.counterReady = counterKeys.every((key) => this.counterHistoriesLoaded[key]);
             }
-            if(this.counterReady) {
+
+            if (this.counterReady) {
                 let params = JSON.stringify(counterKeys);
                 params = params.replace(/"/gi, "");
                 this.props.addRequest();
@@ -314,110 +468,118 @@ class Paper extends Component {
         }
     };
 
-    tick = (msg) => {
+    getCounterHistory = (from, to, realtime) => {
+        const that = this;
 
-        if (!msg) {
-            return;
-        }
+        if (this.props.instances && this.props.instances.length > 0) {
+            let counterKeyMap = {};
+            let counterHistoryKeyMap = {};
 
-        let result = (JSON.parse(msg)).result;
+            for (let i = 0; i < this.state.boxes.length; i++) {
+                let option = this.state.boxes[i].option;
 
-        let now = (new ServerDate()).getTime();
-
-        let datas = null;
-        if (Number(this.props.config.xlog.normal.sampling) !== 100 || Number(this.props.config.xlog.error.sampling) !== 100) {
-            datas = result.xlogs.filter((d) => {
-
-                if (Number(d.error)) {
-                    return Math.round(Math.random() * 100) > (100 - this.props.config.xlog.error.sampling);
-                } else {
-                    return Math.round(Math.random() * 100) > (100 - this.props.config.xlog.normal.sampling);
+                if (option && option.length > 0) {
+                    for (let j = 0; j < option.length; j++) {
+                        let innerOption = option[j];
+                        if (innerOption.type === "counter") {
+                            counterKeyMap[innerOption.counterKey] = true;
+                            counterHistoryKeyMap[innerOption.counterKey] = true;
+                        }
+                    }
                 }
-            })
-        } else {
-            datas = result.xlogs;
-        }
+            }
 
-        let tempXlogs = this.state.data.tempXlogs.concat(datas);
-        let data = this.state.data;
+            let counterKeys = [];
+            for (let attr in counterKeyMap) {
+                counterKeys.push(attr);
+            }
 
-        data.offset1 = result.xlogLoop;
-        data.offset2 = result.xlogIndex;
-        data.tempXlogs = tempXlogs;
-        data.lastRequestTime = now;
+            let counterHistoryKeys = [];
+            for (let attr in counterHistoryKeyMap) {
+                counterHistoryKeys.push(attr);
+            }
 
-        let endTime = (new ServerDate()).getTime();
-        let startTime = endTime - this.state.data.range;
+            if (counterKeys.length < 1) {
+                return false;
+            }
 
-        let firstStepStartTime = this.state.data.lastRequestTime - 1000;
-        let secondStepStartTime = firstStepStartTime - 5000;
+            let instancesAndHosts = this.props.instances.concat(this.props.hosts);
 
-        this.removeOverTimeXLogFrom(data.tempXlogs, startTime);
-        if (!this.state.visible) {
-            this.setState({
-                data: data
-            });
-            return;
-        }
+            // 데이터를 조회한적이 없는 경우, 과거 10분 데이터를 가져온다.
+            for (let i = 0; i < counterHistoryKeys.length; i++) {
+                let counterKey = counterHistoryKeys[i];
+                let now = (new Date()).getTime();
 
-        let xlogs = this.state.data.xlogs;
-        let newXLogs = this.state.data.newXLogs;
-        let firstStepXlogs = this.state.data.firstStepXlogs;
-        let secondStepXlogs = this.state.data.secondStepXlogs;
-        let lastStepXlogs = [];
+                if (realtime) {
+                    if (this.counterHistoriesLoaded[counterKey]) {
+                        continue;
+                    }
+                }
 
-        for (let i = 0; i < secondStepXlogs.length; i++) {
-            let d = secondStepXlogs[i];
-            if (d.endTime >= firstStepStartTime) {
-                firstStepXlogs.push(secondStepXlogs.splice(i, 1)[0]);
-            } else if (d.endTime >= secondStepStartTime && d.endTime < firstStepStartTime) {
+                let startTime = from;
+                let endTime = to;
 
-            } else {
-                lastStepXlogs.push(secondStepXlogs.splice(i, 1)[0]);
+                if (realtime) {
+                    let now = (new ServerDate()).getTime();
+                    let ten = 1000 * 60 * 10;
+                    startTime = now - ten;
+                    endTime = now;
+                }
+
+                this.props.addRequest();
+                jQuery.ajax({
+                    method: "GET",
+                    async: true,
+                    url: getHttpProtocol(this.props.config) + '/scouter/v1/counter/' + counterKey + '?objHashes=' + JSON.stringify(instancesAndHosts.map((obj) => {
+                        return Number(obj.objHash);
+                    })) + "&startTimeMillis=" + startTime + "&endTimeMillis=" + endTime,
+                    xhrFields: getWithCredentials(that.props.config),
+                    beforeSend: function (xhr) {
+                        setAuthHeader(xhr, that.props.config, that.props.user);
+                    }
+                }).done((msg) => {
+
+
+                    let counterHistory = {};
+                    if (msg.result) {
+                        for (let i = 0; i < msg.result.length; i++) {
+                            let counter = msg.result[i];
+                            if (counter.valueList.length > 0) {
+                                counterHistory[counter.objHash] = {};
+                                counterHistory[counter.objHash].timeList = counter.timeList;
+                                counterHistory[counter.objHash].valueList = counter.valueList;
+                            }
+                        }
+                    }
+
+                    let countersHistory = Object.assign(this.state.countersHistory);
+                    countersHistory[counterKey] = counterHistory;
+
+                    if (realtime) {
+                        this.setState({
+                            countersHistory: countersHistory,
+                            countersHistoryTimestamp: now
+                        });
+
+                        if (realtime) {
+                            this.counterHistoriesLoaded[counterKey] = true;
+                        }
+                    } else {
+                        this.setState({
+                            countersHistory: countersHistory,
+                            countersHistoryTimestamp: now,
+                            countersHistoryFrom: from,
+                            countersHistoryTo: to
+                        });
+                    }
+
+
+                }).fail((xhr, textStatus, errorThrown) => {
+                    errorHandler(xhr, textStatus, errorThrown, this.props);
+                });
+
             }
         }
-
-
-        for (let i = 0; i < firstStepXlogs.length; i++) {
-            let d = firstStepXlogs[i];
-            if (d.endTime >= firstStepStartTime) {
-
-            } else if (d.endTime >= secondStepStartTime && d.endTime < firstStepStartTime) {
-                secondStepXlogs.push(firstStepXlogs.splice(i, 1)[0]);
-            } else {
-                lastStepXlogs.push(firstStepXlogs.splice(i, 1)[0]);
-            }
-        }
-
-        for (let i = 0; i < tempXlogs.length; i++) {
-            let d = tempXlogs[i];
-            if (d.endTime >= firstStepStartTime) {
-                firstStepXlogs.push(d);
-            } else if (d.endTime >= secondStepStartTime && d.endTime < firstStepStartTime) {
-                secondStepXlogs.push(d);
-            } else {
-                lastStepXlogs.push(d);
-            }
-        }
-
-        xlogs = xlogs.concat(newXLogs);
-        newXLogs = lastStepXlogs;
-
-        this.removeOverTimeXLogFrom(xlogs, startTime);
-
-        data.tempXlogs = [];
-        data.firstStepXlogs = firstStepXlogs;
-        data.firstStepTimestamp = now;
-        data.secondStepXlogs = secondStepXlogs;
-        data.secondStepTimestamp = now;
-        data.xlogs = xlogs;
-        data.newXLogs = newXLogs;
-        data.startTime = startTime;
-        data.endTime = endTime;
-
-        this.setState({
-            data: data
-        });
     };
 
     removeOverTimeXLogFrom(tempXlogs, startTime) {
@@ -477,6 +639,12 @@ class Paper extends Component {
 
         return key;
     }
+
+    toggleRangeControl = () => {
+        this.setState({
+            rangeControl: !this.state.rangeControl
+        });
+    };
 
     addPaper = () => {
         let boxes = this.state.boxes;
@@ -737,8 +905,8 @@ class Paper extends Component {
         return (
             <div className="papers">
                 <div className={"fixed-alter-object " + (this.state.fixedControl ? 'show' : '')}></div>
-                <PaperControl addPaper={this.addPaper} addPaperAndAddMetric={this.addPaperAndAddMetric}
-                              clearLayout={this.clearLayout} fixedControl={this.state.fixedControl}/>
+                <PaperControl addPaper={this.addPaper} addPaperAndAddMetric={this.addPaperAndAddMetric} clearLayout={this.clearLayout} fixedControl={this.state.fixedControl} toggleRangeControl={this.toggleRangeControl} realtime={this.state.realtime}/>
+                <RangeControl visible={this.state.rangeControl} changeRealtime={this.changeRealtime} search={this.search} fixedControl={this.state.fixedControl} toggleRangeControl={this.toggleRangeControl}/>
                 {(instanceSelected && (!this.state.boxes || this.state.boxes.length === 0)) &&
                 <div className="quick-usage">
                     <div>
@@ -758,9 +926,10 @@ class Paper extends Component {
                         return (
                             <div className="box-layout" key={box.key} data-grid={box.layout}>
                                 <button className="box-control box-layout-remove-btn last" onClick={this.removePaper.bind(null, box.key)}><i className="fa fa-times-circle-o" aria-hidden="true"></i></button>
-                                {box.option && (box.option.length > 1 || box.option.config ) && <button className="box-control box-layout-config-btn" onClick={this.toggleConfig.bind(null, box.key)}><i className="fa fa-cog" aria-hidden="true"></i></button>}
+                                {box.option && (box.option.length > 1 || box.option.config ) &&
+                                <button className="box-control box-layout-config-btn" onClick={this.toggleConfig.bind(null, box.key)}><i className="fa fa-cog" aria-hidden="true"></i></button>}
                                 {box.config && <BoxConfig box={box} setOptionValues={this.setOptionValues} setOptionClose={this.setOptionClose} removeMetrics={this.removeMetrics}/>}
-                                <Box visible={this.state.visible} setOption={this.setOption} box={box} data={this.state.data} config={this.props.config} visitor={this.state.visitor} counters={this.state.counters} countersHistory={this.state.countersHistory} layoutChangeTime={this.state.layoutChangeTime}/>
+                                <Box visible={this.state.visible} setOption={this.setOption} box={box} pastTimestamp={this.state.pastTimestamp} data={this.state.data} config={this.props.config} visitor={this.state.visitor} counters={this.state.counters} countersHistory={this.state.countersHistory} countersHistoryFrom={this.state.countersHistoryFrom} countersHistoryTo={this.state.countersHistoryTo} countersHistoryTimestamp={this.state.countersHistoryTimestamp} layoutChangeTime={this.state.layoutChangeTime} realtime={this.state.realtime}/>
                             </div>
                         )
                     })}

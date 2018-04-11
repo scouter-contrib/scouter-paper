@@ -50,15 +50,22 @@ class LineChart extends Component {
         this.graphInit();
     }
 
-    shouldComponentUpdate() {
+    shouldComponentUpdate(nextProps, nextState) {
+
+        /*if (this.props.visible && this.props.countersHistoryTimestamp !== nextProps.countersHistoryTimestamp) {
+            return true;
+        }*/
         return !!this.props.visible;
     }
 
     componentWillReceiveProps(nextProps) {
 
         //inner function
-        function loadHistoryCounter(counterKey) {
+        function loadHistoryCounter(counterKey, clear) {
             counters[counterKey] = counters[counterKey] || [];
+            if (clear) {
+                counters[counterKey] = [];
+            }
             const timeKeyRow = {};
             for (let objHash in nextProps.countersHistory[counterKey]) {
 
@@ -97,13 +104,13 @@ class LineChart extends Component {
                     let counterKey = nextProps.box.option[i].counterKey;
 
                     if (nextProps.countersHistory[counterKey]) {
-                        if (this.historyInit[counterKey]) {
+                        if (this.historyInit[counterKey] && this.props.countersHistoryTimestamp === nextProps.countersHistoryTimestamp) {
                             continue;
-                        } else {
-                            this.historyInit[counterKey] = true;
                         }
 
-                        loadHistoryCounter(counterKey);
+                        this.historyInit[counterKey] = true;
+
+                        loadHistoryCounter(counterKey, nextProps.countersHistoryFrom && nextProps.countersHistoryTo);
                     }
                 }
             } else {
@@ -119,6 +126,11 @@ class LineChart extends Component {
 
             let endTime = nextProps.time;
             let startTime = nextProps.time - (1000 * 60 * 10);
+
+            if (nextProps.countersHistoryFrom && nextProps.countersHistoryTo) {
+                endTime = nextProps.countersHistoryTo;
+                startTime = nextProps.countersHistoryFrom;
+            }
 
             if (Array.isArray(nextProps.box.option)) {
                 for (let i = 0; i < nextProps.box.option.length; i++) {
@@ -154,38 +166,7 @@ class LineChart extends Component {
                 }
             }
 
-            let maxY = 0;
-            for (let attr in this.state.counters) {
-                for (let i = 0; i < this.state.counters[attr].length; i++) {
-                    for (let hash in this.state.counters[attr][i].data) {
-                        if (Array.isArray(this.state.counters[attr][i].data[hash].value)) {
-                            for (let j = 0; j < this.state.counters[attr][i].data[hash].value.length; j++) {
-                                if (Number(this.state.counters[attr][i].data[hash].value[j]) > maxY) {
-                                    maxY = Number(this.state.counters[attr][i].data[hash].value[j]);
-                                }
-                            }
-                        } else {
-                            if (Number(this.state.counters[attr][i].data[hash].value) > maxY) {
-                                maxY = Number(this.state.counters[attr][i].data[hash].value);
-                            }
-                        }
-                    }
-                }
-            }
-
-            if (!maxY || maxY < 10) {
-                maxY = 10;
-            }
-
-            this.graph.autoMaxY = maxY;
-
-            if (!this.graph.maxY) {
-                this.graph.maxY = maxY * 1.2;
-            }
-
-            if (this.graph.autoMaxY > this.graph.maxY) {
-                this.graph.maxY = this.graph.autoMaxY;
-            }
+            this.setMaxY();
 
             let noData = true;
             if (Array.isArray(nextProps.box.option)) {
@@ -213,8 +194,18 @@ class LineChart extends Component {
                 noData: noData
             });
         } else {
+
+            this.graph.maxY = 10;
+
+            this.setMaxY();
+
             let startTime = (new ServerDate()).getTime() - (1000 * 60 * 10);
             let endTime = (new ServerDate()).getTime();
+
+            if (nextProps.countersHistoryFrom && nextProps.countersHistoryTo) {
+                endTime = nextProps.countersHistoryTo;
+                startTime = nextProps.countersHistoryFrom;
+            }
 
             this.setState({
                 startTime: startTime,
@@ -228,6 +219,41 @@ class LineChart extends Component {
         }
 
     }
+
+    setMaxY = () => {
+        let maxY = 0;
+        for (let attr in this.state.counters) {
+            for (let i = 0; i < this.state.counters[attr].length; i++) {
+                for (let hash in this.state.counters[attr][i].data) {
+                    if (Array.isArray(this.state.counters[attr][i].data[hash].value)) {
+                        for (let j = 0; j < this.state.counters[attr][i].data[hash].value.length; j++) {
+                            if (Number(this.state.counters[attr][i].data[hash].value[j]) > maxY) {
+                                maxY = Number(this.state.counters[attr][i].data[hash].value[j]);
+                            }
+                        }
+                    } else {
+                        if (Number(this.state.counters[attr][i].data[hash].value) > maxY) {
+                            maxY = Number(this.state.counters[attr][i].data[hash].value);
+                        }
+                    }
+                }
+            }
+        }
+
+        if (!maxY || maxY < 10) {
+            maxY = 10;
+        }
+
+        this.graph.autoMaxY = maxY;
+
+        if (!this.graph.maxY) {
+            this.graph.maxY = maxY * 1.2;
+        }
+
+        if (this.graph.autoMaxY > this.graph.maxY) {
+            this.graph.maxY = this.graph.autoMaxY;
+        }
+    };
 
     componentDidUpdate = (prevProps, prevState) => {
         this.graphResize();
@@ -328,7 +354,7 @@ class LineChart extends Component {
         let valueLine = d3.line().curve(d3.curveCatmullRom)
             .defined(function (d) {
                 let objData = d.data ? d.data[obj.objHash] : null;
-                return objData && !isNaN(objData.value);
+                return objData && !isNaN(objData.value) && !isNaN(that.graph.y(Number(objData.value)));
             })
             .x(function (d) {
                 return that.graph.x(d.time);

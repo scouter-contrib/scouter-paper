@@ -35,6 +35,7 @@ class XLog extends Component {
 
     lastStartTime = null;
     lastEndTime = null;
+    lastPastTimestamp = null;
 
     constructor(props) {
         super(props);
@@ -61,6 +62,10 @@ class XLog extends Component {
         }
 
         if (this.lastStartTime !== this.props.data.startTime || this.lastEndTime !== this.props.data.endTime) {
+            return true;
+        }
+
+        if (this.lastPastTimestamp !== nextProps.pastTimestamp) {
             return true;
         }
 
@@ -92,10 +97,14 @@ class XLog extends Component {
             this.updateYAxis(true);
         }
 
-
-        this.draw(this.props.data.newXLogs);
-
-
+        // 과거 데이터가 조회되거나, 실시간으로 변한 경우, 전체 지우고 다시 그리기
+        if (this.lastPastTimestamp !== this.props.pastTimestamp) {
+            this.lastPastTimestamp = this.props.pastTimestamp;
+            this.clear();
+            this.redraw();
+        } else {
+            this.draw(this.props.data.newXLogs);
+        }
     };
 
 
