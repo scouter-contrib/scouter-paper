@@ -85,7 +85,7 @@
     padding: 3px 5px;
     border: 1px solid rgba(0, 0, 0, 0.3);
     cursor: pointer;
-    width: 50px;
+    width: 60px;
     text-align: center;
     box-sizing: border-box;
 }
@@ -100,10 +100,23 @@
     border-left: none;
 }
 
+.range-controls .time-type > div.longterm-time {
+    width: 30px;
+    margin-left: 5px;
+    border-radius: 3px;
+}
+
 .range-controls .time-type > div.selected {
     background-color: #FFCC11;
     color: #333;
 }
+
+.range-controls .time-type > div.disabled {
+    background-color: transparent;
+    color: #AAA;
+    cursor: auto;
+}
+
 
 .range-controls.visible {
     display: block;
@@ -333,7 +346,7 @@
 
 .range-controls .selected-time .start-time,
 .range-controls .selected-time .end-time {
-    width: 80px;
+    width: 110px;
     box-sizing: border-box;
     text-align: center;
 }
