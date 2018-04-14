@@ -120,6 +120,23 @@ class LineChart extends Component {
                     });
                 }
             }
+
+            this.graph.maxY = 10;
+
+            this.setMaxY(counters);
+
+            let startTime = (new ServerDate()).getTime() - (1000 * 60 * 10);
+            let endTime = (new ServerDate()).getTime();
+
+            if (nextProps.countersHistoryFrom && nextProps.countersHistoryTo) {
+                endTime = nextProps.countersHistoryTo;
+                startTime = nextProps.countersHistoryFrom;
+            }
+
+            this.setState({
+                startTime: startTime,
+                endTime: endTime
+            });
         }
 
         if (nextProps.counters && nextProps.time !== this.lastCountersTime) {
@@ -181,31 +198,8 @@ class LineChart extends Component {
                 noData: noData
             });
 
-        } else {
-
-            /*if (nextProps.countersHistoryFrom && nextProps.countersHistoryTo) {
-                endTime = nextProps.countersHistoryTo;
-                startTime = nextProps.countersHistoryFrom;
-            }*/
-
-            this.graph.maxY = 10;
-
-            this.setMaxY(counters);
-
-            let startTime = (new ServerDate()).getTime() - (1000 * 60 * 10);
-            let endTime = (new ServerDate()).getTime();
-
-            if (nextProps.countersHistoryFrom && nextProps.countersHistoryTo) {
-                endTime = nextProps.countersHistoryTo;
-                startTime = nextProps.countersHistoryFrom;
-            }
-
-            this.setState({
-                startTime: startTime,
-                endTime: endTime
-            });
-
         }
+
 
         if (this.props.layoutChangeTime !== nextProps.layoutChangeTime) {
             this.graphResize();

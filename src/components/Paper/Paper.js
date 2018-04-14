@@ -90,7 +90,6 @@ class Paper extends Component {
     }
 
     componentWillReceiveProps(nextProps) {
-        console.log(1);
         if (JSON.stringify(nextProps.template) !== JSON.stringify(this.props.template)) {
             if (JSON.stringify(nextProps.template.boxes) !== JSON.stringify(this.state.boxes) || JSON.stringify(nextProps.template.layouts) !== JSON.stringify(this.state.layouts)) {
                 this.setState({
