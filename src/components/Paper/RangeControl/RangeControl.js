@@ -108,6 +108,11 @@ class RangeControl extends Component {
 
 
     moveAndSearch = (type) => {
+
+        if (this.state.realtime) {
+            return;
+        }
+
         let value = this.state.value;
         let current = this.state.date.clone();
         current.seconds(0);

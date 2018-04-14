@@ -71,13 +71,23 @@
     height: 16px;
     border-radius: 50%;
     display: inline-block;
-    background-color: #FFCC11;
-    color: #333;
-    padding-top: 1px;
+    color: white;
+    padding-top: 0px;
     box-sizing: border-box;
+    border: 1px solid white;
+}
+
+.papers-controls .paper-control.live.realtime span.live {
+    background-color: #FFCC11;
+    border: 1px solid rgba(0,0,0,0.2);
+    color: #333;
 }
 
 .papers-controls .paper-control span.live:hover {
+    background-color: rgba(0,0,0,0.2);
+}
+
+.papers-controls .paper-control.live.realtime span.live:hover {
     background-color: #FFC125;
 }
 
@@ -136,10 +146,6 @@
 
 .papers-controls .multi-control:hover ul {
     display: inline-block;
-}
-
-.papers-controls .multi-metrics ul li {
-
 }
 
 .papers-controls .multi-metrics ul li .control-item {

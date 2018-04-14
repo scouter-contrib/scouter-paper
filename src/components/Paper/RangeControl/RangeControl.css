@@ -352,9 +352,18 @@
     cursor: pointer;
 }
 
+.range-controls .selected-time.disabled > div {
+    cursor: auto;
+}
+
 .range-controls .selected-time > div.move-before:hover,
 .range-controls .selected-time > div.move-after:hover {
     background-color: #EEE;
+}
+
+.range-controls .selected-time.disabled > div.move-before:hover,
+.range-controls .selected-time.disabled > div.move-after:hover {
+    background-color: white;
 }
 
 .range-controls .selected-time > div.end-time {
