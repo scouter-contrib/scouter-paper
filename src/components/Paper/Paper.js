@@ -236,6 +236,46 @@ class Paper extends Component {
         }
     };
 
+    getSearchDays (from, to) {
+        let aday = 1000 * 60 * 60 * 24;
+        let startDayTime = moment(from).hours(0).minutes(0).seconds(0).milliseconds(0).valueOf();
+        return  Math.ceil(((to-1000) - startDayTime) / aday);
+    }
+
+    getDivideDays (from, to) {
+        let days = this.getSearchDays(from, to);
+
+        let fromTos = [];
+        if (days > 0) {
+            for (let i=0; i<days; i++) {
+                let splitFrom;
+                let splitTo;
+                if (i === 0) {
+                    splitFrom = moment(from).add(i, 'days').valueOf();
+                    splitTo = moment(from).add(i + 1, 'days').hours(0).minutes(0).seconds(0).milliseconds(0).valueOf();
+                } else if (i === (days - 1)) {
+                    splitFrom = moment(from).add(i, 'days').hours(0).minutes(0).seconds(0).milliseconds(0).valueOf();
+                    splitTo = moment(to);
+                } else {
+                    splitFrom = moment(from).add(i, 'days').hours(0).minutes(0).seconds(0).milliseconds(0).valueOf();
+                    splitTo = moment(from).add(i + 1, 'days').hours(0).minutes(0).seconds(0).milliseconds(0).valueOf();
+                }
+
+                fromTos.push({
+                    from: splitFrom,
+                    to: splitTo
+                })
+            }
+        } else {
+            fromTos.push({
+                from : from,
+                to : to
+            })
+        }
+
+        return fromTos;
+    }
+
     getCounterHistory = (from, to, longTerm) => {
 
         if (this.props.instances && this.props.instances.length > 0) {
@@ -279,31 +319,17 @@ class Paper extends Component {
                 let endTime = to;
                 let url;
                 if (longTerm) {
-                    let aday = 1000 * 60 * 60 * 24;
-                    let startDayTime = moment(from).hours(0).minutes(0).seconds(0).milliseconds(0).valueOf();
-                    let days = Math.ceil(((to-1000) - startDayTime) / aday);
+
+                    let days = this.getSearchDays(from, to);
+                    let fromTos = this.getDivideDays(from, to);
 
                     if (days > 1) {
-                        for (let i=0; i<days; i++) {
-                            let splitFrom;
-                            let splitTo;
-                            if (i === 0) {
-                                splitFrom = moment(from).add(i, 'days').valueOf();
-                                splitTo = moment(from).add(i+1, 'days').hours(0).minutes(0).seconds(0).milliseconds(0).valueOf();
-                            } else if (i === (days - 1)) {
-                                splitFrom = moment(from).add(i, 'days').hours(0).minutes(0).seconds(0).milliseconds(0).valueOf();
-                                splitTo = moment(to);
-                            } else {
-                                splitFrom = moment(from).add(i, 'days').hours(0).minutes(0).seconds(0).milliseconds(0).valueOf();
-                                splitTo = moment(from).add(i+1, 'days').hours(0).minutes(0).seconds(0).milliseconds(0).valueOf();
-                            }
+                        for (let i=0; i<fromTos.length; i++) {
                             url = getHttpProtocol(this.props.config) + '/scouter/v1/counter/stat/' + counterKey + '?objHashes=' + JSON.stringify(instancesAndHosts.map((obj) => {
                                 return Number(obj.objHash);
-                            })) + "&startYmd=" + moment(splitFrom).format("YYYYMMDD") + "&endYmd=" + moment(splitFrom).format("YYYYMMDD");
-
+                            })) + "&startYmd=" + moment(fromTos[i].from).format("YYYYMMDD") + "&endYmd=" + moment(fromTos[i].to).format("YYYYMMDD");
                             this.getCounterHistoryData(url, counterKey, from, to, (new Date()).getTime(), true);
                         }
-
                     } else {
                         url = getHttpProtocol(this.props.config) + '/scouter/v1/counter/stat/' + counterKey + '?objHashes=' + JSON.stringify(instancesAndHosts.map((obj) => {
                             return Number(obj.objHash);
@@ -541,28 +567,14 @@ class Paper extends Component {
 
             this.xlogHistoryRequestTime = now;
 
-            let aday = 1000 * 60 * 60 * 24;
-            let startDayTime = moment(from).hours(0).minutes(0).seconds(0).milliseconds(0).valueOf();
-            let days = Math.ceil(((to-1000) - startDayTime) / aday);
+            let days = this.getSearchDays(from, to);
+            let fromTos = this.getDivideDays(from, to);
+
 
             if (days > 1) {
-                for (let i=0; i<days; i++) {
-                    let splitFrom;
-                    let splitTo;
-                    if (i === 0) {
-                        splitFrom = moment(from).add(i, 'days').valueOf();
-                        splitTo = moment(from).add(i+1, 'days').hours(0).minutes(0).seconds(0).milliseconds(0).valueOf();
-                    } else if (i === (days - 1)) {
-                        splitFrom = moment(from).add(i, 'days').hours(0).minutes(0).seconds(0).milliseconds(0).valueOf();
-                        splitTo = moment(to);
-                    } else {
-                        splitFrom = moment(from).add(i, 'days').hours(0).minutes(0).seconds(0).milliseconds(0).valueOf();
-                        splitTo = moment(from).add(i+1, 'days').hours(0).minutes(0).seconds(0).milliseconds(0).valueOf();
-                    }
-
-                    this.getXLogHistoryData(now, splitFrom, splitTo);
+                for (let i=0; i<fromTos.length; i++) {
+                    this.getXLogHistoryData(now, fromTos[i].from, fromTos[i].to);
                 }
-
             } else {
                 this.getXLogHistoryData(now, from, to);
             }
@@ -661,9 +673,6 @@ class Paper extends Component {
             });
         }
     };
-
-
-
 
 
     getCounterHistoryData = (url, counterKey, from , to, now, append) => {
