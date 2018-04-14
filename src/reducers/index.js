@@ -13,6 +13,9 @@ const configState = {
     authentification : {
         type : "bearer"
     },
+    graph : {
+        color : "instance"
+    },
     xlog: {
         normal: {
             rows: 5,

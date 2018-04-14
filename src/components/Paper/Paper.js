@@ -90,6 +90,7 @@ class Paper extends Component {
     }
 
     componentWillReceiveProps(nextProps) {
+        console.log(1);
         if (JSON.stringify(nextProps.template) !== JSON.stringify(this.props.template)) {
             if (JSON.stringify(nextProps.template.boxes) !== JSON.stringify(this.state.boxes) || JSON.stringify(nextProps.template.layouts) !== JSON.stringify(this.state.layouts)) {
                 this.setState({
@@ -100,19 +101,26 @@ class Paper extends Component {
             }
         }
 
-        if (this.props.instances && this.props.instances.length > 0) {
+        if (JSON.stringify(this.props.instances) !== JSON.stringify(nextProps.instances)) {
             let now = (new ServerDate()).getTime();
             let ten = 1000 * 60 * 10;
-            this.getCounterHistory(now - ten, now, false);
+            this.getCounterHistory(nextProps.instances, nextProps.hosts, now - ten, now, false);
+            if (this.state.realtime) {
+                this.getLatestData();
+            }
         }
     }
 
     componentDidMount() {
         this.mounted = true;
-        if (this.state.realtime) {
+
+        if (this.props.instances && this.props.instances.length > 0) {
             let now = (new ServerDate()).getTime();
             let ten = 1000 * 60 * 10;
-            this.getLatestData();
+            this.getCounterHistory(this.props.instances, this.props.hosts,  now - ten, now, false);
+            if (this.state.realtime) {
+                this.getLatestData();
+            }
         }
 
         setTimeout(() => {
@@ -150,6 +158,10 @@ class Paper extends Component {
 
         this.getVisitor();
         this.getRealTimeCounter();
+
+
+        clearInterval(this.dataRefreshTimer);
+        this.dataRefreshTimer = null;
 
         this.dataRefreshTimer = setTimeout(() => {
             this.getLatestData();
@@ -276,9 +288,9 @@ class Paper extends Component {
         return fromTos;
     }
 
-    getCounterHistory = (from, to, longTerm) => {
+    getCounterHistory = (instances, hosts, from, to, longTerm) => {
 
-        if (this.props.instances && this.props.instances.length > 0) {
+        if (instances && instances.length > 0) {
             let counterKeyMap = {};
             let counterHistoryKeyMap = {};
 
@@ -310,7 +322,7 @@ class Paper extends Component {
                 return false;
             }
 
-            let instancesAndHosts = this.props.instances.concat(this.props.hosts);
+            let instancesAndHosts = instances.concat(hosts);
 
             for (let i = 0; i < counterHistoryKeys.length; i++) {
                 let counterKey = counterHistoryKeys[i];
@@ -372,7 +384,7 @@ class Paper extends Component {
 
             let now = (new ServerDate()).getTime();
             let ten = 1000 * 60 * 10;
-            this.getCounterHistory(now - ten, now, false);
+            this.getCounterHistory(this.props.instances, this.props.hosts, now - ten, now, false);
             this.getLatestData(true);
         } else {
             clearInterval(this.dataRefreshTimer);
@@ -397,7 +409,7 @@ class Paper extends Component {
             }
         });
 
-        this.getCounterHistory(from, to, this.state.longTerm);
+        this.getCounterHistory(this.props.instances, this.props.hosts, from, to, this.state.longTerm);
         this.getXLogHistory(from, to);
     };
 

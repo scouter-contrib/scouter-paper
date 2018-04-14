@@ -64,6 +64,16 @@ class Settings extends Component {
         });
     };
 
+    onChangeGraph = (attr, event) => {
+
+        let config = this.state.config;
+        config.graph[attr] = event.target.value;
+
+        this.setState({
+            config: config
+        });
+    };
+
     onXLogOptionChange = (type, dir, event) => {
 
         let config = this.state.config;
@@ -356,6 +366,22 @@ class Settings extends Component {
                                 </div>
                                 <div className="input">
                                     <input type="text" readOnly={!this.state.edit} onChange={this.onChange.bind(this, "interval")} value={this.state.config.interval} placeholder="POLLING INTERVAL (MS)" />
+                                </div>
+                            </div>
+                        </div>
+                        <div className="category first">
+                            <div>GRAPH</div>
+                        </div>
+                        <div className="setting-box">
+                            <div className="row">
+                                <div className="label">
+                                    <div>COLOR STRATEGRY</div>
+                                </div>
+                                <div className="input">
+                                    <select value={this.state.config.graph.color} onChange={this.onChangeGraph.bind(this, "color")} disabled={!this.state.edit}>
+                                        <option value="metric">METRIC</option>
+                                        <option value="instance">INSTANCE</option>
+                                    </select>
                                 </div>
                             </div>
                         </div>
