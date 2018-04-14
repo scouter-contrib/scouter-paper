@@ -11,6 +11,7 @@ import numeral from "numeral";
 class LineChart extends Component {
 
     lastCountersTime = null;
+    lastCountersHistoryTime = null;
     historyInit = {};
 
     graph = {
@@ -58,66 +59,67 @@ class LineChart extends Component {
         return !!this.props.visible;
     }
 
-    componentWillReceiveProps(nextProps) {
+    loadHistoryCounter(countersHistory, counterKey, longTerm) {
+        let counters = this.state.counters;
+        counters[counterKey] = [];
+        const timeKeyRow = {};
+        for (let objHash in countersHistory[counterKey]) {
 
-        //inner function
-        function loadHistoryCounter(counterKey, clear) {
-            counters[counterKey] = counters[counterKey] || [];
-            if (clear) {
-                counters[counterKey] = [];
-            }
-            const timeKeyRow = {};
-            for (let objHash in nextProps.countersHistory[counterKey]) {
+            let timeList = countersHistory[counterKey][objHash].timeList;
+            let valueList = countersHistory[counterKey][objHash].valueList;
 
-                let timeList = nextProps.countersHistory[counterKey][objHash].timeList;
-                let valueList = nextProps.countersHistory[counterKey][objHash].valueList;
+            for (let j = 0; j < timeList.length; j++) {
+                let row = {};
+                let timeUnit = 2000;
+                if (longTerm) {
+                    timeUnit = 1000 * 60 * 5;
+                }
+                row.time = parseInt(timeList[j] / timeUnit, 10) * timeUnit;
+                row.data = {};
+                row.data[objHash] = {
+                    objHash: objHash,
+                    value: valueList[j]
+                };
 
-                for (let j = 0; j < timeList.length; j++) {
-                    let row = {};
-                    row.time = parseInt(timeList[j] / 2000, 10) * 2000;
-                    row.data = {};
-                    row.data[objHash] = {
+                if (!timeKeyRow[row.time]) {
+                    timeKeyRow[row.time] = row;
+                } else {
+                    timeKeyRow[row.time].data[objHash] = {
                         objHash: objHash,
                         value: valueList[j]
                     };
-
-                    if (!timeKeyRow[row.time]) {
-                        timeKeyRow[row.time] = row;
-                    } else {
-                        timeKeyRow[row.time].data[objHash] = {
-                            objHash: objHash,
-                            value: valueList[j]
-                        };
-                    }
                 }
             }
-            for (const timeKey in timeKeyRow) {
-                counters[counterKey].push(timeKeyRow[timeKey]);
-            }
-            counters[counterKey].sort((a, b) => a.time - b.time);
         }
 
+        for (const timeKey in timeKeyRow) {
+            counters[counterKey].push(timeKeyRow[timeKey]);
+        }
+        counters[counterKey].sort((a, b) => a.time - b.time);
+
+        return counters;
+    }
+
+    componentWillReceiveProps(nextProps) {
         let counters = Object.assign(this.state.counters);
-        if (nextProps.countersHistory) {
-            if (Array.isArray(nextProps.box.option)) {
-                for (let i = 0; i < nextProps.box.option.length; i++) {
-                    let counterKey = nextProps.box.option[i].counterKey;
+        if (nextProps.countersHistory && this.lastCountersHistoryTime !== nextProps.countersHistoryTimestamp) {
 
-                    if (nextProps.countersHistory[counterKey]) {
-                        if (this.historyInit[counterKey] && this.props.countersHistoryTimestamp === nextProps.countersHistoryTimestamp) {
-                            continue;
-                        }
+            this.lastCountersHistoryTime = nextProps.countersHistoryTimestamp;
+            for (let i = 0; i < nextProps.box.option.length; i++) {
+                let counterKey = nextProps.box.option[i].counterKey;
+                if (nextProps.countersHistory[counterKey]) {
 
-                        this.historyInit[counterKey] = true;
-
-                        loadHistoryCounter(counterKey, nextProps.countersHistoryFrom && nextProps.countersHistoryTo);
-                    }
+                    counters = this.loadHistoryCounter(nextProps.countersHistory, counterKey, nextProps.longTerm);
+                    this.setState({
+                        counters: counters
+                    });
+                } else {
+                    counters[counterKey] = [];
+                    this.setState({
+                        counters: counters
+                    });
                 }
-            } else {
-                let counterKey = nextProps.box.option.counterKey;
-                loadHistoryCounter(counterKey);
             }
-
         }
 
         if (nextProps.counters && nextProps.time !== this.lastCountersTime) {
@@ -127,23 +129,8 @@ class LineChart extends Component {
             let endTime = nextProps.time;
             let startTime = nextProps.time - (1000 * 60 * 10);
 
-            if (nextProps.countersHistoryFrom && nextProps.countersHistoryTo) {
-                endTime = nextProps.countersHistoryTo;
-                startTime = nextProps.countersHistoryFrom;
-            }
-
-            if (Array.isArray(nextProps.box.option)) {
-                for (let i = 0; i < nextProps.box.option.length; i++) {
-                    let counterKey = nextProps.box.option[i].counterKey;
-                    counters[counterKey] = counters[counterKey] || [];
-                    counters[counterKey].push({
-                        time: nextProps.time,
-                        data: nextProps.counters[counterKey]
-                    });
-
-                }
-            } else {
-                let counterKey = nextProps.box.option.counterKey;
+            for (let i = 0; i < nextProps.box.option.length; i++) {
+                let counterKey = nextProps.box.option[i].counterKey;
                 counters[counterKey] = counters[counterKey] || [];
                 counters[counterKey].push({
                     time: nextProps.time,
@@ -166,7 +153,7 @@ class LineChart extends Component {
                 }
             }
 
-            this.setMaxY();
+            this.setMaxY(counters);
 
             let noData = true;
             if (Array.isArray(nextProps.box.option)) {
@@ -193,11 +180,17 @@ class LineChart extends Component {
                 counters: counters,
                 noData: noData
             });
+
         } else {
+
+            /*if (nextProps.countersHistoryFrom && nextProps.countersHistoryTo) {
+                endTime = nextProps.countersHistoryTo;
+                startTime = nextProps.countersHistoryFrom;
+            }*/
 
             this.graph.maxY = 10;
 
-            this.setMaxY();
+            this.setMaxY(counters);
 
             let startTime = (new ServerDate()).getTime() - (1000 * 60 * 10);
             let endTime = (new ServerDate()).getTime();
@@ -211,6 +204,7 @@ class LineChart extends Component {
                 startTime: startTime,
                 endTime: endTime
             });
+
         }
 
         if (this.props.layoutChangeTime !== nextProps.layoutChangeTime) {
@@ -220,20 +214,20 @@ class LineChart extends Component {
 
     }
 
-    setMaxY = () => {
+    setMaxY = (counters) => {
         let maxY = 0;
-        for (let attr in this.state.counters) {
-            for (let i = 0; i < this.state.counters[attr].length; i++) {
-                for (let hash in this.state.counters[attr][i].data) {
-                    if (Array.isArray(this.state.counters[attr][i].data[hash].value)) {
-                        for (let j = 0; j < this.state.counters[attr][i].data[hash].value.length; j++) {
-                            if (Number(this.state.counters[attr][i].data[hash].value[j]) > maxY) {
-                                maxY = Number(this.state.counters[attr][i].data[hash].value[j]);
+        for (let attr in counters) {
+            for (let i = 0; i < counters[attr].length; i++) {
+                for (let hash in counters[attr][i].data) {
+                    if (Array.isArray(counters[attr][i].data[hash].value)) {
+                        for (let j = 0; j < counters[attr][i].data[hash].value.length; j++) {
+                            if (Number(counters[attr][i].data[hash].value[j]) > maxY) {
+                                maxY = Number(counters[attr][i].data[hash].value[j]);
                             }
                         }
                     } else {
-                        if (Number(this.state.counters[attr][i].data[hash].value) > maxY) {
-                            maxY = Number(this.state.counters[attr][i].data[hash].value);
+                        if (Number(counters[attr][i].data[hash].value) > maxY) {
+                            maxY = Number(counters[attr][i].data[hash].value);
                         }
                     }
                 }

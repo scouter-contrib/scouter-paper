@@ -17,8 +17,8 @@ const ResponsiveReactGridLayout = WidthProvider(Responsive);
 
 class Paper extends Component {
     dataRefreshTimer = null;
-    isXLogHistoryProcessing = false;
-    currentHistoryTime = null;
+    xlogHistoryRequestTime = null;
+    mounted = false;
 
     constructor(props) {
         super(props);
@@ -71,10 +71,12 @@ class Paper extends Component {
                 data: null
             },
             /* counters past data */
-            countersHistory: {},
-            countersHistoryTimestamp: null,
-            countersHistoryFrom: null,
-            countersHistoryTo: null,
+            countersHistory : {
+                time: null,
+                data: null,
+                from: null,
+                to: null
+            },
             fixedControl: false,
             visible: true,
             rangeControl: false,
@@ -97,10 +99,19 @@ class Paper extends Component {
                 });
             }
         }
+
+        if (this.props.instances && this.props.instances.length > 0) {
+            let now = (new ServerDate()).getTime();
+            let ten = 1000 * 60 * 10;
+            this.getCounterHistory(now - ten, now, false);
+        }
     }
 
     componentDidMount() {
+        this.mounted = true;
         if (this.state.realtime) {
+            let now = (new ServerDate()).getTime();
+            let ten = 1000 * 60 * 10;
             this.getLatestData();
         }
 
@@ -117,6 +128,7 @@ class Paper extends Component {
     }
 
     componentWillUnmount() {
+        this.mounted = false;
         clearInterval(this.dataRefreshTimer);
         this.dataRefreshTimer = null;
         document.removeEventListener("scroll", this.scroll.bind(this));
@@ -137,7 +149,7 @@ class Paper extends Component {
         }
 
         this.getVisitor();
-        this.getCounter();
+        this.getRealTimeCounter();
 
         this.dataRefreshTimer = setTimeout(() => {
             this.getLatestData();
@@ -145,24 +157,198 @@ class Paper extends Component {
 
     }
 
-    changeRealtime = (realtime) => {
+
+    getRealTimeCounter = () => {
+        const that = this;
+
+        if (this.props.instances && this.props.instances.length > 0) {
+            let counterKeyMap = {};
+
+            for (let i = 0; i < this.state.boxes.length; i++) {
+                let option = this.state.boxes[i].option;
+
+                if (option && option.length > 0) {
+                    for (let j = 0; j < option.length; j++) {
+                        let innerOption = option[j];
+                        if (innerOption.type === "counter") {
+                            counterKeyMap[innerOption.counterKey] = true;
+                        }
+                    }
+                }
+            }
+
+            let counterKeys = [];
+            for (let attr in counterKeyMap) {
+                counterKeys.push(attr);
+            }
+
+            if (counterKeys.length < 1) {
+                return false;
+            }
+
+            let instancesAndHosts = this.props.instances.concat(this.props.hosts);
+
+            if (!this.counterReady) {
+                this.counterReady = counterKeys.every((key) => this.counterHistoriesLoaded[key]);
+            }
+
+            if (this.counterReady) {
+                let params = JSON.stringify(counterKeys);
+                params = params.replace(/"/gi, "");
+                this.props.addRequest();
+                jQuery.ajax({
+                    method: "GET",
+                    async: true,
+                    url: getHttpProtocol(this.props.config) + '/scouter/v1/counter/realTime/' + params + '?objHashes=' + JSON.stringify(instancesAndHosts.map((obj) => {
+                        return Number(obj.objHash);
+                    })),
+                    xhrFields: getWithCredentials(that.props.config),
+                    beforeSend: function (xhr) {
+                        setAuthHeader(xhr, that.props.config, that.props.user);
+                    }
+                }).done((msg) => {
+                    if (!that.mounted) {
+                        return;
+                    }
+                    let map = {};
+
+                    for (let i = 0; i < counterKeys.length; i++) {
+                        map[counterKeys[i]] = {};
+                    }
+
+                    if (msg.result) {
+                        for (let i = 0; i < msg.result.length; i++) {
+                            let counter = msg.result[i];
+                            map[counter.name][counter.objHash] = counter;
+                        }
+                    }
+
+                    this.setState({
+                        counters: {
+                            time: (new ServerDate()).getTime(),
+                            data: map
+                        }
+                    });
+                }).fail((xhr, textStatus, errorThrown) => {
+                    errorHandler(xhr, textStatus, errorThrown, this.props);
+                });
+            }
+        }
+    };
+
+    getCounterHistory = (from, to, longTerm) => {
+
+        if (this.props.instances && this.props.instances.length > 0) {
+            let counterKeyMap = {};
+            let counterHistoryKeyMap = {};
+
+            for (let i = 0; i < this.state.boxes.length; i++) {
+                let option = this.state.boxes[i].option;
+
+                if (option && option.length > 0) {
+                    for (let j = 0; j < option.length; j++) {
+                        let innerOption = option[j];
+                        if (innerOption.type === "counter") {
+                            counterKeyMap[innerOption.counterKey] = true;
+                            counterHistoryKeyMap[innerOption.counterKey] = true;
+                        }
+                    }
+                }
+            }
+
+            let counterKeys = [];
+            for (let attr in counterKeyMap) {
+                counterKeys.push(attr);
+            }
+
+            let counterHistoryKeys = [];
+            for (let attr in counterHistoryKeyMap) {
+                counterHistoryKeys.push(attr);
+            }
+
+            if (counterKeys.length < 1) {
+                return false;
+            }
+
+            let instancesAndHosts = this.props.instances.concat(this.props.hosts);
+
+            for (let i = 0; i < counterHistoryKeys.length; i++) {
+                let counterKey = counterHistoryKeys[i];
+                let now = (new Date()).getTime();
+                let startTime = from;
+                let endTime = to;
+                let url;
+                if (longTerm) {
+                    let aday = 1000 * 60 * 60 * 24;
+                    let startDayTime = moment(from).hours(0).minutes(0).seconds(0).milliseconds(0).valueOf();
+                    let days = Math.ceil(((to-1000) - startDayTime) / aday);
+
+                    if (days > 1) {
+                        for (let i=0; i<days; i++) {
+                            let splitFrom;
+                            let splitTo;
+                            if (i === 0) {
+                                splitFrom = moment(from).add(i, 'days').valueOf();
+                                splitTo = moment(from).add(i+1, 'days').hours(0).minutes(0).seconds(0).milliseconds(0).valueOf();
+                            } else if (i === (days - 1)) {
+                                splitFrom = moment(from).add(i, 'days').hours(0).minutes(0).seconds(0).milliseconds(0).valueOf();
+                                splitTo = moment(to);
+                            } else {
+                                splitFrom = moment(from).add(i, 'days').hours(0).minutes(0).seconds(0).milliseconds(0).valueOf();
+                                splitTo = moment(from).add(i+1, 'days').hours(0).minutes(0).seconds(0).milliseconds(0).valueOf();
+                            }
+                            url = getHttpProtocol(this.props.config) + '/scouter/v1/counter/stat/' + counterKey + '?objHashes=' + JSON.stringify(instancesAndHosts.map((obj) => {
+                                return Number(obj.objHash);
+                            })) + "&startYmd=" + moment(splitFrom).format("YYYYMMDD") + "&endYmd=" + moment(splitFrom).format("YYYYMMDD");
+
+                            this.getCounterHistoryData(url, counterKey, from, to, (new Date()).getTime(), true);
+                        }
+
+                    } else {
+                        url = getHttpProtocol(this.props.config) + '/scouter/v1/counter/stat/' + counterKey + '?objHashes=' + JSON.stringify(instancesAndHosts.map((obj) => {
+                            return Number(obj.objHash);
+                        })) + "&startYmd=" + moment(startTime).format("YYYYMMDD") + "&endYmd=" + moment(endTime).format("YYYYMMDD");
+                        this.getCounterHistoryData(url, counterKey, from, to, now, false);
+                    }
+
+
+                } else {
+                    url = getHttpProtocol(this.props.config) + '/scouter/v1/counter/' + counterKey + '?objHashes=' + JSON.stringify(instancesAndHosts.map((obj) => {
+                        return Number(obj.objHash);
+                    })) + "&startTimeMillis=" + startTime + "&endTimeMillis=" + endTime;
+                    this.getCounterHistoryData(url, counterKey, from, to, now, false);
+                }
+            }
+        }
+    };
+
+    changeRealtime = (realtime, longTerm) => {
 
         this.setState({
-            realtime: realtime
+            realtime: realtime,
+            longTerm : longTerm,
+            counters: {
+                time: null,
+                data: null
+            },
+            countersHistory : {
+                time: null,
+                data: null,
+                from: null,
+                to: null
+            }
         });
 
         if (realtime) {
-            this.setState({
-                countersHistoryFrom: null,
-                countersHistoryTo: null
-            });
-
             this.counterHistoriesLoaded = {};
+            clearInterval(this.dataRefreshTimer);
+            this.dataRefreshTimer = null;
+
+            let now = (new ServerDate()).getTime();
+            let ten = 1000 * 60 * 10;
+            this.getCounterHistory(now - ten, now, false);
             this.getLatestData(true);
         } else {
-            this.setState({
-                countersHistory: {}
-            });
             clearInterval(this.dataRefreshTimer);
             this.dataRefreshTimer = null;
         }
@@ -175,7 +361,17 @@ class Paper extends Component {
     };
 
     search = (from, to) => {
-        this.getCounterHistory(from, to);
+
+        this.setState({
+            countersHistory : {
+                time: null,
+                data: null,
+                from: from,
+                to: to
+            }
+        });
+
+        this.getCounterHistory(from, to, this.state.longTerm);
         this.getXLogHistory(from, to);
     };
 
@@ -261,10 +457,10 @@ class Paper extends Component {
                     return;
                 }
 
-                let xlogs = this.state.data.xlogs;
-                let newXLogs = this.state.data.newXLogs;
-                let firstStepXlogs = this.state.data.firstStepXlogs;
-                let secondStepXlogs = this.state.data.secondStepXlogs;
+                let xlogs = clear ? [] : this.state.data.xlogs;
+                let newXLogs = clear ? [] : this.state.data.newXLogs;
+                let firstStepXlogs = clear ? [] : this.state.data.firstStepXlogs;
+                let secondStepXlogs = clear ? [] : this.state.data.secondStepXlogs;
                 let lastStepXlogs = [];
 
                 for (let i = 0; i < secondStepXlogs.length; i++) {
@@ -327,7 +523,6 @@ class Paper extends Component {
     };
 
     getXLogHistory = (from, to) => {
-        let that = this;
         if (this.props.instances && this.props.instances.length > 0) {
 
             let data = this.state.data;
@@ -344,19 +539,7 @@ class Paper extends Component {
                 pastTimestamp: now
             });
 
-            /*if (this.isXLogHistoryProcessing) {
-                if (!requestTime) {
-                    this.currentHistoryTime = now;
-                }
-            } else {
-                this.isXLogHistoryProcessing = true;
-                this.currentHistoryTime = now;
-            }
-
-            // 새로운 요청이 들어온 경우, 기존에 수행되던 페이징을 중지
-            if (this.isXLogHistoryProcessing && this.currentHistoryTime !== now) {
-                return;
-            }*/
+            this.xlogHistoryRequestTime = now;
 
             let aday = 1000 * 60 * 60 * 24;
             let startDayTime = moment(from).hours(0).minutes(0).seconds(0).milliseconds(0).valueOf();
@@ -377,17 +560,26 @@ class Paper extends Component {
                         splitTo = moment(from).add(i+1, 'days').hours(0).minutes(0).seconds(0).milliseconds(0).valueOf();
                     }
 
-                    this.getXLogHistoryData(splitFrom, splitTo);
+                    this.getXLogHistoryData(now, splitFrom, splitTo);
                 }
 
             } else {
-                this.getXLogHistoryData(from, to);
+                this.getXLogHistoryData(now, from, to);
             }
         }
     };
 
-    getXLogHistoryData = (from, to, lastTxid, lastXLogTime) => {
+    getXLogHistoryData = (requestTime, from, to, lastTxid, lastXLogTime) => {
         let that = this;
+
+        if (!this.mounted) {
+            return;
+        }
+
+        if (this.xlogHistoryRequestTime !== requestTime) {
+            return;
+        }
+
         if (this.props.instances && this.props.instances.length > 0) {
 
             let data = this.state.data;
@@ -406,6 +598,9 @@ class Paper extends Component {
                     setAuthHeader(xhr, that.props.config, that.props.user);
                 }
             }).done((msg) => {
+                if (!that.mounted) {
+                    return;
+                }
                 if (!msg) {
                     return;
                 }
@@ -427,7 +622,7 @@ class Paper extends Component {
                 });
 
                 if (hasMore) {
-                    that.getXLogHistoryData(from, to, result.lastTxid, result.lastXLogTime);
+                    that.getXLogHistoryData(requestTime, from, to, result.lastTxid, result.lastXLogTime);
                 }
 
             }).fail((xhr, textStatus, errorThrown) => {
@@ -452,6 +647,9 @@ class Paper extends Component {
                     setAuthHeader(xhr, that.props.config, that.props.user);
                 }
             }).done((msg) => {
+                if (!that.mounted) {
+                    return;
+                }
                 this.setState({
                     visitor: {
                         time: time,
@@ -464,195 +662,11 @@ class Paper extends Component {
         }
     };
 
-    getCounter = () => {
-        const that = this;
-
-        this.getCounterHistory(null, null, true);
-        if (this.props.instances && this.props.instances.length > 0) {
-            let counterKeyMap = {};
-
-            for (let i = 0; i < this.state.boxes.length; i++) {
-                let option = this.state.boxes[i].option;
-
-                if (option && option.length > 0) {
-                    for (let j = 0; j < option.length; j++) {
-                        let innerOption = option[j];
-                        if (innerOption.type === "counter") {
-                            counterKeyMap[innerOption.counterKey] = true;
-                        }
-                    }
-                }
-            }
-
-            let counterKeys = [];
-            for (let attr in counterKeyMap) {
-                counterKeys.push(attr);
-            }
-
-            if (counterKeys.length < 1) {
-                return false;
-            }
-
-            let instancesAndHosts = this.props.instances.concat(this.props.hosts);
-
-            if (!this.counterReady) {
-                this.counterReady = counterKeys.every((key) => this.counterHistoriesLoaded[key]);
-            }
-
-            if (this.counterReady) {
-                let params = JSON.stringify(counterKeys);
-                params = params.replace(/"/gi, "");
-                this.props.addRequest();
-                jQuery.ajax({
-                    method: "GET",
-                    async: true,
-                    url: getHttpProtocol(this.props.config) + '/scouter/v1/counter/realTime/' + params + '?objHashes=' + JSON.stringify(instancesAndHosts.map((obj) => {
-                        return Number(obj.objHash);
-                    })),
-                    xhrFields: getWithCredentials(that.props.config),
-                    beforeSend: function (xhr) {
-                        setAuthHeader(xhr, that.props.config, that.props.user);
-                    }
-                }).done((msg) => {
-                    let map = {};
-
-                    for (let i = 0; i < counterKeys.length; i++) {
-                        map[counterKeys[i]] = {};
-                    }
-
-                    if (msg.result) {
-                        for (let i = 0; i < msg.result.length; i++) {
-                            let counter = msg.result[i];
-                            map[counter.name][counter.objHash] = counter;
-                        }
-                    }
-
-                    this.setState({
-                        counters: {
-                            time: (new ServerDate()).getTime(),
-                            data: map
-                        }
-                    });
-                }).fail((xhr, textStatus, errorThrown) => {
-                    errorHandler(xhr, textStatus, errorThrown, this.props);
-                });
-            }
-        }
-    };
-
-    getCounterHistory = (from, to, realtime) => {
-        const that = this;
-
-        if (this.props.instances && this.props.instances.length > 0) {
-            let counterKeyMap = {};
-            let counterHistoryKeyMap = {};
-
-            for (let i = 0; i < this.state.boxes.length; i++) {
-                let option = this.state.boxes[i].option;
-
-                if (option && option.length > 0) {
-                    for (let j = 0; j < option.length; j++) {
-                        let innerOption = option[j];
-                        if (innerOption.type === "counter") {
-                            counterKeyMap[innerOption.counterKey] = true;
-                            counterHistoryKeyMap[innerOption.counterKey] = true;
-                        }
-                    }
-                }
-            }
-
-            let counterKeys = [];
-            for (let attr in counterKeyMap) {
-                counterKeys.push(attr);
-            }
-
-            let counterHistoryKeys = [];
-            for (let attr in counterHistoryKeyMap) {
-                counterHistoryKeys.push(attr);
-            }
-
-            if (counterKeys.length < 1) {
-                return false;
-            }
-
-            let instancesAndHosts = this.props.instances.concat(this.props.hosts);
-
-            // 데이터를 조회한적이 없는 경우, 과거 10분 데이터를 가져온다.
-            for (let i = 0; i < counterHistoryKeys.length; i++) {
-                let counterKey = counterHistoryKeys[i];
-                let now = (new Date()).getTime();
-
-                if (realtime) {
-                    if (this.counterHistoriesLoaded[counterKey]) {
-                        continue;
-                    }
-                }
-
-                let startTime = from;
-                let endTime = to;
-
-                if (realtime) {
-                    let now = (new ServerDate()).getTime();
-                    let ten = 1000 * 60 * 10;
-                    startTime = now - ten;
-                    endTime = now;
-                }
-
-                let url;
-                if (this.state.longTerm) {
-
-                    let aday = 1000 * 60 * 60 * 24;
-                    let startDayTime = moment(from).hours(0).minutes(0).seconds(0).milliseconds(0).valueOf();
-                    let days = Math.ceil(((to-1000) - startDayTime) / aday);
-
-                    if (days > 1) {
-                        this.setState({
-                            countersHistory: {}
-                        });
-
-                        for (let i=0; i<days; i++) {
-                            let splitFrom;
-                            let splitTo;
-                            if (i === 0) {
-                                splitFrom = moment(from).add(i, 'days').valueOf();
-                                splitTo = moment(from).add(i+1, 'days').hours(0).minutes(0).seconds(0).milliseconds(0).valueOf();
-                            } else if (i === (days - 1)) {
-                                splitFrom = moment(from).add(i, 'days').hours(0).minutes(0).seconds(0).milliseconds(0).valueOf();
-                                splitTo = moment(to);
-                            } else {
-                                splitFrom = moment(from).add(i, 'days').hours(0).minutes(0).seconds(0).milliseconds(0).valueOf();
-                                splitTo = moment(from).add(i+1, 'days').hours(0).minutes(0).seconds(0).milliseconds(0).valueOf();
-                            }
-                            url = getHttpProtocol(this.props.config) + '/scouter/v1/counter/stat/' + counterKey + '?objHashes=' + JSON.stringify(instancesAndHosts.map((obj) => {
-                                return Number(obj.objHash);
-                            })) + "&startYmd=" + moment(splitFrom).format("YYYYMMDD") + "&endYmd=" + moment(splitFrom).format("YYYYMMDD");
-
-                            this.getCounterHistoryData(url, counterKey, realtime, from, to, (new Date()).getTime(), true);
-                        }
-
-                    } else {
-                        url = getHttpProtocol(this.props.config) + '/scouter/v1/counter/stat/' + counterKey + '?objHashes=' + JSON.stringify(instancesAndHosts.map((obj) => {
-                            return Number(obj.objHash);
-                        })) + "&startYmd=" + moment(startTime).format("YYYYMMDD") + "&endYmd=" + moment(endTime).format("YYYYMMDD");
-                        this.getCounterHistoryData(url, counterKey, realtime, from, to, now, false);
-                    }
-
-
-                } else {
-                    url = getHttpProtocol(this.props.config) + '/scouter/v1/counter/' + counterKey + '?objHashes=' + JSON.stringify(instancesAndHosts.map((obj) => {
-                        return Number(obj.objHash);
-                    })) + "&startTimeMillis=" + startTime + "&endTimeMillis=" + endTime;
-                    this.getCounterHistoryData(url, counterKey, realtime, from, to, now, false);
-                }
 
 
 
 
-            }
-        }
-    };
-
-    getCounterHistoryData = (url, counterKey, realtime, from , to, now, append) => {
+    getCounterHistoryData = (url, counterKey, from , to, now, append) => {
         let that = this;
         this.props.addRequest();
         jQuery.ajax({
@@ -664,15 +678,16 @@ class Paper extends Component {
                 setAuthHeader(xhr, that.props.config, that.props.user);
             }
         }).done((msg) => {
-
-
-            let countersHistory = Object.assign(this.state.countersHistory);
+            if (!this.mounted) {
+                return;
+            }
+            let countersHistory = this.state.countersHistory.data ? Object.assign(this.state.countersHistory.data) : {};
 
             let counterHistory;
             if (msg.result) {
                 for (let i = 0; i < msg.result.length; i++) {
                     let counter = msg.result[i];
-                    counterHistory = append ? (countersHistory[counterKey] ? countersHistory[counterKey] : {}) : {};
+                    counterHistory = countersHistory[counterKey] ? countersHistory[counterKey] : {};
                     if (counter.valueList.length > 0) {
                         if (append) {
                             if (counterHistory[counter.objHash]) {
@@ -734,24 +749,16 @@ class Paper extends Component {
                 }
             }
 
-            if (realtime) {
-                this.setState({
-                    countersHistory: countersHistory,
-                    countersHistoryTimestamp: now
-                });
-
-                if (realtime) {
-                    this.counterHistoriesLoaded[counterKey] = true;
-                }
-            } else {
-                this.setState({
-                    countersHistory: countersHistory,
-                    countersHistoryTimestamp: now,
-                    countersHistoryFrom: from,
-                    countersHistoryTo: to
-                });
-            }
-
+            this.state.countersHistory.data = countersHistory;
+            this.setState({
+                countersHistory : {
+                    time: new Date().getTime(),
+                    data: countersHistory,
+                    from : from,
+                    to : to
+                },
+            });
+            this.counterHistoriesLoaded[counterKey] = true;
         }).fail((xhr, textStatus, errorThrown) => {
             errorHandler(xhr, textStatus, errorThrown, this.props);
         });
@@ -1104,7 +1111,7 @@ class Paper extends Component {
                                 {box.option && (box.option.length > 1 || box.option.config ) &&
                                 <button className="box-control box-layout-config-btn" onClick={this.toggleConfig.bind(null, box.key)}><i className="fa fa-cog" aria-hidden="true"></i></button>}
                                 {box.config && <BoxConfig box={box} setOptionValues={this.setOptionValues} setOptionClose={this.setOptionClose} removeMetrics={this.removeMetrics}/>}
-                                <Box visible={this.state.visible} setOption={this.setOption} box={box} pastTimestamp={this.state.pastTimestamp} pageCnt={this.state.pageCnt} data={this.state.data} config={this.props.config} visitor={this.state.visitor} counters={this.state.counters} countersHistory={this.state.countersHistory} countersHistoryFrom={this.state.countersHistoryFrom} countersHistoryTo={this.state.countersHistoryTo} countersHistoryTimestamp={this.state.countersHistoryTimestamp} layoutChangeTime={this.state.layoutChangeTime} realtime={this.state.realtime}/>
+                                <Box visible={this.state.visible} setOption={this.setOption} box={box} pastTimestamp={this.state.pastTimestamp} pageCnt={this.state.pageCnt} data={this.state.data} config={this.props.config} visitor={this.state.visitor} counters={this.state.counters} countersHistory={this.state.countersHistory.data} countersHistoryFrom={this.state.countersHistory.from} countersHistoryTo={this.state.countersHistory.to} countersHistoryTimestamp={this.state.countersHistory.time} longTerm={this.state.longTerm} layoutChangeTime={this.state.layoutChangeTime} realtime={this.state.realtime}/>
                             </div>
                         )
                     })}

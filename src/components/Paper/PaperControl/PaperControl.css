@@ -47,10 +47,16 @@
 
 .papers-controls .paper-control.live {
     color: #AAA;
+    text-align: center;
+    background-color: transparent;
+    padding: 3px 0;
+}
+
+.papers-controls .paper-control.live:hover {
+    background-color: transparent;
 }
 
 .papers-controls .paper-control.live.realtime {
-    background-color: #FFCC11;
     color: #333;
 }
 
@@ -58,7 +64,21 @@
     font-size: 8px;
     position: relative;
     top: -2px;
+}
 
+.papers-controls .paper-control span.live {
+    width: 16px;
+    height: 16px;
+    border-radius: 50%;
+    display: inline-block;
+    background-color: #FFCC11;
+    color: #333;
+    padding-top: 1px;
+    box-sizing: border-box;
+}
+
+.papers-controls .paper-control span.live:hover {
+    background-color: #FFC125;
 }
 
 .papers-controls .paper-control.multi-control {

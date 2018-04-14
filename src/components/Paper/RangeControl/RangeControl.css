@@ -6,7 +6,7 @@
     background-color: #1874CD;
     box-sizing: border-box;
     position: absolute;
-    z-index: 20;
+    z-index: 2;
     top: 90px;
     left: 18px;
     margin: 0;
@@ -100,6 +100,10 @@
     border-left: none;
 }
 
+.range-controls .time-type > div:hover {
+    background-color: rgba(0,0,0,0.2);
+}
+
 .range-controls .time-type > div.longterm-time {
     width: 30px;
     margin-left: 5px;
@@ -110,6 +114,12 @@
     background-color: #FFCC11;
     color: #333;
 }
+
+.range-controls .time-type > div.selected:hover {
+    background-color: #FFC125;
+}
+
+
 
 .range-controls .time-type > div.disabled {
     background-color: transparent;
@@ -194,7 +204,14 @@
 .range-controls .span-range {
     width: 200px;
     position: relative;
+    z-index: 2;
 }
+
+.range-controls .range-right-btn {
+    position: relative;
+    z-index: 1;
+}
+
 
 @media screen and (max-width: 600px) {
     .range-controls .span-range {
@@ -230,48 +247,48 @@
     background-color: #999;
 }
 
-.input-range__label {
+.range-controls .input-range__label {
     _display: none;
 }
 
-.input-range__track {
+.range-controls .input-range__track {
     transition: none;
     border-radius: 0;
 }
 
-.input-range__track--background {
+.range-controls .input-range__track--background {
     margin-top: 0;
     top: 0;
     height: 100%;
 }
 
-.input-range__track--active {
+.range-controls .input-range__track--active {
     height: 100%;
     background-color: rgba(0, 0, 0, 0.3);
     border-radius: 0;
 
 }
 
-.input-range__slider-container {
+.range-controls .input-range__slider-container {
     height: 100%;
     top: 0;
     width: 10px;
     transition: none;
 }
 
-.input-range--disabled .input-range__slider {
+.range-controls .input-range--disabled .input-range__slider {
     border: none;
 }
 
-.input-range__label--min {
+.range-controls .input-range__label--min {
     display: none;
 }
 
-.input-range__label--max {
+.range-controls .input-range__label--max {
     display: none;
 }
 
-.input-range__label--value {
+.range-controls .input-range__label--value {
     top: -23px;
     left: -50%;
     font-family: "Righteous" !important;
@@ -284,15 +301,15 @@
     border: 1px solid rgba(0, 0, 0, 0.2);
 }
 
-.input-range--disabled .input-range__label--value {
+.range-controls .input-range--disabled .input-range__label--value {
     display: none;
 }
 
-.input-range__label--value .input-range__label-container {
+.range-controls .input-range__label--value .input-range__label-container {
     left: 0;
 }
 
-.input-range__slider {
+.range-controls .input-range__slider {
     border-radius: 0;
     top: 0;
     height: 100%;

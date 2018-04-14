@@ -68,13 +68,22 @@ class RangeControl extends Component {
 
     changeTimeType = (type) => {
         this.setState({
-            realtime: type === "realtime"
+            realtime: type === "realtime",
+            longTerm : type === "realtime" ? false : this.state.longTerm,
+            value: this.state.value > 60 ? 60 : this.state.value,
+            range : 60,
+            step : 5
         });
 
-        this.props.changeRealtime(type === "realtime");
+        this.props.changeRealtime(type === "realtime", type === "realtime" ? false : this.state.longTerm);
     };
 
     changeLongTerm = () => {
+
+        if (this.state.realtime) {
+            return;
+        }
+
         if (this.state.longTerm) {
 
             this.setState({
@@ -205,7 +214,7 @@ class RangeControl extends Component {
                             onChange={value => this.setState({ value })} />
 
                     </div>
-                    <div>
+                    <div className="range-right-btn">
                         <button className={"search-btn " + (this.state.realtime ? "disabled" : "")} onClick={this.search}>SEARCH</button>
                     </div>
                 </div>
