@@ -342,7 +342,7 @@ class LineChart extends Component {
         let valueLine = d3.line().curve(d3.curveCatmullRom)
             .defined(function (d) {
                 let objData = d.data ? d.data[obj.objHash] : null;
-                return objData && !isNaN(objData.value) && !isNaN(that.graph.y(Number(objData.value)));
+                return objData && !isNaN(d.time) &&  !isNaN(objData.value) && !isNaN(that.graph.y(Number(objData.value)));
             })
             .x(function (d) {
                 return that.graph.x(d.time);
@@ -396,7 +396,12 @@ class LineChart extends Component {
                             if(!instanceMetricCount[obj.objHash]) {
                                 instanceMetricCount[obj.objHash] = 0;
                             }
-                            const color = InstanceColor.getInstanceColors()[obj.objHash][instanceMetricCount[obj.objHash]++%2===0 ? 'main' : 'sub'];
+                            let color;
+                            if (this.props.config.graph.color === "metric") {
+                                 color = InstanceColor.getMetricColor(thisOption.counterKey);
+                            } else {
+                                color = InstanceColor.getInstanceColors()[obj.objHash][instanceMetricCount[obj.objHash]++%2===0 ? 'main' : 'sub'];
+                            }
                             this.drawObjectLine(obj, thisOption, counterKey, color);
                         }
                     }
@@ -407,7 +412,12 @@ class LineChart extends Component {
                             if(!hostMetricCount[obj.objHash]) {
                                 hostMetricCount[obj.objHash] = 0;
                             }
-                            const color = InstanceColor.getHostColors()[obj.objHash][hostMetricCount[obj.objHash]++%2===0 ? 'main' : 'sub'];
+                            let color;
+                            if (this.props.config.graph.color === "metric") {
+                                color = InstanceColor.getMetricColor(thisOption.counterKey);
+                            } else {
+                                color = InstanceColor.getHostColors()[obj.objHash][hostMetricCount[obj.objHash]++%2===0 ? 'main' : 'sub'];
+                            }
                             this.drawObjectLine(obj, thisOption, counterKey, color);
                         }
                     }
@@ -524,7 +534,12 @@ class LineChart extends Component {
                         if(!instanceMetricCount[obj.objHash]) {
                             instanceMetricCount[obj.objHash] = 0;
                         }
-                        const color = InstanceColor.getInstanceColors()[obj.objHash][instanceMetricCount[obj.objHash]++%2===0 ? 'main' : 'sub'];
+                        let color;
+                        if (that.props.config.graph.color === "metric") {
+                            color = InstanceColor.getMetricColor(thisOption.counterKey);
+                        } else {
+                            color = InstanceColor.getInstanceColors()[obj.objHash][instanceMetricCount[obj.objHash]++%2===0 ? 'main' : 'sub'];
+                        }
                         that.mouseOverObject(that.props.instances[i], thisOption, color);
                     }
                 }
@@ -535,7 +550,12 @@ class LineChart extends Component {
                         if(!hostMetricCount[obj.objHash]) {
                             hostMetricCount[obj.objHash] = 0;
                         }
-                        const color = InstanceColor.getHostColors()[obj.objHash][hostMetricCount[obj.objHash]++%2===0 ? 'main' : 'sub'];
+                        let color;
+                        if (that.props.config.graph.color === "metric") {
+                            color = InstanceColor.getMetricColor(thisOption.counterKey);
+                        } else {
+                            color = InstanceColor.getHostColors()[obj.objHash][hostMetricCount[obj.objHash]++%2===0 ? 'main' : 'sub'];
+                        }
                         that.mouseOverObject(that.props.hosts[i], thisOption, color);
                     }
                 }
@@ -629,7 +649,12 @@ class LineChart extends Component {
                         if(!instanceMetricCount[obj.objHash]) {
                             instanceMetricCount[obj.objHash] = 0;
                         }
-                        const color = InstanceColor.getInstanceColors()[obj.objHash][instanceMetricCount[obj.objHash]++%2===0 ? 'main' : 'sub'];
+                        let  color;
+                        if (that.props.config.graph.color === "metric") {
+                            color = InstanceColor.getMetricColor(thisOption.counterKey);
+                        } else {
+                            color = InstanceColor.getInstanceColors()[obj.objHash][instanceMetricCount[obj.objHash]++%2===0 ? 'main' : 'sub'];
+                        }
                         that.mouseMoveObject(that.props.instances[i], thisOption, counterKey, dataIndex, color, tooltip);
                     }
                 }
@@ -640,7 +665,12 @@ class LineChart extends Component {
                         if(!hostMetricCount[obj.objHash]) {
                             hostMetricCount[obj.objHash] = 0;
                         }
-                        const color = InstanceColor.getHostColors()[obj.objHash][hostMetricCount[obj.objHash]++%2===0 ? 'main' : 'sub'];
+                        let color;
+                        if (that.props.config.graph.color === "metric") {
+                            color = InstanceColor.getMetricColor(thisOption.counterKey);
+                        } else {
+                            color = InstanceColor.getHostColors()[obj.objHash][hostMetricCount[obj.objHash]++%2===0 ? 'main' : 'sub'];
+                        }
                         that.mouseMoveObject(that.props.hosts[i], thisOption, counterKey, dataIndex, color, tooltip);
                     }
                 }

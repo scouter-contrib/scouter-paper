@@ -243,6 +243,10 @@ class Paper extends Component {
                 }).fail((xhr, textStatus, errorThrown) => {
                     errorHandler(xhr, textStatus, errorThrown, this.props);
                 });
+            } else {
+                let now = (new ServerDate()).getTime();
+                let ten = 1000 * 60 * 10;
+                this.getCounterHistory(this.props.instances, this.props.hosts, now - ten, now, false);
             }
         }
     };
