@@ -62,7 +62,8 @@ class Paper extends Component {
                 endTime: endTime,
                 range: range,
                 maxElapsed: 2000,
-                lastRequestTime: null
+                lastRequestTime: null,
+                clearTimestamp : null
             },
 
             pastTimestamp: null,
@@ -104,12 +105,11 @@ class Paper extends Component {
         }
 
         if (JSON.stringify(this.props.instances) !== JSON.stringify(nextProps.instances)) {
-            console.log(1);
             if (this.state.realtime) {
                 let now = (new ServerDate()).getTime();
                 let ten = 1000 * 60 * 10;
                 this.getCounterHistory(nextProps.instances, nextProps.hosts, now - ten, now, false);
-                this.getLatestData();
+                this.getLatestData(true, nextProps.instances);
             }
         }
     }
@@ -122,7 +122,7 @@ class Paper extends Component {
             let ten = 1000 * 60 * 10;
             this.getCounterHistory(this.props.instances, this.props.hosts,  now - ten, now, false);
             if (this.state.realtime) {
-                this.getLatestData();
+                this.getLatestData(false, this.props.instances);
             }
         }
 
@@ -146,17 +146,17 @@ class Paper extends Component {
         document.removeEventListener('visibilitychange', this.visibilitychange.bind(this));
     }
 
-    getLatestData(clear) {
+    getLatestData(clear, instances) {
         if (clear) {
             // SEARCH 옵션으로 한번이라도 조회했다면 지우고 다시
             if (this.state.pastTimestamp) {
-                this.getXLog(true);
+                this.getXLog(true, instances);
             } else {
                 // SEARCH에서 다시 REALTIME인 경우 이어서
-                this.getXLog();
+                this.getXLog(clear, instances);
             }
         } else {
-            this.getXLog();
+            this.getXLog(false, instances);
         }
 
         this.getVisitor();
@@ -167,7 +167,7 @@ class Paper extends Component {
         this.dataRefreshTimer = null;
 
         this.dataRefreshTimer = setTimeout(() => {
-            this.getLatestData();
+            this.getLatestData(false, instances);
         }, this.props.config.interval);
 
     }
@@ -390,7 +390,7 @@ class Paper extends Component {
             let now = (new ServerDate()).getTime();
             let ten = 1000 * 60 * 10;
             this.getCounterHistory(this.props.instances, this.props.hosts, now - ten, now, false);
-            this.getLatestData(true);
+            this.getLatestData(true, this.props.instances);
         } else {
             clearInterval(this.dataRefreshTimer);
             this.dataRefreshTimer = null;
@@ -446,15 +446,15 @@ class Paper extends Component {
         })
     };
 
-    getXLog = (clear) => {
+    getXLog = (clear, instances) => {
         let that = this;
-        if (this.props.instances && this.props.instances.length > 0) {
+        if (instances && instances.length > 0) {
             this.props.addRequest();
             jQuery.ajax({
                 method: "GET",
                 async: true,
                 dataType: 'text',
-                url: getHttpProtocol(this.props.config) + '/scouter/v1/xlog/realTime/' + (clear ? 0 : this.state.data.offset1) + '/' + (clear ? 0 : this.state.data.offset2) + '?objHashes=' + JSON.stringify(this.props.instances.map((instance) => {
+                url: getHttpProtocol(this.props.config) + '/scouter/v1/xlog/realTime/' + (clear ? 0 : this.state.data.offset1) + '/' + (clear ? 0 : this.state.data.offset2) + '?objHashes=' + JSON.stringify(instances.map((instance) => {
                     return Number(instance.objHash);
                 })),
                 xhrFields: getWithCredentials(that.props.config),
@@ -555,6 +555,7 @@ class Paper extends Component {
                 data.startTime = startTime;
                 data.endTime = endTime;
                 data.pastTimestamp = null;
+                data.clearTimestamp = clear ? (new Date()).getTime() : data.clearTimestamp;
                 this.setState({
                     data: data
                 });
