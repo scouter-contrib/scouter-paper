@@ -247,9 +247,44 @@ class LineChart extends Component {
         }
     };
 
+    removeObjLine (prevList, currentList) {
+        // 제외된 인스턴스 찾기
+        let currentInstanceMap = {};
+        if (currentList && currentList.length > 0) {
+            for (let i=0; i<currentList.length; i++) {
+                currentInstanceMap[currentList[i].objHash] = true;
+            }
+        }
+
+        if (prevList && prevList.length > 1) {
+            for (let i=0; i<prevList.length; i++) {
+                if (!currentInstanceMap[prevList[i].objHash]) {
+
+                    for (let counterKey in this.state.counters) {
+
+                        let thisOption = null;
+                        for (let j = 0; j < this.props.box.option.length; j++) {
+                            if (this.props.box.option[j].counterKey === counterKey) {
+                                thisOption = this.props.box.option[j];
+                                break;
+                            }
+                        }
+
+                        if (thisOption) {
+                            this.removeObjectLineOnly(prevList[i], counterKey);
+                        }
+                    }
+                }
+            }
+        }
+    }
+
     componentDidUpdate = (prevProps, prevState) => {
         this.graphResize();
         this.draw();
+
+        this.removeObjLine(prevProps.instances, this.props.instances);
+        this.removeObjLine(prevProps.hosts, this.props.hosts);
     };
 
     moveTooltip = () => {
@@ -326,6 +361,25 @@ class LineChart extends Component {
 
         // 제목 삭제
         this.props.removeTitle(counterKey);
+    };
+
+    removeObjectLineOnly = (obj, counterKey) => {
+        let pathClass = "line-" + obj.objHash + "-" + counterKey;
+        let path = this.graph.svg.selectAll("path." + pathClass);
+
+        // 라인 그래프 삭제
+        if (path && path.size() > 0) {
+            path.remove();
+        }
+
+        // 툴팁 그래프 삭제
+        let circleKey = "circle-" + obj.objHash + "_" + counterKey;
+        let circle = this.graph.focus.selectAll("circle." + circleKey);
+
+        if (circle.size() > 0) {
+            circle.remove();
+        }
+
     };
 
     drawObjectLine = (obj, option, counterKey, color) => {

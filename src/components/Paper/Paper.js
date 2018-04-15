@@ -104,10 +104,10 @@ class Paper extends Component {
         }
 
         if (JSON.stringify(this.props.instances) !== JSON.stringify(nextProps.instances)) {
-            let now = (new ServerDate()).getTime();
-            let ten = 1000 * 60 * 10;
-            this.getCounterHistory(nextProps.instances, nextProps.hosts, now - ten, now, false);
             if (this.state.realtime) {
+                let now = (new ServerDate()).getTime();
+                let ten = 1000 * 60 * 10;
+                this.getCounterHistory(nextProps.instances, nextProps.hosts, now - ten, now, false);
                 this.getLatestData();
             }
         }
