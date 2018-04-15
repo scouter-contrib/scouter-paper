@@ -42,8 +42,7 @@ class XLog extends Component {
         super(props);
 
         this.state = {
-            elapsed: common.getLocalSettingData(XLOG_ELAPSED, 2000),
-            xlog: []
+            elapsed: common.getLocalSettingData(XLOG_ELAPSED, 2000)
         }
     }
 

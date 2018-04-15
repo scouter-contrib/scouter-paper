@@ -33,7 +33,8 @@ class LineChart extends Component {
         yAxisHeight: 30,
         noData: true,
         bisector: null,
-        currentTooltipTime: null
+        currentTooltipTime: null,
+        leftAxisFormat : ".2s"
     };
 
     constructor(props) {
@@ -67,6 +68,7 @@ class LineChart extends Component {
 
             let timeList = countersHistory[counterKey][objHash].timeList;
             let valueList = countersHistory[counterKey][objHash].valueList;
+            let unit = countersHistory[counterKey][objHash].unit;
 
             for (let j = 0; j < timeList.length; j++) {
                 let row = {};
@@ -78,7 +80,8 @@ class LineChart extends Component {
                 row.data = {};
                 row.data[objHash] = {
                     objHash: objHash,
-                    value: valueList[j]
+                    value: valueList[j],
+                    unit : unit
                 };
 
                 if (!timeKeyRow[row.time]) {
@@ -86,7 +89,8 @@ class LineChart extends Component {
                 } else {
                     timeKeyRow[row.time].data[objHash] = {
                         objHash: objHash,
-                        value: valueList[j]
+                        value: valueList[j],
+                        unit : unit
                     };
                 }
             }
@@ -277,7 +281,7 @@ class LineChart extends Component {
         }
 
         if (init) {
-            this.graph.svg.insert("g", ":first-child").attr("class", "axis-y").call(d3.axisLeft(this.graph.y).tickFormat(d3.format(".0s")).ticks(yAxisCount));
+            this.graph.svg.insert("g", ":first-child").attr("class", "axis-y").call(d3.axisLeft(this.graph.y).tickFormat(d3.format(this.graph.leftAxisFormat)).ticks(yAxisCount));
             this.graph.svg.insert("g", ":first-child").attr("class", "grid-y").style("stroke-dasharray", "5 5").style("opacity", "0.3").call(d3.axisLeft(this.graph.y).tickSize(-this.graph.width).tickFormat("").ticks(yAxisCount));
         } else {
             this.graph.svg.select(".axis-x").call(d3.axisBottom(this.graph.x).tickFormat(d3.timeFormat(this.graph.timeFormat)).ticks(xAxisCount));
@@ -288,7 +292,7 @@ class LineChart extends Component {
             this.graph.svg.insert("g", ":first-child").attr("class", "axis-x").attr("transform", "translate(0," + this.graph.height + ")").call(d3.axisBottom(this.graph.x).tickFormat(d3.timeFormat(this.graph.timeFormat)).ticks(xAxisCount));
             this.graph.svg.insert("g", ":first-child").attr("class", "grid-x").style("stroke-dasharray", "5 5").style("opacity", "0.3").attr("transform", "translate(0," + this.graph.height + ")").call(d3.axisBottom(this.graph.x).tickSize(-this.graph.height).tickFormat("").ticks(xAxisCount));
         } else {
-            this.graph.svg.select(".axis-y").transition().duration(500).call(d3.axisLeft(this.graph.y).tickFormat(d3.format(".0s")).ticks(yAxisCount));
+            this.graph.svg.select(".axis-y").transition().duration(500).call(d3.axisLeft(this.graph.y).tickFormat(d3.format(this.graph.leftAxisFormat)).ticks(yAxisCount));
             this.graph.svg.select(".grid-y").transition().duration(500).call(d3.axisLeft(this.graph.y).tickSize(-this.graph.width).tickFormat("").ticks(yAxisCount));
         }
     };

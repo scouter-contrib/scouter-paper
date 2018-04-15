@@ -19,6 +19,9 @@ class Paper extends Component {
     dataRefreshTimer = null;
     xlogHistoryRequestTime = null;
     mounted = false;
+    xlogHistoryTemp = [];
+    xlogHistoryTotalDays = 0;
+    xlogHistoryCurrentDays = 0;
 
     constructor(props) {
         super(props);
@@ -580,11 +583,15 @@ class Paper extends Component {
                 pastTimestamp: now
             });
 
-            this.xlogHistoryRequestTime = now;
+
 
             let days = this.getSearchDays(from, to);
             let fromTos = this.getDivideDays(from, to);
 
+            this.xlogHistoryTemp = [];
+            this.xlogHistorytotalDays = days;
+            this.xlogHistoryCurrentDays = 0;
+            this.xlogHistoryRequestTime = now;
 
             if (days > 1) {
                 for (let i=0; i<fromTos.length; i++) {
@@ -641,8 +648,10 @@ class Paper extends Component {
                 } else {
                     xlogs = result.xlogs;
                 }
-                data.xlogs = data.xlogs.concat(xlogs);
+
+                that.xlogHistoryTemp.push(xlogs);
                 data.newXLogs = xlogs;
+
                 this.setState({
                     data: data,
                     pageCnt : (new Date()).getTime()
@@ -650,6 +659,16 @@ class Paper extends Component {
 
                 if (hasMore) {
                     that.getXLogHistoryData(requestTime, from, to, result.lastTxid, result.lastXLogTime);
+                } else {
+                    that.xlogHistoryCurrentDays++;
+                    if (that.xlogHistoryTotalDays <= that.xlogHistoryCurrentDays) {
+                        let data = this.state.data;
+                        data.xlogs = Array.prototype.concat.apply([], that.xlogHistoryTemp);
+                        this.setState({
+                            data: data,
+                            pageCnt : (new Date()).getTime()
+                        });
+                    }
                 }
 
             }).fail((xhr, textStatus, errorThrown) => {
@@ -717,17 +736,20 @@ class Paper extends Component {
                             if (counterHistory[counter.objHash]) {
                                 counterHistory[counter.objHash].timeList = counterHistory[counter.objHash].timeList.concat(counter.timeList);
                                 counterHistory[counter.objHash].valueList = counterHistory[counter.objHash].valueList.concat(counter.valueList);
+                                counterHistory[counter.objHash].unit = counter.unit;
                                 countersHistory[counterKey] = counterHistory;
                             } else {
                                 counterHistory[counter.objHash] = {};
                                 counterHistory[counter.objHash].timeList = counter.timeList;
                                 counterHistory[counter.objHash].valueList = counter.valueList;
+                                counterHistory[counter.objHash].unit = counter.unit;
                                 countersHistory[counterKey] = counterHistory;
                             }
                         } else {
                             counterHistory[counter.objHash] = {};
                             counterHistory[counter.objHash].timeList = counter.timeList;
                             counterHistory[counter.objHash].valueList = counter.valueList;
+                            counterHistory[counter.objHash].unit = counter.unit;
                             countersHistory[counterKey] = counterHistory;
                         }
                     }
@@ -774,6 +796,7 @@ class Paper extends Component {
             }
 
             this.state.countersHistory.data = countersHistory;
+
             this.setState({
                 countersHistory : {
                     time: new Date().getTime(),
