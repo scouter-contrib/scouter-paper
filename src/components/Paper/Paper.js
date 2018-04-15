@@ -104,6 +104,7 @@ class Paper extends Component {
         }
 
         if (JSON.stringify(this.props.instances) !== JSON.stringify(nextProps.instances)) {
+            console.log(1);
             if (this.state.realtime) {
                 let now = (new ServerDate()).getTime();
                 let ten = 1000 * 60 * 10;
@@ -202,9 +203,7 @@ class Paper extends Component {
 
             let instancesAndHosts = this.props.instances.concat(this.props.hosts);
 
-            if (!this.counterReady) {
-                this.counterReady = counterKeys.every((key) => this.counterHistoriesLoaded[key]);
-            }
+             this.counterReady = counterKeys.every((key) => this.counterHistoriesLoaded[key]);
 
             if (this.counterReady) {
                 let params = JSON.stringify(counterKeys);
