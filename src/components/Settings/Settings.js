@@ -1,7 +1,7 @@
 import React, {Component} from 'react';
 import './Settings.css';
 import {connect} from 'react-redux';
-import {setConfig} from '../../actions';
+import {setConfig, pushMessage, setControlVisibility} from '../../actions';
 import {CompactPicker} from 'react-color';
 
 const colors = ['transparent', '#999999', '#FFFFFF', '#F44E3B', '#FE9200', '#FCDC00', '#DBDF00', '#A4DD00', '#68CCCA', '#73D8FF', '#AEA1FF', '#FDA1FF', '#333333', '#808080', '#cccccc', '#D33115', '#E27300', '#FCC400', '#B0BC00', '#68BC00', '#16A5A5', '#009CE0', '#7B64FF', '#FA28FF', '#000000', '#666666', '#B3B3B3', '#9F0500', '#C45100', '#FB9E00', '#808900', '#194D33', '#0C797D', '#0062B1', '#653294', '#AB149E'];
@@ -44,6 +44,14 @@ class Settings extends Component {
         });
     };
 
+    onChangeRange = (attr, event) => {
+        let config = this.state.config;
+        config.range[attr] = event.target.value;
+        this.setState({
+            config: config
+        });
+    };
+
     onChangeSession = (attr, event) => {
 
         let config = this.state.config;
@@ -64,6 +72,16 @@ class Settings extends Component {
         });
     };
 
+    onChangeGraph = (attr, event) => {
+
+        let config = this.state.config;
+        config.graph[attr] = event.target.value;
+
+        this.setState({
+            config: config
+        });
+    };
+
     onXLogOptionChange = (type, dir, event) => {
 
         let config = this.state.config;
@@ -76,6 +94,16 @@ class Settings extends Component {
     };
 
     applyConfig = () => {
+
+
+    };
+
+    submit = () => {
+
+        this.props.pushMessage("info", "NO LAYOUT SELECTED", "select layout to delete first");
+        this.props.setControlVisibility("Message", true);
+        return;
+
         if (localStorage) {
             this.props.setConfig(this.state.config);
             localStorage.setItem("config", JSON.stringify(this.state.config));
@@ -97,6 +125,8 @@ class Settings extends Component {
                 },
             });
         }
+
+        return false;
     };
 
     resetConfig = () => {
@@ -303,6 +333,7 @@ class Settings extends Component {
         return (
             <div>
                 {this.state.config &&
+                    <form ref="root" onSubmit={this.submit}>
                 <div className={"settings " + (this.state.edit ? 'editable' : '')}>
                     <div className="forms">
                         <div className="category first">
@@ -314,7 +345,10 @@ class Settings extends Component {
                                     <div>PROTOCOL</div>
                                 </div>
                                 <div className="input">
-                                    <input type="text" readOnly={!this.state.edit} onChange={this.onChange.bind(this, "protocol")} value={this.state.config.protocol} placeholder="HTTP or HTTPS"/>
+                                    <select value={this.state.config.protocol} onChange={this.onChange.bind(this, "protocol")} disabled={!this.state.edit}>
+                                        <option value="http">HTTP</option>
+                                        <option value="https">HTTPS</option>
+                                    </select>
                                 </div>
                             </div>
                             <div className="row">
@@ -322,7 +356,7 @@ class Settings extends Component {
                                     <div>ADDRESS</div>
                                 </div>
                                 <div className="input">
-                                    <input type="text" readOnly={!this.state.edit} onChange={this.onChange.bind(this, "address")} value={this.state.config.address} placeholder="SCOUTER WEBAPP SERVER ADDRESS" />
+                                    <input required type="text" readOnly={!this.state.edit} onChange={this.onChange.bind(this, "address")} value={this.state.config.address} placeholder="SCOUTER WEBAPP SERVER ADDRESS" />
                                 </div>
                             </div>
                             <div className="row">
@@ -330,7 +364,7 @@ class Settings extends Component {
                                     <div>PORT</div>
                                 </div>
                                 <div className="input">
-                                    <input type="text" readOnly={!this.state.edit} onChange={this.onChange.bind(this, "port")} value={this.state.config.port} placeholder="SCOUTER WEBAPP SERVER PORT (DEFAULT 6188)" />
+                                    <input required pattern="[0-9\/]*" type="text" readOnly={!this.state.edit} onChange={this.onChange.bind(this, "port")} value={this.state.config.port} placeholder="SCOUTER WEBAPP SERVER PORT (DEFAULT 6188)" />
                                 </div>
                             </div>
                             <div className="row">
@@ -347,15 +381,153 @@ class Settings extends Component {
                             </div>
                         </div>
                         <div className="category first">
-                            <div>POLLING INTERVAL</div>
+                            <div>POLLING & RANGE</div>
                         </div>
                         <div className="setting-box">
                             <div className="row">
                                 <div className="label">
-                                    <div>INTERVAL (ms)</div>
+                                    <div>INTERVAL (milliseconds)</div>
                                 </div>
                                 <div className="input">
-                                    <input type="text" readOnly={!this.state.edit} onChange={this.onChange.bind(this, "interval")} value={this.state.config.interval} placeholder="POLLING INTERVAL (MS)" />
+                                    <input type="number" required min={2000} step={500} readOnly={!this.state.edit} onChange={this.onChange.bind(this, "interval")} value={this.state.config.interval} placeholder="POLLING INTERVAL (MS)" />
+                                </div>
+                            </div>
+                            <div className="row">
+                                <div className="label">
+                                    <div>SHORT HISTORY RANGE (minutes)</div>
+                                </div>
+                                <div className="input">
+                                    <input type="number" required min={10} max={60} readOnly={!this.state.edit} onChange={this.onChangeRange.bind(this, "shortHistoryRange")} value={this.state.config.range.shortHistoryRange} placeholder="MINUTES" />
+                                </div>
+                            </div>
+                            <div className="row">
+                                <div className="label">
+                                    <div>SHORT HISTORY STEP (minutes)</div>
+                                </div>
+                                <div className="input">
+                                    <input type="number" required min={1} max={30} readOnly={!this.state.edit} onChange={this.onChangeRange.bind(this, "shortHistoryStep")} value={this.state.config.range.shortHistoryStep} placeholder="MINUTES" />
+                                </div>
+                            </div>
+                            <div className="row">
+                                <div className="label">
+                                    <div>LONG HISTORY RANGE (hours)</div>
+                                </div>
+                                <div className="input">
+                                    <input type="number" required min={2} readOnly={!this.state.edit} onChange={this.onChangeRange.bind(this, "longHistoryRange")} value={this.state.config.range.longHistoryRange} placeholder="HOURS" />
+                                </div>
+                            </div>
+                            <div className="row">
+                                <div className="label">
+                                    <div>LONG HISTORY STEP (minutes)</div>
+                                </div>
+                                <div className="input">
+                                    <input type="number" required min={10} step={10} readOnly={!this.state.edit} onChange={this.onChangeRange.bind(this, "longHistoryStep")} value={this.state.config.range.longHistoryStep} placeholder="MINUTES" />
+                                </div>
+                            </div>
+                        </div>
+                        <div className="category first">
+                            <div>GRAPH</div>
+                        </div>
+                        <div className="setting-box">
+                            <div className="row">
+                                <div className="label">
+                                    <div>COLOR STRATEGRY</div>
+                                </div>
+                                <div className="input">
+                                    <select value={this.state.config.graph.color} onChange={this.onChangeGraph.bind(this, "color")} disabled={!this.state.edit}>
+                                        <option value="metric">BY METRIC</option>
+                                        <option value="instance">BY INSTANCE</option>
+                                    </select>
+                                </div>
+                            </div>
+                            <div className="row">
+                                <div className="label">
+                                    <div>CURVE FUNCTION</div>
+                                </div>
+                                <div className="input">
+                                    <select value={this.state.config.graph.curve} onChange={this.onChangeGraph.bind(this, "curve")} disabled={!this.state.edit}>
+                                        <option value="curveLinear">LINEAR</option>
+                                        <option value="curveStep">STEP</option>
+                                        <option value="curveStepBefore">STEP BEFORE</option>
+                                        <option value="curveStepAfter">STEP AFTER</option>
+                                        <option value="curveBasis">BASIS</option>
+                                        <option value="curveCardinal">CARDINAL</option>
+                                        <option value="curveMonotoneX">MONOTONE X</option>
+                                        <option value="curveCatmullRom">CATMULL ROM</option>
+                                    </select>
+                                </div>
+                            </div>
+                            <div className="row">
+                                <div className="label">
+                                    <div>LINE WIDTH (px)</div>
+                                </div>
+                                <div className="input">
+                                    <select value={this.state.config.graph.width} onChange={this.onChangeGraph.bind(this, "width")} disabled={!this.state.edit}>
+                                        <option value="1">1</option>
+                                        <option value="2">2</option>
+                                        <option value="3">3</option>
+                                        <option value="4">4</option>
+                                        <option value="5">5</option>
+                                    </select>
+                                </div>
+                            </div>
+                            <div className="row">
+                                <div className="label">
+                                    <div>LINE OPACITY</div>
+                                </div>
+                                <div className="input">
+                                    <select value={this.state.config.graph.opacity} onChange={this.onChangeGraph.bind(this, "opacity")} disabled={!this.state.edit}>
+                                        <option value="0.2">0.2</option>
+                                        <option value="0.3">0.3</option>
+                                        <option value="0.4">0.4</option>
+                                        <option value="0.5">0.5</option>
+                                        <option value="0.6">0.6</option>
+                                        <option value="0.7">0.7</option>
+                                        <option value="0.8">0.8</option>
+                                        <option value="0.9">0.9</option>
+                                        <option value="1">1</option>
+                                    </select>
+                                </div>
+                            </div>
+                            <div className="row">
+                                <div className="label">
+                                    <div>FILL AREA</div>
+                                </div>
+                                <div className="input">
+                                    <select value={this.state.config.graph.fill} onChange={this.onChangeGraph.bind(this, "fill")} disabled={!this.state.edit}>
+                                        <option value="Y">Y</option>
+                                        <option value="N">N</option>
+
+                                    </select>
+                                </div>
+                            </div>
+                            <div className="row">
+                                <div className="label">
+                                    <div>FILL OPACITY</div>
+                                </div>
+                                <div className="input">
+                                    <select value={this.state.config.graph.fillOpacity} onChange={this.onChangeGraph.bind(this, "fillOpacity")} disabled={!this.state.edit}>
+                                        <option value="0.2">0.2</option>
+                                        <option value="0.3">0.3</option>
+                                        <option value="0.4">0.4</option>
+                                        <option value="0.5">0.5</option>
+                                        <option value="0.6">0.6</option>
+                                        <option value="0.7">0.7</option>
+                                        <option value="0.8">0.8</option>
+                                        <option value="0.9">0.9</option>
+                                        <option value="1">1</option>
+                                    </select>
+                                </div>
+                            </div>
+                            <div className="row">
+                                <div className="label">
+                                    <div>DISPLAY A BREAK</div>
+                                </div>
+                                <div className="input">
+                                    <select value={this.state.config.graph.break} onChange={this.onChangeGraph.bind(this, "break")} disabled={!this.state.edit}>
+                                        <option value="Y">Y</option>
+                                        <option value="N">N</option>
+                                    </select>
                                 </div>
                             </div>
                         </div>
@@ -644,7 +816,7 @@ class Settings extends Component {
                     {this.state.edit &&
                     <div className="buttons">
                         <button onClick={this.resetConfig}>CANCEL</button>
-                        <button onClick={this.applyConfig}>APPLY</button>
+                        <button type="submit" onClick={this.applyConfig}>APPLY</button>
                     </div>
                     }
                     {!this.state.edit &&
@@ -652,7 +824,7 @@ class Settings extends Component {
                         <button onClick={this.editClick}>EDIT</button>
                     </div>
                     }
-                </div>}</div>
+                </div></form>}</div>
         );
     }
 }
@@ -666,7 +838,9 @@ let mapStateToProps = (state) => {
 
 let mapDispatchToProps = (dispatch) => {
     return {
-        setConfig: (config) => dispatch(setConfig(config))
+        setConfig: (config) => dispatch(setConfig(config)),
+        pushMessage: (category, title, content) => dispatch(pushMessage(category, title, content)),
+        setControlVisibility: (name, value) => dispatch(setControlVisibility(name, value))
     };
 };
 

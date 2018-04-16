@@ -1,4 +1,6 @@
 import * as d3 from "d3";
+import Color from "color-js";
+
 
 let colorMain1 = [];
 let colorSub1 = [];
@@ -37,7 +39,7 @@ for(let n=0; n < 5; n++) {
 
 let instanceColors = {};
 let hostColors = {};
-
+let metricColors = {};
 class InstanceColor {
     static setInstances(instances) {
         const mainColors = colorMain1.concat(colorMain2);
@@ -72,6 +74,20 @@ class InstanceColor {
     static getHostColors() {
         return hostColors;
     }
+
+    static getMetricColor(metric) {
+        if (!metricColors[metric]) {
+            let inx = Object.values(metricColors).length % 10;
+            let hue = Math.floor(Object.values(metricColors).length / 10);
+            let color = Color(d3.schemeCategory10[inx]);
+            //metricColors[metric] = color.shiftHue(20 * hue).toCSS();
+            metricColors[metric] = color.darkenByRatio(0.1 * hue).toCSS();
+        }
+
+        return metricColors[metric];
+    }
+
+
 }
 
 export default InstanceColor;

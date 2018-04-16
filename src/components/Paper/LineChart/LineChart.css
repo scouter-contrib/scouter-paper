@@ -4,8 +4,8 @@
 
 .line-chart-wrapper .line-chart path {
     fill: none;
-    stroke-width: 2px;
-    opacity: 0.6;
+    _stroke-width: 2px;
+    _opacity: 0.6;
 }
 
 .line-chart-wrapper .no-data {
