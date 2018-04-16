@@ -93,16 +93,7 @@ class Settings extends Component {
 
     };
 
-    applyConfig = () => {
-
-
-    };
-
     submit = () => {
-
-        this.props.pushMessage("info", "NO LAYOUT SELECTED", "select layout to delete first");
-        this.props.setControlVisibility("Message", true);
-        return;
 
         if (localStorage) {
             this.props.setConfig(this.state.config);
@@ -816,7 +807,7 @@ class Settings extends Component {
                     {this.state.edit &&
                     <div className="buttons">
                         <button onClick={this.resetConfig}>CANCEL</button>
-                        <button type="submit" onClick={this.applyConfig}>APPLY</button>
+                        <button type="submit">APPLY</button>
                     </div>
                     }
                     {!this.state.edit &&
