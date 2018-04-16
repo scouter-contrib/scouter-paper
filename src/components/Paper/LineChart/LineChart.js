@@ -34,7 +34,7 @@ class LineChart extends Component {
         noData: true,
         bisector: null,
         currentTooltipTime: null,
-        leftAxisFormat : ".2s"
+        leftAxisFormat: ".2s"
     };
 
     constructor(props) {
@@ -81,7 +81,7 @@ class LineChart extends Component {
                 row.data[objHash] = {
                     objHash: objHash,
                     value: valueList[j],
-                    unit : unit
+                    unit: unit
                 };
 
                 if (!timeKeyRow[row.time]) {
@@ -90,7 +90,7 @@ class LineChart extends Component {
                     timeKeyRow[row.time].data[objHash] = {
                         objHash: objHash,
                         value: valueList[j],
-                        unit : unit
+                        unit: unit
                     };
                 }
             }
@@ -243,21 +243,21 @@ class LineChart extends Component {
         }
 
         if (this.graph.autoMaxY > this.graph.maxY) {
-            this.graph.maxY = this.graph.autoMaxY;
+            this.graph.maxY = this.graph.autoMaxY * 1.2;
         }
     };
 
-    removeObjLine (prevList, currentList) {
+    removeObjLine(prevList, currentList) {
         // 제외된 인스턴스 찾기
         let currentInstanceMap = {};
         if (currentList && currentList.length > 0) {
-            for (let i=0; i<currentList.length; i++) {
+            for (let i = 0; i < currentList.length; i++) {
                 currentInstanceMap[currentList[i].objHash] = true;
             }
         }
 
-        if (prevList && prevList.length > 1) {
-            for (let i=0; i<prevList.length; i++) {
+        if (prevList && prevList.length > 0) {
+            for (let i = 0; i < prevList.length; i++) {
                 if (!currentInstanceMap[prevList[i].objHash]) {
 
                     for (let counterKey in this.state.counters) {
@@ -384,24 +384,65 @@ class LineChart extends Component {
 
     drawObjectLine = (obj, option, counterKey, color) => {
         const that = this;
+
+        if (this.props.config.graph.fill === "Y") {
+
+            let areaClass = "area-" + obj.objHash + "-" + counterKey;
+            let area = this.graph.svg.selectAll("path." + areaClass);
+
+            if (area.size() < 1) {
+                area = this.graph.svg.insert("path", ":first-child").attr("class", areaClass).style("stroke", color);
+            }
+
+            let valueArea = d3.area().curve(d3[this.props.config.graph.curve])
+                .x(function (d) {
+                    return that.graph.x(d.time);
+                })
+                .y0(that.graph.height)
+                .y1(function (counter) {
+                    let objData = counter.data[obj.objHash];
+                    if (objData) {
+                        return that.graph.y(Number(objData.value));
+                    } else {
+                        return that.graph.y(0);
+                    }
+                });
+
+            if (this.props.config.graph.break === "Y") {
+                valueArea.defined(function (d) {
+                    let objData = d.data ? d.data[obj.objHash] : null;
+                    return objData && !isNaN(d.time) && !isNaN(objData.value) && !isNaN(that.graph.y(Number(objData.value)));
+                })
+            }
+
+            area.data([that.state.counters[counterKey]]).attr("d", valueArea).style("fill", color).style("opacity", this.props.config.graph.fillOpacity);
+        }
+
+
         let pathClass = "line-" + obj.objHash + "-" + counterKey;
         let path = this.graph.svg.selectAll("path." + pathClass);
 
         if (path.size() < 1) {
             path = this.graph.svg.insert("path", ":first-child").attr("class", pathClass).style("stroke", color);
-            this.props.setTitle(counterKey, option.title, color);
+            if (this.props.config.graph.color === "instance") {
+                this.props.setTitle(counterKey, option.title, "#333");
+            } else {
+                this.props.setTitle(counterKey, option.title, color);
+            }
+
         } else {
             path.style("stroke", color);
-            this.props.setTitle(counterKey, option.title, color);
+            if (this.props.config.graph.color === "instance") {
+                this.props.setTitle(counterKey, option.title, "#333");
+            } else {
+                this.props.setTitle(counterKey, option.title, color);
+            }
+
             let circleKey = "circle-" + obj.objHash + "_" + counterKey;
             that.graph.focus.select("circle." + circleKey).attr("stroke", color);
         }
 
-        let valueLine = d3.line().curve(d3.curveCatmullRom)
-            .defined(function (d) {
-                let objData = d.data ? d.data[obj.objHash] : null;
-                return objData && !isNaN(d.time) &&  !isNaN(objData.value) && !isNaN(that.graph.y(Number(objData.value)));
-            })
+        let valueLine = d3.line().curve(d3[this.props.config.graph.curve])
             .x(function (d) {
                 return that.graph.x(d.time);
             })
@@ -414,7 +455,15 @@ class LineChart extends Component {
                 }
             });
 
-        path.data([that.state.counters[counterKey]]).attr("d", valueLine);
+        if (this.props.config.graph.break === "Y") {
+            valueLine.defined(function (d) {
+                let objData = d.data ? d.data[obj.objHash] : null;
+                return objData && !isNaN(d.time) && !isNaN(objData.value) && !isNaN(that.graph.y(Number(objData.value)));
+            })
+        }
+
+        path.data([that.state.counters[counterKey]]).attr("d", valueLine).style("stroke-width", this.props.config.graph.width).style("opacity", this.props.config.graph.opacity);
+
     };
 
 
@@ -451,14 +500,14 @@ class LineChart extends Component {
                     if (thisOption && thisOption.objectType === "instance") {
                         for (let i = 0; i < this.props.instances.length; i++) {
                             const obj = that.props.instances[i];
-                            if(!instanceMetricCount[obj.objHash]) {
+                            if (!instanceMetricCount[obj.objHash]) {
                                 instanceMetricCount[obj.objHash] = 0;
                             }
                             let color;
                             if (this.props.config.graph.color === "metric") {
-                                 color = InstanceColor.getMetricColor(thisOption.counterKey);
+                                color = InstanceColor.getMetricColor(thisOption.counterKey);
                             } else {
-                                color = InstanceColor.getInstanceColors()[obj.objHash][instanceMetricCount[obj.objHash]++%2===0 ? 'main' : 'sub'];
+                                color = InstanceColor.getInstanceColors()[obj.objHash][instanceMetricCount[obj.objHash]++ % 2 === 0 ? 'main' : 'sub'];
                             }
                             this.drawObjectLine(obj, thisOption, counterKey, color);
                         }
@@ -467,14 +516,14 @@ class LineChart extends Component {
                     if (thisOption && thisOption.objectType === "host") {
                         for (let i = 0; i < this.props.hosts.length; i++) {
                             const obj = that.props.hosts[i];
-                            if(!hostMetricCount[obj.objHash]) {
+                            if (!hostMetricCount[obj.objHash]) {
                                 hostMetricCount[obj.objHash] = 0;
                             }
                             let color;
                             if (this.props.config.graph.color === "metric") {
                                 color = InstanceColor.getMetricColor(thisOption.counterKey);
                             } else {
-                                color = InstanceColor.getHostColors()[obj.objHash][hostMetricCount[obj.objHash]++%2===0 ? 'main' : 'sub'];
+                                color = InstanceColor.getHostColors()[obj.objHash][hostMetricCount[obj.objHash]++ % 2 === 0 ? 'main' : 'sub'];
                             }
                             this.drawObjectLine(obj, thisOption, counterKey, color);
                         }
@@ -589,14 +638,14 @@ class LineChart extends Component {
                 if (thisOption.objectType === "instance") {
                     for (let i = 0; i < that.props.instances.length; i++) {
                         const obj = that.props.instances[i];
-                        if(!instanceMetricCount[obj.objHash]) {
+                        if (!instanceMetricCount[obj.objHash]) {
                             instanceMetricCount[obj.objHash] = 0;
                         }
                         let color;
                         if (that.props.config.graph.color === "metric") {
                             color = InstanceColor.getMetricColor(thisOption.counterKey);
                         } else {
-                            color = InstanceColor.getInstanceColors()[obj.objHash][instanceMetricCount[obj.objHash]++%2===0 ? 'main' : 'sub'];
+                            color = InstanceColor.getInstanceColors()[obj.objHash][instanceMetricCount[obj.objHash]++ % 2 === 0 ? 'main' : 'sub'];
                         }
                         that.mouseOverObject(that.props.instances[i], thisOption, color);
                     }
@@ -605,14 +654,14 @@ class LineChart extends Component {
                 if (thisOption.objectType === "host") {
                     for (let i = 0; i < that.props.hosts.length; i++) {
                         const obj = that.props.hosts[i];
-                        if(!hostMetricCount[obj.objHash]) {
+                        if (!hostMetricCount[obj.objHash]) {
                             hostMetricCount[obj.objHash] = 0;
                         }
                         let color;
                         if (that.props.config.graph.color === "metric") {
                             color = InstanceColor.getMetricColor(thisOption.counterKey);
                         } else {
-                            color = InstanceColor.getHostColors()[obj.objHash][hostMetricCount[obj.objHash]++%2===0 ? 'main' : 'sub'];
+                            color = InstanceColor.getHostColors()[obj.objHash][hostMetricCount[obj.objHash]++ % 2 === 0 ? 'main' : 'sub'];
                         }
                         that.mouseOverObject(that.props.hosts[i], thisOption, color);
                     }
@@ -628,7 +677,6 @@ class LineChart extends Component {
 
             let l = that.refs.lineChartRoot.parentNode.parentNode.parentNode.parentNode.parentNode;
             l.style.zIndex = 5;
-
 
 
             let hoverLine = that.graph.focus.select("line.x-hover-line");
@@ -704,14 +752,14 @@ class LineChart extends Component {
                 if (thisOption.objectType === "instance") {
                     for (let i = 0; i < that.props.instances.length; i++) {
                         const obj = that.props.instances[i];
-                        if(!instanceMetricCount[obj.objHash]) {
+                        if (!instanceMetricCount[obj.objHash]) {
                             instanceMetricCount[obj.objHash] = 0;
                         }
-                        let  color;
+                        let color;
                         if (that.props.config.graph.color === "metric") {
                             color = InstanceColor.getMetricColor(thisOption.counterKey);
                         } else {
-                            color = InstanceColor.getInstanceColors()[obj.objHash][instanceMetricCount[obj.objHash]++%2===0 ? 'main' : 'sub'];
+                            color = InstanceColor.getInstanceColors()[obj.objHash][instanceMetricCount[obj.objHash]++ % 2 === 0 ? 'main' : 'sub'];
                         }
                         that.mouseMoveObject(that.props.instances[i], thisOption, counterKey, dataIndex, color, tooltip);
                     }
@@ -720,14 +768,14 @@ class LineChart extends Component {
                 if (thisOption.objectType === "host") {
                     for (let i = 0; i < that.props.hosts.length; i++) {
                         const obj = that.props.hosts[i];
-                        if(!hostMetricCount[obj.objHash]) {
+                        if (!hostMetricCount[obj.objHash]) {
                             hostMetricCount[obj.objHash] = 0;
                         }
                         let color;
                         if (that.props.config.graph.color === "metric") {
                             color = InstanceColor.getMetricColor(thisOption.counterKey);
                         } else {
-                            color = InstanceColor.getHostColors()[obj.objHash][hostMetricCount[obj.objHash]++%2===0 ? 'main' : 'sub'];
+                            color = InstanceColor.getHostColors()[obj.objHash][hostMetricCount[obj.objHash]++ % 2 === 0 ? 'main' : 'sub'];
                         }
                         that.mouseMoveObject(that.props.hosts[i], thisOption, counterKey, dataIndex, color, tooltip);
                     }

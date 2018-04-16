@@ -14,7 +14,19 @@ const configState = {
         type : "bearer"
     },
     graph : {
-        color : "instance"
+        color : "instance",
+        width : 2,
+        opacity : 0.7,
+        fill : "N",
+        fillOpacity : 0.4,
+        curve : "curveCatmullRom",
+        break : "Y"
+    },
+    range : {
+        shortHistoryRange : 60,
+        shortHistoryStep : 5,
+        longHistoryRange : 48,
+        longHistoryStep : 30
     },
     xlog: {
         normal: {

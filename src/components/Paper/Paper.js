@@ -23,6 +23,9 @@ class Paper extends Component {
     xlogHistoryTotalDays = 0;
     xlogHistoryCurrentDays = 0;
 
+    lastFrom = null;
+    lastTo = null;
+
     constructor(props) {
         super(props);
         this.counterHistoriesLoaded = {};
@@ -110,6 +113,8 @@ class Paper extends Component {
                 let ten = 1000 * 60 * 10;
                 this.getCounterHistory(nextProps.instances, nextProps.hosts, now - ten, now, false);
                 this.getLatestData(true, nextProps.instances);
+            } else {
+                this.getXLogHistory(this.lastFrom, this.lastTo, nextProps.instances);
             }
         }
     }
@@ -405,6 +410,9 @@ class Paper extends Component {
 
     search = (from, to) => {
 
+        this.lastFrom = from;
+        this.lastTo = to;
+
         this.setState({
             countersHistory : {
                 time: null,
@@ -415,7 +423,7 @@ class Paper extends Component {
         });
 
         this.getCounterHistory(this.props.instances, this.props.hosts, from, to, this.state.longTerm);
-        this.getXLogHistory(from, to);
+        this.getXLogHistory(from, to, this.props.instances);
     };
 
     scroll = () => {
@@ -566,8 +574,8 @@ class Paper extends Component {
         }
     };
 
-    getXLogHistory = (from, to) => {
-        if (this.props.instances && this.props.instances.length > 0) {
+    getXLogHistory = (from, to, instances) => {
+        if (instances && instances.length > 0) {
 
             let data = this.state.data;
             let now = (new ServerDate()).getTime();
@@ -595,15 +603,15 @@ class Paper extends Component {
 
             if (days > 1) {
                 for (let i=0; i<fromTos.length; i++) {
-                    this.getXLogHistoryData(now, fromTos[i].from, fromTos[i].to);
+                    this.getXLogHistoryData(now, fromTos[i].from, fromTos[i].to, instances);
                 }
             } else {
-                this.getXLogHistoryData(now, from, to);
+                this.getXLogHistoryData(now, from, to, instances);
             }
         }
     };
 
-    getXLogHistoryData = (requestTime, from, to, lastTxid, lastXLogTime) => {
+    getXLogHistoryData = (requestTime, from, to, instances, lastTxid, lastXLogTime) => {
         let that = this;
 
         if (!this.mounted) {
@@ -624,7 +632,7 @@ class Paper extends Component {
                 async: true,
                 dataType: 'text',
                 url: getHttpProtocol(this.props.config) + "/scouter/v1/xlog/" + moment(from).format("YYYYMMDD") + "?startTimeMillis=" + from + '&endTimeMillis=' + to + (lastTxid ? '&lastTxid=' + lastTxid : "") + (lastXLogTime ? '&lastXLogTime=' + lastXLogTime : "") + '&objHashes=' +
-                JSON.stringify(this.props.instances.map((instance) => {
+                JSON.stringify(instances.map((instance) => {
                     return Number(instance.objHash);
                 })),
                 xhrFields: getWithCredentials(that.props.config),
@@ -658,7 +666,7 @@ class Paper extends Component {
                 });
 
                 if (hasMore) {
-                    that.getXLogHistoryData(requestTime, from, to, result.lastTxid, result.lastXLogTime);
+                    that.getXLogHistoryData(requestTime, from, to, instances, result.lastTxid, result.lastXLogTime);
                 } else {
                     that.xlogHistoryCurrentDays++;
                     if (that.xlogHistoryTotalDays <= that.xlogHistoryCurrentDays) {
