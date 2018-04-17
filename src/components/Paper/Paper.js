@@ -12,6 +12,7 @@ import Profiler from "./XLog/Profiler/Profiler";
 import ServerDate from "../../common/ServerDate";
 import RangeControl from "./RangeControl/RangeControl";
 import moment from 'moment';
+import _ from "lodash";
 
 const ResponsiveReactGridLayout = WidthProvider(Responsive);
 
@@ -70,13 +71,16 @@ class Paper extends Component {
             },
 
             pastTimestamp: null,
+
             /* visitor */
             visitor: {},
+
             /* counters */
             counters: {
                 time: null,
                 data: null
             },
+
             /* counters past data */
             countersHistory : {
                 time: null,
@@ -84,6 +88,7 @@ class Paper extends Component {
                 from: null,
                 to: null
             },
+
             fixedControl: false,
             visible: true,
             rangeControl: false,
@@ -92,7 +97,12 @@ class Paper extends Component {
             realtime: true,
 
             /*longterm*/
-            longTerm: false
+            longTerm: false,
+
+            alert: {
+                data: [],
+                offset : {}
+            }
         };
     }
 
@@ -112,7 +122,7 @@ class Paper extends Component {
                 let now = (new ServerDate()).getTime();
                 let ten = 1000 * 60 * 10;
                 this.getCounterHistory(nextProps.instances, nextProps.hosts, now - ten, now, false);
-                this.getLatestData(true, nextProps.instances);
+                this.getLatestData(true, nextProps.instances, nextProps.hosts);
             } else {
                 this.getXLogHistory(this.lastFrom, this.lastTo, nextProps.instances);
             }
@@ -127,7 +137,7 @@ class Paper extends Component {
             let ten = 1000 * 60 * 10;
             this.getCounterHistory(this.props.instances, this.props.hosts,  now - ten, now, false);
             if (this.state.realtime) {
-                this.getLatestData(false, this.props.instances);
+                this.getLatestData(false, this.props.instances, this.props.hosts);
             }
         }
 
@@ -151,7 +161,7 @@ class Paper extends Component {
         document.removeEventListener('visibilitychange', this.visibilitychange.bind(this));
     }
 
-    getLatestData(clear, instances) {
+    getLatestData(clear, instances, hosts) {
         if (clear) {
             // SEARCH 옵션으로 한번이라도 조회했다면 지우고 다시
             if (this.state.pastTimestamp) {
@@ -166,13 +176,13 @@ class Paper extends Component {
 
         this.getVisitor();
         this.getRealTimeCounter();
-
+        this.getRealTimeAlert(instances, hosts);
 
         clearInterval(this.dataRefreshTimer);
         this.dataRefreshTimer = null;
 
         this.dataRefreshTimer = setTimeout(() => {
-            this.getLatestData(false, instances);
+            this.getLatestData(false, instances, hosts);
         }, this.props.config.interval);
 
     }
@@ -255,6 +265,66 @@ class Paper extends Component {
                 let ten = 1000 * 60 * 10;
                 this.getCounterHistory(this.props.instances, this.props.hosts, now - ten, now, false);
             }
+        }
+    };
+
+    getRealTimeAlert = (instances, hosts) => {
+        const that = this;
+
+        let objTypes = [];
+
+
+        if (instances && instances.length > 0) {
+            objTypes = _.chain(instances).map((d) => d.objType).uniq().value();
+        }
+
+        if (hosts && hosts.length > 0) {
+            objTypes = objTypes.concat(_.chain(hosts).map((d) => d.objType).uniq().value());
+        }
+
+
+        if (objTypes && objTypes.length > 0) {
+            objTypes.forEach((objType) => {
+                this.props.addRequest();
+
+                let offset1 = this.state.alert.offset[objType] ? this.state.alert.offset[objType].offset1 : 0;
+                let offset2 = this.state.alert.offset[objType] ? this.state.alert.offset[objType].offset2 : 0;
+
+                jQuery.ajax({
+                    method: "GET",
+                    async: true,
+                    url: getHttpProtocol(this.props.config) + "/scouter/v1/alert/realTime/" + offset1 + "/" + offset2 + "?objType=" + objType,
+                    xhrFields: getWithCredentials(that.props.config),
+                    beforeSend: function (xhr) {
+                        setAuthHeader(xhr, that.props.config, that.props.user);
+                    }
+                }).done((msg) => {
+                    if (msg) {
+
+                        let alert = this.state.alert;
+                        if (!alert.offset[objType]) {
+                            alert.offset[objType] = {};
+                        }
+
+                        alert.offset[objType].offset1 = msg.result.offset1;
+                        alert.offset[objType].offset2 = msg.result.offset2;
+                        //alert.data = alert.data.concat(msg.result.alerts);
+                        // TODO 증분이 아니고, 모든 데이터가 내려옴
+                        if (msg.result.alerts.length > 0) {
+                            alert.data = msg.result.alerts.sort((a,b) => {return Number(b.time) - Number(a.time)});
+                            this.setState({
+                                alert : alert
+                            });
+                        }
+
+                        console.log(alert);
+
+
+                    }
+                }).fail((xhr, textStatus, errorThrown) => {
+                    errorHandler(xhr, textStatus, errorThrown, this.props);
+                });
+            });
         }
     };
 
@@ -395,7 +465,7 @@ class Paper extends Component {
             let now = (new ServerDate()).getTime();
             let ten = 1000 * 60 * 10;
             this.getCounterHistory(this.props.instances, this.props.hosts, now - ten, now, false);
-            this.getLatestData(true, this.props.instances);
+            this.getLatestData(true, this.props.instances, this.props.hosts);
         } else {
             clearInterval(this.dataRefreshTimer);
             this.dataRefreshTimer = null;
@@ -1142,7 +1212,7 @@ class Paper extends Component {
         return (
             <div className="papers">
                 <div className={"fixed-alter-object " + (this.state.fixedControl ? 'show' : '')}></div>
-                <PaperControl addPaper={this.addPaper} addPaperAndAddMetric={this.addPaperAndAddMetric} clearLayout={this.clearLayout} fixedControl={this.state.fixedControl} toggleRangeControl={this.toggleRangeControl} realtime={this.state.realtime}/>
+                <PaperControl addPaper={this.addPaper} addPaperAndAddMetric={this.addPaperAndAddMetric} clearLayout={this.clearLayout} fixedControl={this.state.fixedControl} toggleRangeControl={this.toggleRangeControl} realtime={this.state.realtime} alert={this.state.alert} />
                 <RangeControl visible={this.state.rangeControl} changeRealtime={this.changeRealtime} search={this.search} fixedControl={this.state.fixedControl} toggleRangeControl={this.toggleRangeControl} changeLongTerm={this.changeLongTerm}/>
                 {(instanceSelected && (!this.state.boxes || this.state.boxes.length === 0)) &&
                 <div className="quick-usage">

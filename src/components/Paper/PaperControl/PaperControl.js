@@ -3,6 +3,7 @@ import './PaperControl.css';
 import * as Options from './Options';
 import {Draggable} from 'react-drag-and-drop'
 import ReactTooltip from 'react-tooltip'
+import AlertList from "./AlertList";
 
 class PaperControl extends Component {
 
@@ -16,7 +17,24 @@ class PaperControl extends Component {
         if ("ontouchstart" in document.documentElement) {
             this.touch = true;
         }
+
+        this.state = {
+            showAlert: false,
+            alertCount : 0
+        }
     }
+
+    toggleAlert = () => {
+        this.setState({
+            showAlert : !this.state.showAlert
+        });
+    };
+
+    setAlertCount = (alertCount) => {
+        this.setState({
+            alertCount : alertCount
+        });
+    };
 
     render() {
 
@@ -91,8 +109,12 @@ class PaperControl extends Component {
                     <i className="fa fa-trash-o" aria-hidden="true"></i>
                 </div>
                 }
-
+                <div className="paper-control-separator paper-right"></div>
+                <div className="paper-control paper-alert paper-right" data-count={this.state.alertCount > 99 ? "99+" : this.state.alertCount} onClick={this.toggleAlert} data-tip="CLICK TO SHOW ALERT">
+                    <span><i className="fa fa-exclamation-circle" aria-hidden="true"></i></span>
+                </div>
                 <ReactTooltip />
+                <AlertList alert={this.props.alert} show={this.state.showAlert} setAlertCount={this.setAlertCount} />
             </div>
         );
     }

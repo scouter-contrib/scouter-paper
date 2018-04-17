@@ -79,12 +79,12 @@
 
 .papers-controls .paper-control.live.realtime span.live {
     background-color: #FFCC11;
-    border: 1px solid rgba(0,0,0,0.2);
+    border: 1px solid rgba(0, 0, 0, 0.2);
     color: #333;
 }
 
 .papers-controls .paper-control span.live:hover {
-    background-color: rgba(0,0,0,0.2);
+    background-color: rgba(0, 0, 0, 0.2);
 }
 
 .papers-controls .paper-control.live.realtime span.live:hover {
@@ -204,10 +204,27 @@
     }
 }
 
-.__react_component_tooltip {
+.papers-controls .__react_component_tooltip {
     font-size: 8px !important;
     padding: 4px 8px !important;
 }
 
+.papers-controls .paper-alert {
+    position: relative;
+}
 
-
+.papers-controls .paper-alert[data-count]:after {
+    content: attr(data-count);
+    position: absolute;
+    top: -10px;
+    right: -10px;
+    font-size: 9px;
+    background: #FF3300;
+    color: white;
+    width: 19px;
+    height: 19px;
+    text-align: center;
+    line-height: 18px;
+    border-radius: 50%;
+    box-shadow: 0 0 1px #333;
+}
