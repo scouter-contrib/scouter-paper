@@ -20,7 +20,6 @@ class PaperControl extends Component {
 
         this.state = {
             showAlert: false,
-            alertCount : 0
         }
     }
 
@@ -30,11 +29,7 @@ class PaperControl extends Component {
         });
     };
 
-    setAlertCount = (alertCount) => {
-        this.setState({
-            alertCount : alertCount
-        });
-    };
+
 
     render() {
 
@@ -110,11 +105,11 @@ class PaperControl extends Component {
                 </div>
                 }
                 <div className="paper-control-separator paper-right"></div>
-                <div className="paper-control paper-alert paper-right" data-count={this.state.alertCount > 99 ? "99+" : this.state.alertCount} onClick={this.toggleAlert} data-tip="CLICK TO SHOW ALERT">
+                <div className="paper-control paper-alert paper-right" data-count={this.props.alert.data.length > 99 ? this.props.alert.data.length : this.props.alert.data.length} onClick={this.toggleAlert} data-tip="CLICK TO SHOW ALERT">
                     <span><i className="fa fa-exclamation-circle" aria-hidden="true"></i></span>
                 </div>
                 <ReactTooltip />
-                <AlertList alert={this.props.alert} show={this.state.showAlert} setAlertCount={this.setAlertCount} />
+                <AlertList alert={this.props.alert} show={this.state.showAlert} setRewind={this.props.setRewind} clearAllAlert={this.props.clearAllAlert} clearOneAlert={this.props.clearOneAlert} />
             </div>
         );
     }

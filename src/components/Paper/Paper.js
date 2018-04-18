@@ -1,17 +1,17 @@
-import React, {Component} from 'react';
-import './Paper.css';
-import './Resizable.css';
-import {connect} from 'react-redux';
-import {addRequest, pushMessage, setControlVisibility} from '../../actions';
+import React, {Component} from "react";
+import "./Paper.css";
+import "./Resizable.css";
+import {connect} from "react-redux";
 import {withRouter} from 'react-router-dom';
+import {addRequest, pushMessage, setControlVisibility} from "../../actions";
 import {Responsive, WidthProvider} from "react-grid-layout";
 import {Box, BoxConfig, PaperControl} from "../../components";
 import jQuery from "jquery";
-import {getData, setData, getHttpProtocol, errorHandler, getWithCredentials, setAuthHeader} from '../../common/common';
+import {errorHandler, getData, getHttpProtocol, getWithCredentials, setAuthHeader, setData} from "../../common/common";
 import Profiler from "./XLog/Profiler/Profiler";
 import ServerDate from "../../common/ServerDate";
 import RangeControl from "./RangeControl/RangeControl";
-import moment from 'moment';
+import moment from "moment";
 import _ from "lodash";
 
 const ResponsiveReactGridLayout = WidthProvider(Responsive);
@@ -67,7 +67,7 @@ class Paper extends Component {
                 range: range,
                 maxElapsed: 2000,
                 lastRequestTime: null,
-                clearTimestamp : null
+                clearTimestamp: null
             },
 
             pastTimestamp: null,
@@ -82,7 +82,7 @@ class Paper extends Component {
             },
 
             /* counters past data */
-            countersHistory : {
+            countersHistory: {
                 time: null,
                 data: null,
                 from: null,
@@ -101,7 +101,9 @@ class Paper extends Component {
 
             alert: {
                 data: [],
-                offset : {}
+                offset: {},
+                clearTime: null,
+                clearItem: {}
             }
         };
     }
@@ -135,7 +137,7 @@ class Paper extends Component {
         if (this.props.instances && this.props.instances.length > 0) {
             let now = (new ServerDate()).getTime();
             let ten = 1000 * 60 * 10;
-            this.getCounterHistory(this.props.instances, this.props.hosts,  now - ten, now, false);
+            this.getCounterHistory(this.props.instances, this.props.hosts, now - ten, now, false);
             if (this.state.realtime) {
                 this.getLatestData(false, this.props.instances, this.props.hosts);
             }
@@ -218,7 +220,7 @@ class Paper extends Component {
 
             let instancesAndHosts = this.props.instances.concat(this.props.hosts);
 
-             this.counterReady = counterKeys.every((key) => this.counterHistoriesLoaded[key]);
+            this.counterReady = counterKeys.every((key) => this.counterHistoriesLoaded[key]);
 
             if (this.counterReady) {
                 let params = JSON.stringify(counterKeys);
@@ -268,6 +270,68 @@ class Paper extends Component {
         }
     };
 
+    clearAllAlert = () => {
+        if (this.state.alert.data && this.state.alert.data.length > 0) {
+            let last = this.state.alert.data[0];
+            this.setState({
+                alert: {
+                    data : [],
+                    offset : this.state.alert.offset,
+                    clearTime: Number(last.time),
+                    clearItem: {}
+                }
+            });
+        } else {
+            this.setState({
+                alert: {
+                    data : [],
+                    offset : this.state.alert.offset,
+                    clearTime: (new Date()).getTime(),
+                    clearItem: {}
+                }
+            });
+        }
+    };
+
+    clearOneAlert = (objHash, time) => {
+
+        let clearItem = this.state.alert.clearItem;
+
+        if (!clearItem[objHash]) {
+            clearItem[objHash] = {};
+        }
+
+        clearItem[objHash][time] = true;
+
+        let data = this.state.alert.data;
+        if (data && data.length > 0) {
+            for (let i=0; i<data.length; i++) {
+                if (data[i].objHash === objHash && Number(data[i].time) === Number(time)) {
+                    data.splice(i, 1);
+                    break;
+                }
+            }
+        }
+
+        this.setState({
+            alert : {
+                data: data,
+                offset: this.state.alert.offset,
+                clearTime: this.state.clearTime,
+                clearItem: clearItem
+            }
+        });
+    };
+
+    setRewind = (time) => {
+
+        this.changeRealtime(false, false);
+        let target = Math.floor(time / (1000 * 60)) * (1000 * 60);
+        console.log(new Date(target));
+        this.search(target - (1000 * 60 * 5), target + (1000 * 60 * 5));
+
+    };
+
     getRealTimeAlert = (instances, hosts) => {
         const that = this;
 
@@ -310,10 +374,37 @@ class Paper extends Component {
                         alert.offset[objType].offset2 = msg.result.offset2;
                         //alert.data = alert.data.concat(msg.result.alerts);
                         // TODO 증분이 아니고, 모든 데이터가 내려옴
-                        if (msg.result.alerts.length > 0) {
-                            alert.data = msg.result.alerts.sort((a,b) => {return Number(b.time) - Number(a.time)});
+                        if (msg.result.alerts && msg.result.alerts.length > 0) {
+                            alert.data = msg.result.alerts;
+                        }
+
+                        if (alert.data.length > 0) {
+                            alert.data = alert.data.sort((a, b) => {
+                                return Number(b.time) - Number(a.time)
+                            });
+
+                            alert.data = alert.data.filter((alert) => {
+                                if (this.state.alert.clearTime) {
+                                    if (this.state.alert.clearTime >= Number(alert.time)) {
+                                        return false;
+                                    } else {
+                                        if (this.state.alert.clearItem[alert.objHash] && this.state.alert.clearItem[alert.objHash][alert.time]) {
+                                            return false;
+                                        } else {
+                                            return true;
+                                        }
+                                    }
+                                } else {
+                                    if (this.state.alert.clearItem[alert.objHash] && this.state.alert.clearItem[alert.objHash][alert.time]) {
+                                        return false;
+                                    } else {
+                                        return true;
+                                    }
+                                }
+                            });
+
                             this.setState({
-                                alert : alert
+                                alert: alert
                             });
                         }
 
@@ -328,18 +419,18 @@ class Paper extends Component {
         }
     };
 
-    getSearchDays (from, to) {
+    getSearchDays(from, to) {
         let aday = 1000 * 60 * 60 * 24;
         let startDayTime = moment(from).hours(0).minutes(0).seconds(0).milliseconds(0).valueOf();
-        return  Math.ceil(((to-1000) - startDayTime) / aday);
+        return Math.ceil(((to - 1000) - startDayTime) / aday);
     }
 
-    getDivideDays (from, to) {
+    getDivideDays(from, to) {
         let days = this.getSearchDays(from, to);
 
         let fromTos = [];
         if (days > 0) {
-            for (let i=0; i<days; i++) {
+            for (let i = 0; i < days; i++) {
                 let splitFrom;
                 let splitTo;
                 if (i === 0) {
@@ -360,8 +451,8 @@ class Paper extends Component {
             }
         } else {
             fromTos.push({
-                from : from,
-                to : to
+                from: from,
+                to: to
             })
         }
 
@@ -416,24 +507,24 @@ class Paper extends Component {
                     let fromTos = this.getDivideDays(from, to);
 
                     if (days > 1) {
-                        for (let i=0; i<fromTos.length; i++) {
+                        for (let i = 0; i < fromTos.length; i++) {
                             url = getHttpProtocol(this.props.config) + '/scouter/v1/counter/stat/' + counterKey + '?objHashes=' + JSON.stringify(instancesAndHosts.map((obj) => {
-                                return Number(obj.objHash);
-                            })) + "&startYmd=" + moment(fromTos[i].from).format("YYYYMMDD") + "&endYmd=" + moment(fromTos[i].to).format("YYYYMMDD");
+                                    return Number(obj.objHash);
+                                })) + "&startYmd=" + moment(fromTos[i].from).format("YYYYMMDD") + "&endYmd=" + moment(fromTos[i].to).format("YYYYMMDD");
                             this.getCounterHistoryData(url, counterKey, from, to, (new Date()).getTime(), true);
                         }
                     } else {
                         url = getHttpProtocol(this.props.config) + '/scouter/v1/counter/stat/' + counterKey + '?objHashes=' + JSON.stringify(instancesAndHosts.map((obj) => {
-                            return Number(obj.objHash);
-                        })) + "&startYmd=" + moment(startTime).format("YYYYMMDD") + "&endYmd=" + moment(endTime).format("YYYYMMDD");
+                                return Number(obj.objHash);
+                            })) + "&startYmd=" + moment(startTime).format("YYYYMMDD") + "&endYmd=" + moment(endTime).format("YYYYMMDD");
                         this.getCounterHistoryData(url, counterKey, from, to, now, false);
                     }
 
 
                 } else {
                     url = getHttpProtocol(this.props.config) + '/scouter/v1/counter/' + counterKey + '?objHashes=' + JSON.stringify(instancesAndHosts.map((obj) => {
-                        return Number(obj.objHash);
-                    })) + "&startTimeMillis=" + startTime + "&endTimeMillis=" + endTime;
+                            return Number(obj.objHash);
+                        })) + "&startTimeMillis=" + startTime + "&endTimeMillis=" + endTime;
                     this.getCounterHistoryData(url, counterKey, from, to, now, false);
                 }
             }
@@ -444,12 +535,12 @@ class Paper extends Component {
 
         this.setState({
             realtime: realtime,
-            longTerm : longTerm,
+            longTerm: longTerm,
             counters: {
                 time: null,
                 data: null
             },
-            countersHistory : {
+            countersHistory: {
                 time: null,
                 data: null,
                 from: null,
@@ -484,7 +575,7 @@ class Paper extends Component {
         this.lastTo = to;
 
         this.setState({
-            countersHistory : {
+            countersHistory: {
                 time: null,
                 data: null,
                 from: from,
@@ -662,7 +753,6 @@ class Paper extends Component {
             });
 
 
-
             let days = this.getSearchDays(from, to);
             let fromTos = this.getDivideDays(from, to);
 
@@ -672,7 +762,7 @@ class Paper extends Component {
             this.xlogHistoryRequestTime = now;
 
             if (days > 1) {
-                for (let i=0; i<fromTos.length; i++) {
+                for (let i = 0; i < fromTos.length; i++) {
                     this.getXLogHistoryData(now, fromTos[i].from, fromTos[i].to, instances);
                 }
             } else {
@@ -732,7 +822,7 @@ class Paper extends Component {
 
                 this.setState({
                     data: data,
-                    pageCnt : (new Date()).getTime()
+                    pageCnt: (new Date()).getTime()
                 });
 
                 if (hasMore) {
@@ -744,7 +834,7 @@ class Paper extends Component {
                         data.xlogs = Array.prototype.concat.apply([], that.xlogHistoryTemp);
                         this.setState({
                             data: data,
-                            pageCnt : (new Date()).getTime()
+                            pageCnt: (new Date()).getTime()
                         });
                     }
                 }
@@ -787,7 +877,7 @@ class Paper extends Component {
     };
 
 
-    getCounterHistoryData = (url, counterKey, from , to, now, append) => {
+    getCounterHistoryData = (url, counterKey, from, to, now, append) => {
         let that = this;
         this.props.addRequest();
         jQuery.ajax({
@@ -838,14 +928,14 @@ class Paper extends Component {
                 for (let objHash in countersHistory[key]) {
                     let smallInx = -1;
                     let temp = [];
-                    for (let i=0; i<countersHistory[key][objHash].timeList.length; i++) {
+                    for (let i = 0; i < countersHistory[key][objHash].timeList.length; i++) {
                         temp.push({
-                            time : Number(countersHistory[key][objHash].timeList[i]),
-                            value : countersHistory[key][objHash].valueList[i]
+                            time: Number(countersHistory[key][objHash].timeList[i]),
+                            value: countersHistory[key][objHash].valueList[i]
                         });
                     }
-                    temp.sort((a,b) => a.time - b.time);
-                    for (let i=0; i<temp.length; i++) {
+                    temp.sort((a, b) => a.time - b.time);
+                    for (let i = 0; i < temp.length; i++) {
                         if (from < temp[i].time) {
                             smallInx = i;
                             break;
@@ -857,7 +947,7 @@ class Paper extends Component {
                     }
 
                     let binInx = -1;
-                    for (let i=temp.length-1; i>-0; i--) {
+                    for (let i = temp.length - 1; i > -0; i--) {
                         if (to > temp[i].time) {
                             binInx = i;
                             break;
@@ -876,11 +966,11 @@ class Paper extends Component {
             this.state.countersHistory.data = countersHistory;
 
             this.setState({
-                countersHistory : {
+                countersHistory: {
                     time: new Date().getTime(),
                     data: countersHistory,
-                    from : from,
-                    to : to
+                    from: from,
+                    to: to
                 },
             });
             this.counterHistoriesLoaded[counterKey] = true;
@@ -1212,7 +1302,7 @@ class Paper extends Component {
         return (
             <div className="papers">
                 <div className={"fixed-alter-object " + (this.state.fixedControl ? 'show' : '')}></div>
-                <PaperControl addPaper={this.addPaper} addPaperAndAddMetric={this.addPaperAndAddMetric} clearLayout={this.clearLayout} fixedControl={this.state.fixedControl} toggleRangeControl={this.toggleRangeControl} realtime={this.state.realtime} alert={this.state.alert} />
+                <PaperControl addPaper={this.addPaper} addPaperAndAddMetric={this.addPaperAndAddMetric} clearLayout={this.clearLayout} fixedControl={this.state.fixedControl} toggleRangeControl={this.toggleRangeControl} realtime={this.state.realtime} alert={this.state.alert} clearAllAlert={this.clearAllAlert} clearOneAlert={this.clearOneAlert} setRewind={this.setRewind} />
                 <RangeControl visible={this.state.rangeControl} changeRealtime={this.changeRealtime} search={this.search} fixedControl={this.state.fixedControl} toggleRangeControl={this.toggleRangeControl} changeLongTerm={this.changeLongTerm}/>
                 {(instanceSelected && (!this.state.boxes || this.state.boxes.length === 0)) &&
                 <div className="quick-usage">
@@ -1259,24 +1349,26 @@ class Paper extends Component {
     }
 }
 
-let mapStateToProps = (state) => {
-    return {
-        hosts: state.target.hosts,
-        instances: state.target.instances,
-        selection: state.target.selection,
-        config: state.config,
-        user: state.user,
-        template: state.template
+let
+    mapStateToProps = (state) => {
+        return {
+            hosts: state.target.hosts,
+            instances: state.target.instances,
+            selection: state.target.selection,
+            config: state.config,
+            user: state.user,
+            template: state.template
+        };
     };
-};
 
-let mapDispatchToProps = (dispatch) => {
-    return {
-        addRequest: () => dispatch(addRequest()),
-        pushMessage: (category, title, content) => dispatch(pushMessage(category, title, content)),
-        setControlVisibility: (name, value) => dispatch(setControlVisibility(name, value))
+let
+    mapDispatchToProps = (dispatch) => {
+        return {
+            addRequest: () => dispatch(addRequest()),
+            pushMessage: (category, title, content) => dispatch(pushMessage(category, title, content)),
+            setControlVisibility: (name, value) => dispatch(setControlVisibility(name, value))
+        };
     };
-};
 
 Paper = connect(mapStateToProps, mapDispatchToProps)(Paper);
 export default withRouter(Paper);
