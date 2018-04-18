@@ -6,8 +6,34 @@
     background-color: #207ce5;
     border: 1px solid rgba(0, 0, 0, 0.6);
     font-size: 9px;
+    font-weight: normal;
 }
 
+@media screen and (max-width: 800px) {
+    .papers-controls .alert-list {
+        top: 40px;
+        right: 0;
+    }
+}
+
+
+@media screen and (max-width: 680px) {
+
+    .papers-controls .alert-list {
+        line-height: 100%;
+    }
+
+    .papers-controls .alert-list {
+        top: 40px;
+        right: 0;
+        left : 0;
+        width: 100%;
+        background-color: #207ce5;
+        border: 1px solid rgba(0, 0, 0, 0.6);
+        font-size: 9px;
+        font-weight: normal;
+    }
+}
 .papers-controls .alert-list.hidden {
     display: none;
 }

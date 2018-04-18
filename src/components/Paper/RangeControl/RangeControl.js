@@ -29,6 +29,14 @@ class RangeControl extends Component {
         this.handleChange = this.dateChange.bind(this);
     }
 
+    componentDidMount() {
+        this.props.onRef(this);
+    }
+
+    componentWillUnmount() {
+        this.props.onRef(undefined);
+    }
+
     shouldComponentUpdate(nextProps, nextState) {
         return true;
     }
@@ -40,12 +48,27 @@ class RangeControl extends Component {
     };
 
     hoursChange = (e) => {
-        if (e.target.value) {
-
+        if (isNaN(e)) {
+            this.setState({
+                hours: e.target.value
+            });
+        } else {
+            this.setState({
+                hours: e
+            });
         }
-        this.setState({
-            hours: e.target.value
-        });
+    };
+
+    minutesChange = (e) => {
+        if (isNaN(e)) {
+            this.setState({
+                minutes: e.target.value
+            });
+        } else {
+            this.setState({
+                minutes: e
+            });
+        }
     };
 
     wheel = (e) => {
@@ -56,14 +79,6 @@ class RangeControl extends Component {
         if (e.key === 'Enter') {
             this.search();
         }
-    };
-
-
-
-    minutesChange = (e) => {
-        this.setState({
-            minutes: e.target.value
-        });
     };
 
     changeTimeType = (type) => {
@@ -78,6 +93,37 @@ class RangeControl extends Component {
         this.props.changeRealtime(type === "realtime", type === "realtime" ? false : this.state.longTerm);
     };
 
+    setRangeValue = (value) => {
+        this.setState({
+            value: value
+        });
+    }
+
+    setLongTerm = (longTerm) => {
+        if (this.state.realtime) {
+            return;
+        }
+
+        if (!longTerm) {
+            this.setState({
+                longTerm: false,
+                range : this.props.config.range.shortHistoryRange,
+                step : this.props.config.range.shortHistoryStep,
+                value : this.state.value > this.props.config.range.shortHistoryRange ? this.props.config.range.shortHistoryRange : this.state.value
+            });
+
+            this.props.changeLongTerm(false);
+        } else {
+            this.setState({
+                longTerm: true,
+                range : this.props.config.range.longHistoryRange * 60,
+                step : this.props.config.range.longHistoryStep,
+                value : this.state.value < this.props.config.range.longHistoryStep ? this.props.config.range.longHistoryStep : this.state.value
+            });
+
+            this.props.changeLongTerm(true);
+        }
+    };
     changeLongTerm = () => {
 
         if (this.state.realtime) {

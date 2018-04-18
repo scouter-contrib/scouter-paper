@@ -41,17 +41,14 @@ class AlertList extends Component {
                                             <span className="message">{alert.message}</span>
                                         </div>
                                     </div>
-
                                 </div>
-
-
                             </li>
                         )
                     })}
                 </ul>
                 }
-                {!this.props.alert.data || this.props.alert.data.length < 1 &&
-                <div className="no-alerts"><div><div>NO ALERTS</div></div></div>
+                {(!this.props.alert.data || this.props.alert.data.length < 1) &&
+                <div className="no-alerts"><div><div>NO ALERT</div></div></div>
                 }
             </div>
         );

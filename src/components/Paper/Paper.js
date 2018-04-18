@@ -47,6 +47,8 @@ class Paper extends Component {
         let endTime = (new ServerDate()).getTime();
         let startTime = endTime - range;
 
+        let alertInfo = JSON.parse(localStorage.getItem("alert"));
+
         this.state = {
             layouts: layouts,
             layoutChangeTime: null,
@@ -102,10 +104,13 @@ class Paper extends Component {
             alert: {
                 data: [],
                 offset: {},
-                clearTime: null,
-                clearItem: {}
-            }
+                clearTime: alertInfo ? alertInfo.clearTime : null,
+                clearItem: alertInfo ? alertInfo.clearItem : {}
+            },
+            showAlert: false
         };
+
+
     }
 
     componentWillReceiveProps(nextProps) {
@@ -270,26 +275,39 @@ class Paper extends Component {
         }
     };
 
+    toggleShowAlert = () => {
+        this.setState({
+            showAlert : !this.state.showAlert
+        });
+    };
+
     clearAllAlert = () => {
+        let clearTime;
+        let clearItem;
         if (this.state.alert.data && this.state.alert.data.length > 0) {
             let last = this.state.alert.data[0];
-            this.setState({
-                alert: {
-                    data : [],
-                    offset : this.state.alert.offset,
-                    clearTime: Number(last.time),
-                    clearItem: {}
-                }
-            });
+            clearTime = Number(last.time);
+            clearItem = {};
         } else {
-            this.setState({
-                alert: {
-                    data : [],
-                    offset : this.state.alert.offset,
-                    clearTime: (new Date()).getTime(),
-                    clearItem: {}
-                }
-            });
+            clearTime = (new Date()).getTime();
+            clearItem = {};
+        }
+
+        this.setState({
+            alert: {
+                data : [],
+                offset : this.state.alert.offset,
+                clearTime: clearTime,
+                clearItem: clearItem
+            },
+            showAlert : false
+        });
+
+        if (localStorage) {
+            localStorage.setItem("alert", JSON.stringify({
+                clearTime: clearTime,
+                clearItem: clearItem
+            }));
         }
     };
 
@@ -317,19 +335,30 @@ class Paper extends Component {
             alert : {
                 data: data,
                 offset: this.state.alert.offset,
-                clearTime: this.state.clearTime,
+                clearTime: this.state.alert.clearTime,
                 clearItem: clearItem
             }
         });
+
+        if (localStorage) {
+            localStorage.setItem("alert", JSON.stringify({
+                clearTime: this.state.alert.clearTime,
+                clearItem: clearItem
+            }));
+        }
     };
 
     setRewind = (time) => {
-
-        this.changeRealtime(false, false);
-        let target = Math.floor(time / (1000 * 60)) * (1000 * 60);
-        console.log(new Date(target));
-        this.search(target - (1000 * 60 * 5), target + (1000 * 60 * 5));
-
+        let start = moment(Math.floor(time / (1000 * 60)) * (1000 * 60));
+        start.subtract(5, "minutes");
+        let end = start.clone().add(10, "minutes");
+        this.rangeControlChild.changeTimeType("search");
+        this.rangeControlChild.setLongTerm(false);
+        this.rangeControlChild.setRangeValue(10);
+        this.rangeControlChild.dateChange(start);
+        this.rangeControlChild.hoursChange(start.hours());
+        this.rangeControlChild.minutesChange(start.minutes());
+        this.rangeControlChild.search(start, end);
     };
 
     getRealTimeAlert = (instances, hosts) => {
@@ -372,11 +401,7 @@ class Paper extends Component {
 
                         alert.offset[objType].offset1 = msg.result.offset1;
                         alert.offset[objType].offset2 = msg.result.offset2;
-                        //alert.data = alert.data.concat(msg.result.alerts);
-                        // TODO 증분이 아니고, 모든 데이터가 내려옴
-                        if (msg.result.alerts && msg.result.alerts.length > 0) {
-                            alert.data = msg.result.alerts;
-                        }
+                        alert.data = alert.data.concat(msg.result.alerts);
 
                         if (alert.data.length > 0) {
                             alert.data = alert.data.sort((a, b) => {
@@ -407,10 +432,6 @@ class Paper extends Component {
                                 alert: alert
                             });
                         }
-
-                        console.log(alert);
-
-
                     }
                 }).fail((xhr, textStatus, errorThrown) => {
                     errorHandler(xhr, textStatus, errorThrown, this.props);
@@ -1302,8 +1323,8 @@ class Paper extends Component {
         return (
             <div className="papers">
                 <div className={"fixed-alter-object " + (this.state.fixedControl ? 'show' : '')}></div>
-                <PaperControl addPaper={this.addPaper} addPaperAndAddMetric={this.addPaperAndAddMetric} clearLayout={this.clearLayout} fixedControl={this.state.fixedControl} toggleRangeControl={this.toggleRangeControl} realtime={this.state.realtime} alert={this.state.alert} clearAllAlert={this.clearAllAlert} clearOneAlert={this.clearOneAlert} setRewind={this.setRewind} />
-                <RangeControl visible={this.state.rangeControl} changeRealtime={this.changeRealtime} search={this.search} fixedControl={this.state.fixedControl} toggleRangeControl={this.toggleRangeControl} changeLongTerm={this.changeLongTerm}/>
+                <PaperControl addPaper={this.addPaper} addPaperAndAddMetric={this.addPaperAndAddMetric} clearLayout={this.clearLayout} fixedControl={this.state.fixedControl} toggleRangeControl={this.toggleRangeControl} realtime={this.state.realtime} alert={this.state.alert} clearAllAlert={this.clearAllAlert} clearOneAlert={this.clearOneAlert} setRewind={this.setRewind} showAlert={this.state.showAlert} toggleShowAlert={this.toggleShowAlert} />
+                <RangeControl onRef={ref => (this.rangeControlChild = ref)} visible={this.state.rangeControl} changeRealtime={this.changeRealtime} search={this.search} fixedControl={this.state.fixedControl} toggleRangeControl={this.toggleRangeControl} changeLongTerm={this.changeLongTerm}/>
                 {(instanceSelected && (!this.state.boxes || this.state.boxes.length === 0)) &&
                 <div className="quick-usage">
                     <div>
