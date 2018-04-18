@@ -82,6 +82,16 @@ class Settings extends Component {
         });
     };
 
+    onChangeAlert = (attr, event) => {
+
+        let config = this.state.config;
+        config.alert[attr] = event.target.value;
+
+        this.setState({
+            config: config
+        });
+    };
+
     onXLogOptionChange = (type, dir, event) => {
 
         let config = this.state.config;
@@ -413,6 +423,22 @@ class Settings extends Component {
                                 </div>
                                 <div className="input">
                                     <input type="number" required min={10} step={10} readOnly={!this.state.edit} onChange={this.onChangeRange.bind(this, "longHistoryStep")} value={this.state.config.range.longHistoryStep} placeholder="MINUTES" />
+                                </div>
+                            </div>
+                        </div>
+                        <div className="category first">
+                            <div>ALERT</div>
+                        </div>
+                        <div className="setting-box">
+                            <div className="row">
+                                <div className="label">
+                                    <div>USE BROWSER NOITIFICATION</div>
+                                </div>
+                                <div className="input">
+                                    <select value={this.state.config.alert.notification} onChange={this.onChangeAlert.bind(this, "notification")} disabled={!this.state.edit}>
+                                        <option value="Y">Y</option>
+                                        <option value="N">N</option>
+                                    </select>
                                 </div>
                             </div>
                         </div>

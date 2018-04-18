@@ -9,13 +9,22 @@
     font-weight: normal;
 }
 
+.papers-controls.fixed-control .alert-list {
+    top: 31px;
+    right: 20px;
+}
+
 @media screen and (max-width: 800px) {
     .papers-controls .alert-list {
         top: 40px;
         right: 0;
     }
-}
 
+    .papers-controls.fixed-control .alert-list {
+        top: 57px;
+        right: 20px;
+    }
+}
 
 @media screen and (max-width: 680px) {
 
@@ -26,14 +35,21 @@
     .papers-controls .alert-list {
         top: 40px;
         right: 0;
-        left : 0;
+        left: 0;
         width: 100%;
         background-color: #207ce5;
         border: 1px solid rgba(0, 0, 0, 0.6);
         font-size: 9px;
         font-weight: normal;
     }
+
+    .papers-controls.fixed-control .alert-list {
+        right: 20px;
+        left: 20px;
+        width: calc(100% - 40px);
+    }
 }
+
 .papers-controls .alert-list.hidden {
     display: none;
 }
@@ -45,10 +61,11 @@
     font-size: 12px;
 
 }
+
 .papers-controls .alert-list .top-control button {
     position: absolute;
-    top : 7px;
-    right : 5px;
+    top: 7px;
+    right: 5px;
     font-size: 9px;
     padding: 4px 8px;
 }
@@ -80,7 +97,6 @@
     vertical-align: middle;
 }
 
-
 .papers-controls .alert-list ul::-webkit-scrollbar {
     width: 7px;
     height: 7px;
@@ -88,7 +104,6 @@
 
 .papers-controls .alert-list ul::-webkit-scrollbar-thumb {
     background-color: rgba(0, 0, 0, 0.4);
-    background-color: #FCDC3B;
 }
 
 .papers-controls .alert-list ul li {

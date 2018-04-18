@@ -13,10 +13,12 @@ import ServerDate from "../../common/ServerDate";
 import RangeControl from "./RangeControl/RangeControl";
 import moment from "moment";
 import _ from "lodash";
+import notificationIcon from '../../img/notification.png';
 
 const ResponsiveReactGridLayout = WidthProvider(Responsive);
 
 class Paper extends Component {
+    mountTime = null;
     dataRefreshTimer = null;
     xlogHistoryRequestTime = null;
     mounted = false;
@@ -29,8 +31,10 @@ class Paper extends Component {
 
     constructor(props) {
         super(props);
+        this.mountTime = (new Date()).getTime();
         this.counterHistoriesLoaded = {};
         this.counterReady = false;
+
 
         let layouts = getData("layouts");
         let boxes = getData("boxes");
@@ -158,7 +162,14 @@ class Paper extends Component {
         this.setState({
             visible: document.visibilityState === 'visible'
         });
+
+        if (this.props.config.alert.notification === "Y") {
+            if (Notification.permission !== "granted" || Notification.permission === "denied") {
+                Notification.requestPermission();
+            }
+        }
     }
+
 
     componentWillUnmount() {
         this.mounted = false;
@@ -427,6 +438,21 @@ class Paper extends Component {
                                     }
                                 }
                             });
+
+
+                            if (this.props.config.alert.notification === "Y" && Notification.permission === "granted") {
+                                for (let i=0; i<alert.data.length; i++) {
+                                    if (Number(alert.data[i].time) > this.mountTime && !alert.data[i]["_notificated"]) {
+                                        alert.data[i]["_notificated"] = true;
+
+                                        var options = {
+                                            body: alert.data[i].objName + "\n" + alert.data[i].message,
+                                            icon: notificationIcon
+                                        };
+                                        new Notification("[" + alert.data[i].level + "]" +  alert.data[i].title, options);
+                                    }
+                                }
+                            }
 
                             this.setState({
                                 alert: alert
