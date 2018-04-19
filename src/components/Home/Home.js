@@ -11,7 +11,8 @@ class Home extends Component {
     constructor(props) {
         super(props);
         this.state = {
-            release : false
+            release : false,
+            showNote : false
         };
     }
 
@@ -37,8 +38,16 @@ class Home extends Component {
                     <div>
                         {this.state.release &&
                         <div className="release">
-                            <div>NOW NEW RELEASE AVAILABLE</div>
-                            <div>{this.state.version}</div>
+                            <div className="msg">NEW VERSION({this.state.version}) RELEASED</div>
+                            <div className="btns"><a href={this.state.url}><span>DOWNLOAD</span></a><span onClick={() => {this.setState({showNote:true})}}>RELEASE NOTE</span></div>
+                        </div>
+                        }
+                        {(this.state.release && this.state.showNote) &&
+                        <div className="note">
+                            <div>
+                                <div className="release-title">{this.state.version} RELEASE NOTE</div>
+                                <div className="release-note">{this.state.text}</div>
+                            </div>
                         </div>
                         }
                         <div className="home-content">

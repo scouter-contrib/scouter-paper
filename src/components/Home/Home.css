@@ -102,4 +102,65 @@
     width: 60px;
 }
 
+.home .release {
+    margin-bottom: 20px;
+}
 
+.home .release > div {
+    padding: 10px;
+}
+
+.home .release .btns span {
+    display: inline-block;
+    margin: 0 2px;
+    padding: 6px 4px;
+    border-radius: 3px;
+    background-color: rgba(0,0,0,0.2);
+    color: white;
+    width: 100px;
+    cursor: pointer;
+}
+
+.home .release .btns span a {
+    color: white;
+    text-decoration: none;
+}
+
+.home .note {
+    position: fixed;
+    top : 0;
+    left : 0;
+    right : 0;
+    bottom : 0;
+    background-color: rgba(0,0,0,0.4);
+    z-index: 51;
+    text-align: left;
+    display: table;
+    width: 100%;
+    height: 100%;
+}
+
+.home .note > div {
+    display: table-cell;
+    width: 100%;
+    height: 100%;
+    vertical-align: middle;
+}
+
+.home .note .release-title {
+    text-align: center;
+    padding: 10px;
+}
+
+.home .note .release-note {
+    white-space: pre-wrap;
+    margin: 0 auto;
+    height: 400px;
+    width: 600px;
+    overflow-y: auto;
+    line-height: 160%;
+    background-color: white;
+    color : #333;
+    padding: 20px;
+    box-sizing: border-box;
+}
