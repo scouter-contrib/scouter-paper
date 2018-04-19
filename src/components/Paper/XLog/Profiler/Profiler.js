@@ -9,7 +9,7 @@ import SingleProfile from "./SingleProfile/SingleProfile";
 import ProfileList from "./ProfileList/ProfileList";
 import _ from "lodash";
 import moment from "moment";
-import {disableBodyScroll, enableBodyScroll} from 'body-scroll-lock';
+//import {disableBodyScroll, enableBodyScroll} from 'body-scroll-lock';
 
 const xlogMaxSelectionCount = 200;
 
@@ -157,9 +157,6 @@ class Profiler extends Component {
     }*/
 
     getList = (x1, x2, y1, y2) => {
-        let that = this;
-
-
         let aday = 1000 * 60 * 60 * 24;
         let startDayTime = moment(x1).hours(0).minutes(0).seconds(0).milliseconds(0).valueOf();
         let days = Math.ceil(((x2-1000) - startDayTime) / aday);
