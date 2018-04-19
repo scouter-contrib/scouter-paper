@@ -27,7 +27,8 @@ class InstanceSelector extends Component {
             instances: [],
             activeServerId: null,
             selectedInstances: {},
-            selectedHosts: {}
+            selectedHosts: {},
+            filter : ""
         };
     }
 
@@ -41,6 +42,82 @@ class InstanceSelector extends Component {
             }
         }
     }
+
+    onFilterChange = (event) => {
+        this.setState({
+            filter: event.target.value
+        });
+    };
+
+    clearFilter = () => {
+        this.setState({
+            filter: ""
+        });
+    };
+
+    selectAll = () => {
+        let filterdInstance = this.state.instances.filter((instance) => {
+            if (instance.objFamily === 'javaee') {
+                if (this.state.filter && this.state.filter.length > 1) {
+                    if ((instance.objType && instance.objType.toLowerCase().indexOf(this.state.filter.toLowerCase()) > -1) || (instance.objName && instance.objName.toLowerCase().indexOf(this.state.filter.toLowerCase()) > -1) || (instance.address && instance.address.toLowerCase().indexOf(this.state.filter.toLowerCase()) > -1)) {
+                        return true;
+                    } else {
+                        return false;
+                    }
+                } else {
+                    return true;
+                }
+            } else {
+                return false;
+            }
+        });
+
+        let isAllSelected = true;
+
+        for (let i=0; i<filterdInstance.length; i++) {
+            if (!this.state.selectedInstances[filterdInstance[i].objHash]) {
+                isAllSelected = false;
+                break;
+            }
+        }
+
+        let selectedInstances = Object.assign(this.state.selectedInstances);
+
+        if (isAllSelected) {
+            for (let i=0; i<filterdInstance.length; i++) {
+                if (this.state.selectedInstances[filterdInstance[i].objHash]) {
+                    delete selectedInstances[filterdInstance[i].objHash];
+                }
+            }
+        } else {
+            for (let i=0; i<filterdInstance.length; i++) {
+                if (!this.state.selectedInstances[filterdInstance.objHash]) {
+                    selectedInstances[filterdInstance[i].objHash] = filterdInstance[i];
+                }
+            }
+        }
+
+        let selectedInstanceCount = 0;
+        for (let attr in selectedInstances) {
+            for (let i = 0; i < this.state.instances.length; i++) {
+                if (this.state.instances[i].objHash === attr) {
+                    selectedInstanceCount++;
+                }
+            }
+        }
+
+        let servers = this.state.servers;
+        for (let i = 0; i < servers.length; i++) {
+            if (servers[i].id === this.state.activeServerId) {
+                servers[i].selectedInstanceCount = selectedInstanceCount;
+            }
+        }
+
+        this.setState({
+            servers: servers,
+            selectedInstances: selectedInstances
+        });
+    };
 
     setTargetFromUrl = (props) => {
 
@@ -363,17 +440,31 @@ class InstanceSelector extends Component {
                         </div>
                         <div className="instance-list">
                             <div>
-                                <div className="title">
-                                    <div>INSTANCES</div>
+                                <div className={"filter " + (this.state.filter && this.state.filter.length > 1 ? 'filtered' : '')}>
+                                    <span className="filter-icon" onClick={this.clearFilter}><i className="fa fa-filter" aria-hidden="true"></i></span><span className="filter-tag">INSTANCE</span><input type="search" onChange={this.onFilterChange.bind(this)} value={this.state.filter} /><span className="check-btn" onClick={this.selectAll}><i className="fa fa-check-circle-o" aria-hidden="true"></i> ALL</span>
                                 </div>
                                 <div className="list-content scrollbar">
-                                    {this.state.instances && this.state.instances.filter((instance) => {
-                                        return instance.objFamily === 'javaee';
+                                    {(this.state.instances && this.state.instances.length > 0) && this.state.instances.filter((instance) => {
+                                        if (instance.objFamily === 'javaee') {
+                                            if (this.state.filter && this.state.filter.length > 1) {
+                                                if ((instance.objType && instance.objType.toLowerCase().indexOf(this.state.filter.toLowerCase()) > -1) || (instance.objName && instance.objName.toLowerCase().indexOf(this.state.filter.toLowerCase()) > -1) || (instance.address && instance.address.toLowerCase().indexOf(this.state.filter.toLowerCase()) > -1)) {
+                                                    return true;
+                                                }  else {
+                                                    return false;
+                                                }
+                                            } else {
+                                                return true;
+                                            }
+                                        } else {
+                                            return false;
+                                        }
                                     }).map((instance, i) => {
-                                        return (<div key={i}
-                                                     className={"instance " + (i === 0 ? 'first ' : ' ') + (!(!this.state.selectedInstances[instance.objHash]) ? "selected" : " ")}
-                                                     onClick={this.instanceClick.bind(this, instance)}>{instance.objName}</div>)
+                                        return (
+                                            <div key={i} className={"instance " + (i === 0 ? 'first ' : ' ') + (!(!this.state.selectedInstances[instance.objHash]) ? "selected" : " ")} onClick={this.instanceClick.bind(this, instance)}>
+                                                <div className="instance-name">{instance.objName}</div><div className="instance-other"><span>{instance.address}</span><span className="instance-objtype">{instance.objType}</span></div>
+                                            </div>)
                                     })}
+                                    {(!this.state.instances || this.state.instances.length < 1) && <div className="no-instance"><div><div>NO INSTANCE</div></div></div> }
                                 </div>
                             </div>
                         </div>

@@ -1,10 +1,10 @@
 .instance-selector-bg {
     position: fixed;
-    top : 0;
-    left : 0;
+    top: 0;
+    left: 0;
     right: 0;
     bottom: 0;
-    background-color: rgba(0,0,0,0.3);
+    background-color: rgba(0, 0, 0, 0.3);
     z-index: 30;
 }
 
@@ -56,19 +56,101 @@
 
 .instance-selector .instance-selector-content .title {
     position: absolute;
-    top : 0;
+    top: 0;
     text-align: center;
     width: 100%;
     height: 20px;
 }
 
-.instance-selector .instance-selector-content .list-content {
-    height: calc(100% - 20px);
+.instance-selector .instance-selector-content .filter {
     position: absolute;
-    top : 20px;
+    top: 0;
+    width: 100%;
+    padding: 4px 0;
+    height: 30px;
+    box-sizing: border-box;
+    border-bottom: 1px solid rgba(0, 0, 0, 0.2);
+    background-color: rgba(0, 0, 0, 0.1);
+}
+
+.instance-selector .instance-selector-content .filter .check-btn {
+    display: inline-block;
+    width: 45px;
+    padding: 4px 0;
+    margin-left: 4px;
+    text-align: center;
+    background-color: white;
+    color: #333;
+    cursor: pointer;
+    border-radius: 3px;
+}
+
+.instance-selector .instance-selector-content .filter .check-btn:hover {
+    background-color: #DDD;
+}
+
+.instance-selector .instance-selector-content .filter .filter-icon {
+    display: inline-block;
+    width: 20px;
+    text-align: center;
+    box-sizing: border-box;
+    cursor: pointer;
+}
+
+.instance-selector .instance-selector-content .filter.filtered .filter-icon {
+    color: #EEC900;
+}
+
+.instance-selector .instance-selector-content .filter .filter-tag {
+    width: 70px;
+    display: inline-block;
+    text-align: center;
+    padding: 5px 0;
+    background-color: rgba(0, 0, 0, 0.2);
+    border-radius: 3px 0 0 3px;
+    height: 20px;
+    box-sizing: border-box;
+}
+
+.instance-selector .instance-selector-content .filter input {
+    width: calc(100% - 94px - 50px);
+    font-size: 10px;
+    padding: 3px 5px;
+    border-radius: 0 3px 3px 0;
+    border: none;
+    outline: none;
+    box-sizing: border-box;
+    border: 1px solid rgba(0, 0, 0, 0.3);
+    transition: background-color 0.3s;
+    height: 20px;
+
+}
+
+.instance-selector .instance-selector-content .list-content {
+    height: calc(100% - 30px);
+    position: absolute;
+    top: 29px;
     overflow-y: auto;
     width: 100%;
     line-height: 0;
+}
+
+.instance-selector .instance-selector-content .list-content .no-instance {
+    text-align: center;
+    height: 100%;
+}
+
+.instance-selector .instance-selector-content .list-content .no-instance > div {
+    display: table;
+    width: 100%;
+    height: 100%;
+}
+
+.instance-selector .instance-selector-content .list-content .no-instance > div > div {
+    display: table-cell;
+    width: 100%;
+    height: 100%;
+    vertical-align: middle;
 }
 
 .instance-selector .instance-selector-content .list-content > div {
@@ -91,25 +173,25 @@
     font-size: 10px;
 }
 
-.instance-selector .host-list  div.host {
-    padding: 12px 8px;
+.instance-selector .host-list div.host {
+    padding: 17px 8px 16px;
     cursor: pointer;
     border-bottom: 1px solid rgba(0, 0, 0, 0.2);
 }
 
-.instance-selector .host-list  div.host .host-selected-count {
+.instance-selector .host-list div.host .host-selected-count {
     float: right;
 }
 
-.instance-selector .host-list  div.host:hover {
+.instance-selector .host-list div.host:hover {
     background-color: rgba(0, 0, 0, 0.1);
 }
 
-.instance-selector .host-list  div.host.active {
+.instance-selector .host-list div.host.active {
     background-color: rgba(0, 0, 0, 0.3);
 }
 
-.instance-selector .host-list  div.host.first {
+.instance-selector .host-list div.host.first {
     border-top: 1px solid rgba(0, 0, 0, 0.2);
 
 }
@@ -118,23 +200,42 @@
     font-size: 10px;
 }
 
-
-
 .instance-selector .instance-list div.instance {
-    padding: 12px 8px;
+    padding: 8px 8px 7px;
     cursor: pointer;
     border-bottom: 1px solid rgba(0, 0, 0, 0.2);
 }
 
-.instance-selector .instance-list  div.instance.first {
+.instance-selector .instance-list div.instance .instance-name {
+    font-size: 11px;
+}
+
+.instance-selector .instance-list div.instance .instance-other {
+    font-size: 8px;
+    padding-top: 4px;
+}
+
+.instance-selector .instance-list div.instance .instance-other > span {
+    background-color: rgba(0, 0, 0, 0.2);
+    display: inline-block;
+    padding: 2px 4px;
+    border-radius: 2px;
+}
+
+.instance-selector .instance-list div.instance .instance-other .instance-objtype {
+    margin-left: 5px;
+    text-transform: uppercase;
+}
+
+.instance-selector .instance-list div.instance.first {
     border-top: 1px solid rgba(0, 0, 0, 0.2);
 }
 
-.instance-selector .instance-list  div.instance:hover {
+.instance-selector .instance-list div.instance:hover {
     background-color: rgba(0, 0, 0, 0.1);
 }
 
-.instance-selector .instance-list  div.instance.selected {
+.instance-selector .instance-list div.instance.selected {
     background-color: rgba(0, 0, 0, 0.3);
 }
 

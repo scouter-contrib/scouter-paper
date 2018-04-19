@@ -13,6 +13,10 @@
     position: relative;
 }
 
+.instance-info .small {
+    display: none;
+}
+
 .instance-info.selected > div {
     background-color: #FFD700;
     color: black;
@@ -23,5 +27,13 @@
         padding: 4px 5px;
         font-size: 8px;
         border-radius: 3px;
+    }
+
+    .instance-info .big {
+        display: none;
+    }
+
+    .instance-info .small {
+        display: inline;
     }
 }

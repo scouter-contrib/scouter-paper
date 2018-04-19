@@ -37,9 +37,9 @@
 }
 
 .layout-manager > div.content-ilst {
-    height: calc(100% - 60px);
+    height: calc(100% - 70px);
     overflow-y: auto;
-    margin-top: 20px;
+    margin-top: 30px;
 }
 
 .layout-manager .title {
@@ -47,7 +47,7 @@
     position: absolute;
     top: 0;
     width: 100%;
-    height: 20px;
+    height: 30px;
 }
 
 .layout-manager .title > div {

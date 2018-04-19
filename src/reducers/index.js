@@ -22,6 +22,9 @@ const configState = {
         curve : "curveCatmullRom",
         break : "Y"
     },
+    alert : {
+        notification : "Y"
+    },
     range : {
         shortHistoryRange : 60,
         shortHistoryStep : 5,
