@@ -37,13 +37,13 @@ class XLog extends Component {
     lastEndTime = null;
     lastPastTimestamp = null;
     lastPageCnt = null;
+    lastClearTimestamp = null;
 
     constructor(props) {
         super(props);
 
         this.state = {
-            elapsed: common.getLocalSettingData(XLOG_ELAPSED, 2000),
-            xlog: []
+            elapsed: common.getLocalSettingData(XLOG_ELAPSED, 2000)
         }
     }
 
@@ -103,6 +103,11 @@ class XLog extends Component {
         }
 
         // 과거 데이터가 조회되거나, 실시간으로 변한 경우, 전체 지우고 다시 그리기
+        if (this.lastClearTimestamp !== this.props.data.clearTimestamp) {
+            this.lastClearTimestamp = this.props.data.clearTimestamp;
+            this.clear();
+        }
+
         if (this.lastPastTimestamp !== this.props.pastTimestamp) {
             this.lastPastTimestamp = this.props.pastTimestamp;
             this.clear();

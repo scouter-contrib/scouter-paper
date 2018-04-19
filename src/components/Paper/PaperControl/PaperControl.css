@@ -8,7 +8,7 @@
     height: 32px;
     box-sizing: border-box;
     position: relative;
-    z-index: 20;
+    z-index: 21;
 }
 
 .papers-controls.fixed-control {
@@ -47,10 +47,16 @@
 
 .papers-controls .paper-control.live {
     color: #AAA;
+    text-align: center;
+    background-color: transparent;
+    padding: 3px 0;
+}
+
+.papers-controls .paper-control.live:hover {
+    background-color: transparent;
 }
 
 .papers-controls .paper-control.live.realtime {
-    background-color: #FFCC11;
     color: #333;
 }
 
@@ -58,7 +64,31 @@
     font-size: 8px;
     position: relative;
     top: -2px;
+}
 
+.papers-controls .paper-control span.live {
+    width: 16px;
+    height: 16px;
+    border-radius: 50%;
+    display: inline-block;
+    color: white;
+    padding-top: 0px;
+    box-sizing: border-box;
+    border: 1px solid white;
+}
+
+.papers-controls .paper-control.live.realtime span.live {
+    background-color: #FFCC11;
+    border: 1px solid rgba(0,0,0,0.2);
+    color: #333;
+}
+
+.papers-controls .paper-control span.live:hover {
+    background-color: rgba(0,0,0,0.2);
+}
+
+.papers-controls .paper-control.live.realtime span.live:hover {
+    background-color: #FFC125;
 }
 
 .papers-controls .paper-control.multi-control {
@@ -116,10 +146,6 @@
 
 .papers-controls .multi-control:hover ul {
     display: inline-block;
-}
-
-.papers-controls .multi-metrics ul li {
-
 }
 
 .papers-controls .multi-metrics ul li .control-item {

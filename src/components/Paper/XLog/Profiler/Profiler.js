@@ -146,7 +146,7 @@ class Profiler extends Component {
         }
     }
 
-    componentDidUpdate(prevProps, prevState) {
+    /*componentDidUpdate(prevProps, prevState) {
         if (this.state.show !== prevState.show) {
             if (this.state.show) {
                 disableBodyScroll(document.querySelector("body"));
@@ -154,9 +154,7 @@ class Profiler extends Component {
                 enableBodyScroll(document.querySelector("body"));
             }
         }
-    }
-
-
+    }*/
 
     getList = (x1, x2, y1, y2) => {
         let that = this;
@@ -200,7 +198,6 @@ class Profiler extends Component {
         let that = this;
         let allXLogs = that.props.xlogs;
         let newXLogs = that.props.newXLogs;
-
 
         let filtered = [];
 

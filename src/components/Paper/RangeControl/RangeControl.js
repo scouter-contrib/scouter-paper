@@ -20,11 +20,11 @@ class RangeControl extends Component {
             date: now,
             hours: now.hours(),
             minutes : now.minutes(),
-            value: 10,
+            value: this.props.config.range.shortHistoryStep,
             realtime : true,
             longTerm : false,
-            range : 60,
-            step : 5
+            range : this.props.config.range.shortHistoryRange,
+            step : this.props.config.range.shortHistoryStep
         };
         this.handleChange = this.dateChange.bind(this);
     }
@@ -68,29 +68,38 @@ class RangeControl extends Component {
 
     changeTimeType = (type) => {
         this.setState({
-            realtime: type === "realtime"
+            realtime: type === "realtime",
+            longTerm : type === "realtime" ? false : this.state.longTerm,
+            value: this.state.value > this.props.config.range.shortHistoryRange ? this.props.config.range.shortHistoryRange : this.state.value,
+            range : this.props.config.range.shortHistoryRange,
+            step : this.props.config.range.shortHistoryStep
         });
 
-        this.props.changeRealtime(type === "realtime");
+        this.props.changeRealtime(type === "realtime", type === "realtime" ? false : this.state.longTerm);
     };
 
     changeLongTerm = () => {
+
+        if (this.state.realtime) {
+            return;
+        }
+
         if (this.state.longTerm) {
 
             this.setState({
                 longTerm: false,
-                range : 60,
-                step : 5,
-                value : this.state.value > 60 ? 60 : this.state.value
+                range : this.props.config.range.shortHistoryRange,
+                step : this.props.config.range.shortHistoryStep,
+                value : this.state.value > this.props.config.range.shortHistoryRange ? this.props.config.range.shortHistoryRange : this.state.value
             });
 
             this.props.changeLongTerm(false);
         } else {
             this.setState({
                 longTerm: true,
-                range : 2880,
-                step : 30,
-                value : this.state.value < 30 ? 30 : this.state.value
+                range : this.props.config.range.longHistoryRange * 60,
+                step : this.props.config.range.longHistoryStep,
+                value : this.state.value < this.props.config.range.longHistoryStep ? this.props.config.range.longHistoryStep : this.state.value
             });
 
             this.props.changeLongTerm(true);
@@ -99,6 +108,11 @@ class RangeControl extends Component {
 
 
     moveAndSearch = (type) => {
+
+        if (this.state.realtime) {
+            return;
+        }
+
         let value = this.state.value;
         let current = this.state.date.clone();
         current.seconds(0);
@@ -158,7 +172,7 @@ class RangeControl extends Component {
                 <div className="time-type">
                     <div onClick={this.changeTimeType.bind(this, "realtime")} className={"time-type-item real-time " + (this.state.realtime ? "selected" : "")}>REALTIME</div>
                     <div onClick={this.changeTimeType.bind(this, "search")} className={"time-type-item search-time " + (!this.state.realtime ? "selected" : "")}>SEARCH</div>
-                    <div onClick={this.changeLongTerm.bind(this)} className={"time-type-item longterm-time " + (this.state.longTerm ? "selected " : " ") + (this.state.realtime ? "disabled" : "")}>48H</div>
+                    <div onClick={this.changeLongTerm.bind(this)} className={"time-type-item longterm-time " + (this.state.longTerm ? "selected " : " ") + (this.state.realtime ? "disabled" : "")}>{this.props.config.range.longHistoryRange}H</div>
                 </div>
                 <div className="time-controller">
                     <div>
@@ -184,7 +198,7 @@ class RangeControl extends Component {
                         <div className="span-range-right-bg"></div>
                         <InputRange
                             maxValue={this.state.range}
-                            minValue={10}
+                            minValue={this.props.config.range.shortHistoryStep}
                             value={this.state.value}
                             step={this.state.step}
                             disabled={this.state.realtime}
@@ -205,7 +219,7 @@ class RangeControl extends Component {
                             onChange={value => this.setState({ value })} />
 
                     </div>
-                    <div>
+                    <div className="range-right-btn">
                         <button className={"search-btn " + (this.state.realtime ? "disabled" : "")} onClick={this.search}>SEARCH</button>
                     </div>
                 </div>
