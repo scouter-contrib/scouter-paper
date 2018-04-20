@@ -1,4 +1,5 @@
 // local storage access
+import moment from "moment";
 
 export function getData(key) {
     let ls = null;
@@ -137,4 +138,44 @@ export function mergeDeep(target, ...sources) {
     }
 
     return mergeDeep(target, ...sources);
+}
+
+export function getSearchDays(from, to) {
+    let aday = 1000 * 60 * 60 * 24;
+    let startDayTime = moment(from).hours(0).minutes(0).seconds(0).milliseconds(0).valueOf();
+    return Math.ceil(((to - 1000) - startDayTime) / aday);
+}
+
+export function getDivideDays(from, to) {
+    let days = getSearchDays(from, to);
+
+    let fromTos = [];
+    if (days > 0) {
+        for (let i = 0; i < days; i++) {
+            let splitFrom;
+            let splitTo;
+            if (i === 0) {
+                splitFrom = moment(from).add(i, 'days').valueOf();
+                splitTo = moment(from).add(i + 1, 'days').hours(0).minutes(0).seconds(0).milliseconds(0).valueOf();
+            } else if (i === (days - 1)) {
+                splitFrom = moment(from).add(i, 'days').hours(0).minutes(0).seconds(0).milliseconds(0).valueOf();
+                splitTo = moment(to);
+            } else {
+                splitFrom = moment(from).add(i, 'days').hours(0).minutes(0).seconds(0).milliseconds(0).valueOf();
+                splitTo = moment(from).add(i + 1, 'days').hours(0).minutes(0).seconds(0).milliseconds(0).valueOf();
+            }
+
+            fromTos.push({
+                from: splitFrom,
+                to: splitTo
+            })
+        }
+    } else {
+        fromTos.push({
+            from: from,
+            to: to
+        })
+    }
+
+    return fromTos;
 }

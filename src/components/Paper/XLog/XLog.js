@@ -78,6 +78,14 @@ class XLog extends Component {
             return true;
         }
 
+        if (this.props.longTerm !== nextProps.longTerm) {
+            return true;
+        }
+
+        if (this.props.xlogHistoryDoing !== nextProps.xlogHistoryDoing) {
+            return true;
+        }
+
         return false;
     }
 
@@ -455,6 +463,15 @@ class XLog extends Component {
     render() {
         return (
             <div className="xlog-viewer" ref="xlogViewer" onTouchStart={this.stopProgation} onMouseDown={this.stopProgation}>
+                {(this.props.longTerm) && <div className="no-longterm-support"><div><div>LONGTERM NOT SUPPORTED</div></div></div>}
+                {this.props.xlogHistoryDoing &&
+                <div className="xlog-history-stop-control">
+                    <div>
+                        <div>{this.props.xlogHistoryRequestCnt} REQUESTED</div>
+                        <div className="stop-btn" onClick={this.props.setStopXlogHistory}><i className="fa fa-pause-circle" aria-hidden="true"></i></div>
+                    </div>
+                </div>
+                }
                 <div className="axis-button axis-up noselect" onClick={this.axisUp} onMouseDown={this.stopProgation}>+</div>
                 <div className="axis-button axis-down noselect" onClick={this.axisDown} onMouseDown={this.stopProgation}>-</div>
                 {this.props.box.values.showPreview === "Y" &&
