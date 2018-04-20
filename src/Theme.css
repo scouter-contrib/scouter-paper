@@ -88,6 +88,11 @@ html.theme-gray {
     background-color: rgba(0, 0, 0, 0.8);
 }
 
+.theme-gray .login-wrapper input {
+    color: white;
+    background-color: #000;
+}
+
 /* THEME, BoxConfig.css */
 .theme-gray .box-config .box-config-item input[type=text],
 .theme-gray .box-config .box-config-item select {
@@ -125,6 +130,10 @@ html.theme-gray {
 }
 
 /* THEME, App.css*/
+html.theme-gray, .theme-gray body {
+    color: white;
+}
+
 .theme-gray button {
     background-color: #111;
     color: white;

@@ -39,7 +39,7 @@
 
 .login-wrapper input {
     background-color: transparent;
-    border: 1px solid #666;
+    border: 1px solid rgba(0,0,0,0.4);
     width: 100%;
     color: #333;
     outline: none;
