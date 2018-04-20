@@ -8,6 +8,7 @@ import 'react-datepicker/dist/react-datepicker.css';
 import InputRange from 'react-input-range';
 import 'react-input-range/lib/css/index.css';
 import './RangeControl.css';
+import ServerDate from "../../../common/ServerDate";
 
 class RangeControl extends Component {
 
@@ -24,17 +25,39 @@ class RangeControl extends Component {
             realtime : true,
             longTerm : false,
             range : this.props.config.range.shortHistoryRange,
-            step : this.props.config.range.shortHistoryStep
+            step : this.props.config.range.shortHistoryStep,
+            runMode : undefined
         };
         this.handleChange = this.dateChange.bind(this);
     }
 
     componentDidMount() {
         this.props.onRef(this);
+        let runMode = new URLSearchParams(this.props.location.search).get('run-mode');
+        if (runMode && runMode === "link") {
+            this.setState({
+                runMode: "link"
+            });
+            this.changeTimeType("search");
+        }
     }
 
     componentWillUnmount() {
         this.props.onRef(undefined);
+    }
+
+    componentWillReceiveProps(nextProps) {
+        if (this.state.runMode === "link" && JSON.stringify(this.props.instances) !== JSON.stringify(nextProps.instances)) {
+            let from = new URLSearchParams(this.props.location.search).get('from');
+            let to = new URLSearchParams(this.props.location.search).get('to');
+            if (from && to) {
+                this.props.toggleRangeControl();
+                this.manualSearch(moment(from, 'x'), moment(to, 'x'));
+                this.setState({
+                    runMode: "normal"
+                });
+            }
+        }
     }
 
     shouldComponentUpdate(nextProps, nextState) {
@@ -152,6 +175,28 @@ class RangeControl extends Component {
         }
     };
 
+    manualSearch = (from, to) => {
+        this.changeTimeType("search");
+
+        let value = this.state.value;
+        let current = this.state.date.clone();
+        current.seconds(0);
+        current.minutes(this.state.minutes);
+        current.hours(this.state.hours);
+        current.subtract(value, "minutes");
+
+        this.setState({
+            date: current,
+            hours: current.hours(),
+            minutes : current.minutes()
+        });
+
+        let startDate = current.clone();
+        let endDate = startDate.clone();
+        endDate.add(value, "minutes");
+
+        this.search(startDate, endDate);
+    };
 
     moveAndSearch = (type) => {
 
@@ -282,6 +327,8 @@ class RangeControl extends Component {
 
 let mapStateToProps = (state) => {
     return {
+        hosts: state.target.hosts,
+        instances: state.target.instances,
         config: state.config
     };
 };
