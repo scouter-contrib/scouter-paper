@@ -4,14 +4,15 @@ import {withRouter} from 'react-router-dom';
 import logo from '../../img/scouter.png';
 import jQuery from "jquery";
 const git = "https://github.com/mindplates/scouter-paper";
-const version = "1.3";
+const version = "1.4.190";
 
 class Home extends Component {
 
     constructor(props) {
         super(props);
         this.state = {
-            release : false
+            release : false,
+            showNote : false
         };
     }
 
@@ -20,11 +21,43 @@ class Home extends Component {
         var url = 'https://api.github.com/repos/mindplates/scouter-paper/releases/latest';
         jQuery.get(url).done(function (data) {
             if (data.tag_name > version) {
+
+                let lines = data.body.split("\n");
+                let text = {
+                    title : lines[0],
+                    category : []
+                };
+
+                let current;
+                for (let i=1; i<lines.length; i++) {
+                    let line = lines[i];
+                    if (!line || line.trim() === "") {
+                        continue;
+                    }
+
+                    if (line[0] === "<") {
+                        text.category.push({
+                            title : line.substring(1, line.length - 2),
+                            lines : []
+                        });
+                        current = text.category[text.category.length - 1];
+                        continue;
+                    } else {
+                        if (line[0] === "-") {
+                            current.lines.push(line.substring(1, line.length - 1));
+                        } else {
+                            current.lines.push(line);
+                        }
+
+                    }
+                }
+
                 that.setState({
                     release : true,
                     version : data.name,
                     url : data.html_url,
-                    text : data.body
+                    _text : data.body,
+                    text :text
                 });
             }
         });
@@ -37,8 +70,33 @@ class Home extends Component {
                     <div>
                         {this.state.release &&
                         <div className="release">
-                            <div>NOW NEW RELEASE AVAILABLE</div>
-                            <div>{this.state.version}</div>
+                            <div className="msg">NEW VERSION({this.state.version}) RELEASED</div>
+                            <div className="btns"><a href={this.state.url}><span>DOWNLOAD</span></a><span onClick={() => {this.setState({showNote:true})}}>RELEASE NOTE</span></div>
+                        </div>
+                        }
+                        {(this.state.release && this.state.showNote) &&
+                        <div className="note">
+                            <div>
+                                <div className="note-content">
+                                    <div className="release-title">
+                                        <div className="release-version">{this.state.version} RELEASE NOTES</div>
+                                        <h2>{this.state.text.title}</h2>
+                                        <div className="close-btn" onClick={() => {this.setState({showNote:false})}}></div>
+                                    </div>
+                                    <div className="release-note scrollbar">
+                                        {this.state.text.category.map((d) => {
+                                            return (
+                                                <div className="category">
+                                                    <div className="category-title">{d.title}</div>
+                                                    <div className="category-content">{d.lines.map((line) => {
+                                                        return <div>{line}</div>
+                                                    })}</div>
+                                                </div>
+                                            )
+                                        })}
+                                    </div>
+                                </div>
+                            </div>
                         </div>
                         }
                         <div className="home-content">

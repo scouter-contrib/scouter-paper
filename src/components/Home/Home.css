@@ -102,4 +102,208 @@
     width: 60px;
 }
 
+.home .release {
+    margin: 0 auto 20px;
+}
 
+.home .release > div {
+    padding: 10px;
+}
+
+.home .release .btns span {
+    display: inline-block;
+    margin: 0 2px;
+    padding: 6px 4px;
+    border-radius: 3px;
+    background-color: rgba(0, 0, 0, 0.2);
+    color: white;
+    width: 100px;
+    cursor: pointer;
+}
+
+.home .release .btns span a {
+    color: white;
+    text-decoration: none;
+}
+
+.home .note {
+    position: fixed;
+    top: 0;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    background-color: rgba(0, 0, 0, 0.4);
+    z-index: 51;
+    text-align: left;
+    display: table;
+    width: 100%;
+    height: 100%;
+}
+
+.home .note > div {
+    display: table-cell;
+    width: 100%;
+    height: 100%;
+    vertical-align: middle;
+}
+
+.home .note .note-content {
+    background-color: white;
+    width: 800px;
+    margin: 0 auto;
+    color: #333;
+    box-shadow: 0 0 30px rgba(0, 0, 0, 0.3);
+    border-radius: 3px;
+}
+
+@media screen and (max-width: 1000px) {
+    .home .note .note-content {
+        width: calc(100% - 80px);
+        margin: 0 40px;
+    }
+}
+
+.home .note .note-content .release-title {
+    background-color: #0A9AD7;
+    color: white;
+    text-align: center;
+    position: relative;
+    border-radius: 3px 3px 0 0;
+}
+
+.home .note .note-content .release-title .release-version {
+    padding-top: 10px;
+}
+
+.home .note .note-content h2 {
+    padding: 15px 0 20px;
+    margin: 0;
+    font-size: 14px;
+    text-align: center;
+}
+
+.home .note .release-note {
+    margin: 0 auto;
+    max-height: 420px;
+    overflow-y: auto;
+    box-sizing: border-box;
+    background-color: #18325c;
+    color: white;
+    border-radius: 0 0 3px 3px;
+    font-size: 12px;
+}
+
+.home .note .release-note .category {
+    display: table;
+    width: 100%;
+    table-layout: fixed;
+}
+
+.home .note .release-note .category > div {
+    display: table-cell;
+}
+
+.home .note .release-note .category > div.category-title {
+    width: 100px;
+    text-align: center;
+    box-sizing: border-box;
+}
+
+.home .note .release-note .category > div.category-content {
+    padding-top: 20px;
+}
+
+@media screen and (max-width: 800px) {
+    .home .note .note-content {
+        width: calc(100% - 40px);
+        margin: 0 20px;
+    }
+
+    .home .note .release-note {
+        font-size: 11px;
+    }
+
+    .home .note .release-note .category {
+        display: block;
+        width: 100%;
+    }
+
+    .home .note .release-note .category > div {
+        display: block;
+    }
+
+    .home .note .release-note .category > div.category-title {
+        width: 100%;
+        text-align: left;
+        padding: 10px;
+    }
+
+    .home .note .release-note .category > div.category-content {
+        padding-top: 0;
+        padding-left: 20px;
+    }
+}
+
+@media screen and (max-width: 600px) {
+
+    .home .note .note-content {
+        width: calc(100% - 20px);
+        margin: 0 10px;
+    }
+
+    .home .note .note-content h2 {
+        padding: 15px 20px 20px;
+        font-size: 12px;
+    }
+
+    .home .note .release-note {
+        font-size: 10px;
+    }
+}
+
+.home .note .release-note .category:last-child > div.category-content {
+    padding-bottom: 20px;
+}
+
+.home .note .release-note .category > div.category-content > div {
+    list-style: disc inside;
+    display: list-item;
+    line-height: 160%;
+}
+
+.home .note .close-btn {
+    display: inline-block;
+    width: 12px;
+    height: 12px;
+    cursor: pointer;
+    box-sizing: border-box;
+    position: absolute;
+    top: 8px;
+    right: 5px;
+}
+
+.home .note .close-btn:before,
+.home .note .close-btn:after {
+    content: '';
+    position: absolute;
+    height: 1px;
+    width: 90%;
+    top: 50%;
+    left: 0;
+    margin-top: -1px;
+    background: white;
+    box-sizing: border-box;
+}
+
+.home .note .close-btn:hover:before,
+.home .note .close-btn:hover:after {
+    background: #FFE600;
+}
+
+.home .note .close-btn:before {
+    transform: rotate(45deg);
+}
+
+.home .note .close-btn:after {
+    transform: rotate(-45deg);
+}
