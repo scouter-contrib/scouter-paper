@@ -13,6 +13,8 @@ const configState = {
     authentification : {
         type : "bearer"
     },
+    theme : "theme-blue/white",
+    colorType : "white",
     graph : {
         color : "instance",
         width : 2,

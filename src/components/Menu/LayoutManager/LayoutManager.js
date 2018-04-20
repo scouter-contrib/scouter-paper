@@ -172,7 +172,7 @@ class LayoutManager extends Component {
 
         return (
             <div className={"layout-manager-bg " + (this.props.visible ? "" : "hidden")}>
-                <div className="layout-manager">
+                <div className="layout-manager popup-div">
                     <div className="title">
                         <div>LAYOUTS</div>
                     </div>

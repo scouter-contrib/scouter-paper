@@ -10,7 +10,7 @@ class AlertList extends Component {
     render() {
 
         return (
-            <div className={"alert-list " + (this.props.show ? '' : 'hidden')}>
+            <div className={"popup-div alert-list " + (this.props.show ? '' : 'hidden')}>
                 <div className="top-control">
                     <div className="alerts">ALERTS</div>
                     <button onClick={this.props.clearAllAlert}>CLEAR ALL</button>

@@ -30,7 +30,8 @@ class XLog extends Component {
         originY: null,
         preview: {
             width: 100
-        }
+        },
+        opacity : 0.3
     };
 
     lastStartTime = null;
@@ -78,10 +79,23 @@ class XLog extends Component {
             return true;
         }
 
+        if (this.props.longTerm !== nextProps.longTerm) {
+            return true;
+        }
+
+        if (this.props.xlogHistoryDoing !== nextProps.xlogHistoryDoing) {
+            return true;
+        }
+
         return false;
     }
 
     componentDidMount() {
+        if (this.props.config.colorType === "white") {
+            this.graph.opacity = 0.3;
+        } else {
+            this.graph.opacity = 0.6;
+        }
         this.graph.timeFormat = this.props.config.minuteFormat;
         this.graphInit();
     }
@@ -296,10 +310,10 @@ class XLog extends Component {
         }).ticks(yAxisCount));
 
         // X축 단위 그리드 그리기
-        svg.append("g").attr("class", "grid-x").style("stroke-dasharray", "5 5").style("opacity", "0.3").attr("transform", "translate(0," + this.graph.height + ")").call(d3.axisBottom(this.graph.x).tickSize(-this.graph.height).tickFormat("").ticks(xAxisCount));
+        svg.append("g").attr("class", "grid-x").style("stroke-dasharray", "5 5").style("opacity", this.graph.opacity).attr("transform", "translate(0," + this.graph.height + ")").call(d3.axisBottom(this.graph.x).tickSize(-this.graph.height).tickFormat("").ticks(xAxisCount));
 
         // Y축 단위 그리드 그리기
-        svg.append("g").attr("class", "grid-y").style("stroke-dasharray", "5 5").style("opacity", "0.3").call(d3.axisLeft(this.graph.y).tickSize(-this.graph.width).tickFormat("").ticks(yAxisCount));
+        svg.append("g").attr("class", "grid-y").style("stroke-dasharray", "5 5").style("opacity", this.graph.opacity).call(d3.axisLeft(this.graph.y).tickSize(-this.graph.width).tickFormat("").ticks(yAxisCount));
 
         // 캔버스 그리기
         let canvasDiv = d3.select(this.refs.xlogViewer).select(".canvas-div");
@@ -455,6 +469,15 @@ class XLog extends Component {
     render() {
         return (
             <div className="xlog-viewer" ref="xlogViewer" onTouchStart={this.stopProgation} onMouseDown={this.stopProgation}>
+                {(this.props.longTerm) && <div className="no-longterm-support"><div><div>LONGTERM NOT SUPPORTED</div></div></div>}
+                {this.props.xlogHistoryDoing &&
+                <div className="xlog-history-stop-control">
+                    <div>
+                        <div>{this.props.xlogHistoryRequestCnt} REQUESTED</div>
+                        <div className="stop-btn" onClick={this.props.setStopXlogHistory}><i className="fa fa-stop-circle" aria-hidden="true"></i></div>
+                    </div>
+                </div>
+                }
                 <div className="axis-button axis-up noselect" onClick={this.axisUp} onMouseDown={this.stopProgation}>+</div>
                 <div className="axis-button axis-down noselect" onClick={this.axisDown} onMouseDown={this.stopProgation}>-</div>
                 {this.props.box.values.showPreview === "Y" &&

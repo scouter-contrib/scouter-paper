@@ -30,12 +30,6 @@ class Settings extends Component {
         };
     }
 
-    componentDidUpdate(prevProps, prevState) {
-
-
-    }
-
-
     onChange = (attr, event) => {
         let config = this.state.config;
         config[attr] = event.target.value;
@@ -76,6 +70,21 @@ class Settings extends Component {
 
         let config = this.state.config;
         config.graph[attr] = event.target.value;
+
+        this.setState({
+            config: config
+        });
+    };
+
+    onChangeTheme = (event) => {
+        let config = this.state.config;
+        config.theme = event.target.value;
+
+        if (config.theme === "theme-blue/white") {
+            config.colorType = "white";
+        } else {
+            config.colorType = "black";
+        }
 
         this.setState({
             config: config
@@ -544,6 +553,22 @@ class Settings extends Component {
                                     <select value={this.state.config.graph.break} onChange={this.onChangeGraph.bind(this, "break")} disabled={!this.state.edit}>
                                         <option value="Y">Y</option>
                                         <option value="N">N</option>
+                                    </select>
+                                </div>
+                            </div>
+                        </div>
+                        <div className="category first">
+                            <div>THEME</div>
+                        </div>
+                        <div className="setting-box">
+                            <div className="row">
+                                <div className="label">
+                                    <div>COLOR THEME</div>
+                                </div>
+                                <div className="input">
+                                    <select value={this.state.config.theme} onChange={this.onChangeTheme.bind(this)} disabled={!this.state.edit}>
+                                        <option value="theme-blue/white">BLUE/WHITE</option>
+                                        <option value="theme-gray">GRAY</option>
                                     </select>
                                 </div>
                             </div>

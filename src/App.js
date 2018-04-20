@@ -1,5 +1,6 @@
 import React, {Component} from 'react';
 import './App.css';
+import './Theme.css';
 import {
     Settings,
     Paper,
@@ -113,6 +114,10 @@ class App extends Component {
         if (JSON.stringify(this.props.config.fontSetting) !== JSON.stringify(nextProps.config.fontSetting)) {
             this.setFontSetting(nextProps.config.fontSetting);
         }
+
+        if (this.props.config.theme !== nextProps.config.theme) {
+            document.querySelector("html").setAttribute("class", nextProps.config.theme);
+        }
     };
 
     componentWillMount() {
@@ -147,6 +152,7 @@ class App extends Component {
     }
 
     componentDidMount() {
+        document.querySelector("html").setAttribute("class", this.props.config.theme);
         this.setFontSetting(this.props.config.fontSetting);
     }
 
@@ -156,7 +162,7 @@ class App extends Component {
 
     render() {
         return (
-            <div>
+            <div className="black">
                 {support &&
                 <ContentWrapper>
                     <RequestBar/>

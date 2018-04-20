@@ -7,7 +7,7 @@ import {addRequest, pushMessage, setControlVisibility} from "../../actions";
 import {Responsive, WidthProvider} from "react-grid-layout";
 import {Box, BoxConfig, PaperControl} from "../../components";
 import jQuery from "jquery";
-import {errorHandler, getData, getHttpProtocol, getWithCredentials, setAuthHeader, setData} from "../../common/common";
+import {errorHandler, getData, getHttpProtocol, getWithCredentials, setAuthHeader, setData, getSearchDays, getDivideDays} from "../../common/common";
 import Profiler from "./XLog/Profiler/Profiler";
 import ServerDate from "../../common/ServerDate";
 import RangeControl from "./RangeControl/RangeControl";
@@ -75,6 +75,8 @@ class Paper extends Component {
                 lastRequestTime: null,
                 clearTimestamp: null
             },
+            xlogHistoryDoing : false,
+            xlogHistoryRequestCnt : 0,
 
             pastTimestamp: null,
 
@@ -135,7 +137,7 @@ class Paper extends Component {
                 this.getCounterHistory(nextProps.instances, nextProps.hosts, now - ten, now, false);
                 this.getLatestData(true, nextProps.instances, nextProps.hosts);
             } else {
-                this.getXLogHistory(this.lastFrom, this.lastTo, nextProps.instances);
+                this.getXLogHistory(this.lastFrom, this.lastTo, nextProps.instances, this.state.longTerm);
             }
         }
     }
@@ -466,45 +468,6 @@ class Paper extends Component {
         }
     };
 
-    getSearchDays(from, to) {
-        let aday = 1000 * 60 * 60 * 24;
-        let startDayTime = moment(from).hours(0).minutes(0).seconds(0).milliseconds(0).valueOf();
-        return Math.ceil(((to - 1000) - startDayTime) / aday);
-    }
-
-    getDivideDays(from, to) {
-        let days = this.getSearchDays(from, to);
-
-        let fromTos = [];
-        if (days > 0) {
-            for (let i = 0; i < days; i++) {
-                let splitFrom;
-                let splitTo;
-                if (i === 0) {
-                    splitFrom = moment(from).add(i, 'days').valueOf();
-                    splitTo = moment(from).add(i + 1, 'days').hours(0).minutes(0).seconds(0).milliseconds(0).valueOf();
-                } else if (i === (days - 1)) {
-                    splitFrom = moment(from).add(i, 'days').hours(0).minutes(0).seconds(0).milliseconds(0).valueOf();
-                    splitTo = moment(to);
-                } else {
-                    splitFrom = moment(from).add(i, 'days').hours(0).minutes(0).seconds(0).milliseconds(0).valueOf();
-                    splitTo = moment(from).add(i + 1, 'days').hours(0).minutes(0).seconds(0).milliseconds(0).valueOf();
-                }
-
-                fromTos.push({
-                    from: splitFrom,
-                    to: splitTo
-                })
-            }
-        } else {
-            fromTos.push({
-                from: from,
-                to: to
-            })
-        }
-
-        return fromTos;
-    }
 
     getCounterHistory = (instances, hosts, from, to, longTerm) => {
 
@@ -550,14 +513,15 @@ class Paper extends Component {
                 let url;
                 if (longTerm) {
 
-                    let days = this.getSearchDays(from, to);
-                    let fromTos = this.getDivideDays(from, to);
+                    let days = getSearchDays(from, to);
+                    let fromTos = getDivideDays(from, to);
 
                     if (days > 1) {
                         for (let i = 0; i < fromTos.length; i++) {
                             url = getHttpProtocol(this.props.config) + '/scouter/v1/counter/stat/' + counterKey + '?objHashes=' + JSON.stringify(instancesAndHosts.map((obj) => {
                                     return Number(obj.objHash);
-                                })) + "&startYmd=" + moment(fromTos[i].from).format("YYYYMMDD") + "&endYmd=" + moment(fromTos[i].to).format("YYYYMMDD");
+                                })) + "&startYmd=" + moment(fromTos[i].from).format("YYYYMMDD") + "&endYmd=" + moment(fromTos[i].from).format("YYYYMMDD");
+
                             this.getCounterHistoryData(url, counterKey, from, to, (new Date()).getTime(), true);
                         }
                     } else {
@@ -631,7 +595,7 @@ class Paper extends Component {
         });
 
         this.getCounterHistory(this.props.instances, this.props.hosts, from, to, this.state.longTerm);
-        this.getXLogHistory(from, to, this.props.instances);
+        this.getXLogHistory(from, to, this.props.instances, this.state.longTerm);
     };
 
     scroll = () => {
@@ -782,9 +746,18 @@ class Paper extends Component {
         }
     };
 
-    getXLogHistory = (from, to, instances) => {
-        if (instances && instances.length > 0) {
+    setStopXlogHistory = () => {
+        this.xlogHistoryRequestTime = null;
+        this.setState({
+            xlogHistoryDoing : false,
+            xlogHistoryRequestCnt : 0
+        });
 
+    };
+
+    getXLogHistory = (from, to, instances, longTerm) => {
+
+        if (longTerm) {
             let data = this.state.data;
             let now = (new ServerDate()).getTime();
             data.lastRequestTime = now;
@@ -798,10 +771,29 @@ class Paper extends Component {
                 data: data,
                 pastTimestamp: now
             });
+            return;
+        }
 
+        if (instances && instances.length > 0) {
 
-            let days = this.getSearchDays(from, to);
-            let fromTos = this.getDivideDays(from, to);
+            let data = this.state.data;
+            let now = (new ServerDate()).getTime();
+            data.lastRequestTime = now;
+            data.tempXlogs = [];
+            data.newXLogs = [];
+            data.xlogs = [];
+            data.startTime = from;
+            data.endTime = to;
+
+            this.setState({
+                data: data,
+                pastTimestamp: now,
+                xlogHistoryDoing : true,
+                xlogHistoryRequestCnt : 0
+            });
+
+            let days = getSearchDays(from, to);
+            let fromTos = getDivideDays(from, to);
 
             this.xlogHistoryTemp = [];
             this.xlogHistorytotalDays = days;
@@ -853,6 +845,16 @@ class Paper extends Component {
                 if (!msg) {
                     return;
                 }
+
+                if (this.xlogHistoryRequestTime !== requestTime) {
+                    let data = this.state.data;
+                    data.xlogs = Array.prototype.concat.apply([], that.xlogHistoryTemp);
+                    this.setState({
+                        data: data
+                    });
+                    return;
+                }
+
                 let result = (JSON.parse(msg)).result;
 
                 let hasMore = result.hasMore;
@@ -869,7 +871,8 @@ class Paper extends Component {
 
                 this.setState({
                     data: data,
-                    pageCnt: (new Date()).getTime()
+                    pageCnt: (new Date()).getTime(),
+                    xlogHistoryRequestCnt : this.state.xlogHistoryRequestCnt + 1
                 });
 
                 if (hasMore) {
@@ -881,7 +884,9 @@ class Paper extends Component {
                         data.xlogs = Array.prototype.concat.apply([], that.xlogHistoryTemp);
                         this.setState({
                             data: data,
-                            pageCnt: (new Date()).getTime()
+                            pageCnt: (new Date()).getTime(),
+                            xlogHistoryDoing : false,
+                            xlogHistoryRequestCnt : 0
                         });
                     }
                 }
@@ -1373,7 +1378,7 @@ class Paper extends Component {
                                 {box.option && (box.option.length > 1 || box.option.config ) &&
                                 <button className="box-control box-layout-config-btn" onClick={this.toggleConfig.bind(null, box.key)}><i className="fa fa-cog" aria-hidden="true"></i></button>}
                                 {box.config && <BoxConfig box={box} setOptionValues={this.setOptionValues} setOptionClose={this.setOptionClose} removeMetrics={this.removeMetrics}/>}
-                                <Box visible={this.state.visible} setOption={this.setOption} box={box} pastTimestamp={this.state.pastTimestamp} pageCnt={this.state.pageCnt} data={this.state.data} config={this.props.config} visitor={this.state.visitor} counters={this.state.counters} countersHistory={this.state.countersHistory.data} countersHistoryFrom={this.state.countersHistory.from} countersHistoryTo={this.state.countersHistory.to} countersHistoryTimestamp={this.state.countersHistory.time} longTerm={this.state.longTerm} layoutChangeTime={this.state.layoutChangeTime} realtime={this.state.realtime}/>
+                                <Box visible={this.state.visible} setOption={this.setOption} box={box} pastTimestamp={this.state.pastTimestamp} pageCnt={this.state.pageCnt} data={this.state.data} config={this.props.config} visitor={this.state.visitor} counters={this.state.counters} countersHistory={this.state.countersHistory.data} countersHistoryFrom={this.state.countersHistory.from} countersHistoryTo={this.state.countersHistory.to} countersHistoryTimestamp={this.state.countersHistory.time} longTerm={this.state.longTerm} layoutChangeTime={this.state.layoutChangeTime} realtime={this.state.realtime} xlogHistoryDoing={this.state.xlogHistoryDoing} xlogHistoryRequestCnt={this.state.xlogHistoryRequestCnt} setStopXlogHistory={this.setStopXlogHistory} />
                             </div>
                         )
                     })}

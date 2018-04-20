@@ -24,11 +24,11 @@
     background-color: white;
     display: inline-block;
     width: 380px;
-    border: 1px solid #666;
+    border: 1px solid rgba(0, 0, 0, 0.4);
     padding: 20px 40px;
     box-sizing: border-box;
     border-radius: 2px;
-    box-shadow: 0 0 5px #333;
+    box-shadow: 0 0 5px rgba(0, 0, 0, 0.4);
 }
 
 @media screen and (max-width: 400px) {
@@ -37,10 +37,9 @@
     }
 }
 
-
 .login-wrapper input {
     background-color: transparent;
-    border: 1px solid #666;
+    border: 1px solid rgba(0,0,0,0.4);
     width: 100%;
     color: #333;
     outline: none;
@@ -120,4 +119,3 @@
 .login-wrapper .when {
     margin-bottom: 10px;
 }
-
