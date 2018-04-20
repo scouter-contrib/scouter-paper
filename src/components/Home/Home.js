@@ -1,7 +1,8 @@
 import React, {Component} from 'react';
 import './Home.css';
-import {withRouter} from 'react-router-dom';
 import logo from '../../img/scouter.png';
+import logoBlack from '../../img/scouter_black.png';
+import {connect} from 'react-redux';
 import jQuery from "jquery";
 const git = "https://github.com/mindplates/scouter-paper";
 const version = "1.4.190";
@@ -101,7 +102,7 @@ class Home extends Component {
                         }
                         <div className="home-content">
                             <div className="top-div">
-                                <div className="logo-div"><img alt="scouter-logo" className="logo" src={logo}/></div>
+                                <div className="logo-div"><img alt="scouter-logo" className="logo" src={this.props.config.theme === "theme-gray" ? logoBlack : logo}/></div>
                                 <div className="product">SCOUTER PAPER</div>
                                 <div className="version">V-{version}</div>
                                 <div className="power-by">powered by <a href="https://github.com/scouter-project/scouter" target="scouter_paper">scouter</a></div>
@@ -116,4 +117,12 @@ class Home extends Component {
     }
 }
 
-export default withRouter(Home);
+
+let mapStateToProps = (state) => {
+    return {
+        config: state.config
+    };
+};
+
+Home = connect(mapStateToProps, undefined)(Home);
+export default Home;

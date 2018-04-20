@@ -1,0 +1,191 @@
+/* THEME, index.css */
+html.theme-gray {
+    background: #222;
+}
+
+.theme-gray body {
+    background: #222;
+}
+
+.theme-gray .popup-div {
+    background: #171717;
+}
+
+/* THEME, PaperControl.css*/
+.theme-gray .papers-controls {
+    background-color: rgba(0, 0, 0, 0.4);
+}
+
+.theme-gray .papers-controls .multi-metrics ul {
+    background-color: #161616;
+}
+
+/* THEME, XLog.css */
+.theme-gray .xlog-viewer .xlog-history-stop-control > div {
+    background-color: #111;
+}
+
+/* THEME, Home.css */
+.theme-gray .home .home-content {
+    background-color: #111;
+    color: white;
+}
+
+.theme-gray .home a {
+    color: white;
+}
+
+.theme-gray .home .home-content .top-div .compatibility {
+    font-size: 8px;
+    color: #FFE600;
+}
+
+.theme-gray .home .home-content .top-div .product {
+    background-color: black;
+}
+
+/* THEME, Tooltip.css */
+.theme-gray .tooltip {
+    background-color: #060606;
+    border: 1px solid black;
+    color: white;
+}
+
+/* THEME, LineChart.css */
+.theme-gray .grid-x path,
+.theme-gray .grid-x line,
+.theme-gray .axis-x line,
+.theme-gray .grid-y path,
+.theme-gray .grid-y line,
+.theme-gray .axis-y line {
+    stroke: white;
+}
+
+.theme-gray .axis-x text,
+.theme-gray .axis-y text{
+    fill: white;
+}
+
+.theme-gray .hover-line {
+    stroke: #deffba;
+}
+
+
+/* THEME, Login.css */
+.theme-gray .login-wrapper .login-box {
+    background-color: #111;
+}
+
+.theme-gray .login-wrapper .product {
+    background-color: black;
+}
+
+.theme-gray .login-wrapper button {
+    background-color: rgba(0, 0, 0, 0.6);
+}
+
+.theme-gray .login-wrapper button:hover {
+    background-color: rgba(0, 0, 0, 0.8);
+}
+
+/* THEME, BoxConfig.css */
+.theme-gray .box-config .box-config-item input[type=text],
+.theme-gray .box-config .box-config-item select {
+    background-color: #000;
+    color: white;
+}
+
+/* THEME, XLog.css */
+.theme-gray .xlog-viewer .axis-x path,
+.theme-gray .xlog-viewer .axis-x line,
+.theme-gray .xlog-viewer .axis-y path,
+.theme-gray .xlog-viewer .axis-y line,
+.theme-gray .xlog-viewer .grid-x path,
+.theme-gray .xlog-viewer .grid-x line,
+.theme-gray .xlog-viewer .grid-y path,
+.theme-gray .xlog-viewer .grid-y line {
+    stroke: white;
+}
+
+.theme-gray .xlog-viewer .axis-x text,
+.theme-gray .xlog-viewer .axis-y text {
+    fill: white;
+}
+
+.theme-gray .line-chart-wrapper .axis-x path,
+.theme-gray .line-chart-wrapper .axis-x line,
+.theme-gray .line-chart-wrapper .axis-y path,
+.theme-gray .line-chart-wrapper .axis-y line,
+.theme-gray .line-chart-wrapper .grid-x path,
+.theme-gray .line-chart-wrapper .grid-x line,
+.theme-gray .line-chart-wrapper .grid-y path,
+.theme-gray .line-chart-wrapper .grid-y line {
+    stroke: white;
+    stroke-width: 1px;
+}
+
+/* THEME, App.css*/
+.theme-gray button {
+    background-color: #111;
+    color: white;
+}
+
+.theme-gray button:hover {
+    background-color: #0A0A0A;
+}
+
+/* THEME, Menu.css */
+.theme-gray .menu-div {
+    background-color: #111;
+}
+
+/* THEME, Paper.css */
+.theme-gray .papers .select-instance div.select-instance-message {
+    background-color: black;
+    color: white;
+}
+
+/* THEME, Resizable.css */
+.theme-gray .react-grid-item {
+    background-color: #0A0A0A;
+    color: white;
+}
+
+/* THEME, Settings.css */
+.theme-gray .settings .setting-box {
+    background-color: #111;
+    color: white;
+    box-shadow: 0 0 5px black;
+    box-shadow: none;
+}
+
+.theme-gray .settings .forms .setting-box select[disabled] {
+    background-color: rgba(0, 0, 0, 0.1);
+    border: 1px solid transparent;
+    color: #CCC;
+}
+
+.theme-gray .settings .xlog-dot-config {
+    background-color: rgba(0,0,0,0.1);
+}
+
+.theme-gray .settings .forms input {
+    color: white;
+    background-color: black;
+}
+
+.theme-gray .settings .forms input[readonly] {
+    background-color: rgba(0,0,0,0.1);
+}
+
+.theme-gray .settings .forms .setting-box select {
+    color: white;
+    background-color: black;
+}
+.theme-gray .settings.editable .xlog-dot-config {
+    background-color: black;
+}
+
+.theme-gray .xlog-config-controller > div > div {
+    background-color: black;
+}

@@ -1,3 +1,5 @@
+@import url('https://fonts.googleapis.com/css?family=Bungee|Righteous|Mina|Nanum+Gothic|Noto+Sans|Nanum+Gothic+Coding|Cousine|Space+Mono|Handlee|Kavivanar');
+
 html, body {
     height: 100%;
     padding: 0;
@@ -7,6 +9,14 @@ html, body {
     transition: background-color 2s;
     color: #333;
     line-height: 100%;
+    background: #207ce5;
+}
+
+body {
+    margin: 0;
+    padding: 0;
+    background: #207ce5;
+    _filter: progid:DXImageTransform.Microsoft.gradient(startColorstr='#207ce5', endColorstr='#499bea', GradientType=0);
 }
 
 .hidden {
@@ -48,4 +58,59 @@ input,
 select,
 button {
     font-family: 'Righteous', sans-serif;
+}
+
+.btn {
+    padding: 5px 10px 7px;
+    margin-left: 5px;
+    font-size: 12px;
+    border-radius: 2px;
+    display: inline-block;
+    outline: none;
+    cursor: pointer;
+    background-color: white;
+    border: 1px solid #BBB;
+}
+
+.btn:hover {
+    font-weight: bold;
+}
+
+.noselect {
+    -webkit-touch-callout: none; /* iOS Safari */
+    -webkit-user-select: none; /* Safari */
+    -moz-user-select: none; /* Firefox */
+    -ms-user-select: none; /* Internet Explorer/Edge */
+    user-select: none; /* Non-prefixed version, currently supported by Chrome and Opera */
+}
+
+.scrollbar::-webkit-scrollbar {
+    width: 7px;
+    height: 7px;
+}
+
+.scrollbar::-webkit-scrollbar-thumb {
+    background-color: #333;
+}
+
+body::-webkit-scrollbar {
+    width: 7px;
+    height: 7px;
+}
+
+body::-webkit-scrollbar-thumb {
+    background-color: rgba(0, 0, 0, 0.4);
+    background-color: #FCDC3B;
+}
+
+.noselect {
+    -webkit-touch-callout: none; /* iOS Safari */
+    -webkit-user-select: none; /* Safari */
+    -moz-user-select: none; /* Firefox */
+    -ms-user-select: none; /* Internet Explorer/Edge */
+    user-select: none;
+}
+
+.popup-div {
+    background-color: #207ce5;
 }

@@ -92,7 +92,7 @@ class BoxConfig extends Component {
 
     render() {
         return (
-            <div className={"box-config " + (this.state.singleRow ? "single-row" : "")} onMouseDown={(e) => {e.stopPropagation();}} onMouseUp={(e) => {e.stopPropagation();}} ref="boxConfig">
+            <div className={"box-config popup-div " + (this.state.singleRow ? "single-row" : "")} onMouseDown={(e) => {e.stopPropagation();}} onMouseUp={(e) => {e.stopPropagation();}} ref="boxConfig">
                 <div className="box-config-content">
                     <div className={"exclusive-options " + (this.props.box.option.length > 1 ? 'show' : '')}>
                     {(this.props.box.option && this.props.box.option.length > 1) &&

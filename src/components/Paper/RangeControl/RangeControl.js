@@ -213,7 +213,7 @@ class RangeControl extends Component {
         endDate.add(this.state.value, "minutes");
 
         return (
-            <div className={"range-controls noselect " + (this.props.visible ? 'visible ' : ' ') + (this.props.fixedControl ? 'fixed' : '') }>
+            <div className={"range-controls popup-div noselect " + (this.props.visible ? 'visible ' : ' ') + (this.props.fixedControl ? 'fixed' : '') }>
                 <div className="close-btn" onClick={this.props.toggleRangeControl}></div>
                 <div className="time-type">
                     <div onClick={this.changeTimeType.bind(this, "realtime")} className={"time-type-item real-time " + (this.state.realtime ? "selected" : "")}>REALTIME</div>

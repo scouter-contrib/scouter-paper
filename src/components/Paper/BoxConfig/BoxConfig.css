@@ -88,18 +88,6 @@
     color: white;
 }
 
-.box-config .box-config-buttons button {
-    padding: 6px 8px;
-    border: none;
-    background-color: white;
-    margin: 0 2px;
-    outline: none;
-}
-
-.box-config .box-config-buttons button:hover {
-    background-color: #EEE;
-}
-
 .box-config .config-tooltip {
     color: white;
     line-height: 100%;
@@ -156,14 +144,3 @@
     cursor: pointer;
     color: white;
 }
-
-
-
-
-
-
-
-
-
-
-
