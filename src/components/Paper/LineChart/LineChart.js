@@ -34,7 +34,8 @@ class LineChart extends Component {
         noData: true,
         bisector: null,
         currentTooltipTime: null,
-        leftAxisFormat: ".2s"
+        leftAxisFormat: ".2s",
+        opacity : 0.3
     };
 
     constructor(props) {
@@ -47,6 +48,13 @@ class LineChart extends Component {
     }
 
     componentDidMount() {
+        if (this.props.config.colorType === "white") {
+            this.graph.opacity = 0.3;
+        } else {
+            this.graph.opacity = 0.6;
+        }
+
+
         this.graph.timeFormat = this.props.config.minuteFormat;
         this.graph.fullTimeFormat = this.props.config.dateFormat + " " + this.props.config.timeFormat;
         this.graphInit();
@@ -317,7 +325,7 @@ class LineChart extends Component {
 
         if (init) {
             this.graph.svg.insert("g", ":first-child").attr("class", "axis-y").call(d3.axisLeft(this.graph.y).tickFormat(d3.format(this.graph.leftAxisFormat)).ticks(yAxisCount));
-            this.graph.svg.insert("g", ":first-child").attr("class", "grid-y").style("stroke-dasharray", "5 5").style("opacity", "0.3").call(d3.axisLeft(this.graph.y).tickSize(-this.graph.width).tickFormat("").ticks(yAxisCount));
+            this.graph.svg.insert("g", ":first-child").attr("class", "grid-y").style("stroke-dasharray", "5 5").style("opacity", this.graph.opacity).call(d3.axisLeft(this.graph.y).tickSize(-this.graph.width).tickFormat("").ticks(yAxisCount));
         } else {
             this.graph.svg.select(".axis-x").call(d3.axisBottom(this.graph.x).tickFormat(d3.timeFormat(this.graph.timeFormat)).ticks(xAxisCount));
             this.graph.svg.select(".grid-x").call(d3.axisBottom(this.graph.x).tickSize(-this.graph.height).tickFormat("").ticks(xAxisCount));
@@ -325,7 +333,7 @@ class LineChart extends Component {
 
         if (init) {
             this.graph.svg.insert("g", ":first-child").attr("class", "axis-x").attr("transform", "translate(0," + this.graph.height + ")").call(d3.axisBottom(this.graph.x).tickFormat(d3.timeFormat(this.graph.timeFormat)).ticks(xAxisCount));
-            this.graph.svg.insert("g", ":first-child").attr("class", "grid-x").style("stroke-dasharray", "5 5").style("opacity", "0.3").attr("transform", "translate(0," + this.graph.height + ")").call(d3.axisBottom(this.graph.x).tickSize(-this.graph.height).tickFormat("").ticks(xAxisCount));
+            this.graph.svg.insert("g", ":first-child").attr("class", "grid-x").style("stroke-dasharray", "5 5").style("opacity", this.graph.opacity).attr("transform", "translate(0," + this.graph.height + ")").call(d3.axisBottom(this.graph.x).tickSize(-this.graph.height).tickFormat("").ticks(xAxisCount));
         } else {
             this.graph.svg.select(".axis-y").transition().duration(500).call(d3.axisLeft(this.graph.y).tickFormat(d3.format(this.graph.leftAxisFormat)).ticks(yAxisCount));
             this.graph.svg.select(".grid-y").transition().duration(500).call(d3.axisLeft(this.graph.y).tickSize(-this.graph.width).tickFormat("").ticks(yAxisCount));
@@ -425,7 +433,13 @@ class LineChart extends Component {
         if (path.size() < 1) {
             path = this.graph.svg.insert("path", ":first-child").attr("class", pathClass).style("stroke", color);
             if (this.props.config.graph.color === "instance") {
-                this.props.setTitle(counterKey, option.title, "#333");
+
+                if (this.props.config.colorType === "white") {
+                    this.props.setTitle(counterKey, option.title, "#333");
+                } else {
+                    this.props.setTitle(counterKey, option.title, "white");
+                }
+
             } else {
                 this.props.setTitle(counterKey, option.title, color);
             }
@@ -433,7 +447,13 @@ class LineChart extends Component {
         } else {
             path.style("stroke", color);
             if (this.props.config.graph.color === "instance") {
-                this.props.setTitle(counterKey, option.title, "#333");
+
+                if (this.props.config.colorType === "white") {
+                    this.props.setTitle(counterKey, option.title, "#333");
+                } else {
+                    this.props.setTitle(counterKey, option.title, "white");
+                }
+
             } else {
                 this.props.setTitle(counterKey, option.title, color);
             }
@@ -505,9 +525,9 @@ class LineChart extends Component {
                             }
                             let color;
                             if (this.props.config.graph.color === "metric") {
-                                color = InstanceColor.getMetricColor(thisOption.counterKey);
+                                color = InstanceColor.getMetricColor(thisOption.counterKey, this.props.config.colorType);
                             } else {
-                                color = InstanceColor.getInstanceColors()[obj.objHash][instanceMetricCount[obj.objHash]++ % 2 === 0 ? 'main' : 'sub'];
+                                color = InstanceColor.getInstanceColors(this.props.config.colorType)[obj.objHash][(instanceMetricCount[obj.objHash]++) % 5];
                             }
                             this.drawObjectLine(obj, thisOption, counterKey, color);
                         }
@@ -521,9 +541,9 @@ class LineChart extends Component {
                             }
                             let color;
                             if (this.props.config.graph.color === "metric") {
-                                color = InstanceColor.getMetricColor(thisOption.counterKey);
+                                color = InstanceColor.getMetricColor(thisOption.counterKey, this.props.config.colorType);
                             } else {
-                                color = InstanceColor.getHostColors()[obj.objHash][hostMetricCount[obj.objHash]++ % 2 === 0 ? 'main' : 'sub'];
+                                color = InstanceColor.getHostColors()[obj.objHash][(hostMetricCount[obj.objHash]++) % 5];
                             }
                             this.drawObjectLine(obj, thisOption, counterKey, color);
                         }
@@ -558,23 +578,7 @@ class LineChart extends Component {
         let that = this;
 
         let circleKey = "circle-" + obj.objHash + "_" + thisOption.counterKey;
-
-        if (!that.state.counters[counterKey][dataIndex].data || !that.state.counters[counterKey][dataIndex].data[obj.objHash]) {
-            return false;
-        }
-
-        let unit = that.state.counters[counterKey][dataIndex].data[obj.objHash].unit;
-        if (unit === undefined) {
-            const objData = that.state.counters[counterKey][that.state.counters[counterKey].length - 1].data[obj.objHash];
-            if (objData) {
-                unit = objData.unit;
-            }
-        }
-
-        if (!unit) {
-            unit = "";
-        }
-
+        let unit = that.state.counters[counterKey][dataIndex].data[obj.objHash] ? that.state.counters[counterKey][dataIndex].data[obj.objHash].unit : "";
 
         if (that.state.counters[counterKey][dataIndex].time) {
             tooltip.lines.push({
@@ -643,9 +647,9 @@ class LineChart extends Component {
                         }
                         let color;
                         if (that.props.config.graph.color === "metric") {
-                            color = InstanceColor.getMetricColor(thisOption.counterKey);
+                            color = InstanceColor.getMetricColor(thisOption.counterKey, that.props.config.colorType);
                         } else {
-                            color = InstanceColor.getInstanceColors()[obj.objHash][instanceMetricCount[obj.objHash]++ % 2 === 0 ? 'main' : 'sub'];
+                            color = InstanceColor.getInstanceColors(that.props.config.colorType)[obj.objHash][(instanceMetricCount[obj.objHash]++) % 5];
                         }
                         that.mouseOverObject(that.props.instances[i], thisOption, color);
                     }
@@ -659,9 +663,10 @@ class LineChart extends Component {
                         }
                         let color;
                         if (that.props.config.graph.color === "metric") {
-                            color = InstanceColor.getMetricColor(thisOption.counterKey);
+                            color = InstanceColor.getMetricColor(thisOption.counterKey, that.props.config.colorType);
                         } else {
-                            color = InstanceColor.getHostColors()[obj.objHash][hostMetricCount[obj.objHash]++ % 2 === 0 ? 'main' : 'sub'];
+
+                            color = InstanceColor.getHostColors()[obj.objHash][(hostMetricCount[obj.objHash]++) % 5];
                         }
                         that.mouseOverObject(that.props.hosts[i], thisOption, color);
                     }
@@ -757,9 +762,9 @@ class LineChart extends Component {
                         }
                         let color;
                         if (that.props.config.graph.color === "metric") {
-                            color = InstanceColor.getMetricColor(thisOption.counterKey);
+                            color = InstanceColor.getMetricColor(thisOption.counterKey, that.props.config.colorType);
                         } else {
-                            color = InstanceColor.getInstanceColors()[obj.objHash][instanceMetricCount[obj.objHash]++ % 2 === 0 ? 'main' : 'sub'];
+                            color = InstanceColor.getInstanceColors(that.props.config.colorType)[obj.objHash][(instanceMetricCount[obj.objHash]++) % 5];
                         }
                         that.mouseMoveObject(that.props.instances[i], thisOption, counterKey, dataIndex, color, tooltip);
                     }
@@ -773,9 +778,9 @@ class LineChart extends Component {
                         }
                         let color;
                         if (that.props.config.graph.color === "metric") {
-                            color = InstanceColor.getMetricColor(thisOption.counterKey);
+                            color = InstanceColor.getMetricColor(thisOption.counterKey, that.props.config.colorType);
                         } else {
-                            color = InstanceColor.getHostColors()[obj.objHash][hostMetricCount[obj.objHash]++ % 2 === 0 ? 'main' : 'sub'];
+                            color = InstanceColor.getHostColors()[obj.objHash][(hostMetricCount[obj.objHash]++) % 5];
                         }
                         that.mouseMoveObject(that.props.hosts[i], thisOption, counterKey, dataIndex, color, tooltip);
                     }

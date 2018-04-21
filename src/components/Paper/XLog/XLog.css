@@ -112,7 +112,7 @@
 .xlog-viewer .xlog-history-stop-control > div {
     display: inline-block;
     background-color: white;
-    border : 1px solid #666;
+    border: 1px solid rgba(0, 0, 0, 0.5);
     padding: 10px;
     border-radius: 2px;
     min-width: 120px;
@@ -124,6 +124,3 @@
     display: inline-block;
     cursor: pointer;
 }
-
-
-

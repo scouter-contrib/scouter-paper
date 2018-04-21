@@ -92,7 +92,7 @@ class PaperControl extends Component {
                 </div>
                 }
                 <div className="paper-control-separator paper-right"></div>
-                <div className="paper-control paper-alert paper-right" data-count={this.props.alert.data.length > 99 ? this.props.alert.data.length : this.props.alert.data.length} onClick={this.props.toggleShowAlert} data-tip="CLICK TO SHOW ALERT">
+                <div className="paper-control paper-alert paper-right" data-count={this.props.alert.data.length > 99 ? "99+" : this.props.alert.data.length} onClick={this.props.toggleShowAlert} data-tip="CLICK TO SHOW ALERT">
                     <span><i className="fa fa-exclamation-circle" aria-hidden="true"></i></span>
                 </div>
                 <ReactTooltip />

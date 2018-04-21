@@ -7,6 +7,7 @@ import {withRouter} from 'react-router-dom';
 import TimeAgo from 'react-timeago'
 import {errorHandler, getWithCredentials} from '../../common/common';
 import logo from '../../img/scouter.png';
+import logoBlack from '../../img/scouter_black.png';
 
 class Login extends Component {
 
@@ -129,7 +130,7 @@ class Login extends Component {
                     <div className="login-content">
                         {!this.props.user.id &&
                         <div className="login-box">
-                            <div className="logo-div"><img alt="scouter-logo" className="logo" src={logo}/></div>
+                            <div className="logo-div"><img alt="scouter-logo" className="logo" src={this.props.config.theme === "theme-gray" ? logoBlack : logo}/></div>
                             <div className="product">SCOUTER PAPER</div>
                             <div>
                                 <input type="text" placeholder="ID" value={this.state.control.id} onChange={this.handleChange.bind(this, "id")} onKeyPress={this.handleIdKeyPress} />
@@ -145,7 +146,7 @@ class Login extends Component {
                         }
                         {this.props.user.id &&
                         <div className="login-box">
-                            <div className="logo-div"><img alt="scouter-logo" className="logo" src={logo}/></div>
+                            <div className="logo-div"><img alt="scouter-logo" className="logo" src={this.props.config.theme === "theme-gray" ? logoBlack : logo}/></div>
                             <div className="product">SCOUTER PAPER</div>
                             <div className="user-id">{this.props.user.id}</div>
                             <div className="when">LOGIN <TimeAgo date={this.props.user.time}/></div>

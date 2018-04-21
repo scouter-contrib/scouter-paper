@@ -237,8 +237,8 @@ class InstanceSelector extends Component {
                                 selectedInstances: selectedInstanceMap
                             });
 
-                            AgentColor.setHosts(selectedHosts);
-                            AgentColor.setInstances(selectedInstances);
+                            AgentColor.setHosts(selectedHosts, this.props.config.colorType);
+                            AgentColor.setInstances(selectedInstances, this.props.config.colorType);
                             this.props.setTarget(selectedHosts, selectedInstances);
 
                         } else {
@@ -392,8 +392,8 @@ class InstanceSelector extends Component {
             instances && instances.sort((a, b) => a.objName < b.objName ? -1 : 1);
             hosts && hosts.sort((a, b) => a.objName < b.objName ? -1 : 1);
 
-            AgentColor.setHosts(hosts);
-            AgentColor.setInstances(instances);
+            AgentColor.setHosts(hosts, this.props.config.colorType);
+            AgentColor.setInstances(instances, this.props.config.colorType);
 
             this.props.setTarget(hosts, instances);
             this.props.setControlVisibility("TargetSelector", false);
@@ -418,7 +418,7 @@ class InstanceSelector extends Component {
     render() {
         return (
             <div className={"instance-selector-bg " + (this.props.visible ? "" : "hidden")}>
-                <div className="instance-selector">
+                <div className="instance-selector popup-div">
                     <div className="instance-selector-content">
                         <div className="host-list">
                             <div>
