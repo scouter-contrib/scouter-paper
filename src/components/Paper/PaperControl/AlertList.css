@@ -3,7 +3,6 @@
     width: 400px;
     top: 30px;
     right: 0;
-    background-color: #207ce5;
     border: 1px solid rgba(0, 0, 0, 0.6);
     font-size: 9px;
     font-weight: normal;
@@ -37,7 +36,6 @@
         right: 0;
         left: 0;
         width: 100%;
-        background-color: #207ce5;
         border: 1px solid rgba(0, 0, 0, 0.6);
         font-size: 9px;
         font-weight: normal;

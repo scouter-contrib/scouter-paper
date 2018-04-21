@@ -63,7 +63,6 @@
 }
 
 .papers .select-instance div.select-instance-message {
-    background-color: rgba(0, 0, 0, 0.4);
     background-color: white;
     padding: 20px;
     color: #333;
@@ -165,6 +164,3 @@
         height: calc(100% - 62px);
     }
 }
-
-
-

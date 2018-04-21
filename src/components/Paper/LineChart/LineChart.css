@@ -4,8 +4,8 @@
 
 .line-chart-wrapper .line-chart path {
     fill: none;
-    _stroke-width: 2px;
-    _opacity: 0.6;
+    stroke-width: 2px;
+    opacity: 0.6;
 }
 
 .line-chart-wrapper .no-data {
@@ -54,13 +54,6 @@
 
 .line-chart-wrapper text {
     font-size: 8px;
-
-
-
-
-
-
-
 }
 
 .line-chart-wrapper .axis-button {
@@ -83,9 +76,20 @@
 
 .line-chart-wrapper .axis-button.axis-up {
     top: 5px;
-
 }
 
 .line-chart-wrapper .axis-button.axis-down {
     bottom: 6px;
+}
+
+.line-chart-wrapper .axis-x path,
+.line-chart-wrapper .axis-x line,
+.line-chart-wrapper .axis-y path,
+.line-chart-wrapper .axis-y line,
+.line-chart-wrapper .grid-x path,
+.line-chart-wrapper .grid-x line,
+.line-chart-wrapper .grid-y path,
+.line-chart-wrapper .grid-y line {
+    stroke: #333;
+    stroke-width: 1px;
 }
