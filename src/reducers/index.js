@@ -10,6 +10,7 @@ const configState = {
     dateFormat: "%Y-%m-%d",
     timeFormat: "%H:%M:%S",
     minuteFormat: "%H:%M",
+    runMode: "normal",
     authentification : {
         type : "bearer"
     },

@@ -46,20 +46,6 @@ class RangeControl extends Component {
         this.props.onRef(undefined);
     }
 
-    componentWillReceiveProps(nextProps) {
-        if (this.state.runMode === "link" && JSON.stringify(this.props.instances) !== JSON.stringify(nextProps.instances)) {
-            let from = new URLSearchParams(this.props.location.search).get('from');
-            let to = new URLSearchParams(this.props.location.search).get('to');
-            if (from && to) {
-                this.props.toggleRangeControl();
-                this.manualSearch(moment(from, 'x'), moment(to, 'x'));
-                this.setState({
-                    runMode: "normal"
-                });
-            }
-        }
-    }
-
     shouldComponentUpdate(nextProps, nextState) {
         return true;
     }
@@ -231,9 +217,9 @@ class RangeControl extends Component {
 
 
 
-    search = (startDateParam, endDateParam) => {
+    search = (startDateParam, endDateParam, instances, hosts) => {
         if (startDateParam && endDateParam) {
-            this.props.search(startDateParam.valueOf(), endDateParam.valueOf());
+            this.props.search(startDateParam.valueOf(), endDateParam.valueOf(), instances, hosts);
         } else {
             let startDate = this.state.date.clone();
             startDate.seconds(0);
@@ -243,7 +229,7 @@ class RangeControl extends Component {
             let endDate = startDate.clone();
             endDate.add(this.state.value, "minutes");
 
-            this.props.search(startDate.valueOf(), endDate.valueOf());
+            this.props.search(startDate.valueOf(), endDate.valueOf(), instances, hosts);
         }
     };
 

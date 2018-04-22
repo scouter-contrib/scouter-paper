@@ -52,6 +52,14 @@ export function getLocalSettingData(key, defaultValue) {
     return value ? value : defaultValue;
 }
 
+export function setLinkModeData(data) {
+    setLocalSettingData("linkModeData", data);
+}
+
+export function getLinkModeData() {
+    return getLocalSettingData("linkModeData");
+}
+
 export function getHttpProtocol(config) {
     return config.protocol + "://" + config.address + ":" + config.port;
 }
