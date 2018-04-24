@@ -8,6 +8,7 @@ import 'react-datepicker/dist/react-datepicker.css';
 import InputRange from 'react-input-range';
 import 'react-input-range/lib/css/index.css';
 import './RangeControl.css';
+import ServerDate from "../../../common/ServerDate";
 
 class RangeControl extends Component {
 
@@ -24,13 +25,21 @@ class RangeControl extends Component {
             realtime : true,
             longTerm : false,
             range : this.props.config.range.shortHistoryRange,
-            step : this.props.config.range.shortHistoryStep
+            step : this.props.config.range.shortHistoryStep,
+            runMode : undefined
         };
         this.handleChange = this.dateChange.bind(this);
     }
 
     componentDidMount() {
         this.props.onRef(this);
+        let runMode = new URLSearchParams(this.props.location.search).get('run-mode');
+        if (runMode && runMode === "link") {
+            this.setState({
+                runMode: "link"
+            });
+            this.changeTimeType("search");
+        }
     }
 
     componentWillUnmount() {
@@ -152,6 +161,28 @@ class RangeControl extends Component {
         }
     };
 
+    manualSearch = (from, to) => {
+        this.changeTimeType("search");
+
+        let value = this.state.value;
+        let current = this.state.date.clone();
+        current.seconds(0);
+        current.minutes(this.state.minutes);
+        current.hours(this.state.hours);
+        current.subtract(value, "minutes");
+
+        this.setState({
+            date: current,
+            hours: current.hours(),
+            minutes : current.minutes()
+        });
+
+        let startDate = current.clone();
+        let endDate = startDate.clone();
+        endDate.add(value, "minutes");
+
+        this.search(startDate, endDate);
+    };
 
     moveAndSearch = (type) => {
 
@@ -186,9 +217,9 @@ class RangeControl extends Component {
 
 
 
-    search = (startDateParam, endDateParam) => {
+    search = (startDateParam, endDateParam, instances, hosts) => {
         if (startDateParam && endDateParam) {
-            this.props.search(startDateParam.valueOf(), endDateParam.valueOf());
+            this.props.search(startDateParam.valueOf(), endDateParam.valueOf(), instances, hosts);
         } else {
             let startDate = this.state.date.clone();
             startDate.seconds(0);
@@ -198,7 +229,7 @@ class RangeControl extends Component {
             let endDate = startDate.clone();
             endDate.add(this.state.value, "minutes");
 
-            this.props.search(startDate.valueOf(), endDate.valueOf());
+            this.props.search(startDate.valueOf(), endDate.valueOf(), instances, hosts);
         }
     };
 
@@ -282,6 +313,8 @@ class RangeControl extends Component {
 
 let mapStateToProps = (state) => {
     return {
+        hosts: state.target.hosts,
+        instances: state.target.instances,
         config: state.config
     };
 };

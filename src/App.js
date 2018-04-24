@@ -19,8 +19,9 @@ import {setConfig, addRequest, clearAllMessage, setControlVisibility, setUserId,
 import {detect} from 'detect-browser';
 import Unsupport from "./components/Unsupport/Unsupport";
 import jQuery from "jquery";
-import {errorHandler, mergeDeep} from './common/common';
+import {errorHandler, mergeDeep, setLinkModeData} from './common/common';
 import Home from "./components/Home/Home";
+import moment from "moment/moment";
 
 const browser = detect();
 //const support = (browser.name === "chrome" || browser.name === "firefox" || browser.name === "opera" || browser.name === "safari");
@@ -126,11 +127,52 @@ class App extends Component {
         if (str) {
             config = JSON.parse(str);
             config = mergeDeep(this.props.config, config); //for added config's properties on later versions.
-            this.props.setConfig(config);
             localStorage.setItem("config", JSON.stringify(config));
         } else {
             config = this.props.config;
         }
+
+        let runMode = new URLSearchParams(this.props.location.search).get('run-mode');
+        if (runMode && runMode === "link") {
+            config.runMode = "link";
+            let from = new URLSearchParams(this.props.location.search).get('from');
+            let to = new URLSearchParams(this.props.location.search).get('to');
+            if(from && to) {
+                if(from.length === 14 && to.length === 14) {
+                    from = moment(from, 'YYYYMMDDHHmmss').valueOf();
+                    to = moment(to, 'YYYYMMDDhhmmss').valueOf();
+                }
+
+                let address = new URLSearchParams(this.props.location.search).get('address');
+                let port = new URLSearchParams(this.props.location.search).get('port');
+                address && (config.address = address);
+                port && (config.port = port);
+
+                setLinkModeData({
+                    mode : "link",
+                    dirty : false,
+                    ready : false,
+                    from: from,
+                    to: to
+                });
+
+            } else {
+                config.runMode = "normal";
+                setLinkModeData({
+                    mode : "normal",
+                    dirty : true,
+                    ready : false,
+                });
+            }
+        } else {
+            setLinkModeData({
+                mode : "normal",
+                dirty : true,
+                ready : false,
+            });
+        }
+
+        this.props.setConfig(config);
 
         let user = localStorage.getItem("user");
         if (user) {

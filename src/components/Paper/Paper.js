@@ -10,6 +10,7 @@ import jQuery from "jquery";
 import {errorHandler, getData, getHttpProtocol, getWithCredentials, setAuthHeader, setData, getSearchDays, getDivideDays} from "../../common/common";
 import Profiler from "./XLog/Profiler/Profiler";
 import ServerDate from "../../common/ServerDate";
+import * as common from "../../common/common";
 import RangeControl from "./RangeControl/RangeControl";
 import moment from "moment";
 import _ from "lodash";
@@ -35,7 +36,6 @@ class Paper extends Component {
         this.counterHistoriesLoaded = {};
         this.counterReady = false;
 
-
         let layouts = getData("layouts");
         let boxes = getData("boxes");
 
@@ -45,6 +45,15 @@ class Paper extends Component {
 
         if (!boxes) {
             boxes = [];
+        }
+
+        let paramBoxes = new URLSearchParams(this.props.location.search).get('boxes');
+        let paramLayouts = new URLSearchParams(this.props.location.search).get('layouts');
+        if(paramBoxes && paramLayouts) {
+            boxes = JSON.parse(paramBoxes);
+            layouts = JSON.parse(paramLayouts);
+            //TODO layout이 전달된 모양으로 변경되니 일단 현재 layout을 나중에 다시 로드할 수 있도록 저장해 놓도록 하자.
+            this.saveLastLayout();
         }
 
         let range = 1000 * 60 * 10;
@@ -131,13 +140,39 @@ class Paper extends Component {
         }
 
         if (JSON.stringify(this.props.instances) !== JSON.stringify(nextProps.instances)) {
-            if (this.state.realtime) {
-                let now = (new ServerDate()).getTime();
-                let ten = 1000 * 60 * 10;
-                this.getCounterHistory(nextProps.instances, nextProps.hosts, now - ten, now, false);
-                this.getLatestData(true, nextProps.instances, nextProps.hosts);
-            } else {
-                this.getXLogHistory(this.lastFrom, this.lastTo, nextProps.instances, this.state.longTerm);
+            let linkMode = false;
+            if(this.props.config.runMode === "link") {
+                let linkModeData = common.getLinkModeData();
+                if(linkModeData.mode === "link" && linkModeData.dirty === false) {
+                    linkModeData.ready = true;
+                    common.setLinkModeData(linkModeData);
+                    linkMode = true;
+                }
+            }
+
+            if(!linkMode) {
+                if (this.state.realtime) {
+                    let now = (new ServerDate()).getTime();
+                    let ten = 1000 * 60 * 10;
+                    this.getCounterHistory(nextProps.instances, nextProps.hosts, now - ten, now, false);
+                    this.getLatestData(true, nextProps.instances, nextProps.hosts);
+                } else {
+                    this.getXLogHistory(this.lastFrom, this.lastTo, nextProps.instances, this.state.longTerm);
+                }
+            }
+        }
+    }
+
+    componentDidUpdate() {
+        if(this.props.config.runMode === "link") {
+            let linkModeData = common.getLinkModeData();
+            if(linkModeData.mode === "link" && !linkModeData.dirty && linkModeData.ready) {
+                linkModeData.dirty = true;
+                common.setLinkModeData(linkModeData);
+                setTimeout(() => {
+                    this.toggleRangeControl();
+                    this.manualSearch(linkModeData.from, linkModeData.to, this.props.instances, this.props.hosts);
+                }, 0);
             }
         }
     }
@@ -361,6 +396,25 @@ class Paper extends Component {
         }
     };
 
+    manualSearch = (from, to, instances, hosts) => {
+        let start = moment(Math.floor(from / (1000 * 60)) * (1000 * 60));
+        let end = moment(Math.floor(to / (1000 * 60)) * (1000 * 60));
+        let duration = moment.duration(end.diff(start));
+        if(duration.asMinutes() > this.props.config.range.shortHistoryRange) {
+            this.rangeControlChild.changeLongTerm();
+            this.rangeControlChild.setLongTerm(true);
+            this.rangeControlChild.setRangeValue(Math.floor(duration.asHours()));
+        } else {
+            this.rangeControlChild.setLongTerm(false);
+            this.rangeControlChild.setRangeValue(duration.asMinutes());
+        }
+        this.rangeControlChild.changeTimeType("search");
+        this.rangeControlChild.dateChange(start);
+        this.rangeControlChild.hoursChange(start.hours());
+        this.rangeControlChild.minutesChange(start.minutes());
+        this.rangeControlChild.search(start, end, instances, hosts);
+    };
+
     setRewind = (time) => {
         let start = moment(Math.floor(time / (1000 * 60)) * (1000 * 60));
         start.subtract(5, "minutes");
@@ -580,7 +634,7 @@ class Paper extends Component {
         });
     };
 
-    search = (from, to) => {
+    search = (from, to, instances, hosts) => {
 
         this.lastFrom = from;
         this.lastTo = to;
@@ -594,8 +648,8 @@ class Paper extends Component {
             }
         });
 
-        this.getCounterHistory(this.props.instances, this.props.hosts, from, to, this.state.longTerm);
-        this.getXLogHistory(from, to, this.props.instances, this.state.longTerm);
+        this.getCounterHistory(instances || this.props.instances, hosts || this.props.hosts, from, to, this.state.longTerm);
+        this.getXLogHistory(from, to, instances || this.props.instances, this.state.longTerm);
     };
 
     scroll = () => {
@@ -821,7 +875,7 @@ class Paper extends Component {
             return;
         }
 
-        if (this.props.instances && this.props.instances.length > 0) {
+        if (instances && instances.length > 0) {
 
             let data = this.state.data;
 
@@ -1045,6 +1099,25 @@ class Paper extends Component {
             tempXlogs.splice(0, outOfRangeIndex + 1);
         }
     }
+
+    saveLastLayout = () => {
+        let layouts = getData("layouts");
+        let boxes = getData("boxes");
+        if(layouts && boxes) {
+            let templates = getData("templates");
+            if (!templates) {
+                templates = [];
+            }
+            templates.push({
+                no : templates.length,
+                name : "last-layout-" + moment().format("YY-MM-DD_hh:mm:ss"),
+                creationTime : (new Date()).getTime(),
+                boxes : boxes,
+                layouts : layouts
+            });
+            setData("templates", templates);
+        }
+    };
 
     onLayoutChange(layout, layouts) {
 
