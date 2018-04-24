@@ -20,9 +20,17 @@ html.theme-gray {
     background-color: #161616;
 }
 
+.theme-gray .papers-controls.fixed-control {
+    background-color: #161616;
+}
+
 /* THEME, XLog.css */
 .theme-gray .xlog-viewer .xlog-history-stop-control > div {
     background-color: #111;
+}
+
+.theme-gray .xlog-viewer .no-longterm-support {
+    background-color: #0A0A0A;
 }
 
 /* THEME, Home.css */
