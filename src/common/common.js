@@ -52,14 +52,6 @@ export function getLocalSettingData(key, defaultValue) {
     return value ? value : defaultValue;
 }
 
-export function setLinkModeData(data) {
-    setLocalSettingData("linkModeData", data);
-}
-
-export function getLinkModeData() {
-    return getLocalSettingData("linkModeData");
-}
-
 export function getHttpProtocol(config) {
     return config.protocol + "://" + config.address + ":" + config.port;
 }
@@ -186,4 +178,53 @@ export function getDivideDays(from, to) {
     }
 
     return fromTos;
+}
+
+
+export function isChangeParam(prev, next, key) {
+    let prevParam = null;
+    let nextParam = null;
+    if (prev && prev.location.search) {
+        prevParam = new URLSearchParams(prev.location.search).get(key);
+    }
+
+    if (next && next.location.search) {
+        nextParam = new URLSearchParams(next.location.search).get(key);
+    }
+
+    return prevParam !== nextParam;
+}
+
+export function getParam(props, key) {
+    if (key.indexOf(",") > -1) {
+        let keys = key.split(",");
+        let params = new URLSearchParams(props.location.search);
+        let result = [];
+        for (let i=0; i<keys.length; i++) {
+            let val = params.get(keys[i]);
+            if (val === "true") {
+                result.push(true);
+            } else if (val === "false") {
+                result.push(false);
+            } else {
+                result.push(val);
+            }
+        }
+        return result;
+    } else {
+        if (props && props.location.search) {
+            return (new URLSearchParams(props.location.search)).get(key);
+        }
+    }
+}
+
+export function setPath(props, key, value) {
+    let search = new URLSearchParams(props.location.search);
+    search.set(key, value);
+    if (props.history.location.search !== ("?" + search.toString())) {
+        props.history.push({
+            pathname: props.location.pathname,
+            search: "?" + search.toString()
+        });
+    }
 }

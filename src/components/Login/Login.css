@@ -51,10 +51,6 @@
 
 }
 
-.mac .login-wrapper input {
-    padding: 5px 10px;
-}
-
 .login-wrapper .product {
     display: inline-block;
     background-color: rgba(0, 0, 0, 0.4);

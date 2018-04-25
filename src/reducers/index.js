@@ -1,5 +1,6 @@
-import {ADD_REQUEST, SET_CONFIG, SET_USER_ID, SET_TARGET, SET_INSTANCES, PUSH_MESSAGE, SET_CONTROL_VISIBILITY, CLEAR_ALL_MESSAGE, SET_BG_COLOR, SET_SELECTION, SET_TEMPLATE} from '../actions';
+import {ADD_REQUEST, SET_CONFIG, SET_USER_ID, SET_TARGET, SET_INSTANCES, PUSH_MESSAGE, SET_CONTROL_VISIBILITY, CLEAR_ALL_MESSAGE, SET_BG_COLOR, SET_SELECTION, SET_TEMPLATE, SET_REAL_TIME, SET_RANGE_DATE, SET_RANGE_HOURS, SET_RANGE_MINUTES, SET_RANGE_VALUE, SET_REAL_TIME_VALUE, SET_RANGE_DATE_HOURS_MINUTES, SET_REAL_TIME_RANGE_STEP_VALUE, SET_RANGE_DATE_HOURS_MINUTES_VALUE, SET_RANGE_ALL} from '../actions';
 import {combineReducers} from 'redux';
+import moment from 'moment';
 
 const configState = {
     protocol: window.location.protocol.replace(":", ""),
@@ -310,6 +311,56 @@ const template = (state = templateState, action) => {
     }
 };
 
+let now = moment();
+now.subtract(10, "minutes");
+
+const rangeState = {
+    date : now,
+    hours : now.hours(),
+    minutes : now.minutes(),
+    value : configState.range.shortHistoryStep,
+    realTime : true,
+    longTerm : false,
+    range : configState.range.shortHistoryRange,
+    step : configState.range.shortHistoryStep
+};
+
+const range = (state = rangeState, action) => {
+    switch (action.type) {
+        case SET_REAL_TIME:
+            if (state.longTerm === action.longTerm) {
+                return Object.assign({}, state, {realTime : action.realTime, longTerm: action.longTerm});
+            } else {
+                if (action.longTerm) {
+                    return Object.assign({}, state, {realTime : action.realTime, longTerm: action.longTerm, range : configState.range.longHistoryRange * 60, step : configState.range.longHistoryStep});
+                } else {
+                    return Object.assign({}, state, {realTime : action.realTime, longTerm: action.longTerm, range : configState.range.shortHistoryRange, step : configState.range.shortHistoryStep});
+                }
+            }
+
+        case SET_REAL_TIME_VALUE:
+            return Object.assign({}, state, {realTime : action.realTime, longTerm: action.longTerm, value: action.value});
+        case SET_REAL_TIME_RANGE_STEP_VALUE:
+            return Object.assign({}, state, {realTime : action.realTime, longTerm: action.longTerm, value: action.value, range : action.range, step : action.step});
+        case SET_RANGE_DATE:
+            return Object.assign({}, state, {date : action.date});
+        case SET_RANGE_HOURS:
+            return Object.assign({}, state, {hours : action.hours});
+        case SET_RANGE_MINUTES:
+            return Object.assign({}, state, {minutes : action.minutes});
+        case SET_RANGE_VALUE:
+            return Object.assign({}, state, {value : action.value});
+        case SET_RANGE_DATE_HOURS_MINUTES:
+            return Object.assign({}, state, {date : action.date, hours : action.hours, minutes : action.minutes});
+        case SET_RANGE_DATE_HOURS_MINUTES_VALUE:
+            return Object.assign({}, state, {date : action.date, hours : action.hours, minutes : action.minutes, value : action.value});
+        case SET_RANGE_ALL:
+            return Object.assign({}, state, {date : action.date, hours : action.hours, minutes : action.minutes, value : action.value, realTime : action.realTime, longTerm: action.longTerm, range : action.range, step : action.step});
+        default:
+            return state;
+    }
+};
+
 const scouterApp = combineReducers({
     target,
     user,
@@ -318,7 +369,8 @@ const scouterApp = combineReducers({
     style,
     config,
     request,
-    template
+    template,
+    range
 });
 
 export default scouterApp;

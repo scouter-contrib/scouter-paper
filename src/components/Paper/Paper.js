@@ -3,7 +3,7 @@ import "./Paper.css";
 import "./Resizable.css";
 import {connect} from "react-redux";
 import {withRouter} from 'react-router-dom';
-import {addRequest, pushMessage, setControlVisibility} from "../../actions";
+import {addRequest, pushMessage, setControlVisibility, setRealTime, setRealTimeValue, setRangeDate, setRangeHours, setRangeMinutes, setRangeValue, setRangeDateHoursMinutes, setRangeDateHoursMinutesValue, setRangeAll} from "../../actions";
 import {Responsive, WidthProvider} from "react-grid-layout";
 import {Box, BoxConfig, PaperControl} from "../../components";
 import jQuery from "jquery";
@@ -30,6 +30,10 @@ class Paper extends Component {
     lastFrom = null;
     lastTo = null;
 
+    needSearch = false;
+    needSearchFrom = null;
+    needSearchTo = null;
+
     constructor(props) {
         super(props);
         this.mountTime = (new Date()).getTime();
@@ -45,15 +49,6 @@ class Paper extends Component {
 
         if (!boxes) {
             boxes = [];
-        }
-
-        let paramBoxes = new URLSearchParams(this.props.location.search).get('boxes');
-        let paramLayouts = new URLSearchParams(this.props.location.search).get('layouts');
-        if(paramBoxes && paramLayouts) {
-            boxes = JSON.parse(paramBoxes);
-            layouts = JSON.parse(paramLayouts);
-            //TODO layout이 전달된 모양으로 변경되니 일단 현재 layout을 나중에 다시 로드할 수 있도록 저장해 놓도록 하자.
-            this.saveLastLayout();
         }
 
         let range = 1000 * 60 * 10;
@@ -109,13 +104,6 @@ class Paper extends Component {
             fixedControl: false,
             visible: true,
             rangeControl: false,
-
-            /* realtime */
-            realtime: true,
-
-            /*longterm*/
-            longTerm: false,
-
             alert: {
                 data: [],
                 offset: {},
@@ -125,10 +113,43 @@ class Paper extends Component {
             showAlert: false
         };
 
+        let params = common.getParam(this.props, "realtime,longterm,from,to");
+        if (params[0] || params[0] === null) {//realtime
+            this.props.setRealTime(true, false);
+        } else {
+            if (params[1]) {//longterm
+                this.props.setRealTime(false, true);
+            } else {
+                this.props.setRealTime(false, false);
+            }
 
+            let now = moment();
+            let from = now.clone().subtract(10, "minutes");
+            let to = now;
+            //http://localhost:3000/#/paper?instances=-657282994%2C-1939064594&realtime=false&longterm=false&from=1524675000123&to=1524675600123
+            //http://localhost:3000/#/paper?instances=-657282994%2C-1939064594&realtime=false&longterm=false&from=20180420182500&to=20180422162500
+            if (params[2] && params[3]) {
+                if (params[2].length === 14 && params[3].length === 14) {
+                    from = moment(params[2], "YYYYMMDDhhmmss");
+                    to = moment(params[3], "YYYYMMDDhhmmss");
+                } else {
+                    from = moment(Number(params[2]));
+                    to = moment(Number(params[3]));
+                }
+
+                let value = Math.floor((to.valueOf() - from.valueOf()) / (1000 * 60));
+                if (!isNaN(value)) {
+                    this.props.setRangeDateHoursMinutesValue(from, from.hours(), from.minutes(), value);
+                    this.needSearch = true;
+                    this.needSearchFrom = from.valueOf();
+                    this.needSearchTo = to.valueOf();
+                }
+            }
+        }
     }
 
     componentWillReceiveProps(nextProps) {
+
         if (JSON.stringify(nextProps.template) !== JSON.stringify(this.props.template)) {
             if (JSON.stringify(nextProps.template.boxes) !== JSON.stringify(this.state.boxes) || JSON.stringify(nextProps.template.layouts) !== JSON.stringify(this.state.layouts)) {
                 this.setState({
@@ -140,39 +161,49 @@ class Paper extends Component {
         }
 
         if (JSON.stringify(this.props.instances) !== JSON.stringify(nextProps.instances)) {
-            let linkMode = false;
-            if(this.props.config.runMode === "link") {
-                let linkModeData = common.getLinkModeData();
-                if(linkModeData.mode === "link" && linkModeData.dirty === false) {
-                    linkModeData.ready = true;
-                    common.setLinkModeData(linkModeData);
-                    linkMode = true;
-                }
-            }
-
-            if(!linkMode) {
-                if (this.state.realtime) {
-                    let now = (new ServerDate()).getTime();
-                    let ten = 1000 * 60 * 10;
-                    this.getCounterHistory(nextProps.instances, nextProps.hosts, now - ten, now, false);
-                    this.getLatestData(true, nextProps.instances, nextProps.hosts);
+            if (this.props.range.realTime) {
+                let now = (new ServerDate()).getTime();
+                let ten = 1000 * 60 * 10;
+                this.getCounterHistory(nextProps.instances, nextProps.hosts, now - ten, now, false);
+                this.getLatestData(true, nextProps.instances, nextProps.hosts);
+            } else {
+                if (this.needSearch) {
+                    this.needSearch = false;
+                    this.search(this.needSearchFrom, this.needSearchTo, nextProps.instances, nextProps.hosts);
                 } else {
-                    this.getXLogHistory(this.lastFrom, this.lastTo, nextProps.instances, this.state.longTerm);
+                    if (this.lastFrom && this.lastTo) {
+                        this.getXLogHistory(this.lastFrom, this.lastTo, nextProps.instances, this.props.range.longTerm);
+                    }
                 }
             }
         }
-    }
 
-    componentDidUpdate() {
-        if(this.props.config.runMode === "link") {
-            let linkModeData = common.getLinkModeData();
-            if(linkModeData.mode === "link" && !linkModeData.dirty && linkModeData.ready) {
-                linkModeData.dirty = true;
-                common.setLinkModeData(linkModeData);
-                setTimeout(() => {
-                    this.toggleRangeControl();
-                    this.manualSearch(linkModeData.from, linkModeData.to, this.props.instances, this.props.hosts);
-                }, 0);
+        if (this.props.range.realTime !== nextProps.range.realTime) {
+            this.setState({
+                counters: {
+                    time: null,
+                    data: null
+                },
+                countersHistory: {
+                    time: null,
+                    data: null,
+                    from: null,
+                    to: null
+                }
+            });
+
+            if (nextProps.range.realTime) {
+                this.counterHistoriesLoaded = {};
+                clearInterval(this.dataRefreshTimer);
+                this.dataRefreshTimer = null;
+
+                let now = (new ServerDate()).getTime();
+                let ten = 1000 * 60 * 10;
+                this.getCounterHistory(this.props.instances, this.props.hosts, now - ten, now, false);
+                this.getLatestData(true, this.props.instances, this.props.hosts);
+            } else {
+                clearInterval(this.dataRefreshTimer);
+                this.dataRefreshTimer = null;
             }
         }
     }
@@ -184,7 +215,7 @@ class Paper extends Component {
             let now = (new ServerDate()).getTime();
             let ten = 1000 * 60 * 10;
             this.getCounterHistory(this.props.instances, this.props.hosts, now - ten, now, false);
-            if (this.state.realtime) {
+            if (this.props.range.realTime) {
                 this.getLatestData(false, this.props.instances, this.props.hosts);
             }
         }
@@ -396,36 +427,15 @@ class Paper extends Component {
         }
     };
 
-    manualSearch = (from, to, instances, hosts) => {
-        let start = moment(Math.floor(from / (1000 * 60)) * (1000 * 60));
-        let end = moment(Math.floor(to / (1000 * 60)) * (1000 * 60));
-        let duration = moment.duration(end.diff(start));
-        if(duration.asMinutes() > this.props.config.range.shortHistoryRange) {
-            this.rangeControlChild.changeLongTerm();
-            this.rangeControlChild.setLongTerm(true);
-            this.rangeControlChild.setRangeValue(Math.floor(duration.asHours()));
-        } else {
-            this.rangeControlChild.setLongTerm(false);
-            this.rangeControlChild.setRangeValue(duration.asMinutes());
-        }
-        this.rangeControlChild.changeTimeType("search");
-        this.rangeControlChild.dateChange(start);
-        this.rangeControlChild.hoursChange(start.hours());
-        this.rangeControlChild.minutesChange(start.minutes());
-        this.rangeControlChild.search(start, end, instances, hosts);
-    };
-
     setRewind = (time) => {
         let start = moment(Math.floor(time / (1000 * 60)) * (1000 * 60));
         start.subtract(5, "minutes");
         let end = start.clone().add(10, "minutes");
-        this.rangeControlChild.changeTimeType("search");
-        this.rangeControlChild.setLongTerm(false);
-        this.rangeControlChild.setRangeValue(10);
-        this.rangeControlChild.dateChange(start);
-        this.rangeControlChild.hoursChange(start.hours());
-        this.rangeControlChild.minutesChange(start.minutes());
-        this.rangeControlChild.search(start, end);
+        this.props.setRangeAll(start, start.hours(), start.minutes(), 10, false, false, this.props.config.range.shortHistoryRange, this.props.config.range.shortHistoryStep);
+        setTimeout(() => {
+            this.search(start, end, this.props.instances, this.props.hosts);
+        }, 100);
+
     };
 
     getRealTimeAlert = (instances, hosts) => {
@@ -596,38 +606,6 @@ class Paper extends Component {
         }
     };
 
-    changeRealtime = (realtime, longTerm) => {
-
-        this.setState({
-            realtime: realtime,
-            longTerm: longTerm,
-            counters: {
-                time: null,
-                data: null
-            },
-            countersHistory: {
-                time: null,
-                data: null,
-                from: null,
-                to: null
-            }
-        });
-
-        if (realtime) {
-            this.counterHistoriesLoaded = {};
-            clearInterval(this.dataRefreshTimer);
-            this.dataRefreshTimer = null;
-
-            let now = (new ServerDate()).getTime();
-            let ten = 1000 * 60 * 10;
-            this.getCounterHistory(this.props.instances, this.props.hosts, now - ten, now, false);
-            this.getLatestData(true, this.props.instances, this.props.hosts);
-        } else {
-            clearInterval(this.dataRefreshTimer);
-            this.dataRefreshTimer = null;
-        }
-    };
-
     changeLongTerm = (longTerm) => {
         this.setState({
             longTerm: longTerm
@@ -648,8 +626,8 @@ class Paper extends Component {
             }
         });
 
-        this.getCounterHistory(instances || this.props.instances, hosts || this.props.hosts, from, to, this.state.longTerm);
-        this.getXLogHistory(from, to, instances || this.props.instances, this.state.longTerm);
+        this.getCounterHistory(instances || this.props.instances, hosts || this.props.hosts, from, to, this.props.range.longTerm);
+        this.getXLogHistory(from, to, instances || this.props.instances, this.props.range.longTerm);
     };
 
     scroll = () => {
@@ -1100,25 +1078,6 @@ class Paper extends Component {
         }
     }
 
-    saveLastLayout = () => {
-        let layouts = getData("layouts");
-        let boxes = getData("boxes");
-        if(layouts && boxes) {
-            let templates = getData("templates");
-            if (!templates) {
-                templates = [];
-            }
-            templates.push({
-                no : templates.length,
-                name : "last-layout-" + moment().format("YY-MM-DD_hh:mm:ss"),
-                creationTime : (new Date()).getTime(),
-                boxes : boxes,
-                layouts : layouts
-            });
-            setData("templates", templates);
-        }
-    };
-
     onLayoutChange(layout, layouts) {
 
         let boxes = this.state.boxes;
@@ -1427,8 +1386,8 @@ class Paper extends Component {
         return (
             <div className="papers">
                 <div className={"fixed-alter-object " + (this.state.fixedControl ? 'show' : '')}></div>
-                <PaperControl addPaper={this.addPaper} addPaperAndAddMetric={this.addPaperAndAddMetric} clearLayout={this.clearLayout} fixedControl={this.state.fixedControl} toggleRangeControl={this.toggleRangeControl} realtime={this.state.realtime} alert={this.state.alert} clearAllAlert={this.clearAllAlert} clearOneAlert={this.clearOneAlert} setRewind={this.setRewind} showAlert={this.state.showAlert} toggleShowAlert={this.toggleShowAlert} />
-                <RangeControl onRef={ref => (this.rangeControlChild = ref)} visible={this.state.rangeControl} changeRealtime={this.changeRealtime} search={this.search} fixedControl={this.state.fixedControl} toggleRangeControl={this.toggleRangeControl} changeLongTerm={this.changeLongTerm}/>
+                <PaperControl addPaper={this.addPaper} addPaperAndAddMetric={this.addPaperAndAddMetric} clearLayout={this.clearLayout} fixedControl={this.state.fixedControl} toggleRangeControl={this.toggleRangeControl} realtime={this.props.range.realTime} alert={this.state.alert} clearAllAlert={this.clearAllAlert} clearOneAlert={this.clearOneAlert} setRewind={this.setRewind} showAlert={this.state.showAlert} toggleShowAlert={this.toggleShowAlert} />
+                <RangeControl visible={this.state.rangeControl} changeRealtime={this.changeRealtime} search={this.search} fixedControl={this.state.fixedControl} toggleRangeControl={this.toggleRangeControl} changeLongTerm={this.changeLongTerm}/>
                 {(instanceSelected && (!this.state.boxes || this.state.boxes.length === 0)) &&
                 <div className="quick-usage">
                     <div>
@@ -1451,7 +1410,7 @@ class Paper extends Component {
                                 {box.option && (box.option.length > 1 || box.option.config ) &&
                                 <button className="box-control box-layout-config-btn" onClick={this.toggleConfig.bind(null, box.key)}><i className="fa fa-cog" aria-hidden="true"></i></button>}
                                 {box.config && <BoxConfig box={box} setOptionValues={this.setOptionValues} setOptionClose={this.setOptionClose} removeMetrics={this.removeMetrics}/>}
-                                <Box visible={this.state.visible} setOption={this.setOption} box={box} pastTimestamp={this.state.pastTimestamp} pageCnt={this.state.pageCnt} data={this.state.data} config={this.props.config} visitor={this.state.visitor} counters={this.state.counters} countersHistory={this.state.countersHistory.data} countersHistoryFrom={this.state.countersHistory.from} countersHistoryTo={this.state.countersHistory.to} countersHistoryTimestamp={this.state.countersHistory.time} longTerm={this.state.longTerm} layoutChangeTime={this.state.layoutChangeTime} realtime={this.state.realtime} xlogHistoryDoing={this.state.xlogHistoryDoing} xlogHistoryRequestCnt={this.state.xlogHistoryRequestCnt} setStopXlogHistory={this.setStopXlogHistory} />
+                                <Box visible={this.state.visible} setOption={this.setOption} box={box} pastTimestamp={this.state.pastTimestamp} pageCnt={this.state.pageCnt} data={this.state.data} config={this.props.config} visitor={this.state.visitor} counters={this.state.counters} countersHistory={this.state.countersHistory.data} countersHistoryFrom={this.state.countersHistory.from} countersHistoryTo={this.state.countersHistory.to} countersHistoryTimestamp={this.state.countersHistory.time} longTerm={this.props.range.longTerm} layoutChangeTime={this.state.layoutChangeTime} realtime={this.props.range.realTime} xlogHistoryDoing={this.state.xlogHistoryDoing} xlogHistoryRequestCnt={this.state.xlogHistoryRequestCnt} setStopXlogHistory={this.setStopXlogHistory} />
                             </div>
                         )
                     })}
@@ -1468,7 +1427,7 @@ class Paper extends Component {
                     </div>
                 </div>
                 }
-                <Profiler selection={this.props.selection} newXLogs={this.state.data.newXLogs} xlogs={this.state.data.xlogs} startTime={this.state.data.startTime} realtime={this.state.realtime}/>
+                <Profiler selection={this.props.selection} newXLogs={this.state.data.newXLogs} xlogs={this.state.data.xlogs} startTime={this.state.data.startTime} realtime={this.props.range.realTime}/>
             </div>
         );
     }
@@ -1482,7 +1441,8 @@ let
             selection: state.target.selection,
             config: state.config,
             user: state.user,
-            template: state.template
+            template: state.template,
+            range: state.range
         };
     };
 
@@ -1491,7 +1451,18 @@ let
         return {
             addRequest: () => dispatch(addRequest()),
             pushMessage: (category, title, content) => dispatch(pushMessage(category, title, content)),
-            setControlVisibility: (name, value) => dispatch(setControlVisibility(name, value))
+            setControlVisibility: (name, value) => dispatch(setControlVisibility(name, value)),
+
+            setRealTime : (realTime, longTerm) => dispatch(setRealTime(realTime, longTerm)),
+            setRealTimeValue: (realTime, longTerm, value) => dispatch(setRealTimeValue(realTime, longTerm, value)),
+            setRangeDate: (date) => dispatch(setRangeDate(date)),
+            setRangeHours: (hours) => dispatch(setRangeHours(hours)),
+            setRangeMinutes: (minutes) => dispatch(setRangeMinutes(minutes)),
+            setRangeValue: (value) => dispatch(setRangeValue(value)),
+            setRangeDateHoursMinutes: (date, hours, minutes) => dispatch(setRangeDateHoursMinutes(date, hours, minutes)),
+            setRangeDateHoursMinutesValue: (date, hours, minutes, value) => dispatch(setRangeDateHoursMinutesValue(date, hours, minutes, value)),
+            setRangeAll: (date, hours, minutes, value, realTime, longTerm, range, step) => dispatch(setRangeAll(date, hours, minutes, value, realTime, longTerm, range, step)),
+
         };
     };
 

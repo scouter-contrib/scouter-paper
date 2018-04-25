@@ -19,18 +19,11 @@ import {setConfig, addRequest, clearAllMessage, setControlVisibility, setUserId,
 import {detect} from 'detect-browser';
 import Unsupport from "./components/Unsupport/Unsupport";
 import jQuery from "jquery";
-import {errorHandler, mergeDeep, setLinkModeData} from './common/common';
+import {errorHandler, mergeDeep, getParam} from './common/common';
 import Home from "./components/Home/Home";
-import moment from "moment/moment";
 
 const browser = detect();
-//const support = (browser.name === "chrome" || browser.name === "firefox" || browser.name === "opera" || browser.name === "safari");
 const support = (browser.name !== "ie" && browser.name !== "edge");
-
-
-if (browser.os.toUpperCase() === "MAC OS") {
-    document.querySelector("#root").classList.add("mac");
-}
 
 class App extends Component {
 
@@ -79,6 +72,58 @@ class App extends Component {
         });
     };
 
+    componentWillReceiveProps(nextProps) {
+        if (JSON.stringify(this.props.config.fontSetting) !== JSON.stringify(nextProps.config.fontSetting)) {
+            this.setFontSetting(nextProps.config.fontSetting);
+        }
+
+        if (this.props.config.theme !== nextProps.config.theme) {
+            document.querySelector("html").setAttribute("class", nextProps.config.theme);
+        }
+    };
+
+    componentWillMount() {
+        let config = null;
+        let str = localStorage.getItem("config");
+        if (str) {
+            config = JSON.parse(str);
+            config = mergeDeep(this.props.config, config); //for added config's properties on later versions.
+            localStorage.setItem("config", JSON.stringify(config));
+        } else {
+            config = this.props.config;
+        }
+
+        let params = getParam(this.props, "address,port");
+        if (params[0] && params[1]) {
+            config.address = params[0];
+            config.port = params[1];
+        }
+        this.props.setConfig(config);
+
+        let user = localStorage.getItem("user");
+        if (user) {
+            user = JSON.parse(user);
+            this.info(user, config);
+        }
+
+        if (user && config.authentification && config.authentification.type === "bearer") {
+            this.props.setUserId(user.id, user.token, user.time);
+        }
+
+        if (user && config.authentification && config.authentification.type === "cookie") {
+            this.props.setUserId(user.id, null, user.time);
+        }
+
+        if (!user && config && config.authentification.type === "none") {
+            this.info(user, config);
+        }
+    }
+
+    componentDidMount() {
+        document.querySelector("html").setAttribute("class", this.props.config.theme);
+        this.setFontSetting(this.props.config.fontSetting);
+    }
+
     getFontGeneric = (val) => {
         for (let i = 0; i < this.props.config.fonts.length; i++) {
             if (val === this.props.config.fonts[i].val) {
@@ -110,97 +155,6 @@ class App extends Component {
 
         document.body.appendChild(css);
     };
-
-    componentWillReceiveProps(nextProps) {
-        if (JSON.stringify(this.props.config.fontSetting) !== JSON.stringify(nextProps.config.fontSetting)) {
-            this.setFontSetting(nextProps.config.fontSetting);
-        }
-
-        if (this.props.config.theme !== nextProps.config.theme) {
-            document.querySelector("html").setAttribute("class", nextProps.config.theme);
-        }
-    };
-
-    componentWillMount() {
-        let config = null;
-        let str = localStorage.getItem("config");
-        if (str) {
-            config = JSON.parse(str);
-            config = mergeDeep(this.props.config, config); //for added config's properties on later versions.
-            localStorage.setItem("config", JSON.stringify(config));
-        } else {
-            config = this.props.config;
-        }
-
-        let runMode = new URLSearchParams(this.props.location.search).get('run-mode');
-        if (runMode && runMode === "link") {
-            config.runMode = "link";
-            let from = new URLSearchParams(this.props.location.search).get('from');
-            let to = new URLSearchParams(this.props.location.search).get('to');
-            if(from && to) {
-                if(from.length === 14 && to.length === 14) {
-                    from = moment(from, 'YYYYMMDDHHmmss').valueOf();
-                    to = moment(to, 'YYYYMMDDhhmmss').valueOf();
-                }
-
-                let address = new URLSearchParams(this.props.location.search).get('address');
-                let port = new URLSearchParams(this.props.location.search).get('port');
-                address && (config.address = address);
-                port && (config.port = port);
-
-                setLinkModeData({
-                    mode : "link",
-                    dirty : false,
-                    ready : false,
-                    from: from,
-                    to: to
-                });
-
-            } else {
-                config.runMode = "normal";
-                setLinkModeData({
-                    mode : "normal",
-                    dirty : true,
-                    ready : false,
-                });
-            }
-        } else {
-            setLinkModeData({
-                mode : "normal",
-                dirty : true,
-                ready : false,
-            });
-        }
-
-        this.props.setConfig(config);
-
-        let user = localStorage.getItem("user");
-        if (user) {
-            user = JSON.parse(user);
-            this.info(user, config);
-        }
-
-        if (user && config.authentification && config.authentification.type === "bearer") {
-            this.props.setUserId(user.id, user.token, user.time);
-        }
-
-        if (user && config.authentification && config.authentification.type === "cookie") {
-            this.props.setUserId(user.id, null, user.time);
-        }
-
-        if (!user && config && config.authentification.type === "none") {
-            this.info(user, config);
-        }
-    }
-
-    componentDidMount() {
-        document.querySelector("html").setAttribute("class", this.props.config.theme);
-        this.setFontSetting(this.props.config.fontSetting);
-    }
-
-    componentDidUpdate(prevProps, prevState) {
-        //document.querySelector("body").style.backgroundColor = this.props.bgColor;
-    }
 
     render() {
         return (
