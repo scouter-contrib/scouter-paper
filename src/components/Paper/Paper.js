@@ -113,9 +113,11 @@ class Paper extends Component {
             showAlert: false
         };
 
+        // URL로부터 range 컨트럴의 데이터를 세팅
         let params = common.getParam(this.props, "realtime,longterm,from,to");
         if (params[0] || params[0] === null) {//realtime
             this.props.setRealTime(true, false);
+            common.setRangePropsToUrl(this.props);
         } else {
             if (params[1]) {//longterm
                 this.props.setRealTime(false, true);
@@ -126,8 +128,6 @@ class Paper extends Component {
             let now = moment();
             let from = now.clone().subtract(10, "minutes");
             let to = now;
-            //http://localhost:3000/#/paper?instances=-657282994%2C-1939064594&realtime=false&longterm=false&from=1524675000123&to=1524675600123
-            //http://localhost:3000/#/paper?instances=-657282994%2C-1939064594&realtime=false&longterm=false&from=20180420182500&to=20180422162500
             if (params[2] && params[3]) {
                 if (params[2].length === 14 && params[3].length === 14) {
                     from = moment(params[2], "YYYYMMDDhhmmss");
@@ -206,6 +206,11 @@ class Paper extends Component {
                 this.dataRefreshTimer = null;
             }
         }
+
+        if (JSON.stringify(this.props.instances) !== JSON.stringify(nextProps.instances) || JSON.stringify(this.props.range) !== JSON.stringify(nextProps.range)) {
+            common.setRangePropsToUrl(nextProps);
+        }
+
     }
 
     componentDidMount() {

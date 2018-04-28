@@ -180,21 +180,6 @@ export function getDivideDays(from, to) {
     return fromTos;
 }
 
-
-export function isChangeParam(prev, next, key) {
-    let prevParam = null;
-    let nextParam = null;
-    if (prev && prev.location.search) {
-        prevParam = new URLSearchParams(prev.location.search).get(key);
-    }
-
-    if (next && next.location.search) {
-        nextParam = new URLSearchParams(next.location.search).get(key);
-    }
-
-    return prevParam !== nextParam;
-}
-
 export function getParam(props, key) {
     if (key.indexOf(",") > -1) {
         let keys = key.split(",");
@@ -218,13 +203,40 @@ export function getParam(props, key) {
     }
 }
 
-export function setPath(props, key, value) {
+export function setRangePropsToUrl (props, pathname) {
     let search = new URLSearchParams(props.location.search);
-    search.set(key, value);
-    if (props.history.location.search !== ("?" + search.toString())) {
-        props.history.push({
-            pathname: props.location.pathname,
-            search: "?" + search.toString()
-        });
+
+    if (props.instances.length > 0) {
+        search.set("instances", props.instances.map((d) => {
+            return d.objHash
+        }));
+    }
+
+    search.set("realtime", props.range.realTime);
+    search.set("longterm", props.range.longTerm);
+
+    let from = props.range.date.clone();
+    from.seconds(0);
+    from.minutes(props.range.minutes);
+    from.hours(props.range.hours);
+
+    let to = from.clone();
+    to = to.add(props.range.value, "minutes");
+
+    search.set("from", from.format("YYYYMMDDhhmmss"));
+    search.set("to", to.format("YYYYMMDDhhmmss"));
+
+    if (props.location.search !== ("?" + search.toString())) {
+        if (pathname) {
+            props.history.push({
+                pathname: pathname,
+                search: "?" + search.toString()
+            });
+        } else {
+            props.history.replace({
+                pathname: props.location.pathname,
+                search: "?" + search.toString()
+            });
+        }
     }
 }

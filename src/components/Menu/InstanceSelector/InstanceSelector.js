@@ -398,12 +398,13 @@ class InstanceSelector extends Component {
             this.props.setTarget(hosts, instances);
             this.props.setControlVisibility("TargetSelector", false);
 
-            this.props.history.push({
+            common.setRangePropsToUrl(this.props, "/paper");
+            /*this.props.history.push({
                 pathname: '/paper',
                 search: '?instances=' + instances.map((d) => {
                     return d.objHash
                 })
-            });
+            });*/
 
             this.props.toggleSelectorVisible();
         }
@@ -418,6 +419,8 @@ class InstanceSelector extends Component {
     render() {
         return (
             <div className={"instance-selector-bg " + (this.props.visible ? "" : "hidden")}>
+                <div className={"instance-selector-fixed-bg"}>
+                </div>
                 <div className="instance-selector popup-div">
                     <div className="instance-selector-content">
                         <div className="host-list">
@@ -483,7 +486,8 @@ let mapStateToProps = (state) => {
     return {
         instances: state.target.instances,
         config: state.config,
-        user: state.user
+        user: state.user,
+        range: state.range,
     };
 };
 

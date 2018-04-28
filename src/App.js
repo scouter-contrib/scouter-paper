@@ -93,6 +93,7 @@ class App extends Component {
             config = this.props.config;
         }
 
+        // URL로부터 스카우터 서버 IP와 PORT를 세팅
         let params = getParam(this.props, "address,port");
         if (params[0] && params[1]) {
             config.address = params[0];
