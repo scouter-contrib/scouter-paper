@@ -23,7 +23,7 @@
     border: 1px solid rgba(0, 0, 0, 0.6);
     color: white;
     width: 500px;
-    height: 300px;
+    height: 350px;
     position: absolute;
     top: 47px;
     right: 24px;
@@ -49,7 +49,7 @@
 .instance-selector .instance-selector-content {
     display: table;
     width: 100%;
-    height: calc(100% - 40px);
+    height: calc(100% - 74px);
     table-layout: fixed;
 }
 
@@ -267,10 +267,32 @@
         top: 45px;
         right: 10px;
         left: 10px;
-        z-index: 2;
         padding: 0;
-
     }
+}
 
+.instance-selector .scouter-servers {
+    text-align: right;
+    padding: 5px 5px 5px;
+    height: 34px;
+    background-color: rgba(0,0,0,0.3);
+    font-size: 10px;
+    box-sizing: border-box;
+}
+
+.instance-selector .scouter-servers > div {
+    display: inline-block;
+}
+
+.instance-selector .scouter-servers > div.scouter-server-label {
+    margin: 0 10px;
+}
+
+.instance-selector .scouter-servers select {
+    padding: 5px 10px;
+    border: 1px solid rgba(0, 0, 0, 0.3);
+    font-size: 10px;
+    -webkit-appearance: none;
+    outline: none;
 }
 

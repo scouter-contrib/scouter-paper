@@ -160,7 +160,6 @@ class Profiler extends Component {
                     this.rowClick({
                         txid : this.state.paramTxid
                     }, this.state.paramTxidDate);
-                    console.log(2);
                 }
 
             }

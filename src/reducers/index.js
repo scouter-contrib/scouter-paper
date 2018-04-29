@@ -3,18 +3,20 @@ import {combineReducers} from 'redux';
 import moment from 'moment';
 
 const configState = {
-    protocol: window.location.protocol.replace(":", ""),
-    address: window.location.hostname,
-    port: 6188,
+    servers : [
+        {
+            protocol: window.location.protocol.replace(":", ""),
+            address: window.location.hostname,
+            port: 6188,
+            authentification :"bearer",
+            default : true
+        }
+    ],
     interval: 2000,
     numberFormat: "0,0",
     dateFormat: "%Y-%m-%d",
     timeFormat: "%H:%M:%S",
     minuteFormat: "%H:%M",
-    runMode: "normal",
-    authentification : {
-        type : "bearer"
-    },
     theme : "theme-blue/white",
     colorType : "white",
     graph : {

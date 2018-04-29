@@ -53,7 +53,16 @@ export function getLocalSettingData(key, defaultValue) {
 }
 
 export function getHttpProtocol(config) {
-    return config.protocol + "://" + config.address + ":" + config.port;
+    if (config.servers && config.servers.length > 0) {
+        let server = config.servers.filter((server) => server.default);
+        if (server && server.length > 0) {
+            return server[0].protocol + "://" + server[0].address + ":" + server[0].port;
+        } else {
+            return null;
+        }
+    } else {
+        return null;
+    }
 }
 
 export function errorHandler(xhr, textStatus, errorThrown, props) {
@@ -81,12 +90,36 @@ export function errorHandler(xhr, textStatus, errorThrown, props) {
 
 export function getWithCredentials(config) {
     return {
-        withCredentials: (config.authentification && config.authentification.type === "cookie")
+        withCredentials: (getDefaultServerConfig(config).authentification === "cookie")
     }
 }
 
+export function getDefaultServerConfig(config) {
+    if (config.servers && config.servers.length > 0) {
+        let server = config.servers.filter((server) => server.default);
+        if (server && server.length > 0) {
+            return server[0];
+        }
+    }
+    return {};
+}
+
+export function getDefaultServerConfigIndex(config) {
+    let inx = -1;
+    if (config.servers && config.servers.length > 0) {
+        for (let i=0; i<config.servers.length; i++) {
+            if (config.servers[i].default) {
+                inx = i;
+                break;
+            }
+        }
+    }
+
+    return inx;
+}
+
 export function setAuthHeader(xhr, config, user) {
-    if (config.authentification && config.authentification.type === "bearer") {
+    if (getDefaultServerConfig(config).authentification === "bearer") {
         if (user && user.token) {
             xhr.setRequestHeader('Authorization', 'bearer ' + user.token);
         }

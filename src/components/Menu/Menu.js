@@ -6,6 +6,7 @@ import {connect} from 'react-redux';
 import {withRouter} from 'react-router-dom';
 import LayoutManagerButton from "./LayoutManagerButton/LayoutManagerButton";
 import LayoutManager from "./LayoutManager/LayoutManager";
+import {getDefaultServerConfig} from '../../common/common';
 class Menu extends Component {
 
     constructor(props) {
@@ -76,7 +77,7 @@ class Menu extends Component {
                             <div className="text">SETTINGS</div>
                         </div>
                     </NavLink>
-                    {(this.props.config.authentification && this.props.config.authentification.type !== "none") &&
+                    {(getDefaultServerConfig(this.props.config).authentification !== "none") &&
                         <NavLink className={"menu-item right " + (this.state.menu === "login" ? "active" : "")} to={"/login" + instanceParam} activeClassName="active" onClick={this.menuClick.bind(this, "/login")}>
                             <div>
                                 {(this.props.user && this.props.user.id) ? <div className="text"></div> : <div className="icon"><i className="fa fa-handshake-o" aria-hidden="true"></i></div>}

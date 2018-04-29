@@ -19,7 +19,7 @@ import {setConfig, addRequest, clearAllMessage, setControlVisibility, setUserId,
 import {detect} from 'detect-browser';
 import Unsupport from "./components/Unsupport/Unsupport";
 import jQuery from "jquery";
-import {errorHandler, mergeDeep, getParam} from './common/common';
+import {errorHandler, mergeDeep, getParam, setAuthHeader, getWithCredentials, getHttpProtocol, getDefaultServerConfig} from './common/common';
 import Home from "./components/Home/Home";
 
 const browser = detect();
@@ -34,24 +34,18 @@ class App extends Component {
         jQuery.ajax({
             method: "GET",
             async: true,
-            url: config.protocol + "://" + config.address + ":" + config.port + "/scouter/v1/kv/a",
-            xhrFields: {
-                withCredentials: (config.authentification && config.authentification.type === "token")
-            },
+            url: getHttpProtocol(config) + "/scouter/v1/kv/a",
+            xhrFields: getWithCredentials(config),
             beforeSend: function (xhr) {
-                if (config.authentification && config.authentification.type === "bearer") {
-                    if (user && user.token) {
-                        xhr.setRequestHeader('Authorization', 'bearer ' + user.token);
-                    }
-                }
+                setAuthHeader(xhr, config, user);
             }
         }).done((msg) => {
             if (msg && Number(msg.status) === 200) {
-                if (config.authentification && config.authentification.type === "bearer") {
+                if (getDefaultServerConfig(config).authentification === "bearer") {
                     this.props.setUserId(user.id, user.token, user.time);
                 }
 
-                if (config.authentification && config.authentification.type === "cookie") {
+                if (getDefaultServerConfig(config).authentification === "cookie") {
                     this.props.setUserId(user.id, null, user.time);
                 }
 
@@ -60,7 +54,7 @@ class App extends Component {
             }
         }).fail((xhr, textStatus, errorThrown) => {
             // 응답이 왔고, 401코드인데, 인증 안함 설정한 경우
-            if (xhr.readyState === 4 && xhr.responseJSON.resultCode === "401" && config.authentification && config.authentification.type === "none") {
+            if (xhr.readyState === 4 && xhr.responseJSON.resultCode === "401" && getDefaultServerConfig(config).authentification === "none") {
                 this.props.pushMessage("error", "CHECK SETTINGS", "current setting does not require authentication, but it actually requires authentication.");
                 this.props.setControlVisibility("Message", true);
             } else {
@@ -94,12 +88,36 @@ class App extends Component {
         }
 
         // URL로부터 스카우터 서버 IP와 PORT를 세팅
-        let params = getParam(this.props, "address,port");
-        if (params[0] && params[1]) {
-            config.address = params[0];
-            config.port = params[1];
+        //http://localhost:3000/?#/paper?instances=-657282994%2C-1939064594&realtime=true&longterm=false&from=20180430021500&to=20180430022000&protocol=https&address=mindplates.com&port=6188&authentification=bearer
+        //http://localhost:3000/?#/paper?instances=-657282994%2C-1939064594&realtime=true&longterm=false&from=20180430022200&to=20180430022700&protocol=http&address=127.0.0.1&port=6188&authentification=bearer
+        let params = getParam(this.props, "protocol,address,port,authentification");
+        if (params[0] && params[1] && params[2] && params[3]) {
+            let found = false;
+            for (let i=0; i<config.servers.length; i++) {
+                let server = config.servers[i];
+                if (server.protocol === params[0] && server.address === params[1] && String(server.port) === String(params[2]) && server.authentification === params[3]) {
+                    found = true;
+                    server.default = true;
+                } else {
+                    server.default = false;
+                }
+            }
+
+            if (!found) {
+                config.servers.push({
+                    protocol: params[0],
+                    address: params[1],
+                    port: params[2],
+                    authentification :params[3],
+                    default : true
+                });
+            }
         }
+
         this.props.setConfig(config);
+        if (localStorage) {
+            localStorage.setItem("config", JSON.stringify(config));
+        }
 
         let user = localStorage.getItem("user");
         if (user) {
@@ -107,15 +125,15 @@ class App extends Component {
             this.info(user, config);
         }
 
-        if (user && config.authentification && config.authentification.type === "bearer") {
+        if (user && getDefaultServerConfig(config).authentification === "bearer") {
             this.props.setUserId(user.id, user.token, user.time);
         }
 
-        if (user && config.authentification && config.authentification.type === "cookie") {
+        if (user && getDefaultServerConfig(config).authentification === "cookie") {
             this.props.setUserId(user.id, null, user.time);
         }
 
-        if (!user && config && config.authentification.type === "none") {
+        if (!user && getDefaultServerConfig(config).authentification === "none") {
             this.info(user, config);
         }
     }

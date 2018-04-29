@@ -37,6 +37,20 @@
     box-shadow: 0 0 5px #666;
 }
 
+.settings .server-setting-box {
+    position: relative;
+    padding-top: 40px;
+}
+
+.settings .server-setting-box .server-plus-btn {
+    position: absolute;
+    top : 10px;
+    right : 10px;
+    display: inline-block;
+    cursor: pointer;
+    font-size: 10px;
+}
+
 @media screen and (max-width: 1400px) {
     .settings .forms {
         margin: 0 100px 0;
@@ -83,6 +97,55 @@
     padding-top: 15px;
 }
 
+.settings .forms .server-row {
+    display: table;
+    table-layout: fixed;
+    width: 100%;
+}
+
+.settings .forms .server-row .row {
+    display: table-cell;
+    vertical-align: middle;
+    padding: 0;
+    width: calc((100% - 100px) / 4);
+    padding: 5px;
+    text-align: center;
+}
+
+.settings button[disabled] {
+    background-color: rgba(0, 0, 0, 0.1);
+}
+
+.settings .forms .row.server-row-no {
+    width: 40px;
+}
+
+.settings .forms .row.server-row-default {
+    width: 40px;
+}
+.settings .forms .row.server-row-remove {
+    width: 20px;
+}
+
+.settings .forms .server-row-authentification .short {
+    display: none;
+}
+
+
+.settings .forms .row.server-row-remove .disabled {
+    color: #999;
+}
+
+.settings .forms .row.server-row-remove > div {
+    cursor: pointer;
+}
+
+.settings .forms .server-row input[type=radio] {
+    width: 20px;
+    padding: 0;
+    margin: 0;
+}
+
 .settings .forms .dot-box {
     display: table;
 }
@@ -106,6 +169,10 @@
         padding: 15px 20px 20px 20px;
     }
 
+    .settings .server-setting-box {
+        padding-top: 40px;
+    }
+
     .settings .forms .row {
         margin: 0;
         width: 50%;
@@ -119,6 +186,10 @@
 
     .settings .forms .row:nth-child(2n) {
         padding-right: 0;
+    }
+
+    .settings .forms .server-row .row:nth-child(2n) {
+        padding-right: 5px;
     }
 
 }
@@ -146,6 +217,90 @@
 
     .settings .forms .row.dot-row {
         display: block;
+    }
+
+    .settings .forms .row.server-row-no {
+        display: none;
+    }
+
+    .settings .forms .row.server-row-protocol {
+        width: 60px;
+    }
+
+    .settings .forms .row.server-row-address {
+        width: auto;
+    }
+
+    .settings .forms .row.server-row-port {
+        width: 60px;
+    }
+
+    .settings .forms .row.server-row-authentification {
+        width: 100px;
+    }
+
+    .settings .forms .server-row-authentification .long {
+        display: none;
+    }
+
+    .settings .forms .server-row-authentification .short {
+        display: block;
+    }
+
+    .settings .forms .row.server-row-default {
+        width: 40px;
+    }
+
+    .settings .forms .row.server-row-remove {
+        width: 20px;
+    }
+}
+
+
+@media screen and (max-width: 600px) {
+
+    .settings .setting-box {
+        padding: 0 10px 10px 10px;
+
+    }
+
+    .settings .server-setting-box {
+        padding-top: 40px;
+    }
+
+    .settings .forms .row.server-row-protocol {
+        width: 50px;
+        padding-left: 0;
+    }
+
+    .settings .forms .row.server-row-address {
+        width: auto;
+    }
+
+    .settings .forms .row.server-row-port {
+        width: 50px;
+    }
+
+    .settings .forms .row.server-row-authentification {
+        width: 90px;
+    }
+
+    .settings .forms .server-row-authentification .long {
+        display: none;
+    }
+
+    .settings .forms .server-row-authentification .short {
+        display: block;
+    }
+
+    .settings .forms .row.server-row-default {
+        width: 30px;
+    }
+
+
+
+    .settings .forms .row.server-row-remove {
+        width: 20px;
     }
 }
 
@@ -201,6 +356,7 @@
     border: 1px solid rgba(0, 0, 0, 0.3);
     font-size: 10px;
     -webkit-appearance: none;
+    outline: none;
 }
 
 .settings .forms .setting-box select[disabled] {
