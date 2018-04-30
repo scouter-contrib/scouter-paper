@@ -163,7 +163,7 @@
     position: static !important;
 }
 
-@media screen and (max-width: 800px) {
+@media screen and (max-width: 660px) {
 
     .papers-controls {
         height: 58px;
@@ -215,7 +215,7 @@
     }
 }
 
-@media screen and (max-width: 420px) {
+@media screen and (max-width: 360px) {
     .papers-controls {
         height: 84px;
     }

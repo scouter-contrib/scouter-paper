@@ -256,8 +256,8 @@ export function setRangePropsToUrl (props, pathname) {
     let to = from.clone();
     to = to.add(props.range.value, "minutes");
 
-    search.set("from", from.format("YYYYMMDDhhmmss"));
-    search.set("to", to.format("YYYYMMDDhhmmss"));
+    search.set("from", from.format("YYYYMMDDHHmmss"));
+    search.set("to", to.format("YYYYMMDDHHmmss"));
 
     if (props.location.search !== ("?" + search.toString())) {
         if (pathname) {

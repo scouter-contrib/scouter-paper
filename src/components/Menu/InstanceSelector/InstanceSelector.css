@@ -70,7 +70,10 @@
     top: 0;
     text-align: center;
     width: 100%;
-    height: 20px;
+    height: 30px;
+    background-color: rgba(0, 0, 0, 0.1);
+    padding-top: 4px;
+    box-sizing: border-box;
 }
 
 .instance-selector .instance-selector-content .filter {
@@ -170,11 +173,14 @@
 
 .instance-selector .instance-selector-content .title > div {
     display: inline-block;
-    padding: 8px 8px;
+    padding: 5px 0 5px;
     background-color: rgba(0, 0, 0, 0.2);
     margin: 0;
-    line-height: 0;
     font-size: 10px;
+    width: 70px;
+    height: 20px;
+    box-sizing: border-box;
+    border-radius: 3px;
 }
 
 .instance-selector .host-list {

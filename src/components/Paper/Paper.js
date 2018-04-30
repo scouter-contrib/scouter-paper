@@ -3,7 +3,7 @@ import "./Paper.css";
 import "./Resizable.css";
 import {connect} from "react-redux";
 import {withRouter} from 'react-router-dom';
-import {addRequest, pushMessage, setControlVisibility, setRealTime, setRealTimeValue, setRangeDate, setRangeHours, setRangeMinutes, setRangeValue, setRangeDateHoursMinutes, setRangeDateHoursMinutesValue, setRangeAll} from "../../actions";
+import {addRequest, pushMessage, setControlVisibility, setRealTime, setRealTimeValue, setRangeDate, setRangeHours, setRangeMinutes, setRangeValue, setRangeDateHoursMinutes, setRangeDateHoursMinutesValue, setRangeAll, setTemplate} from "../../actions";
 import {Responsive, WidthProvider} from "react-grid-layout";
 import {Box, BoxConfig, PaperControl} from "../../components";
 import jQuery from "jquery";
@@ -57,6 +57,69 @@ class Paper extends Component {
 
         let alertInfo = JSON.parse(localStorage.getItem("alert"));
 
+        //URL로부터 XLOG 응답시간 축 시간 값 세팅
+        let xlogElapsedTime = common.getParam(this.props, "xlogElapsedTime");
+
+        //URL로부터 layout 세팅
+        let layout = common.getParam(this.props, "layout");
+        if (layout) {
+            jQuery.ajax({
+                method: "GET",
+                async: true,
+                url: getHttpProtocol(this.props.config) + "/scouter/v1/kv/__scouter_paper_layout",
+                xhrFields: getWithCredentials(this.props.config),
+                beforeSend: (xhr) => {
+                    setAuthHeader(xhr, this.props.config, this.props.user);
+                }
+            }).done((msg) => {
+                if (msg && Number(msg.status) === 200) {
+                    let templates = JSON.parse(msg.result);
+                    for (let i=0; i<templates.length; i++) {
+                        if (layout === templates[i].name) {
+                            this.props.setTemplate(templates[i].boxes, templates[i].layouts);
+                            break;
+                        }
+                    }
+                }
+            }).fail((xhr, textStatus, errorThrown) => {
+                errorHandler(xhr, textStatus, errorThrown, this.props);
+            });
+        }
+
+        // URL로부터 range 컨트럴의 데이터를 세팅
+        let params = common.getParam(this.props, "realtime,longterm,from,to");
+        if (params[0] || params[0] === null) {//realtime
+            this.props.setRealTime(true, false);
+            common.setRangePropsToUrl(this.props);
+        } else {
+            if (params[1]) {//longterm
+                this.props.setRealTime(false, true);
+            } else {
+                this.props.setRealTime(false, false);
+            }
+
+            let now = moment();
+            let from = now.clone().subtract(10, "minutes");
+            let to = now;
+            if (params[2] && params[3]) {
+                if (params[2].length === 14 && params[3].length === 14) {
+                    from = moment(params[2], "YYYYMMDDhhmmss");
+                    to = moment(params[3], "YYYYMMDDhhmmss");
+                } else {
+                    from = moment(Number(params[2]));
+                    to = moment(Number(params[3]));
+                }
+
+                let value = Math.floor((to.valueOf() - from.valueOf()) / (1000 * 60));
+                if (!isNaN(value)) {
+                    this.props.setRangeDateHoursMinutesValue(from, from.hours(), from.minutes(), value);
+                    this.needSearch = true;
+                    this.needSearchFrom = from.valueOf();
+                    this.needSearchTo = to.valueOf();
+                }
+            }
+        }
+
         this.state = {
             layouts: layouts,
             layoutChangeTime: null,
@@ -76,6 +139,7 @@ class Paper extends Component {
                 endTime: endTime,
                 range: range,
                 maxElapsed: 2000,
+                paramMaxElapsed : xlogElapsedTime,
                 lastRequestTime: null,
                 clearTimestamp: null
             },
@@ -113,39 +177,10 @@ class Paper extends Component {
             showAlert: false
         };
 
-        // URL로부터 range 컨트럴의 데이터를 세팅
-        let params = common.getParam(this.props, "realtime,longterm,from,to");
-        if (params[0] || params[0] === null) {//realtime
-            this.props.setRealTime(true, false);
-            common.setRangePropsToUrl(this.props);
-        } else {
-            if (params[1]) {//longterm
-                this.props.setRealTime(false, true);
-            } else {
-                this.props.setRealTime(false, false);
-            }
 
-            let now = moment();
-            let from = now.clone().subtract(10, "minutes");
-            let to = now;
-            if (params[2] && params[3]) {
-                if (params[2].length === 14 && params[3].length === 14) {
-                    from = moment(params[2], "YYYYMMDDhhmmss");
-                    to = moment(params[3], "YYYYMMDDhhmmss");
-                } else {
-                    from = moment(Number(params[2]));
-                    to = moment(Number(params[3]));
-                }
 
-                let value = Math.floor((to.valueOf() - from.valueOf()) / (1000 * 60));
-                if (!isNaN(value)) {
-                    this.props.setRangeDateHoursMinutesValue(from, from.hours(), from.minutes(), value);
-                    this.needSearch = true;
-                    this.needSearchFrom = from.valueOf();
-                    this.needSearchTo = to.valueOf();
-                }
-            }
-        }
+
+
     }
 
     componentWillReceiveProps(nextProps) {
@@ -1467,6 +1502,8 @@ let
             setRangeDateHoursMinutes: (date, hours, minutes) => dispatch(setRangeDateHoursMinutes(date, hours, minutes)),
             setRangeDateHoursMinutesValue: (date, hours, minutes, value) => dispatch(setRangeDateHoursMinutesValue(date, hours, minutes, value)),
             setRangeAll: (date, hours, minutes, value, realTime, longTerm, range, step) => dispatch(setRangeAll(date, hours, minutes, value, realTime, longTerm, range, step)),
+
+            setTemplate: (boxes, layouts) => dispatch(setTemplate(boxes, layouts))
 
         };
     };

@@ -37,7 +37,7 @@ class Profiler extends Component {
             formatter: false,
             listWidth : 40,
             smallScreen : false,
-            paramTxid : txid,
+            paramTxid : txid ? txid : null,
             paramTxidDate : txiddate ? txiddate : null
         };
     }
