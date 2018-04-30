@@ -176,11 +176,6 @@ class Paper extends Component {
             },
             showAlert: false
         };
-
-
-
-
-
     }
 
     componentWillReceiveProps(nextProps) {

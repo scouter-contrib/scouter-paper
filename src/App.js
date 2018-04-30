@@ -87,15 +87,18 @@ class App extends Component {
             config = this.props.config;
         }
 
-        // URL로부터 스카우터 서버 IP와 PORT를 세팅
-        //http://localhost:3000/?#/paper?instances=-657282994%2C-1939064594&realtime=true&longterm=false&from=20180430021500&to=20180430022000&protocol=https&address=mindplates.com&port=6188&authentification=bearer
-        //http://localhost:3000/?#/paper?instances=-657282994%2C-1939064594&realtime=true&longterm=false&from=20180430022200&to=20180430022700&protocol=http&address=127.0.0.1&port=6188&authentification=bearer
-        let params = getParam(this.props, "protocol,address,port,authentification");
-        if (params[0] && params[1] && params[2] && params[3]) {
+        // URL로부터 스카우터 서버 정보를 세팅
+        let params = getParam(this.props, "address,port,protocol,authentification");
+        if (params[0] && params[1]) {
+            let paramAddress = params[0];
+            let paramPort = params[1];
+            let paramProtocol = params[2] ? params[2] : "http";
+            let paramAuthentification = params[3] ? params[3] : "none";
+
             let found = false;
             for (let i=0; i<config.servers.length; i++) {
                 let server = config.servers[i];
-                if (server.protocol === params[0] && server.address === params[1] && String(server.port) === String(params[2]) && server.authentification === params[3]) {
+                if (server.protocol === paramProtocol && server.address === paramAddress && String(server.port) === String(paramPort) && server.authentification === paramAuthentification) {
                     found = true;
                     server.default = true;
                 } else {
@@ -103,12 +106,13 @@ class App extends Component {
                 }
             }
 
+            console.log(found);
             if (!found) {
                 config.servers.push({
-                    protocol: params[0],
-                    address: params[1],
-                    port: params[2],
-                    authentification :params[3],
+                    protocol: paramProtocol,
+                    address: paramAddress,
+                    port: paramPort,
+                    authentification :paramAuthentification,
                     default : true
                 });
             }
