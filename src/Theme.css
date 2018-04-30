@@ -20,9 +20,17 @@ html.theme-gray {
     background-color: #161616;
 }
 
+.theme-gray .papers-controls.fixed-control {
+    background-color: #161616;
+}
+
 /* THEME, XLog.css */
 .theme-gray .xlog-viewer .xlog-history-stop-control > div {
     background-color: #111;
+}
+
+.theme-gray .xlog-viewer .no-longterm-support {
+    background-color: #0A0A0A;
 }
 
 /* THEME, Home.css */
@@ -197,4 +205,23 @@ html.theme-gray, .theme-gray body {
 
 .theme-gray .xlog-config-controller > div > div {
     background-color: black;
+}
+
+/* THEME, Message.css */
+.theme-gray .system-message {
+    background-color: #0A0A0A;
+}
+
+.theme-gray .message-content-layout > .message-content .center-message .message-title > span {
+    background-color: black;
+}
+
+.theme-gray .message-content-layout > .message-content .before,
+.theme-gray .message-content-layout > .message-content .after {
+    color: #CCC;
+}
+
+.theme-gray .message-content-layout > .message-content .before > span:hover,
+.theme-gray .message-content-layout > .message-content .after > span:hover {
+    color: white;
 }

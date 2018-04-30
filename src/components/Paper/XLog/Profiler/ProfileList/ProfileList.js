@@ -205,7 +205,7 @@ class ProfileList extends Component {
                     const xtype = xlogTypes[xlog.xlogType];
                     rowClass += xtype && xtype >= 2 && xtype <= 4 ? ' async' : '';
 
-                    return <div onClick={this.props.rowClick.bind(this, xlog)} key={i} className={"row " + rowClass + ' ' + (this.props.txid === xlog.txid ? 'active' : '')}>{this.getRow(xlog, i)}</div>;
+                    return <div onClick={this.props.rowClick.bind(this, xlog, null)} key={i} className={"row " + rowClass + ' ' + (this.props.txid === xlog.txid ? 'active' : '')}>{this.getRow(xlog, i)}</div>;
                 })}
             </div>
 

@@ -25,3 +25,5 @@ yarn-error.log*
 
 # intellij
 .idea
+*.iml
+

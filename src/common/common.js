@@ -53,7 +53,16 @@ export function getLocalSettingData(key, defaultValue) {
 }
 
 export function getHttpProtocol(config) {
-    return config.protocol + "://" + config.address + ":" + config.port;
+    if (config.servers && config.servers.length > 0) {
+        let server = config.servers.filter((server) => server.default);
+        if (server && server.length > 0) {
+            return server[0].protocol + "://" + server[0].address + ":" + server[0].port;
+        } else {
+            return null;
+        }
+    } else {
+        return null;
+    }
 }
 
 export function errorHandler(xhr, textStatus, errorThrown, props) {
@@ -81,12 +90,36 @@ export function errorHandler(xhr, textStatus, errorThrown, props) {
 
 export function getWithCredentials(config) {
     return {
-        withCredentials: (config.authentification && config.authentification.type === "cookie")
+        withCredentials: (getDefaultServerConfig(config).authentification === "cookie")
     }
 }
 
+export function getDefaultServerConfig(config) {
+    if (config.servers && config.servers.length > 0) {
+        let server = config.servers.filter((server) => server.default);
+        if (server && server.length > 0) {
+            return server[0];
+        }
+    }
+    return {};
+}
+
+export function getDefaultServerConfigIndex(config) {
+    let inx = -1;
+    if (config.servers && config.servers.length > 0) {
+        for (let i=0; i<config.servers.length; i++) {
+            if (config.servers[i].default) {
+                inx = i;
+                break;
+            }
+        }
+    }
+
+    return inx;
+}
+
 export function setAuthHeader(xhr, config, user) {
-    if (config.authentification && config.authentification.type === "bearer") {
+    if (getDefaultServerConfig(config).authentification === "bearer") {
         if (user && user.token) {
             xhr.setRequestHeader('Authorization', 'bearer ' + user.token);
         }
@@ -178,4 +211,65 @@ export function getDivideDays(from, to) {
     }
 
     return fromTos;
+}
+
+export function getParam(props, key) {
+    if (key.indexOf(",") > -1) {
+        let keys = key.split(",");
+        let params = new URLSearchParams(props.location.search);
+        let result = [];
+        for (let i=0; i<keys.length; i++) {
+            let val = params.get(keys[i]);
+            if (val === "true") {
+                result.push(true);
+            } else if (val === "false") {
+                result.push(false);
+            } else {
+                result.push(val);
+            }
+        }
+        return result;
+    } else {
+        if (props && props.location.search) {
+            return (new URLSearchParams(props.location.search)).get(key);
+        }
+    }
+}
+
+export function setRangePropsToUrl (props, pathname) {
+    let search = new URLSearchParams(props.location.search);
+
+    if (props.instances.length > 0) {
+        search.set("instances", props.instances.map((d) => {
+            return d.objHash
+        }));
+    }
+
+    search.set("realtime", props.range.realTime);
+    search.set("longterm", props.range.longTerm);
+
+    let from = props.range.date.clone();
+    from.seconds(0);
+    from.minutes(props.range.minutes);
+    from.hours(props.range.hours);
+
+    let to = from.clone();
+    to = to.add(props.range.value, "minutes");
+
+    search.set("from", from.format("YYYYMMDDHHmmss"));
+    search.set("to", to.format("YYYYMMDDHHmmss"));
+
+    if (props.location.search !== ("?" + search.toString())) {
+        if (pathname) {
+            props.history.push({
+                pathname: pathname,
+                search: "?" + search.toString()
+            });
+        } else {
+            props.history.replace({
+                pathname: props.location.pathname,
+                search: "?" + search.toString()
+            });
+        }
+    }
 }

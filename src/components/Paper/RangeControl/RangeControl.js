@@ -3,38 +3,17 @@ import {connect} from 'react-redux';
 import {withRouter} from 'react-router-dom';
 import * as d3 from "d3";
 import DatePicker from 'react-datepicker';
-import moment from 'moment';
 import 'react-datepicker/dist/react-datepicker.css';
 import InputRange from 'react-input-range';
 import 'react-input-range/lib/css/index.css';
 import './RangeControl.css';
+import {setRealTimeValue, setRealTimeRangeStepValue, setRangeDate, setRangeHours, setRangeMinutes, setRangeValue, setRangeDateHoursMinutes} from '../../../actions';
 
 class RangeControl extends Component {
 
     constructor(props) {
         super(props);
-
-        let now = moment();
-        now.subtract(10, "minutes");
-        this.state = {
-            date: now,
-            hours: now.hours(),
-            minutes : now.minutes(),
-            value: this.props.config.range.shortHistoryStep,
-            realtime : true,
-            longTerm : false,
-            range : this.props.config.range.shortHistoryRange,
-            step : this.props.config.range.shortHistoryStep
-        };
         this.handleChange = this.dateChange.bind(this);
-    }
-
-    componentDidMount() {
-        this.props.onRef(this);
-    }
-
-    componentWillUnmount() {
-        this.props.onRef(undefined);
     }
 
     shouldComponentUpdate(nextProps, nextState) {
@@ -42,32 +21,22 @@ class RangeControl extends Component {
     }
 
     dateChange = (date) => {
-        this.setState({
-            date: date
-        });
+        this.props.setRangeDate(date);
     };
 
     hoursChange = (e) => {
         if (isNaN(e)) {
-            this.setState({
-                hours: e.target.value
-            });
+            this.props.setRangeHours(e.target.value);
         } else {
-            this.setState({
-                hours: e
-            });
+            this.props.setRangeHours(e);
         }
     };
 
     minutesChange = (e) => {
         if (isNaN(e)) {
-            this.setState({
-                minutes: e.target.value
-            });
+            this.props.setRangeMinutes(e.target.value);
         } else {
-            this.setState({
-                minutes: e
-            });
+            this.props.setRangeMinutes(e);
         }
     };
 
@@ -82,88 +51,36 @@ class RangeControl extends Component {
     };
 
     changeTimeType = (type) => {
-        this.setState({
-            realtime: type === "realtime",
-            longTerm : type === "realtime" ? false : this.state.longTerm,
-            value: this.state.value > this.props.config.range.shortHistoryRange ? this.props.config.range.shortHistoryRange : this.state.value,
-            range : this.props.config.range.shortHistoryRange,
-            step : this.props.config.range.shortHistoryStep
-        });
-
-        this.props.changeRealtime(type === "realtime", type === "realtime" ? false : this.state.longTerm);
+        let value = this.props.range.value > this.props.config.range.shortHistoryRange ? this.props.config.range.shortHistoryRange : this.props.range.value;
+        this.props.setRealTimeRangeStepValue(type === "realtime", type === "realtime" ? false : this.props.range.longTerm, value, this.props.config.range.shortHistoryRange, this.props.config.range.shortHistoryStep);
     };
 
-    setRangeValue = (value) => {
-        this.setState({
-            value: value
-        });
-    }
-
-    setLongTerm = (longTerm) => {
-        if (this.state.realtime) {
-            return;
-        }
-
-        if (!longTerm) {
-            this.setState({
-                longTerm: false,
-                range : this.props.config.range.shortHistoryRange,
-                step : this.props.config.range.shortHistoryStep,
-                value : this.state.value > this.props.config.range.shortHistoryRange ? this.props.config.range.shortHistoryRange : this.state.value
-            });
-
-            this.props.changeLongTerm(false);
-        } else {
-            this.setState({
-                longTerm: true,
-                range : this.props.config.range.longHistoryRange * 60,
-                step : this.props.config.range.longHistoryStep,
-                value : this.state.value < this.props.config.range.longHistoryStep ? this.props.config.range.longHistoryStep : this.state.value
-            });
-
-            this.props.changeLongTerm(true);
-        }
-    };
     changeLongTerm = () => {
 
-        if (this.state.realtime) {
+        if (this.props.range.realTime) {
             return;
         }
 
-        if (this.state.longTerm) {
-
-            this.setState({
-                longTerm: false,
-                range : this.props.config.range.shortHistoryRange,
-                step : this.props.config.range.shortHistoryStep,
-                value : this.state.value > this.props.config.range.shortHistoryRange ? this.props.config.range.shortHistoryRange : this.state.value
-            });
-
-            this.props.changeLongTerm(false);
+        if (this.props.range.longTerm) {
+            let value = this.props.range.value > this.props.config.range.shortHistoryRange ? this.props.config.range.shortHistoryRange : this.props.range.value;
+            this.props.setRealTimeRangeStepValue(this.props.range.realTime, false, value, this.props.config.range.shortHistoryRange, this.props.config.range.shortHistoryStep);
         } else {
-            this.setState({
-                longTerm: true,
-                range : this.props.config.range.longHistoryRange * 60,
-                step : this.props.config.range.longHistoryStep,
-                value : this.state.value < this.props.config.range.longHistoryStep ? this.props.config.range.longHistoryStep : this.state.value
-            });
-
-            this.props.changeLongTerm(true);
+            let value = this.props.range.value < this.props.config.range.longHistoryStep ? this.props.config.range.longHistoryStep : this.props.range.value
+            this.props.setRealTimeRangeStepValue(this.props.range.realTime, true, value, this.props.config.range.longHistoryRange * 60, this.props.config.range.longHistoryStep);
         }
     };
-
 
     moveAndSearch = (type) => {
 
-        if (this.state.realtime) {
+        if (this.props.range.realTime) {
             return;
         }
 
-        let value = this.state.value;
-        let current = this.state.date.clone();
+        let value = this.props.range.value;
+        let current = this.props.range.date.clone();
         current.seconds(0);
-        current.minutes(this.state.minutes);
-        current.hours(this.state.hours);
+        current.minutes(this.props.range.minutes);
+        current.hours(this.props.range.hours);
 
         if (type === "before") {
             current.subtract(value, "minutes");
@@ -171,11 +88,7 @@ class RangeControl extends Component {
             current.add(value, "minutes");
         }
 
-        this.setState({
-            date: current,
-            hours: current.hours(),
-            minutes : current.minutes()
-        });
+        this.props.setRangeDateHoursMinutes(current, current.hours(), current.minutes());
 
         let startDate = current.clone();
         let endDate = startDate.clone();
@@ -184,70 +97,68 @@ class RangeControl extends Component {
         this.search(startDate, endDate);
     };
 
-
-
-    search = (startDateParam, endDateParam) => {
+    search = (startDateParam, endDateParam, instances, hosts) => {
         if (startDateParam && endDateParam) {
-            this.props.search(startDateParam.valueOf(), endDateParam.valueOf());
+            this.props.search(startDateParam.valueOf(), endDateParam.valueOf(), instances, hosts);
         } else {
-            let startDate = this.state.date.clone();
+            let startDate = this.props.range.date.clone();
             startDate.seconds(0);
-            startDate.minutes(this.state.minutes);
-            startDate.hours(this.state.hours);
+            startDate.minutes(this.props.range.minutes);
+            startDate.hours(this.props.range.hours);
 
             let endDate = startDate.clone();
-            endDate.add(this.state.value, "minutes");
+            endDate.add(this.props.range.value, "minutes");
 
-            this.props.search(startDate.valueOf(), endDate.valueOf());
+            this.props.search(startDate.valueOf(), endDate.valueOf(), instances, hosts);
         }
     };
 
     render() {
-
-        let startDate = this.state.date.clone();
+        let startDate = this.props.range.date.clone();
         startDate.seconds(0);
-        startDate.minutes(this.state.minutes);
-        startDate.hours(this.state.hours);
+        startDate.minutes(this.props.range.minutes);
+        startDate.hours(this.props.range.hours);
 
         let endDate = startDate.clone();
-        endDate.add(this.state.value, "minutes");
+        endDate.add(this.props.range.value, "minutes");
+
 
         return (
             <div className={"range-controls popup-div noselect " + (this.props.visible ? 'visible ' : ' ') + (this.props.fixedControl ? 'fixed' : '') }>
                 <div className="close-btn" onClick={this.props.toggleRangeControl}></div>
                 <div className="time-type">
-                    <div onClick={this.changeTimeType.bind(this, "realtime")} className={"time-type-item real-time " + (this.state.realtime ? "selected" : "")}>REALTIME</div>
-                    <div onClick={this.changeTimeType.bind(this, "search")} className={"time-type-item search-time " + (!this.state.realtime ? "selected" : "")}>SEARCH</div>
-                    <div onClick={this.changeLongTerm.bind(this)} className={"time-type-item longterm-time " + (this.state.longTerm ? "selected " : " ") + (this.state.realtime ? "disabled" : "")}>{this.props.config.range.longHistoryRange}H</div>
+                    <div onClick={this.changeTimeType.bind(this, "realtime")} className={"time-type-item real-time " + (this.props.range.realTime ? "selected" : "")}>REALTIME</div>
+                    <div onClick={this.changeTimeType.bind(this, "search")} className={"time-type-item search-time " + (!this.props.range.realTime ? "selected" : "")}>SEARCH</div>
+                    <div onClick={this.changeLongTerm.bind(this)} className={"time-type-item longterm-time " + (this.props.range.longTerm ? "selected " : " ") + (this.props.range.realTime ? "disabled" : "")}>{this.props.config.range.longHistoryRange}H</div>
                 </div>
                 <div className="time-controller">
                     <div>
                         <DatePicker
-                            selected={this.state.date}
+                            selected={this.props.range.date}
                             onChange={this.dateChange}
                             dateFormat="YYYY-MM-DD"
                             className="range-time-control rage-date"
-                            disabled={this.state.realtime}
+                            disabled={this.props.range.realTime}
                         />
                         <div className="desc-label"><span>D</span></div>
                     </div>
                     <div>
-                        <input type="number" className="range-time-control rage-hours" min={0} max={23} value={this.state.hours} onChange={this.hoursChange} disabled={this.state.realtime} onWheel={(e) => this.wheel.bind(this)} onKeyPress={this.handleKeyPress} />
+                        <input type="number" className="range-time-control rage-hours" min={0} max={23} value={this.props.range.hours} onChange={this.hoursChange} disabled={this.props.range.realTime} onWheel={(e) => this.wheel.bind(this)} onKeyPress={this.handleKeyPress} />
                         <div className="desc-label"><span>H</span></div>
                     </div>
                     <div>
-                        <input type="number" className="range-time-control rage-minute" min={0} max={59} value={this.state.minutes} onChange={this.minutesChange} disabled={this.state.realtime} onWheel={(e) => this.wheel.bind(this)} onKeyPress={this.handleKeyPress} />
+                        <input type="number" className="range-time-control rage-minute" min={0} max={59} value={this.props.range.minutes} onChange={this.minutesChange} disabled={this.props.range.realTime} onWheel={(e) => this.wheel.bind(this)} onKeyPress={this.handleKeyPress} />
                         <div className="desc-label"><span>M</span></div>
                     </div>
                     <div className="span-separator"></div>
                     <div className="span-range">
                         <div className="span-range-right-bg"></div>
                         <InputRange
-                            maxValue={this.state.range}
+                            maxValue={this.props.range.range}
                             minValue={this.props.config.range.shortHistoryStep}
-                            value={this.state.value}
-                            step={this.state.step}
-                            disabled={this.state.realtime}
+                            value={this.props.range.value}
+                            step={this.props.range.step}
+                            disabled={this.props.range.realTime}
                             formatLabel={value => {
                                 let hours = Math.floor(value / 60);
                                 let minute = value % 60;
@@ -262,14 +173,14 @@ class RangeControl extends Component {
                                 }
 
                             }}
-                            onChange={value => this.setState({ value })} />
+                            onChange={value => this.props.setRangeValue(value)} />
 
                     </div>
                     <div className="range-right-btn">
-                        <button className={"search-btn " + (this.state.realtime ? "disabled" : "")} onClick={this.search}>SEARCH</button>
+                        <button className={"search-btn " + (this.props.range.realTime ? "disabled" : "")} onClick={this.search}>SEARCH</button>
                     </div>
                 </div>
-                <div className={"selected-time " + (this.state.realtime ? "disabled" : "")}>
+                <div className={"selected-time " + (this.props.range.realTime ? "disabled" : "")}>
                     <div onClick={this.moveAndSearch.bind(this, "before")} className="move-before"><i className="fa fa-angle-left"></i> <i className="fa fa-search"></i></div>
                     <div onClick={this.moveAndSearch.bind(this, "after")} className="move-after"><i className="fa fa-search"></i> <i className="fa fa-angle-right"></i></div>
                     <div className="start-time">{d3.timeFormat(this.props.config.dateFormat + " " + this.props.config.minuteFormat)(new Date(startDate.valueOf()))}</div>
@@ -282,9 +193,24 @@ class RangeControl extends Component {
 
 let mapStateToProps = (state) => {
     return {
-        config: state.config
+        hosts: state.target.hosts,
+        instances: state.target.instances,
+        config: state.config,
+        range: state.range
     };
 };
 
-RangeControl = connect(mapStateToProps, undefined)(RangeControl);
+let mapDispatchToProps = (dispatch) => {
+    return {
+        setRealTimeValue: (realTime, longTerm, value) => dispatch(setRealTimeValue(realTime, longTerm, value)),
+        setRangeDate: (date) => dispatch(setRangeDate(date)),
+        setRangeHours: (hours) => dispatch(setRangeHours(hours)),
+        setRangeMinutes: (minutes) => dispatch(setRangeMinutes(minutes)),
+        setRangeValue: (value) => dispatch(setRangeValue(value)),
+        setRangeDateHoursMinutes: (date, hours, minutes) => dispatch(setRangeDateHoursMinutes(date, hours, minutes)),
+        setRealTimeRangeStepValue: (realTime, longTerm, value, range, step) => dispatch(setRealTimeRangeStepValue(realTime, longTerm, value, range, step))
+    };
+};
+
+RangeControl = connect(mapStateToProps, mapDispatchToProps)(RangeControl);
 export default withRouter(RangeControl);

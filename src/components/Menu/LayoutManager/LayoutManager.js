@@ -5,6 +5,8 @@ import {connect} from 'react-redux';
 import {withRouter} from 'react-router-dom';
 import {getData, setData} from '../../../common/common';
 import 'url-search-params-polyfill';
+import jQuery from "jquery";
+import {errorHandler, setAuthHeader, getWithCredentials, getHttpProtocol} from '../../../common/common';
 
 class LayoutManager extends Component {
 
@@ -18,48 +20,79 @@ class LayoutManager extends Component {
         };
     }
 
-    componentDidMount() {
-
-    }
-
-
-    loadTemplates = () => {
-        let templates = getData("templates");
-        if (templates) {
-            this.setState({
-                templates : templates,
-                selectedTemplateNo : null,
-                selectedEditNo : null
-            });
-        } else {
-            let defaultTemplate = JSON.parse('[{"no":0,"name":"TIME-XLOG-WAS-HOST-SAMPLE","creationTime":1521048658358,"boxes":[{"key":"1","title":"CLOCK","layout":{"w":3,"h":5,"x":0,"y":0,"i":"1","minW":1,"minH":3,"moved":false,"static":false},"option":{"mode":"exclusive","type":"clock","config":{"timezone":{"name":"TIMEZONE","type":"selector","data":["Asia/Seoul","UCT","US/Central","US/Pacific","Europe/Paris","Asia/Tokyo","Australia/Sydney"],"value":"Asia/Seoul"},"format":{"name":"TIME FORMAT","type":"input","value":"HH:mm:ss","tooltip":{"type":"link","content":"https://momentjs.com/docs/#/displaying/format/"}}}},"values":{"timezone":"Asia/Seoul","format":"HH:mm:ss"},"config":false},{"key":"2","title":"XLOG BAR","layout":{"w":3,"h":5,"x":3,"y":0,"i":"2","minW":1,"minH":3,"moved":false,"static":false},"option":{"mode":"exclusive","type":"xlogBar","config":{"count":{"name":"SHOW COUNT","type":"checkbox","value":false},"history":{"name":"HISTORY COUNT","type":"selector","data":[1,2,3,4,5],"value":1}}},"values":{"count":false,"history":1},"config":false},{"key":"3","title":"VISITOR","layout":{"w":4,"h":5,"x":6,"y":0,"i":"3","minW":1,"minH":3,"moved":false,"static":false},"option":{"mode":"exclusive","type":"visitor","config":{"showNumber":{"name":"SHOW NUMBER","type":"checkbox","value":true},"showGraph":{"name":"SHOW GRAPH","type":"checkbox","value":false},"showAxis":{"name":"AXIS","type":"selector","data":["BOTH","LEFT","RIGHT","NONE"],"value":"BOTH"},"range":{"name":"Range","type":"input","value":"60","tooltip":{"type":"text","content":"seconds"}}}},"values":{"showNumber":true,"showGraph":false,"showAxis":"BOTH","range":"60"},"config":false},{"key":"4","title":"XLOG","layout":{"w":5,"h":8,"x":0,"y":5,"i":"4","minW":1,"minH":3,"moved":false,"static":false},"option":{"mode":"exclusive","type":"xlog","config":{"showPreview":{"name":"SHOW PROCESS","type":"selector","data":["Y","N"],"value":"N"}}},"values":{"showPreview":"N"},"config":false},{"key":"5","title":"TPS, Elapsed Time","layout":{"w":5,"h":8,"x":5,"y":5,"i":"5","minW":1,"minH":3,"moved":false,"static":false},"option":[{"mode":"nonexclusive","type":"counter","counterKey":"TPS","title":"TPS","objectType":"instance"},{"mode":"nonexclusive","type":"counter","counterKey":"ElapsedTime","title":"Elapsed Time","objectType":"instance"}],"values":{},"config":false},{"key":"6","title":"Cpu, Mem","layout":{"w":5,"h":7,"x":0,"y":13,"i":"6","minW":1,"minH":3,"moved":false,"static":false},"option":[{"mode":"nonexclusive","type":"counter","counterKey":"Cpu","title":"Cpu","objectType":"host"},{"mode":"nonexclusive","type":"counter","counterKey":"Mem","title":"Mem","objectType":"host"}],"values":{},"config":false},{"key":"7","title":"Disk Read Bytes, Disk Write Bytes","layout":{"w":5,"h":7,"x":5,"y":13,"i":"7","minW":1,"minH":3,"moved":false,"static":false},"option":[{"mode":"nonexclusive","type":"counter","counterKey":"DiskReadBytes","title":"Disk Read Bytes","objectType":"host"},{"mode":"nonexclusive","type":"counter","counterKey":"DiskWriteBytes","title":"Disk Write Bytes","objectType":"host"}],"values":{},"config":false}],"layouts":{"lg":[{"w":3,"h":5,"x":0,"y":0,"i":"1","minW":1,"minH":3,"moved":false,"static":false},{"w":3,"h":5,"x":3,"y":0,"i":"2","minW":1,"minH":3,"moved":false,"static":false},{"w":6,"h":5,"x":6,"y":0,"i":"3","minW":1,"minH":3,"moved":false,"static":false},{"w":6,"h":8,"x":0,"y":5,"i":"4","minW":1,"minH":3,"moved":false,"static":false},{"w":6,"h":8,"x":6,"y":5,"i":"5","minW":1,"minH":3,"moved":false,"static":false},{"w":6,"h":7,"x":0,"y":13,"i":"6","minW":1,"minH":3,"moved":false,"static":false},{"w":6,"h":7,"x":6,"y":13,"i":"7","minW":1,"minH":3,"moved":false,"static":false}],"sm":[{"w":3,"h":5,"x":0,"y":0,"i":"1","minW":1,"minH":3,"moved":false,"static":false},{"w":3,"h":5,"x":3,"y":0,"i":"2","minW":1,"minH":3,"moved":false,"static":false},{"w":6,"h":5,"x":0,"y":5,"i":"3","minW":1,"minH":3,"moved":false,"static":false},{"w":6,"h":8,"x":0,"y":10,"i":"4","minW":1,"minH":3,"moved":false,"static":false},{"w":6,"h":8,"x":0,"y":18,"i":"5","minW":1,"minH":3,"moved":false,"static":false},{"w":6,"h":7,"x":0,"y":26,"i":"6","minW":1,"minH":3,"moved":false,"static":false},{"w":6,"h":7,"x":0,"y":33,"i":"7","minW":1,"minH":3,"moved":false,"static":false}],"xs":[{"w":4,"h":5,"x":0,"y":0,"i":"1","minW":1,"minH":3,"moved":false,"static":false},{"w":4,"h":5,"x":0,"y":5,"i":"2","minW":1,"minH":3,"moved":false,"static":false},{"w":4,"h":5,"x":0,"y":10,"i":"3","minW":1,"minH":3,"moved":false,"static":false},{"w":4,"h":8,"x":0,"y":15,"i":"4","minW":1,"minH":3,"moved":false,"static":false},{"w":4,"h":8,"x":0,"y":23,"i":"5","minW":1,"minH":3,"moved":false,"static":false},{"w":4,"h":7,"x":0,"y":31,"i":"6","minW":1,"minH":3,"moved":false,"static":false},{"w":4,"h":7,"x":0,"y":38,"i":"7","minW":1,"minH":3,"moved":false,"static":false}],"xxs":[{"w":2,"h":5,"x":0,"y":0,"i":"1","minW":1,"minH":3,"moved":false,"static":false},{"w":2,"h":5,"x":0,"y":5,"i":"2","minW":1,"minH":3,"moved":false,"static":false},{"w":2,"h":5,"x":0,"y":10,"i":"3","minW":1,"minH":3,"moved":false,"static":false},{"w":2,"h":8,"x":0,"y":15,"i":"4","minW":1,"minH":3,"moved":false,"static":false},{"w":2,"h":8,"x":0,"y":23,"i":"5","minW":1,"minH":3,"moved":false,"static":false},{"w":2,"h":7,"x":0,"y":31,"i":"6","minW":1,"minH":3,"moved":false,"static":false},{"w":2,"h":7,"x":0,"y":38,"i":"7","minW":1,"minH":3,"moved":false,"static":false}],"md":[{"w":3,"h":5,"x":0,"y":0,"i":"1","minW":1,"minH":3,"moved":false,"static":false},{"w":3,"h":5,"x":3,"y":0,"i":"2","minW":1,"minH":3,"moved":false,"static":false},{"w":4,"h":5,"x":6,"y":0,"i":"3","minW":1,"minH":3,"moved":false,"static":false},{"w":5,"h":8,"x":0,"y":5,"i":"4","minW":1,"minH":3,"moved":false,"static":false},{"w":5,"h":8,"x":5,"y":5,"i":"5","minW":1,"minH":3,"moved":false,"static":false},{"w":5,"h":7,"x":0,"y":13,"i":"6","minW":1,"minH":3,"moved":false,"static":false},{"w":5,"h":7,"x":5,"y":13,"i":"7","minW":1,"minH":3,"moved":false,"static":false}]}}]');
-            this.setState({
-                templates : defaultTemplate,
-                selectedTemplateNo : null,
-                selectedEditNo : null
-            });
-            setData("templates", defaultTemplate);
-        }
-    };
-
     componentWillReceiveProps(nextProps) {
         if (!this.props.visible && nextProps.visible) {
-            this.loadTemplates();
+            this.loadTemplates(nextProps.config, nextProps.user);
         }
     }
 
+    saveTemplate = (templates) => {
+        let that = this;
+        let data = {
+            key : "__scouter_paper_layout",
+            value : JSON.stringify(templates)
+        };
 
-    componentDidUpdate(prevProps, prevState) {
+        jQuery.ajax({
+            method: "PUT",
+            async: true,
+            url: getHttpProtocol(this.props.config) + "/scouter/v1/kv",
+            xhrFields: getWithCredentials(this.props.config),
+            contentType : "application/json",
+            data : JSON.stringify(data),
+            beforeSend: function (xhr) {
+                setAuthHeader(xhr, that.props.config, that.props.user);
+            }
+        }).done((msg) => {
+            if (msg && Number(msg.status) === 200) {
+                that.setState({
+                    templates : templates
+                });
+            }
+        }).fail((xhr, textStatus, errorThrown) => {
+            errorHandler(xhr, textStatus, errorThrown, this.props);
+        });
+    };
 
+    loadTemplates = (config, user) => {
 
-    }
+        jQuery.ajax({
+            method: "GET",
+            async: true,
+            url: getHttpProtocol(config) + "/scouter/v1/kv/__scouter_paper_layout",
+            xhrFields: getWithCredentials(config),
+            beforeSend: function (xhr) {
+                setAuthHeader(xhr, config, user);
+            }
+        }).done((msg) => {
+            if (msg && Number(msg.status) === 200) {
+                let list = JSON.parse(msg.result);
+                if (list && list.length > 0) {
+                    this.setState({
+                        templates : list,
+                        selectedTemplateNo : null,
+                        selectedEditNo : null
+                    });
+                } else {
+                    let defaultTemplate = JSON.parse('[{"no":0,"name":"TIME-XLOG-WAS-HOST-SAMPLE","creationTime":1521048658358,"boxes":[{"key":"1","title":"CLOCK","layout":{"w":3,"h":5,"x":0,"y":0,"i":"1","minW":1,"minH":3,"moved":false,"static":false},"option":{"mode":"exclusive","type":"clock","config":{"timezone":{"name":"TIMEZONE","type":"selector","data":["Asia/Seoul","UCT","US/Central","US/Pacific","Europe/Paris","Asia/Tokyo","Australia/Sydney"],"value":"Asia/Seoul"},"format":{"name":"TIME FORMAT","type":"input","value":"HH:mm:ss","tooltip":{"type":"link","content":"https://momentjs.com/docs/#/displaying/format/"}}}},"values":{"timezone":"Asia/Seoul","format":"HH:mm:ss"},"config":false},{"key":"2","title":"XLOG BAR","layout":{"w":3,"h":5,"x":3,"y":0,"i":"2","minW":1,"minH":3,"moved":false,"static":false},"option":{"mode":"exclusive","type":"xlogBar","config":{"count":{"name":"SHOW COUNT","type":"checkbox","value":false},"history":{"name":"HISTORY COUNT","type":"selector","data":[1,2,3,4,5],"value":1}}},"values":{"count":false,"history":1},"config":false},{"key":"3","title":"VISITOR","layout":{"w":4,"h":5,"x":6,"y":0,"i":"3","minW":1,"minH":3,"moved":false,"static":false},"option":{"mode":"exclusive","type":"visitor","config":{"showNumber":{"name":"SHOW NUMBER","type":"checkbox","value":true},"showGraph":{"name":"SHOW GRAPH","type":"checkbox","value":false},"showAxis":{"name":"AXIS","type":"selector","data":["BOTH","LEFT","RIGHT","NONE"],"value":"BOTH"},"range":{"name":"Range","type":"input","value":"60","tooltip":{"type":"text","content":"seconds"}}}},"values":{"showNumber":true,"showGraph":false,"showAxis":"BOTH","range":"60"},"config":false},{"key":"4","title":"XLOG","layout":{"w":5,"h":8,"x":0,"y":5,"i":"4","minW":1,"minH":3,"moved":false,"static":false},"option":{"mode":"exclusive","type":"xlog","config":{"showPreview":{"name":"SHOW PROCESS","type":"selector","data":["Y","N"],"value":"N"}}},"values":{"showPreview":"N"},"config":false},{"key":"5","title":"TPS, Elapsed Time","layout":{"w":5,"h":8,"x":5,"y":5,"i":"5","minW":1,"minH":3,"moved":false,"static":false},"option":[{"mode":"nonexclusive","type":"counter","counterKey":"TPS","title":"TPS","objectType":"instance"},{"mode":"nonexclusive","type":"counter","counterKey":"ElapsedTime","title":"Elapsed Time","objectType":"instance"}],"values":{},"config":false},{"key":"6","title":"Cpu, Mem","layout":{"w":5,"h":7,"x":0,"y":13,"i":"6","minW":1,"minH":3,"moved":false,"static":false},"option":[{"mode":"nonexclusive","type":"counter","counterKey":"Cpu","title":"Cpu","objectType":"host"},{"mode":"nonexclusive","type":"counter","counterKey":"Mem","title":"Mem","objectType":"host"}],"values":{},"config":false},{"key":"7","title":"Disk Read Bytes, Disk Write Bytes","layout":{"w":5,"h":7,"x":5,"y":13,"i":"7","minW":1,"minH":3,"moved":false,"static":false},"option":[{"mode":"nonexclusive","type":"counter","counterKey":"DiskReadBytes","title":"Disk Read Bytes","objectType":"host"},{"mode":"nonexclusive","type":"counter","counterKey":"DiskWriteBytes","title":"Disk Write Bytes","objectType":"host"}],"values":{},"config":false}],"layouts":{"lg":[{"w":3,"h":5,"x":0,"y":0,"i":"1","minW":1,"minH":3,"moved":false,"static":false},{"w":3,"h":5,"x":3,"y":0,"i":"2","minW":1,"minH":3,"moved":false,"static":false},{"w":6,"h":5,"x":6,"y":0,"i":"3","minW":1,"minH":3,"moved":false,"static":false},{"w":6,"h":8,"x":0,"y":5,"i":"4","minW":1,"minH":3,"moved":false,"static":false},{"w":6,"h":8,"x":6,"y":5,"i":"5","minW":1,"minH":3,"moved":false,"static":false},{"w":6,"h":7,"x":0,"y":13,"i":"6","minW":1,"minH":3,"moved":false,"static":false},{"w":6,"h":7,"x":6,"y":13,"i":"7","minW":1,"minH":3,"moved":false,"static":false}],"sm":[{"w":3,"h":5,"x":0,"y":0,"i":"1","minW":1,"minH":3,"moved":false,"static":false},{"w":3,"h":5,"x":3,"y":0,"i":"2","minW":1,"minH":3,"moved":false,"static":false},{"w":6,"h":5,"x":0,"y":5,"i":"3","minW":1,"minH":3,"moved":false,"static":false},{"w":6,"h":8,"x":0,"y":10,"i":"4","minW":1,"minH":3,"moved":false,"static":false},{"w":6,"h":8,"x":0,"y":18,"i":"5","minW":1,"minH":3,"moved":false,"static":false},{"w":6,"h":7,"x":0,"y":26,"i":"6","minW":1,"minH":3,"moved":false,"static":false},{"w":6,"h":7,"x":0,"y":33,"i":"7","minW":1,"minH":3,"moved":false,"static":false}],"xs":[{"w":4,"h":5,"x":0,"y":0,"i":"1","minW":1,"minH":3,"moved":false,"static":false},{"w":4,"h":5,"x":0,"y":5,"i":"2","minW":1,"minH":3,"moved":false,"static":false},{"w":4,"h":5,"x":0,"y":10,"i":"3","minW":1,"minH":3,"moved":false,"static":false},{"w":4,"h":8,"x":0,"y":15,"i":"4","minW":1,"minH":3,"moved":false,"static":false},{"w":4,"h":8,"x":0,"y":23,"i":"5","minW":1,"minH":3,"moved":false,"static":false},{"w":4,"h":7,"x":0,"y":31,"i":"6","minW":1,"minH":3,"moved":false,"static":false},{"w":4,"h":7,"x":0,"y":38,"i":"7","minW":1,"minH":3,"moved":false,"static":false}],"xxs":[{"w":2,"h":5,"x":0,"y":0,"i":"1","minW":1,"minH":3,"moved":false,"static":false},{"w":2,"h":5,"x":0,"y":5,"i":"2","minW":1,"minH":3,"moved":false,"static":false},{"w":2,"h":5,"x":0,"y":10,"i":"3","minW":1,"minH":3,"moved":false,"static":false},{"w":2,"h":8,"x":0,"y":15,"i":"4","minW":1,"minH":3,"moved":false,"static":false},{"w":2,"h":8,"x":0,"y":23,"i":"5","minW":1,"minH":3,"moved":false,"static":false},{"w":2,"h":7,"x":0,"y":31,"i":"6","minW":1,"minH":3,"moved":false,"static":false},{"w":2,"h":7,"x":0,"y":38,"i":"7","minW":1,"minH":3,"moved":false,"static":false}],"md":[{"w":3,"h":5,"x":0,"y":0,"i":"1","minW":1,"minH":3,"moved":false,"static":false},{"w":3,"h":5,"x":3,"y":0,"i":"2","minW":1,"minH":3,"moved":false,"static":false},{"w":4,"h":5,"x":6,"y":0,"i":"3","minW":1,"minH":3,"moved":false,"static":false},{"w":5,"h":8,"x":0,"y":5,"i":"4","minW":1,"minH":3,"moved":false,"static":false},{"w":5,"h":8,"x":5,"y":5,"i":"5","minW":1,"minH":3,"moved":false,"static":false},{"w":5,"h":7,"x":0,"y":13,"i":"6","minW":1,"minH":3,"moved":false,"static":false},{"w":5,"h":7,"x":5,"y":13,"i":"7","minW":1,"minH":3,"moved":false,"static":false}]}}]');
+                    this.setState({
+                        templates : defaultTemplate,
+                        selectedTemplateNo : null,
+                        selectedEditNo : null
+                    });
+                }
+            }
+        }).fail((xhr, textStatus, errorThrown) => {
+            errorHandler(xhr, textStatus, errorThrown, this.props);
+        });
+    };
 
     cancelClick = () => {
         this.props.toggleLayoutManagerVisible();
     };
 
     saveClick = () => {
-        let templates = getData("templates");
+        let templates = this.state.templates;
         if (!templates) {
             templates = [];
         }
@@ -74,8 +107,7 @@ class LayoutManager extends Component {
             layouts : layouts
         });
 
-        setData("templates", templates);
-        this.loadTemplates();
+        this.saveTemplate(templates);
     };
 
     deleteClick = () => {
@@ -94,8 +126,8 @@ class LayoutManager extends Component {
                         selectedTemplateNo : null,
                         selectedEditNo : null
                     });
-                    setData("templates", templates);
 
+                    this.saveTemplate(templates);
                     break;
                 }
             }
@@ -155,11 +187,10 @@ class LayoutManager extends Component {
                     selectedTemplateNo : null,
                     selectedEditNo : null
                 });
-                setData("templates", templates);
-
                 break;
             }
         }
+        this.saveTemplate(templates);
     };
 
     onTextChange = (event) => {
@@ -172,6 +203,7 @@ class LayoutManager extends Component {
 
         return (
             <div className={"layout-manager-bg " + (this.props.visible ? "" : "hidden")}>
+                <div className={"layout-manager-fixed-bg"}></div>
                 <div className="layout-manager popup-div">
                     <div className="title">
                         <div>LAYOUTS</div>

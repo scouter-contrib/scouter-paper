@@ -237,6 +237,10 @@
     border: 1px solid rgba(0, 0, 0, 0.3);
 }
 
+.range-controls .search-btn:hover {
+    background-color: #FFDB58;
+}
+
 .range-controls .search-btn.disabled {
     background-color: #999;
 }

@@ -38,19 +38,62 @@ class Settings extends Component {
         });
     };
 
-    onChangeRange = (attr, event) => {
+    onChangeServer = (attr, inx, event) => {
         let config = this.state.config;
-        config.range[attr] = event.target.value;
+        let server = config.servers[inx];
+
+        if (attr === "default") {
+            server.default = !server.default;
+
+            if (server.default === true) {
+                for (let i=0; i<config.servers.length; i++) {
+                    if (i !== inx) {
+                        config.servers[i].default = false;
+                    }
+                }
+            }
+        } else {
+            server[attr] = event.target.value;
+        }
+
         this.setState({
             config: config
         });
     };
 
-    onChangeSession = (attr, event) => {
-
+    addServer = () => {
         let config = this.state.config;
-        config.authentification[attr] = event.target.value;
+        let newServer = Object.assign({}, config.servers[config.servers.length - 1]);
+        newServer.default = false;
+        config.servers.push(newServer);
+        this.setState({
+            config: config
+        });
+    };
 
+    removeServer = (inx) => {
+        if (this.state.edit) {
+            let config = this.state.config;
+            let servers = config.servers;
+            let checked = false;
+            if (servers[inx].default) {
+                checked = true;
+            }
+            servers.splice(inx, 1);
+
+            if (checked && servers.length > 0) {
+                servers[0].default = true;
+            }
+
+            this.setState({
+                config: config
+            });
+        }
+    };
+
+    onChangeRange = (attr, event) => {
+        let config = this.state.config;
+        config.range[attr] = event.target.value;
         this.setState({
             config: config
         });
@@ -114,8 +157,8 @@ class Settings extends Component {
 
     submit = () => {
 
+        this.props.setConfig(this.state.config);
         if (localStorage) {
-            this.props.setConfig(this.state.config);
             localStorage.setItem("config", JSON.stringify(this.state.config));
             this.setState({
                 edit: false,
@@ -349,46 +392,86 @@ class Settings extends Component {
                         <div className="category first">
                             <div>SCOUTER WEB API SERVER INFO</div>
                         </div>
-                        <div className="setting-box">
-                            <div className="row">
-                                <div className="label">
-                                    <div>PROTOCOL</div>
+                        <div className="setting-box server-setting-box">
+                            <div className="server-plus-btn"><button type="button" disabled={!this.state.edit} onClick={this.addServer}><i className="fa fa-plus-circle" aria-hidden="true"></i> ADD SERVER</button></div>
+                            <div className="server-row">
+                                <div className="row server-row-no">
+                                    <div className="label">
+                                        <div>NO</div>
+                                    </div>
                                 </div>
-                                <div className="input">
-                                    <select value={this.state.config.protocol} onChange={this.onChange.bind(this, "protocol")} disabled={!this.state.edit}>
-                                        <option value="http">HTTP</option>
-                                        <option value="https">HTTPS</option>
-                                    </select>
+                                <div className="row server-row-protocol">
+                                    <div className="label">
+                                        <div>PROTOCOL</div>
+                                    </div>
                                 </div>
+                                <div className="row server-row-address">
+                                    <div className="label">
+                                        <div>ADDRESS</div>
+                                    </div>
+                                </div>
+                                <div className="row server-row-port">
+                                    <div className="label">
+                                        <div>PORT</div>
+                                    </div>
+                                </div>
+                                <div className="row server-row-authentification">
+                                    <div className="label">
+                                        <div className="long">AUTHENTIFICATION TYPE</div>
+                                        <div className="short">AUTH TYPE</div>
+                                    </div>
+                                </div>
+                                <div className="row server-row-default">
+                                    <div className="label">
+                                        <div>DEFAULT</div>
+                                    </div>
+                                </div>
+                                <div className="row server-row-remove"></div>
                             </div>
-                            <div className="row">
-                                <div className="label">
-                                    <div>ADDRESS</div>
-                                </div>
-                                <div className="input">
-                                    <input required type="text" readOnly={!this.state.edit} onChange={this.onChange.bind(this, "address")} value={this.state.config.address} placeholder="SCOUTER WEBAPP SERVER ADDRESS" />
-                                </div>
-                            </div>
-                            <div className="row">
-                                <div className="label">
-                                    <div>PORT</div>
-                                </div>
-                                <div className="input">
-                                    <input required pattern="[0-9\/]*" type="text" readOnly={!this.state.edit} onChange={this.onChange.bind(this, "port")} value={this.state.config.port} placeholder="SCOUTER WEBAPP SERVER PORT (DEFAULT 6188)" />
-                                </div>
-                            </div>
-                            <div className="row">
-                                <div className="label">
-                                    <div>AUTHENTIFICATION TYPE</div>
-                                </div>
-                                <div className="input">
-                                    <select value={this.state.config.authentification.type} onChange={this.onChangeSession.bind(this, "type")} disabled={!this.state.edit}>
-                                        <option value="bearer">token (bearer)</option>
-                                        <option value="cookie">cookie</option>
-                                        <option value="none">N/A</option>
-                                    </select>
-                                </div>
-                            </div>
+                            {this.state.config.servers.map((server, inx) => {
+                                return (
+                                    <div className="server-row" key={inx}>
+                                        <div className="row server-row-no">
+                                            <span>{inx + 1}</span>
+                                        </div>
+                                        <div className="row server-row-protocol">
+                                            <div className="input">
+                                                <select value={server.protocol} onChange={this.onChangeServer.bind(this, "protocol", inx)} disabled={!this.state.edit}>
+                                                    <option value="http">HTTP</option>
+                                                    <option value="https">HTTPS</option>
+                                                </select>
+                                            </div>
+                                        </div>
+                                        <div className="row server-row-address">
+                                            <div className="input">
+                                                <input required type="text" readOnly={!this.state.edit} onChange={this.onChangeServer.bind(this, "address", inx)} value={server.address} placeholder="SCOUTER WEBAPP SERVER ADDRESS" />
+                                            </div>
+                                        </div>
+                                        <div className="row server-row-port">
+                                            <div className="input">
+                                                <input required pattern="[0-9\/]*" type="text" readOnly={!this.state.edit} onChange={this.onChangeServer.bind(this, "port", inx)} value={server.port} placeholder="SCOUTER WEBAPP SERVER PORT (DEFAULT 6188)" />
+                                            </div>
+                                        </div>
+                                        <div className="row server-row-authentification">
+                                            <div className="input">
+                                                <select value={server.authentification} onChange={this.onChangeServer.bind(this, "authentification", inx)} disabled={!this.state.edit}>
+                                                    <option value="bearer">token (bearer)</option>
+                                                    <option value="cookie">cookie</option>
+                                                    <option value="none">N/A</option>
+                                                </select>
+                                            </div>
+                                        </div>
+                                        <div className="row server-row-default">
+                                            <div className="input">
+                                                <input type="radio" name="server-default" disabled={!this.state.edit} checked={server.default}  onChange={this.onChangeServer.bind(this, "default", inx)} />
+                                            </div>
+                                        </div>
+                                        <div className="row server-row-remove">
+                                            <div className={this.state.edit ? '' : 'disabled'} onClick={this.removeServer.bind(this, inx)}><i className="fa fa-times-circle-o" aria-hidden="true"></i></div>
+                                        </div>
+                                    </div>
+                                )
+                            })}
                         </div>
                         <div className="category first">
                             <div>POLLING & RANGE</div>

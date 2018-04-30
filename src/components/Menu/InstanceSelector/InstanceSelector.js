@@ -6,7 +6,8 @@ import {
     setTarget,
     setInstances,
     clearAllMessage,
-    setControlVisibility
+    setControlVisibility,
+    setConfig
 } from '../../../actions';
 import {connect} from 'react-redux';
 import jQuery from "jquery";
@@ -33,8 +34,7 @@ class InstanceSelector extends Component {
     }
 
     componentDidMount() {
-        const config = this.props.config;
-        if (config.authentification.type !== "bearer") {
+        if (common.getDefaultServerConfig(this.props.config).authentification !== "bearer") {
             this.setTargetFromUrl(this.props);
         } else {
             if (this.props.config || (this.props.user && this.props.user.id)) {
@@ -266,18 +266,27 @@ class InstanceSelector extends Component {
         }
     }
 
-    getServers = () => {
+    getServers = (config) => {
         let that = this;
         this.props.addRequest();
         jQuery.ajax({
             method: "GET",
             async: true,
-            url: getHttpProtocol(this.props.config) + '/scouter/v1/info/server'
+            url: getHttpProtocol(config) + '/scouter/v1/info/server'
         }).done((msg) => {
             this.setState({
-                servers: msg.result
+                servers: msg.result,
+                selectedInstances: {}
             });
         }).fail((xhr, textStatus, errorThrown) => {
+            this.setState({
+                servers: [],
+                instances: [],
+                activeServerId: null,
+                selectedInstances: {},
+                selectedHosts: {},
+                filter : ""
+            });
             errorHandler(xhr, textStatus, errorThrown, that.props);
         });
 
@@ -286,7 +295,7 @@ class InstanceSelector extends Component {
     componentDidUpdate(prevProps, prevState) {
         if (this.props.visible && prevProps.visible !== this.props.visible) {
             if (!this.state.servers || this.state.servers.length < 1) {
-                this.getServers();
+                this.getServers(this.props.config);
             }
         }
     }
@@ -398,12 +407,13 @@ class InstanceSelector extends Component {
             this.props.setTarget(hosts, instances);
             this.props.setControlVisibility("TargetSelector", false);
 
-            this.props.history.push({
+            common.setRangePropsToUrl(this.props, "/paper");
+            /*this.props.history.push({
                 pathname: '/paper',
                 search: '?instances=' + instances.map((d) => {
                     return d.objHash
                 })
-            });
+            });*/
 
             this.props.toggleSelectorVisible();
         }
@@ -415,10 +425,44 @@ class InstanceSelector extends Component {
         this.props.toggleSelectorVisible();
     };
 
+    onChangeScouterServer = (event) => {
+        let inx = Number(event.target.value);
+        let config = this.props.config;
+
+        for (let i=0; i<config.servers.length; i++) {
+            if (i === inx) {
+                config.servers[i].default = true;
+            } else {
+                config.servers[i].default = false;
+            }
+        }
+
+        this.props.setConfig(config);
+        this.getServers(config);
+        if (localStorage) {
+            localStorage.setItem("config", JSON.stringify(config));
+        }
+
+    };
+
     render() {
         return (
             <div className={"instance-selector-bg " + (this.props.visible ? "" : "hidden")}>
+                <div className={"instance-selector-fixed-bg"}>
+                </div>
                 <div className="instance-selector popup-div">
+                    <div className="scouter-servers">
+                        <div className="scouter-server-label">SCOUTER SERVER</div>
+                        <div>
+                            <select value={common.getDefaultServerConfigIndex(this.props.config)} onChange={this.onChangeScouterServer.bind(this)}>
+                            {this.props.config.servers.map((server, inx) => {
+                                return (
+                                    <option key={inx} value={inx}>{server.protocol + "://" + server.address + ":" + server.port}</option>
+                                )
+                            })}
+                            </select>
+                        </div>
+                    </div>
                     <div className="instance-selector-content">
                         <div className="host-list">
                             <div>
@@ -483,7 +527,8 @@ let mapStateToProps = (state) => {
     return {
         instances: state.target.instances,
         config: state.config,
-        user: state.user
+        user: state.user,
+        range: state.range,
     };
 };
 
@@ -495,6 +540,7 @@ let mapDispatchToProps = (dispatch) => {
         clearAllMessage: () => dispatch(clearAllMessage()),
         pushMessage: (category, title, content) => dispatch(pushMessage(category, title, content)),
         addRequest: () => dispatch(addRequest()),
+        setConfig: (config) => dispatch(setConfig(config)),
     };
 };
 

@@ -4,7 +4,7 @@ import {addRequest, setControlVisibility, pushMessage} from '../../../../actions
 import {withRouter} from 'react-router-dom';
 import {connect} from 'react-redux';
 import jQuery from "jquery";
-import {getHttpProtocol, errorHandler, getWithCredentials, setAuthHeader, getSearchDays, getDivideDays} from '../../../../common/common';
+import {getHttpProtocol, errorHandler, getWithCredentials, setAuthHeader, getSearchDays, getDivideDays, getParam} from '../../../../common/common';
 import SingleProfile from "./SingleProfile/SingleProfile";
 import ProfileList from "./ProfileList/ProfileList";
 import _ from "lodash";
@@ -15,8 +15,13 @@ const xlogMaxSelectionCount = 200;
 
 class Profiler extends Component {
 
+    txidInit = false;
     constructor(props) {
         super(props);
+
+        // URL로부터 TXID와 날짜를 세팅
+        let txid = getParam(this.props, "txid");
+        let txiddate = getParam(this.props, "txiddate");
         this.state = {
             show: false,
             xlogs: [],
@@ -31,15 +36,15 @@ class Profiler extends Component {
             gap: true,
             formatter: false,
             listWidth : 40,
-            smallScreen : false
-        }
+            smallScreen : false,
+            paramTxid : txid ? txid : null,
+            paramTxidDate : txiddate ? txiddate : null
+        };
     }
 
     keyDown = (event) => {
         if (event.keyCode === 27) {
-            this.setState({
-                show: false
-            });
+            this.close();
         }
     };
 
@@ -130,19 +135,35 @@ class Profiler extends Component {
     };
 
     componentWillReceiveProps(nextProps) {
-
-        if (nextProps.selection.x1 === null || nextProps.selection.x2 === null || nextProps.selection.y1 === null || nextProps.selection.y2 === null) {
+        if (this.state.paramTxid === null && (nextProps.selection.x1 === null || nextProps.selection.x2 === null || nextProps.selection.y1 === null || nextProps.selection.y2 === null)) {
             this.setState({
                 show: false
             });
         } else {
-            if (JSON.stringify(nextProps.selection) !== JSON.stringify(this.props.selection)) {
-                let x1 = nextProps.selection.x1;
-                let x2 = nextProps.selection.x2;
-                let y1 = nextProps.selection.y1;
-                let y2 = nextProps.selection.y2;
-                this.getList(x1, x2, y1, y2);
+
+            if (this.state.paramTxid === null) {
+                if (JSON.stringify(nextProps.selection) !== JSON.stringify(this.props.selection)) {
+                    let x1 = nextProps.selection.x1;
+                    let x2 = nextProps.selection.x2;
+                    let y1 = nextProps.selection.y1;
+                    let y2 = nextProps.selection.y2;
+                    this.getList(x1, x2, y1, y2);
+                }
+            } else {
+                if (!this.txidInit) {
+                    this.txidInit = true;
+
+                    this.setState({
+                        show: true
+                    });
+
+                    this.rowClick({
+                        txid : this.state.paramTxid
+                    }, this.state.paramTxidDate);
+                }
+
             }
+
         }
     }
 
@@ -175,7 +196,7 @@ class Profiler extends Component {
     };
 
 
-    // TODO search의 경우, 마지막 newXLogs가 allXLogs에 들어 있는 문제 있음
+    // search의 경우, 마지막 newXLogs가 allXLogs에 들어 있는 문제 있음
     getListData = (x1, x2, y1, y2, append) => {
         let that = this;
         let allXLogs = that.props.xlogs;
@@ -276,25 +297,37 @@ class Profiler extends Component {
             last: null,
             txid: null,
             profile: null,
-            steps: null
+            steps: null,
+            paramTxid : null,
+            paramTxidDate: null
+        });
+
+        let search = new URLSearchParams(this.props.location.search);
+
+        search.delete("txid");
+        search.delete("txiddate");
+
+        this.props.history.replace({
+            pathname: this.props.location.pathname,
+            search: "?" + search.toString()
         });
     };
 
-
-    rowClick = (xlog) => {
+    rowClick = (xlog, txiddate) => {
 
         let that = this;
 
-        if (this.state.txid === xlog.txid) {
-            this.setState({
-                txid: null
-            });
-        } else {
-            this.setState({
-                txid: xlog.txid
-            });
+        if (!txiddate) {
+            if (this.state.txid === xlog.txid) {
+                this.setState({
+                    txid: null
+                });
+            } else {
+                this.setState({
+                    txid: xlog.txid
+                });
+            }
         }
-
 
         // XLOG DATA
         this.props.setControlVisibility("Loading", true);
@@ -302,7 +335,7 @@ class Profiler extends Component {
         jQuery.ajax({
             method: "GET",
             async: true,
-            url: getHttpProtocol(this.props.config) + '/scouter/v1/xlog-data/' + moment(new Date(Number(xlog.endTime))).format("YYYYMMDD") + "/" + xlog.txid,
+            url: getHttpProtocol(this.props.config) + '/scouter/v1/xlog-data/' + (txiddate ? txiddate : moment(new Date(Number(xlog.endTime))).format("YYYYMMDD")) + "/" + xlog.txid,
             xhrFields: getWithCredentials(that.props.config),
             beforeSend: function (xhr) {
                 setAuthHeader(xhr, that.props.config, that.props.user);
@@ -317,7 +350,7 @@ class Profiler extends Component {
             jQuery.ajax({
                 method: "GET",
                 async: true,
-                url: getHttpProtocol(this.props.config) + '/scouter/v1/profile-data/' + moment(new Date(Number(xlog.endTime))).format("YYYYMMDD") + "/" + xlog.txid,
+                url: getHttpProtocol(this.props.config) + '/scouter/v1/profile-data/' + (txiddate ? txiddate : moment(new Date(Number(xlog.endTime))).format("YYYYMMDD")) + "/" + xlog.txid,
                 xhrFields: getWithCredentials(that.props.config),
                 beforeSend: function (xhr) {
                     setAuthHeader(xhr, that.props.config, that.props.user);
@@ -444,29 +477,32 @@ class Profiler extends Component {
 
         let leftStyle = {};
         let rightStyle = {};
-        if (this.state.smallScreen) {
-            if (this.state.txid) {
-                leftStyle = {width : "100%", display : "none"};
-                rightStyle= {width : "100%", display : "inline-block"};
+        if (!this.state.paramTxid) {
+            if (this.state.smallScreen) {
+                if (this.state.txid) {
+                    leftStyle = {width : "100%", display : "none"};
+                    rightStyle= {width : "100%", display : "inline-block"};
+                } else {
+                    leftStyle = {width : "100%", display : "inline-block"};
+                    rightStyle= {width : "100%", display : "none"};
+                }
             } else {
-                leftStyle = {width : "100%", display : "inline-block"};
-                rightStyle= {width : "100%", display : "none"};
+                leftStyle = {width : this.state.listWidth + "%", display : this.state.listWidth === 0 ? "none" : "inline-block"};
+                rightStyle = {width : (100 - this.state.listWidth) + "%", display : this.state.listWidth === 100 ? "none" : "inline-block"}
             }
-        } else {
-            leftStyle = {width : this.state.listWidth + "%", display : this.state.listWidth === 0 ? "none" : "inline-block"};
-            rightStyle = {width : (100 - this.state.listWidth) + "%", display : this.state.listWidth === 100 ? "none" : "inline-block"}
         }
 
         return (
-            <div className={"xlog-profiler " + (this.state.show ? ' ' : 'hidden')}>
+            <div className={"xlog-profiler " + (this.state.paramTxid ? 'param-mode ' : ' ') + (this.state.show ? ' ' : 'hidden')}>
                 <div>
                     <div className="size-control-btns">
-                        <button onClick={this.changeListWidth.bind(this, "min")}><i className="fa fa-angle-double-left icon-1"></i></button>
-                        <button onClick={this.changeListWidth.bind(this, "small")}><i className="fa fa-angle-left icon-2"></i></button>
-                        <button onClick={this.changeListWidth.bind(this, "big")}><i className="fa fa-angle-right icon-3"></i></button>
-                        <button onClick={this.changeListWidth.bind(this, "max")}><i className="fa fa-angle-double-right icon-4"></i></button>
+                        {!this.state.paramTxid && <button onClick={this.changeListWidth.bind(this, "min")}><i className="fa fa-angle-double-left icon-1"></i></button>}
+                        {!this.state.paramTxid && <button onClick={this.changeListWidth.bind(this, "small")}><i className="fa fa-angle-left icon-2"></i></button>}
+                        {!this.state.paramTxid && <button onClick={this.changeListWidth.bind(this, "big")}><i className="fa fa-angle-right icon-3"></i></button>}
+                        {!this.state.paramTxid && <button onClick={this.changeListWidth.bind(this, "max")}><i className="fa fa-angle-double-right icon-4"></i></button>}
                         <div className="close-btn" onClick={this.close}></div>
                     </div>
+                    {!this.state.paramTxid &&
                     <div className="profiler-layout left" style={leftStyle}>
                         <div className="summary">
                             <div className="title">PROFILER</div>
@@ -477,9 +513,10 @@ class Profiler extends Component {
                             <ProfileList txid={this.state.txid} xlogs={this.state.xlogs} rowClick={this.rowClick}/>
                         </div>
                     </div>
+                    }
                     <div className="profiler-layout right" style={rightStyle}>
                         <div className="summary">
-                            {this.state.smallScreen && <div onClick={this.clearTxId.bind(this)} className="profile-list-btn"><i className="fa fa-chevron-circle-left"></i></div>}
+                            {(!this.state.paramTxid && this.state.smallScreen) && <div onClick={this.clearTxId.bind(this)} className="profile-list-btn"><i className="fa fa-chevron-circle-left"></i></div>}
                             <div className="title">DETAIL <span className="selected-info">({this.state.txid ? 'TXID : ' + this.state.txid : 'NO PROFILE SELECTED'})</span></div>
                             <div className="profile-steps-control noselect">
                                 <div className={"profile-control-btn " + (this.state.summary ? 'active' : '')} onClick={this.toggleSummary}>{this.state.summary ? <i className="fa fa-check-circle"></i> : <i className="fa fa-circle-o"></i>} SUMMARY</div>
@@ -493,8 +530,8 @@ class Profiler extends Component {
                         </div>
                         <div className={"profile-steps"}>
                             <div className="profile-steps-content scrollbar">
-                                {this.state.txid && <SingleProfile txid={this.state.txid} profile={this.state.profile} steps={this.state.steps} summary={this.state.summary} indent={this.state.indent} bind={this.state.bind} wrap={this.state.wrap} gap={this.state.gap} formatter={this.state.formatter}/>}
-                                {!this.state.txid && <div className="no-profile"><div>NO PROFILE SELECTED</div></div>}
+                                {(this.state.paramTxid || this.state.txid) && <SingleProfile txid={this.state.txid} profile={this.state.profile} steps={this.state.steps} summary={this.state.summary} indent={this.state.indent} bind={this.state.bind} wrap={this.state.wrap} gap={this.state.gap} formatter={this.state.formatter}/>}
+                                {(!this.state.paramTxid && !this.state.txid) && <div className="no-profile"><div>NO PROFILE SELECTED</div></div>}
                                 </div>
                         </div>
                     </div>

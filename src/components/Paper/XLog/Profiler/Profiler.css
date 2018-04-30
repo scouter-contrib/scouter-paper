@@ -97,6 +97,11 @@
     border-radius: 0 2px 0 0;
 }
 
+
+.xlog-profiler.param-mode .right {
+    width: 100%;
+}
+
 .xlog-profiler .profiler-layout .summary {
     min-height: 60px;
     background-color: #666;
@@ -282,9 +287,19 @@
         margin-left: 40px;
     }
 
+    .xlog-profiler.param-mode .profiler-layout.right .summary .title {
+        padding: 15px 10px 7px;
+        margin-left: 0;
+    }
+
     .xlog-profiler .profile-steps-control {
         margin-left: 40px;
-        padding: 0 0px;
+        padding: 0;
+    }
+
+    .xlog-profiler.param-mode .profile-steps-control {
+        margin-left: 10px;
+        padding: 0;
     }
 
     .xlog-profiler .profile-list-btn {

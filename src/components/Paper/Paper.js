@@ -3,13 +3,14 @@ import "./Paper.css";
 import "./Resizable.css";
 import {connect} from "react-redux";
 import {withRouter} from 'react-router-dom';
-import {addRequest, pushMessage, setControlVisibility} from "../../actions";
+import {addRequest, pushMessage, setControlVisibility, setRealTime, setRealTimeValue, setRangeDate, setRangeHours, setRangeMinutes, setRangeValue, setRangeDateHoursMinutes, setRangeDateHoursMinutesValue, setRangeAll, setTemplate} from "../../actions";
 import {Responsive, WidthProvider} from "react-grid-layout";
 import {Box, BoxConfig, PaperControl} from "../../components";
 import jQuery from "jquery";
 import {errorHandler, getData, getHttpProtocol, getWithCredentials, setAuthHeader, setData, getSearchDays, getDivideDays} from "../../common/common";
 import Profiler from "./XLog/Profiler/Profiler";
 import ServerDate from "../../common/ServerDate";
+import * as common from "../../common/common";
 import RangeControl from "./RangeControl/RangeControl";
 import moment from "moment";
 import _ from "lodash";
@@ -29,12 +30,15 @@ class Paper extends Component {
     lastFrom = null;
     lastTo = null;
 
+    needSearch = false;
+    needSearchFrom = null;
+    needSearchTo = null;
+
     constructor(props) {
         super(props);
         this.mountTime = (new Date()).getTime();
         this.counterHistoriesLoaded = {};
         this.counterReady = false;
-
 
         let layouts = getData("layouts");
         let boxes = getData("boxes");
@@ -52,6 +56,69 @@ class Paper extends Component {
         let startTime = endTime - range;
 
         let alertInfo = JSON.parse(localStorage.getItem("alert"));
+
+        //URL로부터 XLOG 응답시간 축 시간 값 세팅
+        let xlogElapsedTime = common.getParam(this.props, "xlogElapsedTime");
+
+        //URL로부터 layout 세팅
+        let layout = common.getParam(this.props, "layout");
+        if (layout) {
+            jQuery.ajax({
+                method: "GET",
+                async: true,
+                url: getHttpProtocol(this.props.config) + "/scouter/v1/kv/__scouter_paper_layout",
+                xhrFields: getWithCredentials(this.props.config),
+                beforeSend: (xhr) => {
+                    setAuthHeader(xhr, this.props.config, this.props.user);
+                }
+            }).done((msg) => {
+                if (msg && Number(msg.status) === 200) {
+                    let templates = JSON.parse(msg.result);
+                    for (let i=0; i<templates.length; i++) {
+                        if (layout === templates[i].name) {
+                            this.props.setTemplate(templates[i].boxes, templates[i].layouts);
+                            break;
+                        }
+                    }
+                }
+            }).fail((xhr, textStatus, errorThrown) => {
+                errorHandler(xhr, textStatus, errorThrown, this.props);
+            });
+        }
+
+        // URL로부터 range 컨트럴의 데이터를 세팅
+        let params = common.getParam(this.props, "realtime,longterm,from,to");
+        if (params[0] || params[0] === null) {//realtime
+            this.props.setRealTime(true, false);
+            common.setRangePropsToUrl(this.props);
+        } else {
+            if (params[1]) {//longterm
+                this.props.setRealTime(false, true);
+            } else {
+                this.props.setRealTime(false, false);
+            }
+
+            let now = moment();
+            let from = now.clone().subtract(10, "minutes");
+            let to = now;
+            if (params[2] && params[3]) {
+                if (params[2].length === 14 && params[3].length === 14) {
+                    from = moment(params[2], "YYYYMMDDhhmmss");
+                    to = moment(params[3], "YYYYMMDDhhmmss");
+                } else {
+                    from = moment(Number(params[2]));
+                    to = moment(Number(params[3]));
+                }
+
+                let value = Math.floor((to.valueOf() - from.valueOf()) / (1000 * 60));
+                if (!isNaN(value)) {
+                    this.props.setRangeDateHoursMinutesValue(from, from.hours(), from.minutes(), value);
+                    this.needSearch = true;
+                    this.needSearchFrom = from.valueOf();
+                    this.needSearchTo = to.valueOf();
+                }
+            }
+        }
 
         this.state = {
             layouts: layouts,
@@ -72,6 +139,7 @@ class Paper extends Component {
                 endTime: endTime,
                 range: range,
                 maxElapsed: 2000,
+                paramMaxElapsed : xlogElapsedTime,
                 lastRequestTime: null,
                 clearTimestamp: null
             },
@@ -100,13 +168,6 @@ class Paper extends Component {
             fixedControl: false,
             visible: true,
             rangeControl: false,
-
-            /* realtime */
-            realtime: true,
-
-            /*longterm*/
-            longTerm: false,
-
             alert: {
                 data: [],
                 offset: {},
@@ -115,11 +176,10 @@ class Paper extends Component {
             },
             showAlert: false
         };
-
-
     }
 
     componentWillReceiveProps(nextProps) {
+
         if (JSON.stringify(nextProps.template) !== JSON.stringify(this.props.template)) {
             if (JSON.stringify(nextProps.template.boxes) !== JSON.stringify(this.state.boxes) || JSON.stringify(nextProps.template.layouts) !== JSON.stringify(this.state.layouts)) {
                 this.setState({
@@ -131,15 +191,56 @@ class Paper extends Component {
         }
 
         if (JSON.stringify(this.props.instances) !== JSON.stringify(nextProps.instances)) {
-            if (this.state.realtime) {
+            if (this.props.range.realTime) {
                 let now = (new ServerDate()).getTime();
                 let ten = 1000 * 60 * 10;
                 this.getCounterHistory(nextProps.instances, nextProps.hosts, now - ten, now, false);
                 this.getLatestData(true, nextProps.instances, nextProps.hosts);
             } else {
-                this.getXLogHistory(this.lastFrom, this.lastTo, nextProps.instances, this.state.longTerm);
+                if (this.needSearch) {
+                    this.needSearch = false;
+                    this.search(this.needSearchFrom, this.needSearchTo, nextProps.instances, nextProps.hosts);
+                } else {
+                    if (this.lastFrom && this.lastTo) {
+                        this.getXLogHistory(this.lastFrom, this.lastTo, nextProps.instances, this.props.range.longTerm);
+                    }
+                }
             }
         }
+
+        if (this.props.range.realTime !== nextProps.range.realTime) {
+            this.setState({
+                counters: {
+                    time: null,
+                    data: null
+                },
+                countersHistory: {
+                    time: null,
+                    data: null,
+                    from: null,
+                    to: null
+                }
+            });
+
+            if (nextProps.range.realTime) {
+                this.counterHistoriesLoaded = {};
+                clearInterval(this.dataRefreshTimer);
+                this.dataRefreshTimer = null;
+
+                let now = (new ServerDate()).getTime();
+                let ten = 1000 * 60 * 10;
+                this.getCounterHistory(this.props.instances, this.props.hosts, now - ten, now, false);
+                this.getLatestData(true, this.props.instances, this.props.hosts);
+            } else {
+                clearInterval(this.dataRefreshTimer);
+                this.dataRefreshTimer = null;
+            }
+        }
+
+        if (JSON.stringify(this.props.instances) !== JSON.stringify(nextProps.instances) || JSON.stringify(this.props.range) !== JSON.stringify(nextProps.range)) {
+            common.setRangePropsToUrl(nextProps);
+        }
+
     }
 
     componentDidMount() {
@@ -149,7 +250,7 @@ class Paper extends Component {
             let now = (new ServerDate()).getTime();
             let ten = 1000 * 60 * 10;
             this.getCounterHistory(this.props.instances, this.props.hosts, now - ten, now, false);
-            if (this.state.realtime) {
+            if (this.props.range.realTime) {
                 this.getLatestData(false, this.props.instances, this.props.hosts);
             }
         }
@@ -365,13 +466,11 @@ class Paper extends Component {
         let start = moment(Math.floor(time / (1000 * 60)) * (1000 * 60));
         start.subtract(5, "minutes");
         let end = start.clone().add(10, "minutes");
-        this.rangeControlChild.changeTimeType("search");
-        this.rangeControlChild.setLongTerm(false);
-        this.rangeControlChild.setRangeValue(10);
-        this.rangeControlChild.dateChange(start);
-        this.rangeControlChild.hoursChange(start.hours());
-        this.rangeControlChild.minutesChange(start.minutes());
-        this.rangeControlChild.search(start, end);
+        this.props.setRangeAll(start, start.hours(), start.minutes(), 10, false, false, this.props.config.range.shortHistoryRange, this.props.config.range.shortHistoryStep);
+        setTimeout(() => {
+            this.search(start, end, this.props.instances, this.props.hosts);
+        }, 100);
+
     };
 
     getRealTimeAlert = (instances, hosts) => {
@@ -542,45 +641,13 @@ class Paper extends Component {
         }
     };
 
-    changeRealtime = (realtime, longTerm) => {
-
-        this.setState({
-            realtime: realtime,
-            longTerm: longTerm,
-            counters: {
-                time: null,
-                data: null
-            },
-            countersHistory: {
-                time: null,
-                data: null,
-                from: null,
-                to: null
-            }
-        });
-
-        if (realtime) {
-            this.counterHistoriesLoaded = {};
-            clearInterval(this.dataRefreshTimer);
-            this.dataRefreshTimer = null;
-
-            let now = (new ServerDate()).getTime();
-            let ten = 1000 * 60 * 10;
-            this.getCounterHistory(this.props.instances, this.props.hosts, now - ten, now, false);
-            this.getLatestData(true, this.props.instances, this.props.hosts);
-        } else {
-            clearInterval(this.dataRefreshTimer);
-            this.dataRefreshTimer = null;
-        }
-    };
-
     changeLongTerm = (longTerm) => {
         this.setState({
             longTerm: longTerm
         });
     };
 
-    search = (from, to) => {
+    search = (from, to, instances, hosts) => {
 
         this.lastFrom = from;
         this.lastTo = to;
@@ -594,8 +661,8 @@ class Paper extends Component {
             }
         });
 
-        this.getCounterHistory(this.props.instances, this.props.hosts, from, to, this.state.longTerm);
-        this.getXLogHistory(from, to, this.props.instances, this.state.longTerm);
+        this.getCounterHistory(instances || this.props.instances, hosts || this.props.hosts, from, to, this.props.range.longTerm);
+        this.getXLogHistory(from, to, instances || this.props.instances, this.props.range.longTerm);
     };
 
     scroll = () => {
@@ -821,7 +888,7 @@ class Paper extends Component {
             return;
         }
 
-        if (this.props.instances && this.props.instances.length > 0) {
+        if (instances && instances.length > 0) {
 
             let data = this.state.data;
 
@@ -1354,8 +1421,8 @@ class Paper extends Component {
         return (
             <div className="papers">
                 <div className={"fixed-alter-object " + (this.state.fixedControl ? 'show' : '')}></div>
-                <PaperControl addPaper={this.addPaper} addPaperAndAddMetric={this.addPaperAndAddMetric} clearLayout={this.clearLayout} fixedControl={this.state.fixedControl} toggleRangeControl={this.toggleRangeControl} realtime={this.state.realtime} alert={this.state.alert} clearAllAlert={this.clearAllAlert} clearOneAlert={this.clearOneAlert} setRewind={this.setRewind} showAlert={this.state.showAlert} toggleShowAlert={this.toggleShowAlert} />
-                <RangeControl onRef={ref => (this.rangeControlChild = ref)} visible={this.state.rangeControl} changeRealtime={this.changeRealtime} search={this.search} fixedControl={this.state.fixedControl} toggleRangeControl={this.toggleRangeControl} changeLongTerm={this.changeLongTerm}/>
+                <PaperControl addPaper={this.addPaper} addPaperAndAddMetric={this.addPaperAndAddMetric} clearLayout={this.clearLayout} fixedControl={this.state.fixedControl} toggleRangeControl={this.toggleRangeControl} realtime={this.props.range.realTime} alert={this.state.alert} clearAllAlert={this.clearAllAlert} clearOneAlert={this.clearOneAlert} setRewind={this.setRewind} showAlert={this.state.showAlert} toggleShowAlert={this.toggleShowAlert} />
+                <RangeControl visible={this.state.rangeControl} changeRealtime={this.changeRealtime} search={this.search} fixedControl={this.state.fixedControl} toggleRangeControl={this.toggleRangeControl} changeLongTerm={this.changeLongTerm}/>
                 {(instanceSelected && (!this.state.boxes || this.state.boxes.length === 0)) &&
                 <div className="quick-usage">
                     <div>
@@ -1378,7 +1445,7 @@ class Paper extends Component {
                                 {box.option && (box.option.length > 1 || box.option.config ) &&
                                 <button className="box-control box-layout-config-btn" onClick={this.toggleConfig.bind(null, box.key)}><i className="fa fa-cog" aria-hidden="true"></i></button>}
                                 {box.config && <BoxConfig box={box} setOptionValues={this.setOptionValues} setOptionClose={this.setOptionClose} removeMetrics={this.removeMetrics}/>}
-                                <Box visible={this.state.visible} setOption={this.setOption} box={box} pastTimestamp={this.state.pastTimestamp} pageCnt={this.state.pageCnt} data={this.state.data} config={this.props.config} visitor={this.state.visitor} counters={this.state.counters} countersHistory={this.state.countersHistory.data} countersHistoryFrom={this.state.countersHistory.from} countersHistoryTo={this.state.countersHistory.to} countersHistoryTimestamp={this.state.countersHistory.time} longTerm={this.state.longTerm} layoutChangeTime={this.state.layoutChangeTime} realtime={this.state.realtime} xlogHistoryDoing={this.state.xlogHistoryDoing} xlogHistoryRequestCnt={this.state.xlogHistoryRequestCnt} setStopXlogHistory={this.setStopXlogHistory} />
+                                <Box visible={this.state.visible} setOption={this.setOption} box={box} pastTimestamp={this.state.pastTimestamp} pageCnt={this.state.pageCnt} data={this.state.data} config={this.props.config} visitor={this.state.visitor} counters={this.state.counters} countersHistory={this.state.countersHistory.data} countersHistoryFrom={this.state.countersHistory.from} countersHistoryTo={this.state.countersHistory.to} countersHistoryTimestamp={this.state.countersHistory.time} longTerm={this.props.range.longTerm} layoutChangeTime={this.state.layoutChangeTime} realtime={this.props.range.realTime} xlogHistoryDoing={this.state.xlogHistoryDoing} xlogHistoryRequestCnt={this.state.xlogHistoryRequestCnt} setStopXlogHistory={this.setStopXlogHistory} />
                             </div>
                         )
                     })}
@@ -1395,7 +1462,7 @@ class Paper extends Component {
                     </div>
                 </div>
                 }
-                <Profiler selection={this.props.selection} newXLogs={this.state.data.newXLogs} xlogs={this.state.data.xlogs} startTime={this.state.data.startTime} realtime={this.state.realtime}/>
+                <Profiler selection={this.props.selection} newXLogs={this.state.data.newXLogs} xlogs={this.state.data.xlogs} startTime={this.state.data.startTime} realtime={this.props.range.realTime}/>
             </div>
         );
     }
@@ -1409,7 +1476,8 @@ let
             selection: state.target.selection,
             config: state.config,
             user: state.user,
-            template: state.template
+            template: state.template,
+            range: state.range
         };
     };
 
@@ -1418,7 +1486,20 @@ let
         return {
             addRequest: () => dispatch(addRequest()),
             pushMessage: (category, title, content) => dispatch(pushMessage(category, title, content)),
-            setControlVisibility: (name, value) => dispatch(setControlVisibility(name, value))
+            setControlVisibility: (name, value) => dispatch(setControlVisibility(name, value)),
+
+            setRealTime : (realTime, longTerm) => dispatch(setRealTime(realTime, longTerm)),
+            setRealTimeValue: (realTime, longTerm, value) => dispatch(setRealTimeValue(realTime, longTerm, value)),
+            setRangeDate: (date) => dispatch(setRangeDate(date)),
+            setRangeHours: (hours) => dispatch(setRangeHours(hours)),
+            setRangeMinutes: (minutes) => dispatch(setRangeMinutes(minutes)),
+            setRangeValue: (value) => dispatch(setRangeValue(value)),
+            setRangeDateHoursMinutes: (date, hours, minutes) => dispatch(setRangeDateHoursMinutes(date, hours, minutes)),
+            setRangeDateHoursMinutesValue: (date, hours, minutes, value) => dispatch(setRangeDateHoursMinutesValue(date, hours, minutes, value)),
+            setRangeAll: (date, hours, minutes, value, realTime, longTerm, range, step) => dispatch(setRangeAll(date, hours, minutes, value, realTime, longTerm, range, step)),
+
+            setTemplate: (boxes, layouts) => dispatch(setTemplate(boxes, layouts))
+
         };
     };
 

@@ -5,7 +5,7 @@ import {addRequest, clearAllMessage, setControlVisibility, pushMessage, setUserI
 import jQuery from "jquery";
 import {withRouter} from 'react-router-dom';
 import TimeAgo from 'react-timeago'
-import {errorHandler, getWithCredentials} from '../../common/common';
+import {errorHandler, getWithCredentials, getDefaultServerConfig} from '../../common/common';
 import logo from '../../img/scouter.png';
 import logoBlack from '../../img/scouter_black.png';
 
@@ -63,7 +63,7 @@ class Login extends Component {
         };
 
         let action = "";
-        if (this.props.config.authentification.type === "cookie") {
+        if (getDefaultServerConfig(this.props.config).authentification === "cookie") {
             action = "/scouter/v1/user/login";
         } else {
             action = "/scouter/v1/user/loginGetToken";
@@ -80,7 +80,7 @@ class Login extends Component {
             contentType: "application/json; charset=UTF-8",
             processData: false
         }).done((msg) => {
-            if (this.props.config.authentification.type === "cookie") {
+            if (getDefaultServerConfig(this.props.config).authentification === "cookie") {
                 if (msg.status === "200") {
                     this.props.setUserId(this.state.control.id, null, (new Date()).getTime());
                 } else {

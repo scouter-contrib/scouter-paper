@@ -9,6 +9,16 @@ export const SET_USER_ID = 'SET_USER_ID';
 export const ADD_REQUEST = 'ADD_REQUEST';
 export const SET_SELECTION = 'SET_SELECTION';
 export const SET_TEMPLATE = 'SET_TEMPLATE';
+export const SET_REAL_TIME = 'SET_REAL_TIME';
+export const SET_REAL_TIME_VALUE = 'SET_REAL_TIME_VALUE';
+export const SET_RANGE_DATE = 'SET_RANGE_DATE';
+export const SET_RANGE_HOURS = 'SET_RANGE_HOURS';
+export const SET_RANGE_MINUTES = 'SET_RANGE_MINUTES';
+export const SET_RANGE_VALUE = 'SET_RANGE_VALUE';
+export const SET_RANGE_DATE_HOURS_MINUTES = 'SET_RANGE_DATE_HOURS_MINUTES';
+export const SET_REAL_TIME_RANGE_STEP_VALUE = 'SET_REAL_TIME_RANGE_STEP_VALUE';
+export const SET_RANGE_DATE_HOURS_MINUTES_VALUE = 'SET_RANGE_DATE_HOURS_MINUTES_VALUE';
+export const SET_RANGE_ALL = 'SET_RANGE_ALL';
 
 export function setConfig(config) {
     return {
@@ -89,6 +99,95 @@ export function setTemplate(boxes, layouts) {
         type: SET_TEMPLATE,
         boxes : boxes,
         layouts : layouts
+    };
+}
+
+export function setRealTime(realTime, longTerm) {
+    return {
+        type: SET_REAL_TIME,
+        realTime : realTime,
+        longTerm : longTerm
+    };
+}
+
+export function setRealTimeValue(realTime, longTerm, value) {
+    return {
+        type: SET_REAL_TIME_VALUE,
+        realTime : realTime,
+        longTerm : longTerm,
+        value : value
+    };
+}
+
+export function setRealTimeRangeStepValue(realTime, longTerm, value, range, step) {
+    return {
+        type: SET_REAL_TIME_RANGE_STEP_VALUE,
+        realTime : realTime,
+        longTerm : longTerm,
+        value : value,
+        range : range,
+        step : step
+    };
+}
+
+export function setRangeDate(date) {
+    return {
+        type: SET_RANGE_DATE,
+        date : date
+    };
+}
+
+export function setRangeHours(hours) {
+    return {
+        type: SET_RANGE_HOURS,
+        hours : hours
+    };
+}
+
+export function setRangeMinutes(minutes) {
+    return {
+        type: SET_RANGE_MINUTES,
+        minutes : minutes
+    };
+}
+
+export function setRangeDateHoursMinutes(date, hours, minutes) {
+    return {
+        type: SET_RANGE_DATE_HOURS_MINUTES,
+        date : date,
+        hours : hours,
+        minutes : minutes
+    };
+}
+
+export function setRangeDateHoursMinutesValue(date, hours, minutes, value) {
+    return {
+        type: SET_RANGE_DATE_HOURS_MINUTES_VALUE,
+        date : date,
+        hours : hours,
+        minutes : minutes,
+        value : value
+    };
+}
+
+export function setRangeAll(date, hours, minutes, value, realTime, longTerm, range, step) {
+    return {
+        type: SET_RANGE_ALL,
+        date : date,
+        hours : hours,
+        minutes : minutes,
+        value : value,
+        realTime : realTime,
+        longTerm : longTerm,
+        range : range,
+        step : step
+    };
+}
+
+export function setRangeValue(value) {
+    return {
+        type: SET_RANGE_VALUE,
+        value : value
     };
 }
 

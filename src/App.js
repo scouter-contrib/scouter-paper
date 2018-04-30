@@ -19,17 +19,11 @@ import {setConfig, addRequest, clearAllMessage, setControlVisibility, setUserId,
 import {detect} from 'detect-browser';
 import Unsupport from "./components/Unsupport/Unsupport";
 import jQuery from "jquery";
-import {errorHandler, mergeDeep} from './common/common';
+import {errorHandler, mergeDeep, getParam, setAuthHeader, getWithCredentials, getHttpProtocol, getDefaultServerConfig} from './common/common';
 import Home from "./components/Home/Home";
 
 const browser = detect();
-//const support = (browser.name === "chrome" || browser.name === "firefox" || browser.name === "opera" || browser.name === "safari");
 const support = (browser.name !== "ie" && browser.name !== "edge");
-
-
-if (browser.os.toUpperCase() === "MAC OS") {
-    document.querySelector("#root").classList.add("mac");
-}
 
 class App extends Component {
 
@@ -40,24 +34,18 @@ class App extends Component {
         jQuery.ajax({
             method: "GET",
             async: true,
-            url: config.protocol + "://" + config.address + ":" + config.port + "/scouter/v1/kv/a",
-            xhrFields: {
-                withCredentials: (config.authentification && config.authentification.type === "token")
-            },
+            url: getHttpProtocol(config) + "/scouter/v1/kv/a",
+            xhrFields: getWithCredentials(config),
             beforeSend: function (xhr) {
-                if (config.authentification && config.authentification.type === "bearer") {
-                    if (user && user.token) {
-                        xhr.setRequestHeader('Authorization', 'bearer ' + user.token);
-                    }
-                }
+                setAuthHeader(xhr, config, user);
             }
         }).done((msg) => {
             if (msg && Number(msg.status) === 200) {
-                if (config.authentification && config.authentification.type === "bearer") {
+                if (getDefaultServerConfig(config).authentification === "bearer") {
                     this.props.setUserId(user.id, user.token, user.time);
                 }
 
-                if (config.authentification && config.authentification.type === "cookie") {
+                if (getDefaultServerConfig(config).authentification === "cookie") {
                     this.props.setUserId(user.id, null, user.time);
                 }
 
@@ -66,7 +54,7 @@ class App extends Component {
             }
         }).fail((xhr, textStatus, errorThrown) => {
             // 응답이 왔고, 401코드인데, 인증 안함 설정한 경우
-            if (xhr.readyState === 4 && xhr.responseJSON.resultCode === "401" && config.authentification && config.authentification.type === "none") {
+            if (xhr.readyState === 4 && xhr.responseJSON.resultCode === "401" && getDefaultServerConfig(config).authentification === "none") {
                 this.props.pushMessage("error", "CHECK SETTINGS", "current setting does not require authentication, but it actually requires authentication.");
                 this.props.setControlVisibility("Message", true);
             } else {
@@ -77,6 +65,87 @@ class App extends Component {
             this.props.setControlVisibility("Loading", false);
         });
     };
+
+    componentWillReceiveProps(nextProps) {
+        if (JSON.stringify(this.props.config.fontSetting) !== JSON.stringify(nextProps.config.fontSetting)) {
+            this.setFontSetting(nextProps.config.fontSetting);
+        }
+
+        if (this.props.config.theme !== nextProps.config.theme) {
+            document.querySelector("html").setAttribute("class", nextProps.config.theme);
+        }
+    };
+
+    componentWillMount() {
+        let config = null;
+        let str = localStorage.getItem("config");
+        if (str) {
+            config = JSON.parse(str);
+            config = mergeDeep(this.props.config, config); //for added config's properties on later versions.
+            localStorage.setItem("config", JSON.stringify(config));
+        } else {
+            config = this.props.config;
+        }
+
+        // URL로부터 스카우터 서버 정보를 세팅
+        let params = getParam(this.props, "address,port,protocol,authentification");
+        if (params[0] && params[1]) {
+            let paramAddress = params[0];
+            let paramPort = params[1];
+            let paramProtocol = params[2] ? params[2] : "http";
+            let paramAuthentification = params[3] ? params[3] : "none";
+
+            let found = false;
+            for (let i=0; i<config.servers.length; i++) {
+                let server = config.servers[i];
+                if (server.protocol === paramProtocol && server.address === paramAddress && String(server.port) === String(paramPort) && server.authentification === paramAuthentification) {
+                    found = true;
+                    server.default = true;
+                } else {
+                    server.default = false;
+                }
+            }
+
+            console.log(found);
+            if (!found) {
+                config.servers.push({
+                    protocol: paramProtocol,
+                    address: paramAddress,
+                    port: paramPort,
+                    authentification :paramAuthentification,
+                    default : true
+                });
+            }
+        }
+
+        this.props.setConfig(config);
+        if (localStorage) {
+            localStorage.setItem("config", JSON.stringify(config));
+        }
+
+        let user = localStorage.getItem("user");
+        if (user) {
+            user = JSON.parse(user);
+            this.info(user, config);
+        }
+
+        if (user && getDefaultServerConfig(config).authentification === "bearer") {
+            this.props.setUserId(user.id, user.token, user.time);
+        }
+
+        if (user && getDefaultServerConfig(config).authentification === "cookie") {
+            this.props.setUserId(user.id, null, user.time);
+        }
+
+        if (!user && getDefaultServerConfig(config).authentification === "none") {
+            this.info(user, config);
+        }
+    }
+
+    componentDidMount() {
+        document.querySelector("html").setAttribute("class", this.props.config.theme);
+        this.setFontSetting(this.props.config.fontSetting);
+    }
 
     getFontGeneric = (val) => {
         for (let i = 0; i < this.props.config.fonts.length; i++) {
@@ -109,56 +178,6 @@ class App extends Component {
 
         document.body.appendChild(css);
     };
-
-    componentWillReceiveProps(nextProps) {
-        if (JSON.stringify(this.props.config.fontSetting) !== JSON.stringify(nextProps.config.fontSetting)) {
-            this.setFontSetting(nextProps.config.fontSetting);
-        }
-
-        if (this.props.config.theme !== nextProps.config.theme) {
-            document.querySelector("html").setAttribute("class", nextProps.config.theme);
-        }
-    };
-
-    componentWillMount() {
-        let config = null;
-        let str = localStorage.getItem("config");
-        if (str) {
-            config = JSON.parse(str);
-            config = mergeDeep(this.props.config, config); //for added config's properties on later versions.
-            this.props.setConfig(config);
-            localStorage.setItem("config", JSON.stringify(config));
-        } else {
-            config = this.props.config;
-        }
-
-        let user = localStorage.getItem("user");
-        if (user) {
-            user = JSON.parse(user);
-            this.info(user, config);
-        }
-
-        if (user && config.authentification && config.authentification.type === "bearer") {
-            this.props.setUserId(user.id, user.token, user.time);
-        }
-
-        if (user && config.authentification && config.authentification.type === "cookie") {
-            this.props.setUserId(user.id, null, user.time);
-        }
-
-        if (!user && config && config.authentification.type === "none") {
-            this.info(user, config);
-        }
-    }
-
-    componentDidMount() {
-        document.querySelector("html").setAttribute("class", this.props.config.theme);
-        this.setFontSetting(this.props.config.fontSetting);
-    }
-
-    componentDidUpdate(prevProps, prevState) {
-        //document.querySelector("body").style.backgroundColor = this.props.bgColor;
-    }
 
     render() {
         return (
