@@ -276,7 +276,11 @@ class InstanceSelector extends Component {
         }).done((msg) => {
             this.setState({
                 servers: msg.result,
-                selectedInstances: {}
+                instances: [],
+                activeServerId: null,
+                selectedInstances: {},
+                selectedHosts: {},
+                filter : ""
             });
         }).fail((xhr, textStatus, errorThrown) => {
             this.setState({

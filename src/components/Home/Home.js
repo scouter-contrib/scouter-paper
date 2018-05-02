@@ -7,6 +7,7 @@ import jQuery from "jquery";
 const git = "https://github.com/mindplates/scouter-paper";
 const version = "1.6.218";
 
+
 class Home extends Component {
 
     constructor(props) {
@@ -85,12 +86,12 @@ class Home extends Component {
                                         <div className="close-btn" onClick={() => {this.setState({showNote:false})}}></div>
                                     </div>
                                     <div className="release-note scrollbar">
-                                        {this.state.text.category.map((d) => {
+                                        {this.state.text.category.map((d, jnx) => {
                                             return (
-                                                <div className="category">
+                                                <div className="category" key={jnx}>
                                                     <div className="category-title">{d.title}</div>
-                                                    <div className="category-content">{d.lines.map((line) => {
-                                                        return <div>{line}</div>
+                                                    <div className="category-content">{d.lines.map((line, inx) => {
+                                                        return <div className={line[0] === " " ? 'no-list' : ''} key={inx}>{line}</div>
                                                     })}</div>
                                                 </div>
                                             )
