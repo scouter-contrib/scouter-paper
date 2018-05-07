@@ -121,6 +121,14 @@ export function options() {
                 objectType : "instance"
             },
             {
+                text: "Top 90% Elapsed Time",
+                mode: "nonexclusive",
+                type: "counter",
+                title: "Top 90% Elapsed Time",
+                counterKey : "Elapsed90%",
+                objectType : "instance"
+            },
+            {
                 text: "Service Count",
                 mode: "nonexclusive",
                 type: "counter",
@@ -153,10 +161,10 @@ export function options() {
                 objectType : "instance"
             },
             {
-                text: "SqlTime By Service",
+                text: "Sql Time By Service",
                 mode: "nonexclusive",
                 type: "counter",
-                title: "SqlTime By Service",
+                title: "Sql Time By Service",
                 counterKey : "SqlTimeByService",
                 objectType : "instance"
             },
@@ -292,82 +300,11 @@ export function options() {
                 objectType : "instance"
             },
             {
-                text: "Fd Usage",
+                text: "FD Usage",
                 mode: "nonexclusive",
                 type: "counter",
-                title: "Fd Usage",
+                title: "FD Usage",
                 counterKey : "FdUsage",
-                objectType : "instance"
-            }
-        ],
-
-        REQUEST: [
-            {
-                text: "Bytes Received",
-                mode: "nonexclusive",
-                type: "counter",
-                title: "Bytes Received",
-                counterKey : "BytesReceived",
-                objectType : "instance"
-            },
-            {
-                text: "Bytes Sent",
-                mode: "nonexclusive",
-                type: "counter",
-                title: "Bytes Sent",
-                counterKey : "BytesSent",
-                objectType : "instance"
-            },
-            {
-                text: "Error Count",
-                mode: "nonexclusive",
-                type: "counter",
-                title: "Error Count",
-                counterKey : "ErrorCount",
-                objectType : "instance"
-            },
-            {
-                text: "Processing Time",
-                mode: "nonexclusive",
-                type: "counter",
-                title: "Processing Time",
-                counterKey : "ProcessingTime",
-                objectType : "instance"
-            },
-            {
-                text: "Request Count",
-                mode: "nonexclusive",
-                type: "counter",
-                title: "Request Count",
-                counterKey : "RequestCount",
-                objectType : "instance"
-            }
-
-        ],
-
-        CONTEXT: [
-            {
-                text: "Active Sessions",
-                mode: "nonexclusive",
-                type: "counter",
-                title: "Active Sessions",
-                counterKey : "ActiveSessions",
-                objectType : "instance"
-            },
-            {
-                text: "Session Create Rate",
-                mode: "nonexclusive",
-                type: "counter",
-                title: "Session Create Rate",
-                counterKey : "SessionCreateRate",
-                objectType : "instance"
-            },
-            {
-                text: "Session Expired Rate",
-                mode: "nonexclusive",
-                type: "counter",
-                title: "Session Expired Rate",
-                counterKey : "SessionExpiredRate",
                 objectType : "instance"
             }
         ],
@@ -433,26 +370,26 @@ export function options() {
                 objectType : "host"
             },
             {
-                text: "MemA",
+                text: "Mem Available",
                 mode: "nonexclusive",
                 type: "counter",
-                title: "MemA",
+                title: "Mem Available",
                 counterKey : "MemA",
                 objectType : "host"
             },
             {
-                text: "MemU",
+                text: "Mem Used",
                 mode: "nonexclusive",
                 type: "counter",
-                title: "MemU",
+                title: "Mem Used",
                 counterKey : "MemU",
                 objectType : "host"
             },
             {
-                text: "MemT",
+                text: "Mem Total",
                 mode: "nonexclusive",
                 type: "counter",
-                title: "MemT",
+                title: "Mem Total",
                 counterKey : "MemT",
                 objectType : "host"
             },
@@ -481,18 +418,18 @@ export function options() {
                 objectType : "host"
             },
             {
-                text: "SwapU",
+                text: "Swap Used",
                 mode: "nonexclusive",
                 type: "counter",
-                title: "SwapU",
+                title: "Swap Used",
                 counterKey : "SwapU",
                 objectType : "host"
             },
             {
-                text: "SwapT",
+                text: "Swap Total",
                 mode: "nonexclusive",
                 type: "counter",
-                title: "SwapT",
+                title: "Swap Total",
                 counterKey : "SwapT",
                 objectType : "host"
             }
@@ -516,34 +453,34 @@ export function options() {
                 objectType : "host"
             },
             {
-                text: "TCP Stat CLS",
+                text: "TCP Stat CLOSE_WAIT",
                 mode: "nonexclusive",
                 type: "counter",
-                title: "TCP Stat CLS",
+                title: "TCP Stat CLOSE_WAIT",
                 counterKey : "TcpStatCLS",
                 objectType : "host"
             },
             {
-                text: "TCP Stat TIM",
+                text: "TCP Stat TIME_WAIT",
                 mode: "nonexclusive",
                 type: "counter",
-                title: "TCP Stat TIM",
+                title: "TCP Stat TIME_WAIT",
                 counterKey : "TcpStatTIM",
                 objectType : "host"
             },
             {
-                text: "TCP Stat FIN",
+                text: "TCP Stat FIN_WAIT",
                 mode: "nonexclusive",
                 type: "counter",
-                title: "TCP Stat FIN",
+                title: "TCP Stat FIN_WAIT",
                 counterKey : "TcpStatFIN",
                 objectType : "host"
             },
             {
-                text: "TCP Stat EST",
+                text: "TCP Stat ESTABLISHED",
                 mode: "nonexclusive",
                 type: "counter",
-                title: "TCP Stat EST",
+                title: "TCP Stat ESTABLISHED",
                 counterKey : "TcpStatEST",
                 objectType : "host"
             },
@@ -582,38 +519,6 @@ export function options() {
                 counterKey : "DiskWriteBytes",
                 objectType : "host"
             }
-        ],
-
-        /*BATCH: [
-            {
-                text: "Batch Service",
-                mode: "nonexclusive",
-                type: "counter",
-                title: "Batch Service",
-                counterKey : "BatchService"
-            },
-            {
-                text: "Batch Start",
-                mode: "nonexclusive",
-                type: "counter",
-                title: "Batch Start",
-                counterKey : "BatchStart"
-            },
-            {
-                text: "Batch End",
-                mode: "nonexclusive",
-                type: "counter",
-                title: "Batch End",
-                counterKey : "BatchEnd"
-            },
-            {
-                text: "Batch End No Signal",
-                mode: "nonexclusive",
-                type: "counter",
-                title: "Batch End No Signal",
-                counterKey : "BatchEndNoSignal"
-            }
-        ]*/
-
+        ]
     }
 }
