@@ -5,8 +5,8 @@ import moment from 'moment';
 const configState = {
     servers : [
         {
-            protocol: window.location.protocol.replace(":", ""),
-            address: window.location.hostname,
+            protocol: (window.location.protocol.replace(":", "").toLowerCase() === "http" || window.location.protocol.replace(":", "").toLowerCase() === "https") ? window.location.protocol.replace(":", "").toLowerCase() : "http",
+            address: window.location.hostname ? window.location.hostname : "127.0.0.1",
             port: 6188,
             authentification :"bearer",
             default : true
