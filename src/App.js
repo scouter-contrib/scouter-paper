@@ -106,7 +106,6 @@ class App extends Component {
                 }
             }
 
-            console.log(found);
             if (!found) {
                 config.servers.push({
                     protocol: paramProtocol,

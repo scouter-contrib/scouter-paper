@@ -341,7 +341,7 @@ class LineChart extends Component {
     };
 
     removeObjectLine = (obj, counterKey) => {
-        let pathClass = "line-" + obj.objHash + "-" + counterKey;
+        let pathClass = "line-" + obj.objHash + "-" + counterKey.replace('%', '_PCT_');
         let path = this.graph.svg.selectAll("path." + pathClass);
 
         // 데이터 삭제
@@ -360,7 +360,7 @@ class LineChart extends Component {
         }
 
         // 툴팁 그래프 삭제
-        let circleKey = "circle-" + obj.objHash + "_" + counterKey;
+        let circleKey = "circle-" + obj.objHash + "_" + counterKey.replace('%', '_PCT_');
         let circle = this.graph.focus.selectAll("circle." + circleKey);
 
         if (circle.size() > 0) {
@@ -372,7 +372,7 @@ class LineChart extends Component {
     };
 
     removeObjectLineOnly = (obj, counterKey) => {
-        let pathClass = "line-" + obj.objHash + "-" + counterKey;
+        let pathClass = "line-" + obj.objHash + "-" + counterKey.replace('%', '_PCT_');
         let path = this.graph.svg.selectAll("path." + pathClass);
 
         // 라인 그래프 삭제
@@ -381,7 +381,7 @@ class LineChart extends Component {
         }
 
         // 툴팁 그래프 삭제
-        let circleKey = "circle-" + obj.objHash + "_" + counterKey;
+        let circleKey = "circle-" + obj.objHash + "_" + counterKey.replace('%', '_PCT_');
         let circle = this.graph.focus.selectAll("circle." + circleKey);
 
         if (circle.size() > 0) {
@@ -395,7 +395,7 @@ class LineChart extends Component {
 
         if (this.props.config.graph.fill === "Y") {
 
-            let areaClass = "area-" + obj.objHash + "-" + counterKey;
+            let areaClass = "area-" + obj.objHash + "-" + counterKey.replace('%', '_PCT_');
             let area = this.graph.svg.selectAll("path." + areaClass);
 
             if (area.size() < 1) {
@@ -427,7 +427,7 @@ class LineChart extends Component {
         }
 
 
-        let pathClass = "line-" + obj.objHash + "-" + counterKey;
+        let pathClass = "line-" + obj.objHash + "-" + counterKey.replace('%', '_PCT_');
         let path = this.graph.svg.selectAll("path." + pathClass);
 
         if (path.size() < 1) {
@@ -458,7 +458,7 @@ class LineChart extends Component {
                 this.props.setTitle(counterKey, option.title, color);
             }
 
-            let circleKey = "circle-" + obj.objHash + "_" + counterKey;
+            let circleKey = "circle-" + obj.objHash + "_" + counterKey.replace('%', '_PCT_');
             that.graph.focus.select("circle." + circleKey).attr("stroke", color);
         }
 
@@ -567,7 +567,7 @@ class LineChart extends Component {
         let that = this;
         let r = 3;
 
-        let circleKey = "circle-" + obj.objHash + "_" + thisOption.counterKey;
+        let circleKey = "circle-" + obj.objHash + "_" + thisOption.counterKey.replace('%', '_PCT_');
         let circle = that.graph.focus.select("circle." + circleKey);
         if (circle.size() < 1) {
             that.graph.focus.append("circle").attr("class", circleKey).attr("r", r).attr("stroke", color);
@@ -577,7 +577,7 @@ class LineChart extends Component {
     mouseMoveObject = (obj, thisOption, counterKey, dataIndex, color, tooltip) => {
         let that = this;
 
-        let circleKey = "circle-" + obj.objHash + "_" + thisOption.counterKey;
+        let circleKey = "circle-" + obj.objHash + "_" + thisOption.counterKey.replace('%', '_PCT_');
         let unit = that.state.counters[counterKey][dataIndex].data[obj.objHash] ? that.state.counters[counterKey][dataIndex].data[obj.objHash].unit : "";
 
         if (that.state.counters[counterKey][dataIndex].time) {

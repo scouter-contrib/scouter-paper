@@ -270,6 +270,11 @@
     line-height: 160%;
 }
 
+.home .note .release-note .category > div.category-content > div.no-list {
+    list-style: none;
+    padding-left: 15px;
+}
+
 .home .note .close-btn {
     display: inline-block;
     width: 12px;

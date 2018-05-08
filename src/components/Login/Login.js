@@ -62,8 +62,9 @@ class Login extends Component {
             }
         };
 
+        let defaultServerconfig = getDefaultServerConfig(this.props.config);
         let action = "";
-        if (getDefaultServerConfig(this.props.config).authentification === "cookie") {
+        if (defaultServerconfig.authentification === "cookie") {
             action = "/scouter/v1/user/login";
         } else {
             action = "/scouter/v1/user/loginGetToken";
@@ -74,7 +75,7 @@ class Login extends Component {
 
         jQuery.ajax({
             method: "POST",
-            url: this.props.config.protocol + "://" + this.props.config.address + ":" + this.props.config.port + action,
+            url: defaultServerconfig.protocol + "://" + defaultServerconfig.address + ":" + defaultServerconfig.port + action,
             xhrFields: getWithCredentials(this.props.config),
             data: JSON.stringify(condition),
             contentType: "application/json; charset=UTF-8",

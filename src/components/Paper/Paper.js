@@ -88,6 +88,28 @@ class Paper extends Component {
 
         // URL로부터 range 컨트럴의 데이터를 세팅
         let params = common.getParam(this.props, "realtime,longterm,from,to");
+
+        let now = moment();
+        let from = now.clone().subtract(10, "minutes");
+        let to = now;
+        if (params[2] && params[3]) {
+            if (params[2].length === 14 && params[3].length === 14) {
+                from = moment(params[2], "YYYYMMDDhhmmss");
+                to = moment(params[3], "YYYYMMDDhhmmss");
+            } else {
+                from = moment(Number(params[2]));
+                to = moment(Number(params[3]));
+            }
+
+            let value = Math.floor((to.valueOf() - from.valueOf()) / (1000 * 60));
+            if (!isNaN(value)) {
+                this.props.setRangeDateHoursMinutesValue(from, from.hours(), from.minutes(), value);
+                this.needSearch = true;
+                this.needSearchFrom = from.valueOf();
+                this.needSearchTo = to.valueOf();
+            }
+        }
+
         if (params[0] || params[0] === null) {//realtime
             this.props.setRealTime(true, false);
             common.setRangePropsToUrl(this.props);
@@ -95,28 +117,27 @@ class Paper extends Component {
             if (params[1]) {//longterm
                 this.props.setRealTime(false, true);
             } else {
-                this.props.setRealTime(false, false);
-            }
-
-            let now = moment();
-            let from = now.clone().subtract(10, "minutes");
-            let to = now;
-            if (params[2] && params[3]) {
-                if (params[2].length === 14 && params[3].length === 14) {
-                    from = moment(params[2], "YYYYMMDDhhmmss");
-                    to = moment(params[3], "YYYYMMDDhhmmss");
+                //no longterm param then check config
+                if(params[1] === undefined || params[1] === null) {
+                    const shortLimitMillis = this.props.config.range.shortHistoryRange * 60 * 1000;
+                    if(shortLimitMillis && shortLimitMillis < to.diff(from)) {
+                        this.props.setRealTime(false, true);
+                    } else {
+                        this.props.setRealTime(false, false);
+                    }
                 } else {
-                    from = moment(Number(params[2]));
-                    to = moment(Number(params[3]));
+                    this.props.setRealTime(false, false);
                 }
+            }
+        }
 
-                let value = Math.floor((to.valueOf() - from.valueOf()) / (1000 * 60));
-                if (!isNaN(value)) {
-                    this.props.setRangeDateHoursMinutesValue(from, from.hours(), from.minutes(), value);
-                    this.needSearch = true;
-                    this.needSearchFrom = from.valueOf();
-                    this.needSearchTo = to.valueOf();
-                }
+        if (params[2] && params[3]) {
+            let value = Math.floor((to.valueOf() - from.valueOf()) / (1000 * 60));
+            if (!isNaN(value)) {
+                this.props.setRangeDateHoursMinutesValue(from, from.hours(), from.minutes(), value);
+                this.needSearch = true;
+                this.needSearchFrom = from.valueOf();
+                this.needSearchTo = to.valueOf();
             }
         }
 
@@ -342,7 +363,7 @@ class Paper extends Component {
             this.counterReady = counterKeys.every((key) => this.counterHistoriesLoaded[key]);
 
             if (this.counterReady) {
-                let params = JSON.stringify(counterKeys);
+                let params = JSON.stringify(counterKeys.map((key) => encodeURI(key)));
                 params = params.replace(/"/gi, "");
                 this.props.addRequest();
                 jQuery.ajax({
@@ -617,14 +638,14 @@ class Paper extends Component {
 
                     if (days > 1) {
                         for (let i = 0; i < fromTos.length; i++) {
-                            url = getHttpProtocol(this.props.config) + '/scouter/v1/counter/stat/' + counterKey + '?objHashes=' + JSON.stringify(instancesAndHosts.map((obj) => {
+                            url = getHttpProtocol(this.props.config) + '/scouter/v1/counter/stat/' + encodeURI(counterKey) + '?objHashes=' + JSON.stringify(instancesAndHosts.map((obj) => {
                                     return Number(obj.objHash);
                                 })) + "&startYmd=" + moment(fromTos[i].from).format("YYYYMMDD") + "&endYmd=" + moment(fromTos[i].from).format("YYYYMMDD");
 
                             this.getCounterHistoryData(url, counterKey, from, to, (new Date()).getTime(), true);
                         }
                     } else {
-                        url = getHttpProtocol(this.props.config) + '/scouter/v1/counter/stat/' + counterKey + '?objHashes=' + JSON.stringify(instancesAndHosts.map((obj) => {
+                        url = getHttpProtocol(this.props.config) + '/scouter/v1/counter/stat/' + encodeURI(counterKey) + '?objHashes=' + JSON.stringify(instancesAndHosts.map((obj) => {
                                 return Number(obj.objHash);
                             })) + "&startYmd=" + moment(startTime).format("YYYYMMDD") + "&endYmd=" + moment(endTime).format("YYYYMMDD");
                         this.getCounterHistoryData(url, counterKey, from, to, now, false);
@@ -632,7 +653,7 @@ class Paper extends Component {
 
 
                 } else {
-                    url = getHttpProtocol(this.props.config) + '/scouter/v1/counter/' + counterKey + '?objHashes=' + JSON.stringify(instancesAndHosts.map((obj) => {
+                    url = getHttpProtocol(this.props.config) + '/scouter/v1/counter/' + encodeURI(counterKey) + '?objHashes=' + JSON.stringify(instancesAndHosts.map((obj) => {
                             return Number(obj.objHash);
                         })) + "&startTimeMillis=" + startTime + "&endTimeMillis=" + endTime;
                     this.getCounterHistoryData(url, counterKey, from, to, now, false);
