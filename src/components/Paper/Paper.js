@@ -363,7 +363,7 @@ class Paper extends Component {
             this.counterReady = counterKeys.every((key) => this.counterHistoriesLoaded[key]);
 
             if (this.counterReady) {
-                let params = JSON.stringify(counterKeys);
+                let params = JSON.stringify(counterKeys.map((key) => encodeURI(key)));
                 params = params.replace(/"/gi, "");
                 this.props.addRequest();
                 jQuery.ajax({
@@ -638,14 +638,14 @@ class Paper extends Component {
 
                     if (days > 1) {
                         for (let i = 0; i < fromTos.length; i++) {
-                            url = getHttpProtocol(this.props.config) + '/scouter/v1/counter/stat/' + counterKey + '?objHashes=' + JSON.stringify(instancesAndHosts.map((obj) => {
+                            url = getHttpProtocol(this.props.config) + '/scouter/v1/counter/stat/' + encodeURI(counterKey) + '?objHashes=' + JSON.stringify(instancesAndHosts.map((obj) => {
                                     return Number(obj.objHash);
                                 })) + "&startYmd=" + moment(fromTos[i].from).format("YYYYMMDD") + "&endYmd=" + moment(fromTos[i].from).format("YYYYMMDD");
 
                             this.getCounterHistoryData(url, counterKey, from, to, (new Date()).getTime(), true);
                         }
                     } else {
-                        url = getHttpProtocol(this.props.config) + '/scouter/v1/counter/stat/' + counterKey + '?objHashes=' + JSON.stringify(instancesAndHosts.map((obj) => {
+                        url = getHttpProtocol(this.props.config) + '/scouter/v1/counter/stat/' + encodeURI(counterKey) + '?objHashes=' + JSON.stringify(instancesAndHosts.map((obj) => {
                                 return Number(obj.objHash);
                             })) + "&startYmd=" + moment(startTime).format("YYYYMMDD") + "&endYmd=" + moment(endTime).format("YYYYMMDD");
                         this.getCounterHistoryData(url, counterKey, from, to, now, false);
@@ -653,7 +653,7 @@ class Paper extends Component {
 
 
                 } else {
-                    url = getHttpProtocol(this.props.config) + '/scouter/v1/counter/' + counterKey + '?objHashes=' + JSON.stringify(instancesAndHosts.map((obj) => {
+                    url = getHttpProtocol(this.props.config) + '/scouter/v1/counter/' + encodeURI(counterKey) + '?objHashes=' + JSON.stringify(instancesAndHosts.map((obj) => {
                             return Number(obj.objHash);
                         })) + "&startTimeMillis=" + startTime + "&endTimeMillis=" + endTime;
                     this.getCounterHistoryData(url, counterKey, from, to, now, false);
