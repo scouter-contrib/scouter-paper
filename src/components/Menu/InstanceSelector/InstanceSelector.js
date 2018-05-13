@@ -220,7 +220,8 @@ class InstanceSelector extends Component {
 
 
                         // LUCKY! FIND ALL INSTANCE
-                        if (urlInstanceObjHashes.length === selectedInstances.length) {
+                        //if (urlInstanceObjHashes.length === selectedInstances.length) {
+                        if (selectedInstances.length > 0) {
                             selectedInstances.sort((a, b) => a.objName < b.objName ? -1 : 1);
                             selectedHosts && selectedHosts.sort((a, b) => a.objName < b.objName ? -1 : 1);
 
