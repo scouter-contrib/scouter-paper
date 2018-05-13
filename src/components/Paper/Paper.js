@@ -166,6 +166,7 @@ class Paper extends Component {
             },
             xlogHistoryDoing : false,
             xlogHistoryRequestCnt : 0,
+            xlogNotSupportedInRange : false,
 
             pastTimestamp: null,
 
@@ -862,6 +863,25 @@ class Paper extends Component {
             return;
         }
 
+        //xlog retrieve limit is 60 minute
+        if(to - from > 60 * 60 * 1000) {
+            let data = this.state.data;
+            let now = (new ServerDate()).getTime();
+            data.lastRequestTime = now;
+            data.tempXlogs = [];
+            data.newXLogs = [];
+            data.xlogs = [];
+            data.startTime = from;
+            data.endTime = to;
+
+            this.setState({
+                data: data,
+                pastTimestamp: now,
+                xlogNotSupportedInRange: true
+            });
+            return;
+        }
+
         if (instances && instances.length > 0) {
 
             let data = this.state.data;
@@ -877,7 +897,8 @@ class Paper extends Component {
                 data: data,
                 pastTimestamp: now,
                 xlogHistoryDoing : true,
-                xlogHistoryRequestCnt : 0
+                xlogHistoryRequestCnt : 0,
+                xlogNotSupportedInRange: false
             });
 
             let days = getSearchDays(from, to);
@@ -1466,7 +1487,7 @@ class Paper extends Component {
                                 {box.option && (box.option.length > 1 || box.option.config ) &&
                                 <button className="box-control box-layout-config-btn" onClick={this.toggleConfig.bind(null, box.key)}><i className="fa fa-cog" aria-hidden="true"></i></button>}
                                 {box.config && <BoxConfig box={box} setOptionValues={this.setOptionValues} setOptionClose={this.setOptionClose} removeMetrics={this.removeMetrics}/>}
-                                <Box visible={this.state.visible} setOption={this.setOption} box={box} pastTimestamp={this.state.pastTimestamp} pageCnt={this.state.pageCnt} data={this.state.data} config={this.props.config} visitor={this.state.visitor} counters={this.state.counters} countersHistory={this.state.countersHistory.data} countersHistoryFrom={this.state.countersHistory.from} countersHistoryTo={this.state.countersHistory.to} countersHistoryTimestamp={this.state.countersHistory.time} longTerm={this.props.range.longTerm} layoutChangeTime={this.state.layoutChangeTime} realtime={this.props.range.realTime} xlogHistoryDoing={this.state.xlogHistoryDoing} xlogHistoryRequestCnt={this.state.xlogHistoryRequestCnt} setStopXlogHistory={this.setStopXlogHistory} />
+                                <Box visible={this.state.visible} setOption={this.setOption} box={box} pastTimestamp={this.state.pastTimestamp} pageCnt={this.state.pageCnt} data={this.state.data} config={this.props.config} visitor={this.state.visitor} counters={this.state.counters} countersHistory={this.state.countersHistory.data} countersHistoryFrom={this.state.countersHistory.from} countersHistoryTo={this.state.countersHistory.to} countersHistoryTimestamp={this.state.countersHistory.time} longTerm={this.props.range.longTerm} layoutChangeTime={this.state.layoutChangeTime} realtime={this.props.range.realTime} xlogHistoryDoing={this.state.xlogHistoryDoing} xlogHistoryRequestCnt={this.state.xlogHistoryRequestCnt} setStopXlogHistory={this.setStopXlogHistory} xlogNotSupportedInRange={this.state.xlogNotSupportedInRange}/>
                             </div>
                         )
                     })}

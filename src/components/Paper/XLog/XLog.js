@@ -470,6 +470,7 @@ class XLog extends Component {
         return (
             <div className="xlog-viewer" ref="xlogViewer" onTouchStart={this.stopProgation} onMouseDown={this.stopProgation}>
                 {(this.props.longTerm) && <div className="no-longterm-support"><div><div>LONGTERM NOT SUPPORTED</div></div></div>}
+                {(this.props.xlogNotSupportedInRange) && <div className="no-longterm-support"><div><div>XLOG NOT SUPPORTED in this range</div></div></div>}
                 {this.props.xlogHistoryDoing &&
                 <div className="xlog-history-stop-control">
                     <div>

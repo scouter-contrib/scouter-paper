@@ -34,8 +34,8 @@ const configState = {
     range : {
         shortHistoryRange : 60,
         shortHistoryStep : 5,
-        longHistoryRange : 48,
-        longHistoryStep : 30
+        longHistoryRange : 360,
+        longHistoryStep : 1440
     },
     xlog: {
         normal: {

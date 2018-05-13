@@ -490,7 +490,7 @@ class Settings extends Component {
                                     <div>SHORT HISTORY RANGE (minutes)</div>
                                 </div>
                                 <div className="input">
-                                    <input type="number" required min={10} max={60} readOnly={!this.state.edit} onChange={this.onChangeRange.bind(this, "shortHistoryRange")} value={this.state.config.range.shortHistoryRange} placeholder="MINUTES" />
+                                    <input type="number" required min={10} max={180} readOnly={!this.state.edit} onChange={this.onChangeRange.bind(this, "shortHistoryRange")} value={this.state.config.range.shortHistoryRange} placeholder="MINUTES" />
                                 </div>
                             </div>
                             <div className="row">
@@ -506,7 +506,7 @@ class Settings extends Component {
                                     <div>LONG HISTORY RANGE (hours)</div>
                                 </div>
                                 <div className="input">
-                                    <input type="number" required min={2} readOnly={!this.state.edit} onChange={this.onChangeRange.bind(this, "longHistoryRange")} value={this.state.config.range.longHistoryRange} placeholder="HOURS" />
+                                    <input type="number" required min={24} readOnly={!this.state.edit} onChange={this.onChangeRange.bind(this, "longHistoryRange")} value={this.state.config.range.longHistoryRange} placeholder="HOURS" />
                                 </div>
                             </div>
                             <div className="row">
@@ -514,7 +514,7 @@ class Settings extends Component {
                                     <div>LONG HISTORY STEP (minutes)</div>
                                 </div>
                                 <div className="input">
-                                    <input type="number" required min={10} step={10} readOnly={!this.state.edit} onChange={this.onChangeRange.bind(this, "longHistoryStep")} value={this.state.config.range.longHistoryStep} placeholder="MINUTES" />
+                                    <input type="number" required min={60} step={60} readOnly={!this.state.edit} onChange={this.onChangeRange.bind(this, "longHistoryStep")} value={this.state.config.range.longHistoryStep} placeholder="MINUTES" />
                                 </div>
                             </div>
                         </div>
