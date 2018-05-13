@@ -447,18 +447,19 @@ class XLog extends Component {
         this.redraw();
     };
 
-
     axisUp = (e) => {
-        common.setLocalSettingData(XLOG_ELAPSED, this.state.elapsed * 2);
+        const yValue = this.state.elapsed >= 3000 ? this.state.elapsed * 1.3 : this.state.elapsed * 1.7;
+        common.setLocalSettingData(XLOG_ELAPSED, yValue);
         this.setState({
-            elapsed: this.state.elapsed * 2
+            elapsed: yValue
         });
     };
 
     axisDown = () => {
-        common.setLocalSettingData(XLOG_ELAPSED, this.state.elapsed / 2);
+        const yValue = this.state.elapsed >= 3000 ? this.state.elapsed / 1.3 : this.state.elapsed / 1.7;
+        common.setLocalSettingData(XLOG_ELAPSED, yValue);
         this.setState({
-            elapsed: this.state.elapsed / 2
+            elapsed: yValue
         });
     };
 
