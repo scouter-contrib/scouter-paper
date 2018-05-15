@@ -86,6 +86,10 @@ class XLog extends Component {
         if (this.props.xlogHistoryDoing !== nextProps.xlogHistoryDoing) {
             return true;
         }
+        
+        if (nextProps.filter && JSON.stringify(nextProps.filter) !== JSON.stringify(this.props.filter)) {
+            return true;
+        }
 
         return false;
     }
@@ -125,12 +129,17 @@ class XLog extends Component {
         if (this.lastPastTimestamp !== this.props.pastTimestamp) {
             this.lastPastTimestamp = this.props.pastTimestamp;
             this.clear();
-            this.redraw();
+            this.redraw(this.props.filter);
         } else if (this.lastPastTimestamp === this.props.pastTimestamp && this.lastPageCnt !== this.props.pageCnt) {
             this.lastPageCnt = this.props.pageCnt;
-            this.draw(this.props.data.newXLogs);
+            this.draw(this.props.data.newXLogs, this.props.filter);
         } else {
-            this.draw(this.props.data.newXLogs);
+            this.draw(this.props.data.newXLogs, this.props.filter);
+        }
+        
+        if (this.props.filter && JSON.stringify(prevProps.filter) !== JSON.stringify(this.props.filter)) {
+            this.clear();
+            this.redraw(this.props.filter);
         }
     };
 
@@ -149,11 +158,14 @@ class XLog extends Component {
         }
     };
 
+    
 
-    draw = (xlogs) => {
+    draw = (xlogs, filter) => {
         if (this.refs.xlogViewer && xlogs) {
             let context = d3.select(this.refs.xlogViewer).select("canvas").node().getContext("2d");
-            xlogs.forEach((d, i) => {
+            
+            let datas = common.getFilteredData(xlogs, filter);
+            datas.forEach((d, i) => {
                 let x = this.graph.x(d.endTime);
                 let y = this.graph.y(d.elapsed);
 
@@ -192,7 +204,7 @@ class XLog extends Component {
 
         if (clear) {
             this.clear();
-            this.redraw();
+            this.redraw(this.props.filter);
         }
     };
 
@@ -210,8 +222,8 @@ class XLog extends Component {
         context.clearRect(0, 0, canvas.width, canvas.height);
     };
 
-    redraw = () => {
-        this.draw(this.props.data.xlogs);
+    redraw = (filter) => {
+        this.draw(this.props.data.xlogs, filter);
     };
 
     updateYAxis = (clear) => {
@@ -234,7 +246,7 @@ class XLog extends Component {
 
         if (clear) {
             this.clear();
-            this.redraw();
+            this.redraw(this.props.filter);
         }
     };
 
@@ -380,9 +392,9 @@ class XLog extends Component {
                     x1: startTime.getTime(),
                     x2: endTime.getTime(),
                     y1: minTime,
-                    y2: maxTime
+                    y2: maxTime,
+                    filter : that.props.filter
                 });
-
 
                 setTimeout(() => {
                     d3.select(".selection").attr("x", 0).attr("y", 0).attr("width", 0).attr("height", 0);
@@ -444,7 +456,7 @@ class XLog extends Component {
             }
         }
 
-        this.redraw();
+        this.redraw(this.props.filter);
     };
 
     axisUp = (e) => {

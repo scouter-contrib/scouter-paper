@@ -15,6 +15,7 @@ import PaperControl from './Paper/PaperControl/PaperControl';
 import Settings from './Settings/Settings';
 import InstanceInfo from './Menu/InstanceInfo/InstanceInfo';
 import InstanceSelector from './Menu/InstanceSelector/InstanceSelector';
+import XLogFilter from './Paper/XLogFilter/XLogFilter';
 
 export {
     ContentWrapper,
@@ -33,5 +34,6 @@ export {
     PaperControl,
     Settings,
     InstanceInfo,
-    InstanceSelector
+    InstanceSelector,
+    XLogFilter
 };

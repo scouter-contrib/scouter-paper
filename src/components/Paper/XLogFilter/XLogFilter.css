@@ -1,0 +1,131 @@
+.xlog-filter-wrapper {
+    font-size: 9px;
+    z-index: 3;
+    box-sizing: border-box;
+    position: absolute;
+    top : 0;
+    left : 0;
+    right : 0;
+    bottom : 0;
+    background-color: rgba(0,0,0,0.3);
+    display: table;
+    width: 100%;
+    height: 100%;
+}
+
+.xlog-filter-wrapper .xlog-filter-wrapper-cell {
+    display: table-cell;
+    width: 100%;
+    height: 100%;
+    vertical-align: middle;
+}
+.xlog-filter-wrapper .xlog-filter {
+    background-color: white;
+    width: 500px;
+    margin: 0 auto;
+    border : 1px solid rgba(0,0,0,0.5);
+    border-radius: 3px;
+    max-height: 100%;
+    overflow-y: auto;
+}
+
+.xlog-filter .xlog-filter-title {
+    padding: 8px;
+    text-align: center;
+    background-color: rgba(0,0,0,0.1);
+    margin-bottom: 5px;
+    font-size: 11px;
+}
+
+.xlog-filter .xlog-filter-btns {
+    text-align: center;
+    padding: 5px 0 10px;
+}
+
+.xlog-filter .xlog-filter-content {
+    
+    width: 100%;
+}
+
+.xlog-filter .xlog-filter-content .xlog-filter-content-row {
+    width: 100%;
+}
+
+.xlog-filter .xlog-filter-content .xlog-filter-content-row.half {
+    width: 50%;
+    display: inline-block;
+}
+
+.xlog-filter .xlog-filter-content .xlog-filter-content-row > div {
+    display: inline-block;
+    vertical-align: middle;
+    padding: 5px 10px;
+    box-sizing: border-box;
+}
+
+.xlog-filter .xlog-filter-content .xlog-filter-content-row > div.xlog-filter-content-row-label {
+    width: 50px;
+    box-sizing: border-box;
+    padding: 5px 0;
+    text-align: right;
+}
+
+.xlog-filter .xlog-filter-content .xlog-filter-content-row > div.xlog-filter-content-row-control {
+    width: calc(100% - 50px);
+}
+
+.xlog-filter .xlog-filter-content .xlog-filter-content-row.xlog-filter-elapsed > div.xlog-filter-content-row-control {
+    width: calc((100% - 60px)/2);
+}
+
+.xlog-filter .xlog-filter-content .xlog-filter-content-row.xlog-filter-elapsed > div.xlog-filter-content-row-text {
+    width: 10px;
+    text-align: center;
+    display: inline-block;
+    padding: 0;
+    font-size: 16px;
+}
+
+.xlog-filter .xlog-filter-content .type-control > button {
+    margin: 0;
+    background-color: #EEE;
+    border : 1px solid rgba(0,0,0,0.2);
+    border-right : none;
+    width: 50px;
+}
+
+.xlog-filter .xlog-filter-content .type-control > button:hover {
+    background-color: rgba(0,0,0,0.2);
+}
+
+.xlog-filter .xlog-filter-content input {
+    padding: 4px;
+    border-radius: 3px;
+    border: none;
+    outline: none;
+    width: 100%;
+    box-sizing: border-box;
+    border: 1px solid rgba(0, 0, 0, 0.3);
+    transition: background-color 0.3s;
+}
+
+.xlog-filter .xlog-filter-content .type-control > button.active {
+    background-color: #FFD700;
+}
+
+.xlog-filter .xlog-filter-content .type-control > button:first-child {
+    border-radius: 3px 0 0 3px;
+}
+
+.xlog-filter .xlog-filter-content .type-control > button:last-child {
+    border-radius: 0 3px 3px 0;
+    border-right : 1px solid rgba(0,0,0,0.2);
+}
+
+.xlog-filter .xlog-filter-content .xlog-filter-content-row > div.xlog-filter-content-row-control {
+
+}
+
+
+
+

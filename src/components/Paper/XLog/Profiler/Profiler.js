@@ -4,7 +4,7 @@ import {addRequest, setControlVisibility, pushMessage} from '../../../../actions
 import {withRouter} from 'react-router-dom';
 import {connect} from 'react-redux';
 import jQuery from "jquery";
-import {getHttpProtocol, errorHandler, getWithCredentials, setAuthHeader, getSearchDays, getDivideDays, getParam} from '../../../../common/common';
+import {getFilteredData, getHttpProtocol, errorHandler, getWithCredentials, setAuthHeader, getSearchDays, getDivideDays, getParam} from '../../../../common/common';
 import SingleProfile from "./SingleProfile/SingleProfile";
 import ProfileList from "./ProfileList/ProfileList";
 import _ from "lodash";
@@ -147,7 +147,8 @@ class Profiler extends Component {
                     let x2 = nextProps.selection.x2;
                     let y1 = nextProps.selection.y1;
                     let y2 = nextProps.selection.y2;
-                    this.getList(x1, x2, y1, y2);
+                    let filter = nextProps.selection.filter;
+                    this.getList(x1, x2, y1, y2, filter);
                 }
             } else {
                 if (!this.txidInit) {
@@ -177,7 +178,7 @@ class Profiler extends Component {
         }
     }*/
 
-    getList = (x1, x2, y1, y2) => {
+    getList = (x1, x2, y1, y2, filter) => {
         let days = getSearchDays(x1, x2);
         let fromTos = getDivideDays(x1, x2);
 
@@ -187,17 +188,17 @@ class Profiler extends Component {
             });
 
             for (let i = 0; i < fromTos.length; i++) {
-                this.getListData(fromTos[i].from, fromTos[i].to , y1, y2, true);
+                this.getListData(fromTos[i].from, fromTos[i].to , y1, y2, true, filter);
             }
 
         } else {
-            this.getListData(x1, x2, y1, y2, false);
+            this.getListData(x1, x2, y1, y2, false, filter);
         }
     };
 
 
     // search의 경우, 마지막 newXLogs가 allXLogs에 들어 있는 문제 있음
-    getListData = (x1, x2, y1, y2, append) => {
+    getListData = (x1, x2, y1, y2, append, filter) => {
         let that = this;
         let allXLogs = that.props.xlogs;
         let newXLogs = that.props.newXLogs;
@@ -235,6 +236,8 @@ class Profiler extends Component {
             filtered = filtered1;
 
         }
+
+        filtered = getFilteredData(filtered, filter);
 
         let date = moment(new Date(x1)).format("YYYYMMDD");
 

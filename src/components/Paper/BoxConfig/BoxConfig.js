@@ -28,7 +28,6 @@ class BoxConfig extends Component {
                         singleRow : false
                     });
                 }
-
             }
         }
     };

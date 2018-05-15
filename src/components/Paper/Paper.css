@@ -22,6 +22,11 @@
     padding: 1px 4px;
 }
 
+.papers .box-layout .box-control.filter-btn.filtered {
+    color: #0198E1;
+}
+
+
 .papers .box-layout .box-control.last {
     margin-right: 4px;
 }
