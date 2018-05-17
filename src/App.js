@@ -54,7 +54,7 @@ class App extends Component {
             }
         }).fail((xhr, textStatus, errorThrown) => {
             // 응답이 왔고, 401코드인데, 인증 안함 설정한 경우
-            if (xhr.readyState === 4 && xhr.responseJSON.resultCode === "401" && getDefaultServerConfig(config).authentification === "none") {
+            if (xhr.readyState === 4 && xhr.responseJSON && xhr.responseJSON.resultCode === "401" && getDefaultServerConfig(config).authentification === "none") {
                 this.props.pushMessage("error", "CHECK SETTINGS", "current setting does not require authentication, but it actually requires authentication.");
                 this.props.setControlVisibility("Message", true);
             } else {

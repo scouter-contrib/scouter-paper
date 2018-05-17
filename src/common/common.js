@@ -3,9 +3,9 @@ import moment from "moment";
 
 export function getData(key) {
     let ls = null;
-    if (global.localStorage) {
+    if (window.localStorage) {
         try {
-            ls = JSON.parse(global.localStorage.getItem(key));
+            ls = JSON.parse(window.localStorage.getItem(key));
         } catch (e) {
             /*Ignore*/
         }
@@ -14,8 +14,8 @@ export function getData(key) {
 }
 
 export function setData(key, value) {
-    if (global.localStorage) {
-        global.localStorage.setItem(key, JSON.stringify(value));
+    if (window.localStorage) {
+        window.localStorage.setItem(key, JSON.stringify(value));
     }
 }
 
@@ -27,9 +27,9 @@ let localSetting = {};
 
 export function getLocalSetting() {
     let ls = null;
-    if (global.localStorage) {
+    if (window.localStorage) {
         try {
-            ls = JSON.parse(global.localStorage.getItem(LOCAL_SETTING_KEY));
+            ls = JSON.parse(window.localStorage.getItem(LOCAL_SETTING_KEY));
         } catch (e) {
         }
         if (ls) {
@@ -42,8 +42,8 @@ export function getLocalSetting() {
 export function setLocalSettingData(key, value) {
     getLocalSetting();
     localSetting[key] = value;
-    if (global.localStorage) {
-        global.localStorage.setItem(LOCAL_SETTING_KEY, JSON.stringify(localSetting));
+    if (window.localStorage) {
+        window.localStorage.setItem(LOCAL_SETTING_KEY, JSON.stringify(localSetting));
     }
 }
 

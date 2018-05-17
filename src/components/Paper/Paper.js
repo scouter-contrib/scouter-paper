@@ -528,7 +528,7 @@ class Paper extends Component {
                     }
                 }).done((msg) => {
                     if (msg) {
-
+                        
                         let alert = this.state.alert;
                         if (!alert.offset[objType]) {
                             alert.offset[objType] = {};

@@ -119,13 +119,13 @@ class XLogFilter extends Component {
                             <div className="xlog-filter-content-line"></div>
                             <div className="xlog-filter-content-row">
                                 <div className="xlog-filter-content-row-label">SERVICE</div>
-                                <div className="xlog-filter-content-row-control"><input type="text" onChange={this.onChangeService.bind(this)} value={this.state.service} /></div>
+                                <div className="xlog-filter-content-row-control"><input type="text" onChange={this.onChangeService.bind(this)} value={this.state.service} placeholder="URL" /></div>
                             </div>
                             <div className="xlog-filter-content-row xlog-filter-elapsed">
                                 <div className="xlog-filter-content-row-label">ELAPSED</div>
-                                <div className="xlog-filter-content-row-control"><input type="text" onChange={this.onChangeCondition.bind(this, "minElapsedTime")} value={this.state.minElapsedTime} /></div>
+                                <div className="xlog-filter-content-row-control"><input type="number" onChange={this.onChangeCondition.bind(this, "minElapsedTime")} value={this.state.minElapsedTime} placeholder="ms" min="1" /></div>
                                 <div className="xlog-filter-content-row-text">~</div>
-                                <div className="xlog-filter-content-row-control"><input type="text" onChange={this.onChangeCondition.bind(this, "maxElapsedTime")} value={this.state.maxElapsedTime} /></div>
+                                <div className="xlog-filter-content-row-control"><input type="number" onChange={this.onChangeCondition.bind(this, "maxElapsedTime")} value={this.state.maxElapsedTime} placeholder="ms" min="1" /></div>
                             </div>
                             <div className="xlog-filter-content-row half">
                                 <div className="xlog-filter-content-row-label">LOGIN</div>

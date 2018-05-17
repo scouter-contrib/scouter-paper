@@ -28,7 +28,7 @@ class Sql3Step extends Component {
             let params = divideParams(this.props.row.step.param);
             let {sql: sql0, params: params0} = literalBind(this.props.row.mainValue, params);
 
-            for (let i = 0; i < params0.length; i++) {
+            for (let i = 0; i < params0 && params0.length; i++) {
                 params0[i] = "<span class='param'>" + params0[i] + "</span>";
             }
             sql = sqlFormatter.format(sql0, {
