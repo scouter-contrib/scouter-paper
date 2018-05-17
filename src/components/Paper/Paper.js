@@ -1438,7 +1438,6 @@ class Paper extends Component {
     };
 
     setXlogFilter = (key, filtering, filter) => {
-
         let filters = Object.assign(this.state.filters);
         let filterInfo = filters.filter((d) => d.key === key)[0];
         filterInfo.show = false;
@@ -1452,9 +1451,16 @@ class Paper extends Component {
         this.setState({
             filters: filters
         });
-
-        console.log(filterInfo);
     };
+
+    closeFilter = (key) => {
+        let filters = Object.assign(this.state.filters);
+        let filterInfo = filters.filter((d) => d.key === key)[0];
+        filterInfo.show = false;
+        this.setState({
+            filters: filters
+        });
+    }
 
     removeMetrics = (boxKey, counterKeys) => {
 
@@ -1534,7 +1540,7 @@ class Paper extends Component {
                                 {box.option && (box.option.length > 1 || box.option.config ) && <button className="box-control box-layout-config-btn" onClick={this.toggleConfig.bind(null, box.key)}><i className="fa fa-cog" aria-hidden="true"></i></button>}
                                 {box.option && (box.option.length > 1 || box.option.config ) && box.option.type === "xlog" && <button className={"box-control filter-btn " + (filterInfo && filterInfo.data && filterInfo.data.filtering ? "filtered" : "")} onClick={this.toggleFilter.bind(null, box.key)}><i className="fa fa-filter" aria-hidden="true"></i></button>}                                
                                 {box.config && <BoxConfig box={box} setOptionValues={this.setOptionValues} setOptionClose={this.setOptionClose} removeMetrics={this.removeMetrics}/>}
-                                {filterInfo && filterInfo.show && <XLogFilter box={box} filterInfo={filterInfo ? filterInfo.data : {filtering : false}} setXlogFilter={this.setXlogFilter} />}
+                                {filterInfo && filterInfo.show && <XLogFilter box={box} filterInfo={filterInfo ? filterInfo.data : {filtering : false}} setXlogFilter={this.setXlogFilter} closeFilter={this.closeFilter} />}
                                 <Box visible={this.state.visible} setOption={this.setOption} box={box} filter={filterInfo ? filterInfo.data : {filtering : false}} pastTimestamp={this.state.pastTimestamp} pageCnt={this.state.pageCnt} data={this.state.data} config={this.props.config} visitor={this.state.visitor} counters={this.state.counters} countersHistory={this.state.countersHistory.data} countersHistoryFrom={this.state.countersHistory.from} countersHistoryTo={this.state.countersHistory.to} countersHistoryTimestamp={this.state.countersHistory.time} longTerm={this.props.range.longTerm} layoutChangeTime={this.state.layoutChangeTime} realtime={this.props.range.realTime} xlogHistoryDoing={this.state.xlogHistoryDoing} xlogHistoryRequestCnt={this.state.xlogHistoryRequestCnt} setStopXlogHistory={this.setStopXlogHistory} xlogNotSupportedInRange={this.state.xlogNotSupportedInRange}/>
                             </div>
                         )
@@ -1558,8 +1564,7 @@ class Paper extends Component {
     }
 }
 
-let
-    mapStateToProps = (state) => {
+let mapStateToProps = (state) => {
         return {
             hosts: state.target.hosts,
             instances: state.target.instances,
@@ -1571,8 +1576,7 @@ let
         };
     };
 
-let
-    mapDispatchToProps = (dispatch) => {
+let mapDispatchToProps = (dispatch) => {
         return {
             addRequest: () => dispatch(addRequest()),
             pushMessage: (category, title, content) => dispatch(pushMessage(category, title, content)),

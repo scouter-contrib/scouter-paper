@@ -16,26 +16,26 @@ class XLogFilter extends Component {
             address : "",
             referrer : "",
             login : "",
-            userAgent : ""
+            userAgent : "",
+            small : false
         };
     }
 
     resize = () => {
         if (this.refs.XLogFilter) {
             let width = this.refs.XLogFilter.offsetWidth;
-            if (width < 600) {
-                if (!this.state.singleRow) {
+            if (width < 500) {
+                if (!this.state.small) {
                     this.setState({
-                        singleRow : true
+                        small : true
                     });
                 }
             } else {
-                if (this.state.singleRow) {
+                if (this.state.small) {
                     this.setState({
-                        singleRow : false
+                        small : false
                     });
                 }
-
             }
         }
     };
@@ -87,12 +87,17 @@ class XLogFilter extends Component {
         this.props.setXlogFilter(this.props.box.key, false, null);        
     };
 
+    onClose = () => {
+        this.props.closeFilter(this.props.box.key);        
+    };
+
     render() {
         return (
-            <div className={"xlog-filter-wrapper " + (this.state.singleRow ? "single-row" : "")} onMouseDown={(e) => {e.stopPropagation();}} onMouseUp={(e) => {e.stopPropagation();}} ref="XLogFilter">
+            <div className={"xlog-filter-wrapper " + (this.state.small ? "small" : "")} onMouseDown={(e) => {e.stopPropagation();}} onMouseUp={(e) => {e.stopPropagation();}} ref="XLogFilter">
                 <div className="xlog-filter-wrapper-cell">
-                    <div className="xlog-filter">
+                    <div className="xlog-filter scrollbar">
                         <div className="xlog-filter-title">XLOG FILTER</div>
+                        <button className="xlog-filter-close-btn" onClick={this.onClose}><i className="fa fa-times-circle-o" aria-hidden="true"></i></button>
                         <div className="xlog-filter-content">
                             <div className="xlog-filter-content-row half">
                                 <div className="xlog-filter-content-row-label">TXID</div>
