@@ -129,7 +129,7 @@ class RangeControl extends Component {
                 <div className="time-type">
                     <div onClick={this.changeTimeType.bind(this, "realtime")} className={"time-type-item real-time " + (this.props.range.realTime ? "selected" : "")}>REALTIME</div>
                     <div onClick={this.changeTimeType.bind(this, "search")} className={"time-type-item search-time " + (!this.props.range.realTime ? "selected" : "")}>SEARCH</div>
-                    <div onClick={this.changeLongTerm.bind(this)} className={"time-type-item longterm-time " + (this.props.range.longTerm ? "selected " : " ") + (this.props.range.realTime ? "disabled" : "")}>{this.props.config.range.longHistoryRange}H</div>
+                    <div onClick={this.changeLongTerm.bind(this)} className={"time-type-item longterm-time " + (this.props.range.longTerm ? "selected " : " ") + (this.props.range.realTime ? "disabled" : "")}>{this.props.config.range.longHistoryRange/24}D</div>
                 </div>
                 <div className="time-controller">
                     <div>
@@ -154,15 +154,23 @@ class RangeControl extends Component {
                     <div className="span-range">
                         <div className="span-range-right-bg"></div>
                         <InputRange
-                            maxValue={this.props.range.range}
-                            minValue={this.props.config.range.shortHistoryStep}
-                            value={this.props.range.value}
-                            step={this.props.range.step}
+                            maxValue={this.props.range.range*1}
+                            minValue={this.props.config.range.shortHistoryStep*1}
+                            value={this.props.range.value*1}
+                            step={this.props.range.step*1}
                             disabled={this.props.range.realTime}
                             formatLabel={value => {
-                                let hours = Math.floor(value / 60);
-                                let minute = value % 60;
-                                if (hours > 0) {
+                                let days = Math.floor(value / 1440);
+                                let remains = value - days * 1440;
+                                let hours = Math.floor(remains / 60);
+                                let minute = remains % 60;
+                                if (days > 0) {
+                                    if (hours > 0) {
+                                        return days + "D " + hours + "H";
+                                    } else {
+                                        return days + "D";
+                                    }
+                                } else if (hours > 0) {
                                     if (minute > 0) {
                                         return hours + "H " + minute + "M";
                                     } else {

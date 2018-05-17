@@ -5,7 +5,7 @@ import {connect} from "react-redux";
 import {withRouter} from 'react-router-dom';
 import {addRequest, pushMessage, setControlVisibility, setRealTime, setRealTimeValue, setRangeDate, setRangeHours, setRangeMinutes, setRangeValue, setRangeDateHoursMinutes, setRangeDateHoursMinutesValue, setRangeAll, setTemplate} from "../../actions";
 import {Responsive, WidthProvider} from "react-grid-layout";
-import {Box, BoxConfig, PaperControl} from "../../components";
+import {Box, BoxConfig, PaperControl, XLogFilter} from "../../components";
 import jQuery from "jquery";
 import {errorHandler, getData, getHttpProtocol, getWithCredentials, setAuthHeader, setData, getSearchDays, getDivideDays} from "../../common/common";
 import Profiler from "./XLog/Profiler/Profiler";
@@ -49,7 +49,7 @@ class Paper extends Component {
 
         if (!boxes) {
             boxes = [];
-        }
+        }        
 
         let range = 1000 * 60 * 10;
         let endTime = (new ServerDate()).getTime();
@@ -145,6 +145,7 @@ class Paper extends Component {
             layouts: layouts,
             layoutChangeTime: null,
             boxes: boxes,
+            filters : [],
 
             data: {
                 tempXlogs: [],
@@ -166,6 +167,7 @@ class Paper extends Component {
             },
             xlogHistoryDoing : false,
             xlogHistoryRequestCnt : 0,
+            xlogNotSupportedInRange : false,
 
             pastTimestamp: null,
 
@@ -526,7 +528,7 @@ class Paper extends Component {
                     }
                 }).done((msg) => {
                     if (msg) {
-
+                        
                         let alert = this.state.alert;
                         if (!alert.offset[objType]) {
                             alert.offset[objType] = {};
@@ -862,6 +864,25 @@ class Paper extends Component {
             return;
         }
 
+        //xlog retrieve limit is 60 minute
+        if(to - from > 60 * 60 * 1000) {
+            let data = this.state.data;
+            let now = (new ServerDate()).getTime();
+            data.lastRequestTime = now;
+            data.tempXlogs = [];
+            data.newXLogs = [];
+            data.xlogs = [];
+            data.startTime = from;
+            data.endTime = to;
+
+            this.setState({
+                data: data,
+                pastTimestamp: now,
+                xlogNotSupportedInRange: true
+            });
+            return;
+        }
+
         if (instances && instances.length > 0) {
 
             let data = this.state.data;
@@ -877,7 +898,8 @@ class Paper extends Component {
                 data: data,
                 pastTimestamp: now,
                 xlogHistoryDoing : true,
-                xlogHistoryRequestCnt : 0
+                xlogHistoryRequestCnt : 0,
+                xlogNotSupportedInRange: false
             });
 
             let days = getSearchDays(from, to);
@@ -1389,6 +1411,57 @@ class Paper extends Component {
 
     };
 
+    toggleFilter = (key) => {
+        let filters = this.state.filters;
+        let found = false;
+        filters.forEach((filter) => {
+            if (filter.key === key) {
+                filter.show = !filter.show;
+                found = true;
+                return false;
+            }
+        });
+
+        if (!found) {
+            filters.push({
+                key : key,
+                show : true,
+                data : {
+                    filtering : false
+                }
+            });
+        }
+        
+        this.setState({
+            filters: filters
+        });
+    };
+
+    setXlogFilter = (key, filtering, filter) => {
+        let filters = Object.assign(this.state.filters);
+        let filterInfo = filters.filter((d) => d.key === key)[0];
+        filterInfo.show = false;
+        if (filtering) {
+            filter.filtering = true;
+            filterInfo.data = filter;
+        } else {
+            filterInfo.data = {filtering : false};
+        }
+
+        this.setState({
+            filters: filters
+        });
+    };
+
+    closeFilter = (key) => {
+        let filters = Object.assign(this.state.filters);
+        let filterInfo = filters.filter((d) => d.key === key)[0];
+        filterInfo.show = false;
+        this.setState({
+            filters: filters
+        });
+    }
+
     removeMetrics = (boxKey, counterKeys) => {
 
         let boxes = this.state.boxes;
@@ -1460,13 +1533,15 @@ class Paper extends Component {
                 </div>}
                 <ResponsiveReactGridLayout className="layout" cols={{lg: 12, md: 10, sm: 6, xs: 4, xxs: 2}} layouts={this.state.layouts} rowHeight={30} onLayoutChange={(layout, layouts) => this.onLayoutChange(layout, layouts)}>
                     {this.state.boxes.map((box, i) => {
+                        let filterInfo = this.state.filters.filter((d) => d.key === box.key)[0];
                         return (
                             <div className="box-layout" key={box.key} data-grid={box.layout}>
                                 <button className="box-control box-layout-remove-btn last" onClick={this.removePaper.bind(null, box.key)}><i className="fa fa-times-circle-o" aria-hidden="true"></i></button>
-                                {box.option && (box.option.length > 1 || box.option.config ) &&
-                                <button className="box-control box-layout-config-btn" onClick={this.toggleConfig.bind(null, box.key)}><i className="fa fa-cog" aria-hidden="true"></i></button>}
+                                {box.option && (box.option.length > 1 || box.option.config ) && <button className="box-control box-layout-config-btn" onClick={this.toggleConfig.bind(null, box.key)}><i className="fa fa-cog" aria-hidden="true"></i></button>}
+                                {box.option && (box.option.length > 1 || box.option.config ) && box.option.type === "xlog" && <button className={"box-control filter-btn " + (filterInfo && filterInfo.data && filterInfo.data.filtering ? "filtered" : "")} onClick={this.toggleFilter.bind(null, box.key)}><i className="fa fa-filter" aria-hidden="true"></i></button>}                                
                                 {box.config && <BoxConfig box={box} setOptionValues={this.setOptionValues} setOptionClose={this.setOptionClose} removeMetrics={this.removeMetrics}/>}
-                                <Box visible={this.state.visible} setOption={this.setOption} box={box} pastTimestamp={this.state.pastTimestamp} pageCnt={this.state.pageCnt} data={this.state.data} config={this.props.config} visitor={this.state.visitor} counters={this.state.counters} countersHistory={this.state.countersHistory.data} countersHistoryFrom={this.state.countersHistory.from} countersHistoryTo={this.state.countersHistory.to} countersHistoryTimestamp={this.state.countersHistory.time} longTerm={this.props.range.longTerm} layoutChangeTime={this.state.layoutChangeTime} realtime={this.props.range.realTime} xlogHistoryDoing={this.state.xlogHistoryDoing} xlogHistoryRequestCnt={this.state.xlogHistoryRequestCnt} setStopXlogHistory={this.setStopXlogHistory} />
+                                {filterInfo && filterInfo.show && <XLogFilter box={box} filterInfo={filterInfo ? filterInfo.data : {filtering : false}} setXlogFilter={this.setXlogFilter} closeFilter={this.closeFilter} />}
+                                <Box visible={this.state.visible} setOption={this.setOption} box={box} filter={filterInfo ? filterInfo.data : {filtering : false}} pastTimestamp={this.state.pastTimestamp} pageCnt={this.state.pageCnt} data={this.state.data} config={this.props.config} visitor={this.state.visitor} counters={this.state.counters} countersHistory={this.state.countersHistory.data} countersHistoryFrom={this.state.countersHistory.from} countersHistoryTo={this.state.countersHistory.to} countersHistoryTimestamp={this.state.countersHistory.time} longTerm={this.props.range.longTerm} layoutChangeTime={this.state.layoutChangeTime} realtime={this.props.range.realTime} xlogHistoryDoing={this.state.xlogHistoryDoing} xlogHistoryRequestCnt={this.state.xlogHistoryRequestCnt} setStopXlogHistory={this.setStopXlogHistory} xlogNotSupportedInRange={this.state.xlogNotSupportedInRange}/>
                             </div>
                         )
                     })}
@@ -1489,8 +1564,7 @@ class Paper extends Component {
     }
 }
 
-let
-    mapStateToProps = (state) => {
+let mapStateToProps = (state) => {
         return {
             hosts: state.target.hosts,
             instances: state.target.instances,
@@ -1502,8 +1576,7 @@ let
         };
     };
 
-let
-    mapDispatchToProps = (dispatch) => {
+let mapDispatchToProps = (dispatch) => {
         return {
             addRequest: () => dispatch(addRequest()),
             pushMessage: (category, title, content) => dispatch(pushMessage(category, title, content)),
