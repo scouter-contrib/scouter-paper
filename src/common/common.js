@@ -275,70 +275,81 @@ export function setRangePropsToUrl (props, pathname) {
 }
 
 export function getFilteredData (xlogs, filter) {
-        let datas = xlogs;        
-        if (filter.filtering) {
-            if (filter.gxid) {
-                datas = datas.filter((d) => d.gxid === filter.gxid);
-            }
-
-            if (filter.txid) {
-                datas = datas.filter((d) => d.txid === filter.txid);
-            }
-            
-            if (filter.service) {
-                datas = datas.filter((d) => d.service === filter.service);
-            }
-
-            if (filter.minElapsedTime) {
-                datas = datas.filter((d) => Number(d.elapsed) >= filter.minElapsedTime);
-            }
-
-            if (filter.maxElapsedTime) {
-                datas = datas.filter((d) => Number(d.elapsed) <= filter.maxElapsedTime);
-            }
-
-            if (filter.ipaddr) {
-                datas = datas.filter((d) => d.ipaddr === filter.ipaddr);
-            }
-
-            if (filter.ipaddr) {
-                datas = datas.filter((d) => d.ipaddr === filter.ipaddr);
-            }
-
-            if (filter.referrer) {
-                datas = datas.filter((d) => d.referrer === filter.referrer);
-            }
-
-            if (filter.login) {
-                datas = datas.filter((d) => d.login === filter.login);
-            }
-
-            if (filter.userAgent) {
-                datas = datas.filter((d) => d.userAgent === filter.userAgent);
-            }
-            
-            switch (filter.type) {
-                case "ERROR" : {
-                    datas = datas.filter((d) => Number(d.error) !== 0);
-                    break;
-                }
-
-                case "ASYNC" : {
-                    datas = datas.filter((d) => (Number(d.xtype) >=2 && Number(d.xtype) <= 4));
-                    break;
-                }
-
-                case "SYNC" : {
-                    datas = datas.filter((d) => (Number(d.xtype) < 2 || Number(d.xtype) > 4));
-                    break;
-                }
-
-                default : {
-                    break;
-                }
-            }            
+    let datas = xlogs;
+    if (filter.filtering) {
+        if (filter.gxid) {
+            datas = datas.filter((d) => d.gxid === filter.gxid);
         }
 
-        return datas;
+        if (filter.txid) {
+            datas = datas.filter((d) => d.txid === filter.txid);
+        }
+
+        if (filter.service) {
+            datas = datas.filter((d) => d.service === filter.service);
+        }
+
+        if (filter.minElapsedTime) {
+            datas = datas.filter((d) => Number(d.elapsed) >= filter.minElapsedTime);
+        }
+
+        if (filter.maxElapsedTime) {
+            datas = datas.filter((d) => Number(d.elapsed) <= filter.maxElapsedTime);
+        }
+
+        if (filter.ipaddr) {
+            datas = datas.filter((d) => d.ipaddr === filter.ipaddr);
+        }
+
+        if (filter.ipaddr) {
+            datas = datas.filter((d) => d.ipaddr === filter.ipaddr);
+        }
+
+        if (filter.referrer) {
+            datas = datas.filter((d) => d.referrer === filter.referrer);
+        }
+
+        if (filter.login) {
+            datas = datas.filter((d) => d.login === filter.login);
+        }
+
+        if (filter.userAgent) {
+            datas = datas.filter((d) => d.userAgent === filter.userAgent);
+        }
+
+        switch (filter.type) {
+            case "ERROR" : {
+                datas = datas.filter((d) => Number(d.error) !== 0);
+                break;
+            }
+
+            case "ASYNC" : {
+                datas = datas.filter((d) => (Number(d.xtype) >=2 && Number(d.xtype) <= 4));
+                break;
+            }
+
+            case "SYNC" : {
+                datas = datas.filter((d) => (Number(d.xtype) < 2 || Number(d.xtype) > 4));
+                break;
+            }
+
+            default : {
+                break;
+            }
+        }
     }
-    
+
+    return datas;
+}
+
+
+export function updateQueryStringParameter(uri, key, value) {
+    const re = new RegExp("([?&])" + key + "=.*?(&|$)", "i");
+    const separator = uri.indexOf('?') !== -1 ? "&" : "?";
+    if (uri.match(re)) {
+        return uri.replace(re, '$1' + key + "=" + value + '$2');
+    }
+    else {
+        return uri + separator + key + "=" + value;
+    }
+}

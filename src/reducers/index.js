@@ -13,7 +13,7 @@ const configState = {
         }
     ],
     interval: 2000,
-    numberFormat: "0,0",
+    numberFormat: "0,0.0",
     dateFormat: "%Y-%m-%d",
     timeFormat: "%H:%M:%S",
     minuteFormat: "%H:%M",
