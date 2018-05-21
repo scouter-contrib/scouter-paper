@@ -5,7 +5,7 @@ import {connect} from 'react-redux';
 import {withRouter} from 'react-router-dom';
 import 'url-search-params-polyfill';
 import jQuery from "jquery";
-import {errorHandler, setAuthHeader, getWithCredentials, getHttpProtocol, updateQueryStringParameter} from '../../../common/common';
+import {errorHandler, setAuthHeader, getWithCredentials, getHttpProtocol, updateQueryStringParameter, getCurrentDefaultServer} from '../../../common/common';
 
 class PresetManager extends Component {
 
@@ -136,7 +136,10 @@ class PresetManager extends Component {
                     this.props.togglePresetManagerVisible();
                     
                     setTimeout(() => {
-                        const newUrl = updateQueryStringParameter(window.location.href, "instances", preset.instances);
+                        const server = getCurrentDefaultServer(this.props.config);
+                        let newUrl = updateQueryStringParameter(window.location.href, "instances", preset.instances);
+                        newUrl = updateQueryStringParameter(newUrl, "address", server.address);
+                        newUrl = updateQueryStringParameter(newUrl, "port", server.port);
                         window.location.href = newUrl;
                         window.history.go(0);
                     }, 1);

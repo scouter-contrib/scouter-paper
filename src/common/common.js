@@ -65,6 +65,19 @@ export function getHttpProtocol(config) {
     }
 }
 
+export function getCurrentDefaultServer(config) {
+    if (config.servers && config.servers.length > 0) {
+        let server = config.servers.filter((server) => server.default);
+        if (server && server.length > 0) {
+            return server[0];
+        } else {
+            return null;
+        }
+    } else {
+        return null;
+    }
+}
+
 export function errorHandler(xhr, textStatus, errorThrown, props) {
 
     if (xhr.readyState === 4) {
