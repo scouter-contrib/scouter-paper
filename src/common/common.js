@@ -65,6 +65,19 @@ export function getHttpProtocol(config) {
     }
 }
 
+export function getCurrentDefaultServer(config) {
+    if (config.servers && config.servers.length > 0) {
+        let server = config.servers.filter((server) => server.default);
+        if (server && server.length > 0) {
+            return server[0];
+        } else {
+            return null;
+        }
+    } else {
+        return null;
+    }
+}
+
 export function errorHandler(xhr, textStatus, errorThrown, props) {
 
     if (xhr.readyState === 4) {
@@ -325,7 +338,7 @@ export function hash(str) {
 
 export function getFilteredData (xlogs, filter) {
     let datas = xlogs;
-    
+
     if (filter.filtering) {
         if (filter.gxid) {
             datas = datas.filter((d) => d.gxid === filter.gxid);
@@ -334,7 +347,7 @@ export function getFilteredData (xlogs, filter) {
         if (filter.txid) {
             datas = datas.filter((d) => d.txid === filter.txid);
         }
-        
+
         if (filter.service) {
             datas = datas.filter((d) => d.service === String(hash(filter.service)));
         }
@@ -387,4 +400,14 @@ export function getFilteredData (xlogs, filter) {
 
     return datas;
 }
-    
+
+export function updateQueryStringParameter(uri, key, value) {
+    const re = new RegExp("([?&])" + key + "=.*?(&|$)", "i");
+    const separator = uri.indexOf('?') !== -1 ? "&" : "?";
+    if (uri.match(re)) {
+        return uri.replace(re, '$1' + key + "=" + value + '$2');
+    }
+    else {
+        return uri + separator + key + "=" + value;
+    }
+}
