@@ -1,7 +1,7 @@
 import React, {Component} from 'react';
 import './Login.css';
 import {connect} from 'react-redux';
-import {addRequest, clearAllMessage, setControlVisibility, pushMessage, setUserId} from '../../actions';
+import {addRequest, clearAllMessage, setControlVisibility, pushMessage, setUserId, } from '../../actions';
 import jQuery from "jquery";
 import {withRouter} from 'react-router-dom';
 import TimeAgo from 'react-timeago'
@@ -48,9 +48,20 @@ class Login extends Component {
 
 
     logout = () => {
+
+        let defaultServerconfig = getDefaultServerConfig(this.props.config);
+        let origin = defaultServerconfig.protocol + "://" + defaultServerconfig.address + ":" + defaultServerconfig.port;
+
         document["cookie"] = 'JSESSIONID=; expires=Thu, 01 Jan 1970 00:00:01 GMT;';
-        this.props.setUserId(null, null, null);
-        localStorage.removeItem("user");
+        this.props.setUserId(origin, null, null, null);
+
+        let user = Object.assign(this.props.user);
+        user[origin] = {
+            id: null,
+            token : null,
+            time : null
+        };
+        localStorage.setItem("user", JSON.stringify(user));
     };
 
     login = () => {
@@ -73,9 +84,10 @@ class Login extends Component {
         this.props.setControlVisibility("Loading", true);
         this.props.addRequest();
 
+        let origin = defaultServerconfig.protocol + "://" + defaultServerconfig.address + ":" + defaultServerconfig.port;
         jQuery.ajax({
             method: "POST",
-            url: defaultServerconfig.protocol + "://" + defaultServerconfig.address + ":" + defaultServerconfig.port + action,
+            url: origin + action,
             xhrFields: getWithCredentials(this.props.config),
             data: JSON.stringify(condition),
             contentType: "application/json; charset=UTF-8",
@@ -83,7 +95,15 @@ class Login extends Component {
         }).done((msg) => {
             if (getDefaultServerConfig(this.props.config).authentification === "cookie") {
                 if (msg.status === "200") {
-                    this.props.setUserId(this.state.control.id, null, (new Date()).getTime());
+                    let now = (new Date()).getTime();
+                    this.props.setUserId(origin, this.state.control.id, null, now);
+                    let user = Object.assign(this.props.user);
+                    user[origin] = {
+                        id: this.state.control.id,
+                        token : null,
+                        time : now
+                    };
+                    localStorage.setItem("user", JSON.stringify(user));
                 } else {
                     this.setState({
                         message: "LOGIN FAILED"
@@ -91,13 +111,15 @@ class Login extends Component {
                 }
             } else {
                 if (msg.result.success) {
-                    let user = {
-                        id : this.state.control.id,
+                    let now = (new Date()).getTime();
+                    this.props.setUserId(origin, this.state.control.id, msg.result.bearerToken, now);
+                    let user = Object.assign(this.props.user);
+                    user[origin] = {
+                        id: this.state.control.id,
                         token : msg.result.bearerToken,
-                        time : (new Date()).getTime()
+                        time : now
                     };
                     localStorage.setItem("user", JSON.stringify(user));
-                    this.props.setUserId(this.state.control.id, msg.result.bearerToken, (new Date()).getTime());
                 } else {
                     this.setState({
                         message: "LOGIN FAILED"
@@ -125,14 +147,19 @@ class Login extends Component {
     };
 
     render() {
+
+        let defaultServerconfig = getDefaultServerConfig(this.props.config);
+        let origin = defaultServerconfig.protocol + "://" + defaultServerconfig.address + ":" + defaultServerconfig.port;        
+        
         return (
             <div className="login-wrapper">
                 <div>
                     <div className="login-content">
-                        {!this.props.user.id &&
+                        {(!this.props.user[origin] || !this.props.user[origin].id) &&
                         <div className="login-box">
                             <div className="logo-div"><img alt="scouter-logo" className="logo" src={this.props.config.theme === "theme-gray" ? logoBlack : logo}/></div>
                             <div className="product">SCOUTER PAPER</div>
+                            <div className="current-server">{origin}</div>
                             <div>
                                 <input type="text" placeholder="ID" value={this.state.control.id} onChange={this.handleChange.bind(this, "id")} onKeyPress={this.handleIdKeyPress} />
                             </div>
@@ -145,12 +172,13 @@ class Login extends Component {
                             <div className="login-message">{this.state.message}</div>
                         </div>
                         }
-                        {this.props.user.id &&
+                        {(this.props.user[origin] && this.props.user[origin].id) &&
                         <div className="login-box">
                             <div className="logo-div"><img alt="scouter-logo" className="logo" src={this.props.config.theme === "theme-gray" ? logoBlack : logo}/></div>
                             <div className="product">SCOUTER PAPER</div>
-                            <div className="user-id">{this.props.user.id}</div>
-                            <div className="when">LOGIN <TimeAgo date={this.props.user.time}/></div>
+                            <div className="current-server">{origin}</div>
+                            <div className="user-id">{this.props.user[origin].id}</div>
+                            <div className="when">LOGIN <TimeAgo date={this.props.user[origin].time}/></div>
                             <div className="logout-btn">
                                 <button onClick={this.logout}>LOGOUT</button>
                             </div>
@@ -173,7 +201,7 @@ let mapDispatchToProps = (dispatch) => {
     return {
         setControlVisibility: (name, value) => dispatch(setControlVisibility(name, value)),
         clearAllMessage: () => dispatch(clearAllMessage()),
-        setUserId: (id, token, time) => dispatch(setUserId(id, token, time)),
+        setUserId: (origin, id, token, time) => dispatch(setUserId(origin, id, token, time)),
         addRequest: () => dispatch(addRequest()),
         pushMessage: (category, title, content) => dispatch(pushMessage(category, title, content))
     };

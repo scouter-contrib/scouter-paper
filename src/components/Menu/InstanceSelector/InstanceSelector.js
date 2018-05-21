@@ -12,7 +12,7 @@ import {
 import {connect} from 'react-redux';
 import jQuery from "jquery";
 import {withRouter} from 'react-router-dom';
-import {getHttpProtocol, errorHandler, getWithCredentials, setAuthHeader} from '../../../common/common';
+import {getHttpProtocol, errorHandler, getWithCredentials, setAuthHeader, getCurrentUser} from '../../../common/common';
 import 'url-search-params-polyfill';
 import * as common from '../../../common/common'
 import AgentColor from "../../../common/InstanceColor";
@@ -37,7 +37,10 @@ class InstanceSelector extends Component {
         if (common.getDefaultServerConfig(this.props.config).authentification !== "bearer") {
             this.setTargetFromUrl(this.props);
         } else {
-            if (this.props.config || (this.props.user && this.props.user.id)) {
+            
+            let defaultServerconfig = common.getDefaultServerConfig(this.props.config);
+            let origin = defaultServerconfig.protocol + "://" + defaultServerconfig.address + ":" + defaultServerconfig.port;
+            if (this.props.config || (this.props.user[origin] && this.props.user[origin].id)) {
                 this.setTargetFromUrl(this.props);
             }
         }
@@ -131,7 +134,7 @@ class InstanceSelector extends Component {
                 url: getHttpProtocol(props.config) + '/scouter/v1/info/server',
                 xhrFields: getWithCredentials(props.config),
                 beforeSend: function (xhr) {
-                    setAuthHeader(xhr, props.config, props.user);
+                    setAuthHeader(xhr, props.config, getCurrentUser(props.config, props.user));
                 }
             }).done((msg) => {
                 if (msg && msg.result) {
@@ -170,7 +173,7 @@ class InstanceSelector extends Component {
                                 url: getHttpProtocol(this.props.config) + '/scouter/v1/object?serverId=' + server.id,
                                 xhrFields: getWithCredentials(props.config),
                                 beforeSend: function (xhr) {
-                                    setAuthHeader(xhr, props.config, props.user);
+                                    setAuthHeader(xhr, props.config, getCurrentUser(props.config, props.user));
                                 }
                             }).done(function (msg) {
                                 instances = msg.result;
@@ -314,7 +317,7 @@ class InstanceSelector extends Component {
             url: getHttpProtocol(this.props.config) + '/scouter/v1/object?serverId=' + serverId,
             xhrFields: getWithCredentials(that.props.config),
             beforeSend: function (xhr) {
-                setAuthHeader(xhr, that.props.config, that.props.user);
+                setAuthHeader(xhr, that.props.config, getCurrentUser(that.props.config, that.props.user));
             },
         }).done((msg) => {
             if (msg.result) {
@@ -448,17 +451,27 @@ class InstanceSelector extends Component {
             localStorage.setItem("config", JSON.stringify(config));
         }
 
+        this.props.setTarget([], []);
+        this.setState({
+            servers: [],
+            instances: [],
+            activeServerId: null,
+            selectedInstances: {},
+            selectedHosts: {},
+            filter : ""
+        });
+
     };
 
     render() {
         return (
-            <div className={"instance-selector-bg " + (this.props.visible ? "" : "hidden")}>
+            <div className={"instance-selector-bg " + (this.props.visible ? "" : "hidden")} onClick={this.props.toggleSelectorVisible}>
                 <div className={"instance-selector-fixed-bg"}>
                 </div>
                 <div className="instance-selector popup-div">
                     <div className="scouter-servers">
-                        <div className="scouter-server-label">SCOUTER SERVER</div>
-                        <div>
+                        <div className="scouter-server-label">SCOUTER WEB API SERVER</div>
+                        <div className="scouter-server-select">
                             <select value={common.getDefaultServerConfigIndex(this.props.config)} onChange={this.onChangeScouterServer.bind(this)}>
                             {this.props.config.servers.map((server, inx) => {
                                 return (

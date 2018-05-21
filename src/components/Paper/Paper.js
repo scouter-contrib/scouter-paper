@@ -7,7 +7,7 @@ import {addRequest, pushMessage, setControlVisibility, setRealTime, setRealTimeV
 import {Responsive, WidthProvider} from "react-grid-layout";
 import {Box, BoxConfig, PaperControl, XLogFilter} from "../../components";
 import jQuery from "jquery";
-import {errorHandler, getData, getHttpProtocol, getWithCredentials, setAuthHeader, setData, getSearchDays, getDivideDays} from "../../common/common";
+import {errorHandler, getData, getHttpProtocol, getWithCredentials, setAuthHeader, setData, getSearchDays, getDivideDays, getCurrentUser} from "../../common/common";
 import Profiler from "./XLog/Profiler/Profiler";
 import ServerDate from "../../common/ServerDate";
 import * as common from "../../common/common";
@@ -69,7 +69,7 @@ class Paper extends Component {
                 url: getHttpProtocol(this.props.config) + "/scouter/v1/kv/__scouter_paper_layout",
                 xhrFields: getWithCredentials(this.props.config),
                 beforeSend: (xhr) => {
-                    setAuthHeader(xhr, this.props.config, this.props.user);
+                    setAuthHeader(xhr, this.props.config, getCurrentUser(this.props.config, this.props.user));
                 }
             }).done((msg) => {
                 if (msg && Number(msg.status) === 200) {
@@ -376,7 +376,7 @@ class Paper extends Component {
                     })),
                     xhrFields: getWithCredentials(that.props.config),
                     beforeSend: function (xhr) {
-                        setAuthHeader(xhr, that.props.config, that.props.user);
+                        setAuthHeader(xhr, that.props.config, getCurrentUser(that.props.config, that.props.user));
                     }
                 }).done((msg) => {
                     if (!that.mounted) {
@@ -524,7 +524,7 @@ class Paper extends Component {
                     url: getHttpProtocol(this.props.config) + "/scouter/v1/alert/realTime/" + offset1 + "/" + offset2 + "?objType=" + objType,
                     xhrFields: getWithCredentials(that.props.config),
                     beforeSend: function (xhr) {
-                        setAuthHeader(xhr, that.props.config, that.props.user);
+                        setAuthHeader(xhr, that.props.config, getCurrentUser(that.props.config, that.props.user));
                     }
                 }).done((msg) => {
                     if (msg) {
@@ -729,7 +729,7 @@ class Paper extends Component {
                 })),
                 xhrFields: getWithCredentials(that.props.config),
                 beforeSend: function (xhr) {
-                    setAuthHeader(xhr, that.props.config, that.props.user);
+                    setAuthHeader(xhr, that.props.config, getCurrentUser(that.props.config, that.props.user));
                 }
             }).done((msg) => {
 
@@ -946,7 +946,7 @@ class Paper extends Component {
                 })),
                 xhrFields: getWithCredentials(that.props.config),
                 beforeSend: function (xhr) {
-                    setAuthHeader(xhr, that.props.config, that.props.user);
+                    setAuthHeader(xhr, that.props.config, getCurrentUser(that.props.config, that.props.user));
                 }
             }).done((msg) => {
                 if (!that.mounted) {
@@ -1020,7 +1020,7 @@ class Paper extends Component {
                 })),
                 xhrFields: getWithCredentials(that.props.config),
                 beforeSend: function (xhr) {
-                    setAuthHeader(xhr, that.props.config, that.props.user);
+                    setAuthHeader(xhr, that.props.config, getCurrentUser(that.props.config, that.props.user));
                 }
             }).done((msg) => {
                 if (!that.mounted) {
@@ -1048,7 +1048,7 @@ class Paper extends Component {
             url: url,
             xhrFields: getWithCredentials(that.props.config),
             beforeSend: function (xhr) {
-                setAuthHeader(xhr, that.props.config, that.props.user);
+                setAuthHeader(xhr, that.props.config, getCurrentUser(that.props.config, that.props.user));
             }
         }).done((msg) => {
             if (!this.mounted) {

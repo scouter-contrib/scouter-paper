@@ -5,7 +5,7 @@ import {connect} from 'react-redux';
 import {withRouter} from 'react-router-dom';
 import 'url-search-params-polyfill';
 import jQuery from "jquery";
-import {errorHandler, setAuthHeader, getWithCredentials, getHttpProtocol, updateQueryStringParameter, getCurrentDefaultServer} from '../../../common/common';
+import {errorHandler, setAuthHeader, getWithCredentials, getHttpProtocol, updateQueryStringParameter, getCurrentUser, getCurrentDefaultServer, getDefaultServerConfig} from '../../../common/common';
 
 class PresetManager extends Component {
 
@@ -30,7 +30,7 @@ class PresetManager extends Component {
         let data = {
             key : "__scouter_paper_preset",
             value : JSON.stringify(presets)
-        };
+        };        
 
         jQuery.ajax({
             method: "PUT",
@@ -40,7 +40,8 @@ class PresetManager extends Component {
             contentType : "application/json",
             data : JSON.stringify(data),
             beforeSend: function (xhr) {
-                setAuthHeader(xhr, that.props.config, that.props.user);
+                setAuthHeader(xhr, that.props.config, getCurrentUser(that.props.config, that.props.user));
+
             }
         }).done((msg) => {
             if (msg && Number(msg.status) === 200) {
@@ -54,6 +55,7 @@ class PresetManager extends Component {
     };
 
     loadPresets = (config, user) => {
+        
 
         jQuery.ajax({
             method: "GET",
@@ -61,17 +63,20 @@ class PresetManager extends Component {
             url: getHttpProtocol(config) + "/scouter/v1/kv/__scouter_paper_preset",
             xhrFields: getWithCredentials(config),
             beforeSend: function (xhr) {
-                setAuthHeader(xhr, config, user);
+                setAuthHeader(xhr, config, getCurrentUser(config, user));
             }
         }).done((msg) => {
             if (msg && Number(msg.status) === 200) {
-                let list = JSON.parse(msg.result);
-                if (list && list.length > 0) {
-                    this.setState({
-                        presets : list,
-                        selectedPresetNo : null,
-                        selectedEditNo : null
-                    });
+                if (msg.result) {
+                    let list = JSON.parse(msg.result);
+                    console.log(list);
+                    if (list && list.length > 0) {
+                        this.setState({
+                            presets : list,
+                            selectedPresetNo : null,
+                            selectedEditNo : null
+                        });
+                    }
                 }
             }
         }).fail((xhr, textStatus, errorThrown) => {
@@ -190,7 +195,7 @@ class PresetManager extends Component {
     render() {
 
         return (
-            <div className={"preset-manager-bg " + (this.props.visible ? "" : "hidden")}>
+            <div className={"preset-manager-bg " + (this.props.visible ? "" : "hidden")} onClick={this.props.togglePresetManagerVisible}>
                 <div className={"preset-manager-fixed-bg"}></div>
                 <div className="preset-manager popup-div">
                     <div className="title">

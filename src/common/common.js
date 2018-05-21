@@ -139,6 +139,12 @@ export function setAuthHeader(xhr, config, user) {
     }
 }
 
+export function getCurrentUser(config, user) {
+    let defaultServerconfig = getDefaultServerConfig(config);
+    let origin = defaultServerconfig.protocol + "://" + defaultServerconfig.address + ":" + defaultServerconfig.port;
+    return user[origin];
+}
+
 export function zeroPadding(n, p, c) {
     let pad_char = typeof c !== 'undefined' ? c : '0';
     let pad = new Array(1 + p).join(pad_char);

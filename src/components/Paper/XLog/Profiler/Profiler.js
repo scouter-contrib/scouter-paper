@@ -4,7 +4,7 @@ import {addRequest, setControlVisibility, pushMessage} from '../../../../actions
 import {withRouter} from 'react-router-dom';
 import {connect} from 'react-redux';
 import jQuery from "jquery";
-import {getFilteredData, getHttpProtocol, errorHandler, getWithCredentials, setAuthHeader, getSearchDays, getDivideDays, getParam} from '../../../../common/common';
+import {getFilteredData, getHttpProtocol, errorHandler, getWithCredentials, setAuthHeader, getSearchDays, getDivideDays, getParam, getCurrentUser} from '../../../../common/common';
 import SingleProfile from "./SingleProfile/SingleProfile";
 import ProfileList from "./ProfileList/ProfileList";
 import _ from "lodash";
@@ -249,7 +249,7 @@ class Profiler extends Component {
             url: getHttpProtocol(this.props.config) + '/scouter/v1/xlog-data/' + date + '/multi/' + filtered.map(x => x.txid).toString(),
             xhrFields: getWithCredentials(that.props.config),
             beforeSend: function (xhr) {
-                setAuthHeader(xhr, that.props.config, that.props.user);
+                setAuthHeader(xhr, that.props.config, getCurrentUser(that.props.config, that.props.user));
             }
         }).done((msg) => {
 
@@ -341,7 +341,7 @@ class Profiler extends Component {
             url: getHttpProtocol(this.props.config) + '/scouter/v1/xlog-data/' + (txiddate ? txiddate : moment(new Date(Number(xlog.endTime))).format("YYYYMMDD")) + "/" + xlog.txid,
             xhrFields: getWithCredentials(that.props.config),
             beforeSend: function (xhr) {
-                setAuthHeader(xhr, that.props.config, that.props.user);
+                setAuthHeader(xhr, that.props.config, getCurrentUser(that.props.config, that.props.user));
             }
         }).done((msg) => {
             this.setState({
@@ -356,7 +356,7 @@ class Profiler extends Component {
                 url: getHttpProtocol(this.props.config) + '/scouter/v1/profile-data/' + (txiddate ? txiddate : moment(new Date(Number(xlog.endTime))).format("YYYYMMDD")) + "/" + xlog.txid,
                 xhrFields: getWithCredentials(that.props.config),
                 beforeSend: function (xhr) {
-                    setAuthHeader(xhr, that.props.config, that.props.user);
+                    setAuthHeader(xhr, that.props.config, getCurrentUser(that.props.config, that.props.user));
                 }
             }).done((msg) => {
                 const orderedSteps = _.orderBy(msg.result, (e) => Number(e.step.order), ['asc']);

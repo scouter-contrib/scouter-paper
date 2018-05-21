@@ -66,6 +66,11 @@ class Menu extends Component {
 
     render() {
         let instanceParam = (this.props.instances && this.props.instances.length > 0) ? "?instances=" + this.props.instances.map((d) => {return d.objHash}) : "";
+
+        let defaultServerconfig = getDefaultServerConfig(this.props.config);
+        let origin = defaultServerconfig.protocol + "://" + defaultServerconfig.address + ":" + defaultServerconfig.port;
+        let user = this.props.user[origin];
+
         return (
             <div className="menu-div">
                 <div className="menu">
@@ -93,8 +98,8 @@ class Menu extends Component {
                     {(getDefaultServerConfig(this.props.config).authentification !== "none") &&
                         <NavLink className={"menu-item right " + (this.state.menu === "login" ? "active" : "")} to={"/login" + instanceParam} activeClassName="active" onClick={this.menuClick.bind(this, "/login")}>
                             <div>
-                                {(this.props.user && this.props.user.id) ? <div className="text"></div> : <div className="icon"><i className="fa fa-handshake-o" aria-hidden="true"></i></div>}
-                                {(this.props.user && this.props.user.id) ? <div className="text"><i className="fa fa-child login-icon" aria-hidden="true"></i></div> : <div>LOGIN</div>}
+                                {(user && user.id) ? <div className="text"></div> : <div className="icon"><i className="fa fa-handshake-o" aria-hidden="true"></i></div>}
+                                {(user && user.id) ? <div className="text"><i className="fa fa-child login-icon" aria-hidden="true"></i></div> : <div>LOGIN</div>}
                             </div>
                         </NavLink>
                     }
