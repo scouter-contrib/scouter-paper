@@ -214,7 +214,7 @@ class LayoutManager extends Component {
         return (
             <div className={"layout-manager-bg " + (this.props.visible ? "" : "hidden")} onClick={this.props.toggleLayoutManagerVisible}>
                 <div className={"layout-manager-fixed-bg"}></div>
-                <div className="layout-manager popup-div">
+                <div className="layout-manager popup-div" onClick={(e) => e.stopPropagation()}>
                     <div className="title">
                         <div>LAYOUTS</div>
                     </div>

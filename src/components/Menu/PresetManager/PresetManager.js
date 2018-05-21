@@ -197,7 +197,7 @@ class PresetManager extends Component {
         return (
             <div className={"preset-manager-bg " + (this.props.visible ? "" : "hidden")} onClick={this.props.togglePresetManagerVisible}>
                 <div className={"preset-manager-fixed-bg"}></div>
-                <div className="preset-manager popup-div">
+                <div className="preset-manager popup-div" onClick={(e) => e.stopPropagation()}>
                     <div className="title">
                         <div>PRESETS</div>
                     </div>
