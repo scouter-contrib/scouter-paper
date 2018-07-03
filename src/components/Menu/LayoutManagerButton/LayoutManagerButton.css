@@ -1,6 +1,6 @@
 .layout-manager-button > div {
     background-color: rgba(0, 0, 0, 0.2);
-    padding: 5px 10px;
+    padding: 4px 10px;
     border-radius: 5px;
     cursor: pointer;
     font-size: 9px;
@@ -11,6 +11,7 @@
     user-select: none;
     z-index: 50;
     position: relative;
+    border : 1px solid rgba(0,0,0,0.2);
 }
 
 .layout-manager-button.selected > div {

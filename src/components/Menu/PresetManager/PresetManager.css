@@ -100,6 +100,18 @@
 
 .preset-manager ul li > div {
     line-height: 0;
+    display: table;
+    width: 100%;
+    table-layout: fixed;
+}
+
+.preset-manager ul li > div > div {
+    display: table-cell;
+    vertical-align: middle;
+}
+
+.preset-manager ul li > div > div.index {
+    width: 40px;
 }
 
 .preset-manager ul li span {
@@ -110,6 +122,9 @@
     box-sizing: border-box;
     padding: 8px;
     line-height: 100%;
+}
+.preset-manager ul li .summary-info span {
+    padding-top: 0;
 }
 
 .preset-manager ul li .no {

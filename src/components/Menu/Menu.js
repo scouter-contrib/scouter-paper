@@ -6,7 +6,6 @@ import {connect} from 'react-redux';
 import {withRouter} from 'react-router-dom';
 import LayoutManagerButton from "./LayoutManagerButton/LayoutManagerButton";
 import LayoutManager from "./LayoutManager/LayoutManager";
-import PresetManagerButton from "./PresetManagerButton/PresetManagerButton";
 import PresetManager from "./PresetManager/PresetManager";
 import {getDefaultServerConfig} from '../../common/common';
 class Menu extends Component {
@@ -103,9 +102,8 @@ class Menu extends Component {
                             </div>
                         </NavLink>
                     }
-                    <InstanceInfo className="menu-instance-selector" selected={this.state.selector} toggleSelectorVisible={this.toggleSelectorVisible}/>
+                    <InstanceInfo className="menu-instance-selector" selected={this.state.selector || this.state.presetManager} toggleSelectorVisible={this.toggleSelectorVisible} togglePresetManagerVisible={this.togglePresetManagerVisible} />
                     <LayoutManagerButton className="layout-manager-selector" selected={this.state.layoutManager}  toggleLayoutManagerVisible={this.toggleLayoutManagerVisible}/>
-                    <PresetManagerButton className="layout-manager-selector" selected={this.state.presetManager}  togglePresetManagerVisible={this.togglePresetManagerVisible}/>
                 </div>
                 <div className="bar"></div>
                 <InstanceSelector visible={this.state.selector} toggleSelectorVisible={this.toggleSelectorVisible}/>

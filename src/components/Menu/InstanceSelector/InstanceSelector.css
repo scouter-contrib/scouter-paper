@@ -264,6 +264,10 @@
     box-sizing: border-box;
 }
 
+.instance-selector .buttons .save-preset-btn {
+    float: left;
+}
+
 @media screen and (max-width: 700px) {
     .instance-selector {
         width: calc(100% - 20px);

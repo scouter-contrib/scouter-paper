@@ -69,7 +69,6 @@ class PresetManager extends Component {
             if (msg && Number(msg.status) === 200) {
                 if (msg.result) {
                     let list = JSON.parse(msg.result);
-                    console.log(list);
                     if (list && list.length > 0) {
                         this.setState({
                             presets : list,
@@ -86,23 +85,6 @@ class PresetManager extends Component {
 
     cancelClick = () => {
         this.props.togglePresetManagerVisible();
-    };
-
-    saveClick = () => {
-        let presets = this.state.presets;
-        if (!presets) {
-            presets = [];
-        }
-        let instancesParam = new URLSearchParams(this.props.location.search).get('instances');
-
-        presets.push({
-            no : presets.length,
-            name : "my-service-" + (presets.length + 1),
-            creationTime : (new Date()).getTime(),
-            instances : instancesParam
-        });
-
-        this.savePreset(presets);
     };
 
     deleteClick = () => {
@@ -145,9 +127,10 @@ class PresetManager extends Component {
                         let newUrl = updateQueryStringParameter(window.location.href, "instances", preset.instances);
                         newUrl = updateQueryStringParameter(newUrl, "address", server.address);
                         newUrl = updateQueryStringParameter(newUrl, "port", server.port);
+                        newUrl = updateQueryStringParameter(newUrl, "authentification", server.authentification);
                         window.location.href = newUrl;
                         window.history.go(0);
-                    }, 1);
+                    }, 100);
 
                     break;
                 }
@@ -193,7 +176,6 @@ class PresetManager extends Component {
     };
 
     render() {
-
         return (
             <div className={"preset-manager-bg " + (this.props.visible ? "" : "hidden")} onClick={this.props.togglePresetManagerVisible}>
                 <div className={"preset-manager-fixed-bg"}></div>
@@ -206,11 +188,22 @@ class PresetManager extends Component {
                             {this.state.presets.map((d, i) => {
                                 return (<li key={i} className={d.no === this.state.selectedPresetNo ? 'selected' : ''} onClick={this.presetClick.bind(this, d.no)}>
                                     <div>
-                                        <span className="no">{i+1}</span>
-                                        {(d.no !== this.state.selectedEditNo) && <span className="name">{d.name}</span>}
-                                        {(d.no === this.state.selectedEditNo) && <span className="name edit"><input type="text" value={this.state.editText} onChange={this.onTextChange.bind(this )} /></span>}
-                                        {(d.no !== this.state.selectedEditNo) && <span className="edit-btn" onClick={this.editClick.bind(this, d.no, d.name)}>EDIT</span>}
-                                        {(d.no === this.state.selectedEditNo) && <span className="done-btn" onClick={this.updateClick.bind(this, d.no)}>DONE</span>}
+                                        <div className="index">
+                                            <span className="no">{i+1}</span>
+                                        </div>
+                                        <div>
+                                            <div>
+                                                {(d.no !== this.state.selectedEditNo) && <span className="name">{d.name}</span>}
+                                                {(d.no === this.state.selectedEditNo) && <span className="name edit"><input type="text" value={this.state.editText} onChange={this.onTextChange.bind(this )} /></span>}
+                                                {(d.no !== this.state.selectedEditNo) && <span className="edit-btn" onClick={this.editClick.bind(this, d.no, d.name)}>EDIT</span>}
+                                                {(d.no === this.state.selectedEditNo) && <span className="done-btn" onClick={this.updateClick.bind(this, d.no)}>DONE</span>}
+                                            </div>
+                                            <div className="summary-info">
+                                                <span>
+                                                    {d.instances.length} INSTANCES - {d.server.protocol}://{d.server.address}:{d.server.port} ({d.server.authentification})
+                                                </span>
+                                            </div>
+                                        </div>
                                     </div>
                                 </li>)
                             })}
@@ -219,7 +212,6 @@ class PresetManager extends Component {
                     </div>
                     <div className="buttons">
                         <button className="delete-btn" onClick={this.deleteClick}>DELETE</button>
-                        <button className="save-btn" onClick={this.saveClick}>SAVE CURRENT PRESET</button>
                         <button className="cancel-btn" onClick={this.cancelClick}>CANCEL</button>
                         <button className="load-btn" onClick={this.loadClick}>LOAD</button>
                     </div>
