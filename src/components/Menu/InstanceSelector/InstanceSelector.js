@@ -16,6 +16,7 @@ import {getHttpProtocol, errorHandler, getWithCredentials, setAuthHeader, getCur
 import 'url-search-params-polyfill';
 import * as common from '../../../common/common'
 import AgentColor from "../../../common/InstanceColor";
+import InnerLoading from "../../InnerLoading/InnerLoading";
 
 class InstanceSelector extends Component {
 
@@ -29,7 +30,8 @@ class InstanceSelector extends Component {
             activeServerId: null,
             selectedInstances: {},
             selectedHosts: {},
-            filter: ""
+            filter: "",
+            loading : false
         };
     }
 
@@ -272,8 +274,15 @@ class InstanceSelector extends Component {
 
 
     getServers = (config) => {
+
+
         let that = this;
         this.props.addRequest();
+
+        this.setState({
+            loading : true
+        });
+
         jQuery.ajax({
             method: "GET",
             async: true,
@@ -297,6 +306,10 @@ class InstanceSelector extends Component {
                 filter: ""
             });
             errorHandler(xhr, textStatus, errorThrown, that.props);
+        }).always(() => {
+            this.setState({
+                loading : false
+            });
         });
 
     };
@@ -447,14 +460,6 @@ class InstanceSelector extends Component {
             }
         }
 
-        let currentServer = {};
-        for (let inx in this.props.config.servers) {
-            if (this.props.config.servers[inx].default) {
-                currentServer = this.props.config.servers[inx];
-                break;
-            }
-        }
-
         let that = this;
 
         jQuery.ajax({
@@ -477,8 +482,7 @@ class InstanceSelector extends Component {
                     name: "PRESET-" + (presetList.length + 1),
                     creationTime: (new Date()).getTime(),
                     instances: instances.map((d) => d.objHash),
-                    hosts: hosts.map((d) => d.objHash),
-                    server : currentServer
+                    hosts: hosts.map((d) => d.objHash)
                 });
 
                 let data = {
@@ -547,10 +551,6 @@ class InstanceSelector extends Component {
 
     };
 
-    close = () => {
-
-    }
-
     render() {
         return (
             <div className={"instance-selector-bg " + (this.props.visible ? "" : "hidden")}
@@ -561,8 +561,7 @@ class InstanceSelector extends Component {
                     <div className="scouter-servers">
                         <div className="scouter-server-label">SCOUTER WEB API SERVER</div>
                         <div className="scouter-server-select">
-                            <select value={common.getDefaultServerConfigIndex(this.props.config)}
-                                    onChange={this.onChangeScouterServer.bind(this)}>
+                            <select value={common.getDefaultServerConfigIndex(this.props.config)} onChange={this.onChangeScouterServer.bind(this)}>
                                 {this.props.config.servers.map((server, inx) => {
                                     return (
                                         <option key={inx} value={inx}>{server.protocol + "://" + server.address + ":" + server.port}</option>
@@ -579,12 +578,7 @@ class InstanceSelector extends Component {
                                 </div>
                                 <div className="list-content scrollbar">
                                     {this.state.servers && this.state.servers.map((host, i) => {
-                                            return (<div
-                                                className={'host ' + (i === 0 ? 'first ' : ' ') + (host.id === this.state.activeServerId ? 'active ' : ' ')}
-                                                key={i}
-                                                onClick={this.onServerClick.bind(this, host.id)}>{host.name}{host.selectedInstanceCount > 0 &&
-                                            <span
-                                                className="host-selected-count">{host.selectedInstanceCount}</span>}</div>)
+                                            return (<div className={'host ' + (i === 0 ? 'first ' : ' ') + (host.id === this.state.activeServerId ? 'active ' : ' ')} key={i} onClick={this.onServerClick.bind(this, host.id)}>{host.name}{host.selectedInstanceCount > 0 && <span className="host-selected-count">{host.selectedInstanceCount}</span>}</div>)
                                         }
                                     )}
                                 </div>
@@ -636,6 +630,7 @@ class InstanceSelector extends Component {
                         <button onClick={this.cancelClick}>CANCEL</button>
                         <button onClick={this.setInstances}>APPLY</button>
                     </div>
+                    <InnerLoading visible={this.state.loading}></InnerLoading>
                 </div>
             </div>
         );

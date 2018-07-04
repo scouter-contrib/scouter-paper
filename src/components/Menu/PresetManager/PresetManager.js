@@ -6,6 +6,7 @@ import {withRouter} from 'react-router-dom';
 import 'url-search-params-polyfill';
 import jQuery from "jquery";
 import {errorHandler, setAuthHeader, getWithCredentials, getHttpProtocol, updateQueryStringParameter, getCurrentUser, getCurrentDefaultServer, getDefaultServerConfig} from '../../../common/common';
+import InnerLoading from "../../InnerLoading/InnerLoading";
 
 class PresetManager extends Component {
 
@@ -15,7 +16,8 @@ class PresetManager extends Component {
             presets: [],
             selectedPresetNo : null,
             selectedEditNo : null,
-            editText : null
+            editText : null,
+            loading : false
         };
     }
 
@@ -30,7 +32,11 @@ class PresetManager extends Component {
         let data = {
             key : "__scouter_paper_preset",
             value : JSON.stringify(presets)
-        };        
+        };
+
+        this.setState({
+            loading : true
+        });
 
         jQuery.ajax({
             method: "PUT",
@@ -51,11 +57,18 @@ class PresetManager extends Component {
             }
         }).fail((xhr, textStatus, errorThrown) => {
             errorHandler(xhr, textStatus, errorThrown, this.props);
+        }).always(() => {
+            this.setState({
+                loading : false
+            });
         });
     };
 
     loadPresets = (config, user) => {
-        
+
+        this.setState({
+            loading : true
+        });
 
         jQuery.ajax({
             method: "GET",
@@ -80,6 +93,10 @@ class PresetManager extends Component {
             }
         }).fail((xhr, textStatus, errorThrown) => {
             errorHandler(xhr, textStatus, errorThrown, this.props);
+        }).always(() => {
+            this.setState({
+                loading : false
+            });
         });
     };
 
@@ -121,16 +138,14 @@ class PresetManager extends Component {
 
                 if (preset.no === this.state.selectedPresetNo) {
                     this.props.togglePresetManagerVisible();
-                    
-                    setTimeout(() => {
-                        const server = getCurrentDefaultServer(this.props.config);
-                        let newUrl = updateQueryStringParameter(window.location.href, "instances", preset.instances);
-                        newUrl = updateQueryStringParameter(newUrl, "address", server.address);
-                        newUrl = updateQueryStringParameter(newUrl, "port", server.port);
-                        newUrl = updateQueryStringParameter(newUrl, "authentification", server.authentification);
-                        window.location.href = newUrl;
-                        window.history.go(0);
-                    }, 100);
+
+                    const server = getCurrentDefaultServer(this.props.config);
+                    let newUrl = updateQueryStringParameter(window.location.href, "instances", preset.instances);
+                    newUrl = updateQueryStringParameter(newUrl, "address", server.address);
+                    newUrl = updateQueryStringParameter(newUrl, "port", server.port);
+                    newUrl = updateQueryStringParameter(newUrl, "authentification", server.authentification);
+                    window.location.href = newUrl;
+                    window.history.go(0);
 
                     break;
                 }
@@ -184,6 +199,7 @@ class PresetManager extends Component {
                         <div>PRESETS</div>
                     </div>
                     <div className="content-ilst scrollbar">
+                        {(this.state.presets && this.state.presets.length > 0) &&
                         <ul>
                             {this.state.presets.map((d, i) => {
                                 return (<li key={i} className={d.no === this.state.selectedPresetNo ? 'selected' : ''} onClick={this.presetClick.bind(this, d.no)}>
@@ -199,22 +215,22 @@ class PresetManager extends Component {
                                                 {(d.no === this.state.selectedEditNo) && <span className="done-btn" onClick={this.updateClick.bind(this, d.no)}>DONE</span>}
                                             </div>
                                             <div className="summary-info">
-                                                <span>
-                                                    {d.instances.length} INSTANCES - {d.server.protocol}://{d.server.address}:{d.server.port} ({d.server.authentification})
-                                                </span>
+                                                <span>{d.instances.length} INSTANCES</span>
                                             </div>
                                         </div>
                                     </div>
                                 </li>)
                             })}
-
                         </ul>
+                        }
+                        {(!this.state.presets || this.state.presets.length < 1) && <div className="empty-content">NO PRESET</div>}
                     </div>
                     <div className="buttons">
                         <button className="delete-btn" onClick={this.deleteClick}>DELETE</button>
                         <button className="cancel-btn" onClick={this.cancelClick}>CANCEL</button>
                         <button className="load-btn" onClick={this.loadClick}>LOAD</button>
                     </div>
+                    <InnerLoading visible={this.state.loading}></InnerLoading>
                 </div>
             </div>
         );

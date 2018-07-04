@@ -219,6 +219,7 @@ class LayoutManager extends Component {
                         <div>LAYOUTS</div>
                     </div>
                     <div className="content-ilst scrollbar">
+                        {(this.state.templates && this.state.templates.length > 0) &&
                         <ul>
                             {this.state.templates.map((d, i) => {
                                 return (<li key={i} className={d.no === this.state.selectedTemplateNo ? 'selected' : ''} onClick={this.templateClick.bind(this, d.no)}>
@@ -231,8 +232,9 @@ class LayoutManager extends Component {
                                     </div>
                                 </li>)
                             })}
-
                         </ul>
+                        }
+                        {(!this.state.templates || this.state.templates.length < 1) && <div className="empty-content">NO LAYOUT</div>}
                     </div>
                     <div className="buttons">
                         <button className="delete-btn" onClick={this.deleteClick}>DELETE</button>
