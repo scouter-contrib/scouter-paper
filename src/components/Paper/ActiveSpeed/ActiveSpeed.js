@@ -60,8 +60,8 @@ class ActiveSpeed extends Component {
                         long = this.state.activeSpeed[d.objHash].value[2];
                     }
 
-                    medium = Math.ceil(Math.random() * 10);
-                    long = Math.ceil(Math.random() * 10);
+                    /*medium = Math.ceil(Math.random() * 10);
+                    long = Math.ceil(Math.random() * 10);*/
 
                     let color = InstanceColor.getMetricColor(counterKey, this.props.config.colorType);
                     let bars = [];
