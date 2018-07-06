@@ -58,8 +58,6 @@ class PaperControl extends Component {
                             })}
                             </ul>
                         </div>}
-
-
                         {(!isArray && this.touch) &&
                         <div onClick={this.props.addPaperAndAddMetric.bind(this, JSON.stringify(this.options[name]))}>
                             {this.options[name].icon && <i className={"fa " + this.options[name].icon} aria-hidden="true"></i>}

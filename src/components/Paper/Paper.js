@@ -337,7 +337,6 @@ class Paper extends Component {
 
         if (this.props.instances && this.props.instances.length > 0) {
             let counterKeyMap = {};
-
             for (let i = 0; i < this.state.boxes.length; i++) {
                 let option = this.state.boxes[i].option;
 
@@ -348,6 +347,8 @@ class Paper extends Component {
                             counterKeyMap[innerOption.counterKey] = true;
                         }
                     }
+                } else if (option && option.type === "ActiveSpeed") {
+                    counterKeyMap[option.counterKey] = true;
                 }
             }
 
@@ -362,7 +363,7 @@ class Paper extends Component {
 
             let instancesAndHosts = this.props.instances.concat(this.props.hosts);
 
-            this.counterReady = counterKeys.every((key) => this.counterHistoriesLoaded[key]);
+            this.counterReady = counterKeys.filter((key) => key !== "ActiveSpeed").every((key) => this.counterHistoriesLoaded[key]);
 
             if (this.counterReady) {
                 let params = JSON.stringify(counterKeys.map((key) => encodeURI(key)));
@@ -528,7 +529,7 @@ class Paper extends Component {
                     }
                 }).done((msg) => {
                     if (msg) {
-                        
+
                         let alert = this.state.alert;
                         if (!alert.offset[objType]) {
                             alert.offset[objType] = {};

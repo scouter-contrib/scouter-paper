@@ -10,6 +10,7 @@
     user-select: none;
     z-index: 50;
     position: relative;
+
 }
 
 .instance-info > div > div {
@@ -46,9 +47,9 @@
 
 @media screen and (max-width: 600px) {
     .instance-info > div {
-        padding: 4px 5px;
+        padding: 0;
         font-size: 8px;
-        border-radius: 3px;
+        border-radius: 5px;
     }
 
     .instance-info .big {

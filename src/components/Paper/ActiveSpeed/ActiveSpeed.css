@@ -1,0 +1,85 @@
+.active-speed-wrapper {
+    position: relative;
+    width: 100%;
+    height: 100%;
+}
+
+.active-speed-wrapper .active-speed-content {
+    position: relative;
+    width: 100%;
+    height: 100%;
+    overflow-y: auto;
+    text-align: left;
+}
+
+.active-speed-wrapper .active-speed-content .row {
+    display: table;
+    width: 100%;
+    table-layout: fixed;
+}
+
+.active-speed-wrapper .active-speed-content .row > div {
+    display: table-cell;
+    vertical-align: middle;
+    padding: 10px 0;
+
+}
+
+.active-speed-wrapper .active-speed-content .row > div.instance-info-div {
+    text-transform: uppercase;
+    box-sizing: border-box;
+    padding: 10px 10px;
+}
+
+.active-speed-wrapper .active-speed-content .row > div.instance-info-div .instance-name {
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+}
+
+.active-speed-wrapper .active-speed-content .row > div.instance-info-div .bar-info {
+    text-align: center;
+}
+
+.active-speed-wrapper .active-speed-content .row > div.overflow {
+    width: 20px;
+    box-sizing: border-box;
+    font-size: 12px;
+    text-align: center;
+}
+
+.active-speed-wrapper .active-speed-content .row > div.active-speed-bar .bar {
+    display: inline-block;
+    height: 20px;
+    width: 10px;
+    _border: 1px solid rgba(0,0,0,0.2);
+    background-color: #EEE;
+    margin-right: 2px;
+    box-sizing: border-box;
+    transition: background-color 0.4s;
+    border-radius: 2px;
+}
+
+.active-speed-wrapper .active-speed-content .row > div.instance-info-div .bar-info .long {
+    color: #FF6103;
+}
+
+.active-speed-wrapper .active-speed-content .row > div.active-speed-bar .bar.L {
+    background-color: #FF6103;
+}
+
+.active-speed-wrapper .active-speed-content .row > div.instance-info-div .bar-info .medium {
+    color: #FFC125;
+}
+
+.active-speed-wrapper .active-speed-content .row > div.active-speed-bar .bar.M {
+    background-color: #FFC125;
+}
+
+.active-speed-wrapper .active-speed-content .row > div.instance-info-div .bar-info .short {
+    color: #007FFF;
+}
+
+.active-speed-wrapper .active-speed-content .row > div.active-speed-bar .bar.S {
+    background-color: #007FFF;
+}
