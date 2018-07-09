@@ -37,18 +37,14 @@ class ActiveSpeed extends Component {
 
     render() {
 
-        /*console.log(this.props.layoutChangeTime);
-        console.log(this.props.time);
-        console.log(this.props.box);
-        console.log(this.props.counters);*/
-
-
         let maxValue = this.props.box.values["maxValue"];
-        let counterKey = this.props.box.option.counterKey;
+        let singleLine = this.props.box.values["singleLine"];
+
         return (
             <div className="active-speed-wrapper">
                 <div className="active-speed-content">
-                {this.props.instances.map((d, i) => {
+                {(!this.props.realtime) && <div className="no-search-support"><div><div>REALTIME ONLY</div></div></div>}
+                {this.props.realtime && this.props.instances.map((d, i) => {
                     let total = 0;
                     let short = 0;
                     let medium = 0;
@@ -60,10 +56,6 @@ class ActiveSpeed extends Component {
                         long = this.state.activeSpeed[d.objHash].value[2];
                     }
 
-                    /*medium = Math.ceil(Math.random() * 10);
-                    long = Math.ceil(Math.random() * 10);*/
-
-                    let color = InstanceColor.getMetricColor(counterKey, this.props.config.colorType);
                     let bars = [];
                     for (let i=0; i<maxValue; i++) {
                         bars.push({});
@@ -93,10 +85,16 @@ class ActiveSpeed extends Component {
 
                     let overflow = total > maxValue;
 
-                    return <div className="row" key={i}>
-                        <div className="instance-info-div" style={{color : color, width : this.props.box.values["instanceNameWidth"]}} title={d.objName}>
-                            <div className="instance-name">{d.objName}</div>
-                            {/*<div className="bar-info"><span className="long">{long}</span> <span className="medium">{medium}</span> <span className="short">{short}</span></div>*/}
+                    let width = this.props.box.values["instanceNameWidth"];
+                    if (singleLine) {
+                        width = "100%";
+                    }
+
+                    let showCnt = this.props.box.values["showCnt"];
+
+                    return <div className={"row " + (singleLine ? "single-line" : "")} key={i}>
+                        <div className="instance-info-div" style={{width : width}} title={d.objName}>
+                            <div className="instance-name">{showCnt && <div className="bar-info"><span className="separtor">[</span> <span className="long">{long}</span> <span className="medium">{medium}</span> <span className="short">{short}</span><span className="separtor"> ]</span></div>}{d.objName}</div>
                         </div>
                         <div className="active-speed-bar">
                             {bars.map((d, j) => {

@@ -90,17 +90,6 @@ export function options() {
                 }
             }
         },
-
-        /*{
-                text: "Active Speed",
-                mode: "nonexclusive",
-                type: "counter",
-                title: "Active Speed",
-                counterKey : "ActiveSpeed",
-                multiValue : ["L", "M", "S"],
-                objectType : "instance"
-            },*/
-
         activeSpeed: {
             icon: "fa-bars",
             mode: "exclusive",
@@ -111,7 +100,7 @@ export function options() {
                 instanceNameWidth: {
                     name: 'Instance Name Width',
                     type: "selector",
-                    data: ["10%", "20%", "30%", "40%", "50%"],
+                    data: ["10%", "20%", "30%", "40%", "50%", "60%", "70%"],
                     value: "20%"
                 },
                 maxValue: {
@@ -122,6 +111,16 @@ export function options() {
                         type: "text",
                         content: "cnt"
                     }
+                },
+                singleLine: {
+                    name: 'SINGLE LINE',
+                    type: "checkbox",
+                    value: false
+                },
+                showCnt: {
+                    name: 'SHOW COUNT',
+                    type: "checkbox",
+                    value: false
                 }
             }
         },
