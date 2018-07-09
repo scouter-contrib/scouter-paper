@@ -94,7 +94,7 @@ class ActiveSpeed extends Component {
 
                     return <div className={"row " + (singleLine ? "single-line" : "")} key={i}>
                         <div className="instance-info-div" style={{width : width}} title={d.objName}>
-                            <div className="instance-name">{showCnt && <div className="bar-info"><span className="separtor">[</span> <span className="long">{long}</span> <span className="medium">{medium}</span> <span className="short">{short}</span><span className="separtor"> ]</span></div>}{d.objName}</div>
+                            <div className="instance-name">{showCnt && <div className="bar-info"><span className="separtor">[</span> <span className="long" title="LONG">{long}</span> <span className="medium" title="MEDIUM">{medium}</span> <span className="short" title="SHORT">{short}</span><span className="separtor"> ]</span></div>}{d.objName}</div>
                         </div>
                         <div className="active-speed-bar">
                             {bars.map((d, j) => {
