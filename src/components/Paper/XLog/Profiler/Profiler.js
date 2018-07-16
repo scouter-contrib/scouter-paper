@@ -4,11 +4,12 @@ import {addRequest, setControlVisibility, pushMessage} from '../../../../actions
 import {withRouter} from 'react-router-dom';
 import {connect} from 'react-redux';
 import jQuery from "jquery";
-import {getFilteredData, getHttpProtocol, errorHandler, getWithCredentials, setAuthHeader, getSearchDays, getDivideDays, getParam, getCurrentUser} from '../../../../common/common';
+import {setTxidPropsToUrl, getFilteredData, getHttpProtocol, errorHandler, getWithCredentials, setAuthHeader, getSearchDays, getDivideDays, getParam, getCurrentUser} from '../../../../common/common';
 import SingleProfile from "./SingleProfile/SingleProfile";
 import ProfileList from "./ProfileList/ProfileList";
 import _ from "lodash";
 import moment from "moment";
+import copy from 'copy-to-clipboard';
 //import {disableBodyScroll, enableBodyScroll} from 'body-scroll-lock';
 
 const xlogMaxSelectionCount = 200;
@@ -38,7 +39,8 @@ class Profiler extends Component {
             listWidth : 40,
             smallScreen : false,
             paramTxid : txid ? txid : null,
-            paramTxidDate : txiddate ? txiddate : null
+            paramTxidDate : txiddate ? txiddate : null,
+            copyBtnText : "COPY URL"
         };
     }
 
@@ -113,6 +115,10 @@ class Profiler extends Component {
         }
 
         if (nextState.formatter !== this.state.formatter) {
+            return true;
+        }
+
+        if (nextState.copyBtnText !== this.state.copyBtnText) {
             return true;
         }
 
@@ -310,6 +316,8 @@ class Profiler extends Component {
         search.delete("txid");
         search.delete("txiddate");
 
+        setTxidPropsToUrl(this.props, null, null);
+
         this.props.history.replace({
             pathname: this.props.location.pathname,
             search: "?" + search.toString()
@@ -332,13 +340,16 @@ class Profiler extends Component {
             }
         }
 
+        let tdate = (txiddate ? txiddate : moment(new Date(Number(xlog.endTime))).format("YYYYMMDD"));
+        setTxidPropsToUrl(this.props, tdate, xlog.txid);
+
         // XLOG DATA
         this.props.setControlVisibility("Loading", true);
         this.props.addRequest();
         jQuery.ajax({
             method: "GET",
             async: true,
-            url: getHttpProtocol(this.props.config) + '/scouter/v1/xlog-data/' + (txiddate ? txiddate : moment(new Date(Number(xlog.endTime))).format("YYYYMMDD")) + "/" + xlog.txid,
+            url: getHttpProtocol(this.props.config) + '/scouter/v1/xlog-data/' + tdate + "/" + xlog.txid,
             xhrFields: getWithCredentials(that.props.config),
             beforeSend: function (xhr) {
                 setAuthHeader(xhr, that.props.config, getCurrentUser(that.props.config, that.props.user));
@@ -476,6 +487,20 @@ class Profiler extends Component {
         });
     };
 
+    copyUrl = () => {
+        copy(window.location.href);
+
+        this.setState({
+            copyBtnText : "COPIED!"
+        });
+
+        setTimeout(() => {
+            this.setState({
+                copyBtnText : "COPY URL"
+            });
+        }, 2000);
+    };
+
     render() {
 
         let leftStyle = {};
@@ -520,7 +545,8 @@ class Profiler extends Component {
                     <div className="profiler-layout right" style={rightStyle}>
                         <div className="summary">
                             {(!this.state.paramTxid && this.state.smallScreen) && <div onClick={this.clearTxId.bind(this)} className="profile-list-btn"><i className="fa fa-chevron-circle-left"></i></div>}
-                            <div className="title">DETAIL <span className="selected-info">({this.state.txid ? 'TXID : ' + this.state.txid : 'NO PROFILE SELECTED'})</span></div>
+                            {this.state.txid  && <div className="title">DETAIL <span className="selected-info">({this.state.txid ? 'TXID : ' + this.state.txid : 'NO PROFILE SELECTED'})</span>{this.state.txid ? <span className="copy-url-btn" onClick={this.copyUrl}>{this.state.copyBtnText}</span> : null}</div>}
+                            {this.state.paramTxid  && <div className="title">DETAIL <span className="selected-info">({this.state.paramTxid ? 'TXID : ' + this.state.paramTxid : 'NO PROFILE SELECTED'})</span>{this.state.paramTxid ? <span className="copy-url-btn" onClick={this.copyUrl}>{this.state.copyBtnText}</span> : null}</div>}
                             <div className="profile-steps-control noselect">
                                 <div className={"profile-control-btn " + (this.state.summary ? 'active' : '')} onClick={this.toggleSummary}>{this.state.summary ? <i className="fa fa-check-circle"></i> : <i className="fa fa-circle-o"></i>} SUMMARY</div>
                                 <div className={"profile-control-btn " + (this.state.indent ? 'active' : '')} onClick={this.toggleIndent}>{this.state.indent ? <i className="fa fa-check-circle"></i> : <i className="fa fa-circle-o"></i>} INDENT</div>

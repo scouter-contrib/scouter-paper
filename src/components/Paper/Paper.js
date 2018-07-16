@@ -1517,7 +1517,7 @@ class Paper extends Component {
             <div className="papers">
                 <div className={"fixed-alter-object " + (this.state.fixedControl ? 'show' : '')}></div>
                 <PaperControl addPaper={this.addPaper} addPaperAndAddMetric={this.addPaperAndAddMetric} clearLayout={this.clearLayout} fixedControl={this.state.fixedControl} toggleRangeControl={this.toggleRangeControl} realtime={this.props.range.realTime} alert={this.state.alert} clearAllAlert={this.clearAllAlert} clearOneAlert={this.clearOneAlert} setRewind={this.setRewind} showAlert={this.state.showAlert} toggleShowAlert={this.toggleShowAlert} />
-                <RangeControl visible={this.state.rangeControl} changeRealtime={this.changeRealtime} search={this.search} fixedControl={this.state.fixedControl} toggleRangeControl={this.toggleRangeControl} changeLongTerm={this.changeLongTerm}/>
+                <RangeControl visible={this.state.rangeControl} search={this.search} fixedControl={this.state.fixedControl} toggleRangeControl={this.toggleRangeControl} changeLongTerm={this.changeLongTerm}/>
                 {(instanceSelected && (!this.state.boxes || this.state.boxes.length === 0)) &&
                 <div className="quick-usage">
                     <div>
