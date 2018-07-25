@@ -215,7 +215,7 @@ class PresetManager extends Component {
                                                 {(d.no === this.state.selectedEditNo) && <span className="done-btn" onClick={this.updateClick.bind(this, d.no)}>DONE</span>}
                                             </div>
                                             <div className="summary-info">
-                                                <span>{d.instances.length} INSTANCES</span>
+                                                <span>{d.instances.split(',').length} INSTANCES</span>
                                             </div>
                                         </div>
                                     </div>
