@@ -73,6 +73,7 @@
     white-space: nowrap;
     overflow: hidden;
     text-overflow: ellipsis;
+    font-size: 10px;
 }
 
 .active-speed-wrapper .active-speed-content .row > div.instance-info-div .bar-info {

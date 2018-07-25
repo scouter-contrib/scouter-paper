@@ -290,7 +290,7 @@ class Paper extends Component {
         });
 
         if (this.props.config.alert.notification === "Y") {
-            if (Notification.permission !== "granted" || Notification.permission === "denied") {
+            if (Notification && (Notification.permission !== "granted" || Notification.permission === "denied")) {
                 Notification.requestPermission();
             }
         }
@@ -565,7 +565,7 @@ class Paper extends Component {
                             });
 
 
-                            if (this.props.config.alert.notification === "Y" && Notification.permission === "granted") {
+                            if (Notification && this.props.config.alert.notification === "Y" && Notification.permission === "granted") {
                                 for (let i=0; i<alert.data.length; i++) {
                                     if (Number(alert.data[i].time) > this.mountTime && !alert.data[i]["_notificated"]) {
                                         alert.data[i]["_notificated"] = true;
