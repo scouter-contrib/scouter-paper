@@ -23,12 +23,16 @@
 .login-wrapper .login-box {
     background-color: white;
     display: inline-block;
-    width: 380px;
+    width: 400px;
     border: 1px solid rgba(0, 0, 0, 0.4);
     padding: 20px 40px;
     box-sizing: border-box;
     border-radius: 2px;
     box-shadow: 0 0 5px rgba(0, 0, 0, 0.4);
+}
+
+.login-wrapper .login-box .current-server {
+    padding: 10px;
 }
 
 @media screen and (max-width: 400px) {
@@ -58,7 +62,6 @@
     color: white;
     padding: 4px 8px;
     border-radius: 2px;
-    margin-bottom: 10px;
 }
 
 .login-wrapper .logo-div {

@@ -260,7 +260,7 @@ class SingleProfile extends Component {
             startTime = Number(this.props.profile.endTime - this.props.profile.elapsed);
         }
 
-        let beforeEndTime;
+        let beforeStepStartTime;
         return (
             <div className='single-profile'>
                 <div className="sub-title">GENERAL INFO</div>
@@ -281,13 +281,12 @@ class SingleProfile extends Component {
                 <div className="sub-title">PROFILE STEP</div>
                 <div className={"xlog-steps " + (this.props.wrap ? 'wrap' : '')}>
                     {this.props.steps && this.props.steps.map((row, i) => {
-                        let stepStartTime = startTime + Number(row.step.start_time);
-                        let stepEndTime = startTime + Number(row.step.start_time) + Number(row.step.elapsed || 0);
+                        const stepStartTime = Number(row.step.start_time);
                         let gap = 0;
-                        if (beforeEndTime) {
-                            gap = Number(stepStartTime) - Number(beforeEndTime);
+                        if (beforeStepStartTime) {
+                            gap = stepStartTime - beforeStepStartTime;
                         }
-                        beforeEndTime = stepEndTime;
+                        beforeStepStartTime = stepStartTime;
 
                         return (
                             <Step gap={gap} showGap={this.props.gap} indent={row.step.indent} applyIndent={this.props.indent} key={i}>

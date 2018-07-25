@@ -6,6 +6,7 @@ import {connect} from 'react-redux';
 import {withRouter} from 'react-router-dom';
 import LayoutManagerButton from "./LayoutManagerButton/LayoutManagerButton";
 import LayoutManager from "./LayoutManager/LayoutManager";
+import PresetManager from "./PresetManager/PresetManager";
 import {getDefaultServerConfig} from '../../common/common';
 class Menu extends Component {
 
@@ -14,6 +15,7 @@ class Menu extends Component {
         this.state = {
             selector: false,
             layoutManager : false,
+            presetManager : false,
             menu : null
         };
     }
@@ -28,14 +30,24 @@ class Menu extends Component {
     toggleSelectorVisible = () => {
         this.setState({
             selector: !this.state.selector,
-            layoutManager: !this.state.selector ? false : this.state.layoutManager
+            layoutManager: !this.state.selector ? false : this.state.layoutManager,
+            presetManager: !this.state.selector ? false : this.state.presetManager
         });
     };
 
     toggleLayoutManagerVisible = () => {
         this.setState({
             selector: !this.state.layoutManager ? false : this.state.selector,
-            layoutManager: !this.state.layoutManager
+            layoutManager: !this.state.layoutManager,
+            presetManager: !this.state.layoutManager ? false : this.state.presetManager
+        });
+    };
+
+    togglePresetManagerVisible = () => {
+        this.setState({
+            selector: !this.state.presetManager ? false : this.state.selector,
+            layoutManager: !this.state.presetManager ? false : this.state.layoutManager,
+            presetManager: !this.state.presetManager
         });
     };
 
@@ -53,6 +65,11 @@ class Menu extends Component {
 
     render() {
         let instanceParam = (this.props.instances && this.props.instances.length > 0) ? "?instances=" + this.props.instances.map((d) => {return d.objHash}) : "";
+
+        let defaultServerconfig = getDefaultServerConfig(this.props.config);
+        let origin = defaultServerconfig.protocol + "://" + defaultServerconfig.address + ":" + defaultServerconfig.port;
+        let user = this.props.user[origin];
+
         return (
             <div className="menu-div">
                 <div className="menu">
@@ -80,17 +97,18 @@ class Menu extends Component {
                     {(getDefaultServerConfig(this.props.config).authentification !== "none") &&
                         <NavLink className={"menu-item right " + (this.state.menu === "login" ? "active" : "")} to={"/login" + instanceParam} activeClassName="active" onClick={this.menuClick.bind(this, "/login")}>
                             <div>
-                                {(this.props.user && this.props.user.id) ? <div className="text"></div> : <div className="icon"><i className="fa fa-handshake-o" aria-hidden="true"></i></div>}
-                                {(this.props.user && this.props.user.id) ? <div className="text"><i className="fa fa-child login-icon" aria-hidden="true"></i></div> : <div>LOGIN</div>}
+                                {(user && user.id) ? <div className="text"></div> : <div className="icon"><i className="fa fa-handshake-o" aria-hidden="true"></i></div>}
+                                {(user && user.id) ? <div className="text"><i className="fa fa-child login-icon" aria-hidden="true"></i></div> : <div>LOGIN</div>}
                             </div>
                         </NavLink>
                     }
-                    <InstanceInfo className="menu-instance-selector" selected={this.state.selector} toggleSelectorVisible={this.toggleSelectorVisible}/>
+                    <InstanceInfo className="menu-instance-selector" selected={this.state.selector || this.state.presetManager} toggleSelectorVisible={this.toggleSelectorVisible} togglePresetManagerVisible={this.togglePresetManagerVisible} />
                     <LayoutManagerButton className="layout-manager-selector" selected={this.state.layoutManager}  toggleLayoutManagerVisible={this.toggleLayoutManagerVisible}/>
                 </div>
                 <div className="bar"></div>
                 <InstanceSelector visible={this.state.selector} toggleSelectorVisible={this.toggleSelectorVisible}/>
                 <LayoutManager visible={this.state.layoutManager} toggleLayoutManagerVisible={this.toggleLayoutManagerVisible}/>
+                <PresetManager visible={this.state.presetManager} togglePresetManagerVisible={this.togglePresetManagerVisible}/>
             </div>
         );
     }

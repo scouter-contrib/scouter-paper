@@ -3,10 +3,10 @@ import './LayoutManager.css';
 import {setTemplate, setControlVisibility, pushMessage} from '../../../actions';
 import {connect} from 'react-redux';
 import {withRouter} from 'react-router-dom';
-import {getData, setData} from '../../../common/common';
+import {getData, setData, getDefaultServerConfig} from '../../../common/common';
 import 'url-search-params-polyfill';
 import jQuery from "jquery";
-import {errorHandler, setAuthHeader, getWithCredentials, getHttpProtocol} from '../../../common/common';
+import {errorHandler, setAuthHeader, getWithCredentials, getHttpProtocol, getCurrentUser} from '../../../common/common';
 
 class LayoutManager extends Component {
 
@@ -41,7 +41,7 @@ class LayoutManager extends Component {
             contentType : "application/json",
             data : JSON.stringify(data),
             beforeSend: function (xhr) {
-                setAuthHeader(xhr, that.props.config, that.props.user);
+                setAuthHeader(xhr, that.props.config, getCurrentUser(that.props.config, that.props.user));
             }
         }).done((msg) => {
             if (msg && Number(msg.status) === 200) {
@@ -62,7 +62,7 @@ class LayoutManager extends Component {
             url: getHttpProtocol(config) + "/scouter/v1/kv/__scouter_paper_layout",
             xhrFields: getWithCredentials(config),
             beforeSend: function (xhr) {
-                setAuthHeader(xhr, config, user);
+                setAuthHeader(xhr, config, getCurrentUser(config, user));
             }
         }).done((msg) => {
 
@@ -212,13 +212,14 @@ class LayoutManager extends Component {
     render() {
 
         return (
-            <div className={"layout-manager-bg " + (this.props.visible ? "" : "hidden")}>
+            <div className={"layout-manager-bg " + (this.props.visible ? "" : "hidden")} onClick={this.props.toggleLayoutManagerVisible}>
                 <div className={"layout-manager-fixed-bg"}></div>
-                <div className="layout-manager popup-div">
+                <div className="layout-manager popup-div" onClick={(e) => e.stopPropagation()}>
                     <div className="title">
                         <div>LAYOUTS</div>
                     </div>
                     <div className="content-ilst scrollbar">
+                        {(this.state.templates && this.state.templates.length > 0) &&
                         <ul>
                             {this.state.templates.map((d, i) => {
                                 return (<li key={i} className={d.no === this.state.selectedTemplateNo ? 'selected' : ''} onClick={this.templateClick.bind(this, d.no)}>
@@ -231,8 +232,9 @@ class LayoutManager extends Component {
                                     </div>
                                 </li>)
                             })}
-
                         </ul>
+                        }
+                        {(!this.state.templates || this.state.templates.length < 1) && <div className="empty-content">NO LAYOUT</div>}
                     </div>
                     <div className="buttons">
                         <button className="delete-btn" onClick={this.deleteClick}>DELETE</button>

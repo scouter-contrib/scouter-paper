@@ -123,6 +123,20 @@
     font-size: 10px;
 }
 
+.xlog-profiler .profiler-layout .summary .title .copy-url-btn {
+    font-size: 8px;
+    margin-left: 5px;
+    padding: 3px 4px;
+    background-color: rgba(0,0,0,0.2);
+    border-radius: 2px;
+    cursor: pointer;
+}
+
+.xlog-profiler .profiler-layout .summary .title .copy-url-btn:hover {
+    background-color: #FFE600;
+    color: #333;
+}
+
 .xlog-profiler .profiler-layout .summary .list-summary {
     padding: 0 15px 10px;
 }
@@ -231,6 +245,15 @@
     background-color: #FFE600;
     color: black;
 }
+
+.xlog-profiler .profile-steps-control .profile-control-btn:hover {
+    background-color: rgba(0,0,0,0.2);
+}
+
+.xlog-profiler .profile-steps-control .profile-control-btn.active:hover {
+    background-color: #EEC900;
+}
+
 
 .xlog-profiler .profile-steps-content {
     overflow-y: auto;

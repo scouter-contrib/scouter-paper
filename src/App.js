@@ -15,7 +15,7 @@ import {
 import {Route, Switch} from 'react-router-dom';
 import {connect} from 'react-redux';
 import {withRouter} from 'react-router-dom';
-import {setConfig, addRequest, clearAllMessage, setControlVisibility, setUserId, pushMessage} from './actions';
+import {setConfig, addRequest, clearAllMessage, setControlVisibility, setUserId, setUserData, pushMessage} from './actions';
 import {detect} from 'detect-browser';
 import Unsupport from "./components/Unsupport/Unsupport";
 import jQuery from "jquery";
@@ -31,10 +31,11 @@ class App extends Component {
         this.props.setControlVisibility("Loading", true);
         this.props.addRequest();
 
+        let origin = getHttpProtocol(config);
         jQuery.ajax({
             method: "GET",
             async: true,
-            url: getHttpProtocol(config) + "/scouter/v1/kv/a",
+            url: origin + "/scouter/v1/kv/a",
             xhrFields: getWithCredentials(config),
             beforeSend: function (xhr) {
                 setAuthHeader(xhr, config, user);
@@ -42,11 +43,11 @@ class App extends Component {
         }).done((msg) => {
             if (msg && Number(msg.status) === 200) {
                 if (getDefaultServerConfig(config).authentification === "bearer") {
-                    this.props.setUserId(user.id, user.token, user.time);
+                    this.props.setUserId(origin, user.id, user.token, user.time);
                 }
 
                 if (getDefaultServerConfig(config).authentification === "cookie") {
-                    this.props.setUserId(user.id, null, user.time);
+                    this.props.setUserId(origin, user.id, null, user.time);
                 }
 
             } else {
@@ -121,19 +122,24 @@ class App extends Component {
         if (localStorage) {
             localStorage.setItem("config", JSON.stringify(config));
         }
+        let origin = getHttpProtocol(config);
 
-        let user = localStorage.getItem("user");
-        if (user) {
-            user = JSON.parse(user);
+        let userData = localStorage.getItem("user");
+        
+        let user = null;
+        if (userData) {
+            userData = JSON.parse(userData);
+            this.props.setUserData(userData);
+            user = userData[origin];            
             this.info(user, config);
         }
 
         if (user && getDefaultServerConfig(config).authentification === "bearer") {
-            this.props.setUserId(user.id, user.token, user.time);
+            this.props.setUserId(origin, user.id, user.token, user.time);
         }
 
         if (user && getDefaultServerConfig(config).authentification === "cookie") {
-            this.props.setUserId(user.id, null, user.time);
+            this.props.setUserId(origin, user.id, null, user.time);
         }
 
         if (!user && getDefaultServerConfig(config).authentification === "none") {
@@ -223,7 +229,8 @@ let mapDispatchToProps = (dispatch) => {
         clearAllMessage: () => dispatch(clearAllMessage()),
         addRequest: () => dispatch(addRequest()),
         setConfig: (config) => dispatch(setConfig(config)),
-        setUserId: (id, token, time) => dispatch(setUserId(id, token, time)),
+        setUserId: (origin, id, token, time) => dispatch(setUserId(origin, id, token, time)),
+        setUserData: (userData) => dispatch(setUserData(userData)),
         pushMessage: (category, title, content) => dispatch(pushMessage(category, title, content))
     };
 };

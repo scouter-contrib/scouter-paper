@@ -8,7 +8,10 @@ class InstanceInfo extends Component {
     render() {
         return (
             <div className={"instance-info " + this.props.className + " " + (this.props.selected ? "selected" : "")}>
-                <div onClick={this.props.toggleSelectorVisible}>{this.props.instances.length} <span className="big">INSTANCES</span><span className="small">INS</span></div>
+                <div>
+                    <div className="instance-btn" onClick={this.props.toggleSelectorVisible}>{this.props.instances.length} <span className="big">INSTANCES</span><span className="small">INS</span></div>
+                    <div className="preset-btn" onClick={this.props.togglePresetManagerVisible}><i className="fa fa-angle-down" aria-hidden="true"></i></div>
+                </div>
             </div>
         );
     }

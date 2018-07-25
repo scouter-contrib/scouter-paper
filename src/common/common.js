@@ -65,6 +65,19 @@ export function getHttpProtocol(config) {
     }
 }
 
+export function getCurrentDefaultServer(config) {
+    if (config.servers && config.servers.length > 0) {
+        let server = config.servers.filter((server) => server.default);
+        if (server && server.length > 0) {
+            return server[0];
+        } else {
+            return null;
+        }
+    } else {
+        return null;
+    }
+}
+
 export function errorHandler(xhr, textStatus, errorThrown, props) {
 
     if (xhr.readyState === 4) {
@@ -124,6 +137,12 @@ export function setAuthHeader(xhr, config, user) {
             xhr.setRequestHeader('Authorization', 'bearer ' + user.token);
         }
     }
+}
+
+export function getCurrentUser(config, user) {
+    let defaultServerconfig = getDefaultServerConfig(config);
+    let origin = defaultServerconfig.protocol + "://" + defaultServerconfig.address + ":" + defaultServerconfig.port;
+    return user[origin];
 }
 
 export function zeroPadding(n, p, c) {
@@ -274,6 +293,25 @@ export function setRangePropsToUrl (props, pathname) {
     }
 }
 
+export function setTxidPropsToUrl (props, txiddate, txid) {
+    let search = new URLSearchParams(props.location.search);
+
+    if (txiddate && txid) {
+        search.set("txiddate", txiddate);
+        search.set("txid", txid);
+    } else {
+        search.delete("txiddate");
+        search.delete("txid");
+    }
+
+    if (props.location.search !== ("?" + search.toString())) {
+        props.history.replace({
+            pathname: props.location.pathname,
+            search: "?" + search.toString()
+        });
+    }
+}
+
 const table = [
         0x00000000, 0x77073096, 0xee0e612c, 0x990951ba, 0x076dc419, 0x706af48f, 0xe963a535, 0x9e6495a3,
         0x0edb8832, 0x79dcb8a4, 0xe0d5e91e, 0x97d2d988, 0x09b64c2b, 0x7eb17cbd, 0xe7b82d07, 0x90bf1d91,
@@ -325,7 +363,7 @@ export function hash(str) {
 
 export function getFilteredData (xlogs, filter) {
     let datas = xlogs;
-    
+
     if (filter.filtering) {
         if (filter.gxid) {
             datas = datas.filter((d) => d.gxid === filter.gxid);
@@ -334,7 +372,7 @@ export function getFilteredData (xlogs, filter) {
         if (filter.txid) {
             datas = datas.filter((d) => d.txid === filter.txid);
         }
-        
+
         if (filter.service) {
             datas = datas.filter((d) => d.service === String(hash(filter.service)));
         }
@@ -387,4 +425,14 @@ export function getFilteredData (xlogs, filter) {
 
     return datas;
 }
-    
+
+export function updateQueryStringParameter(uri, key, value) {
+    const re = new RegExp("([?&])" + key + "=.*?(&|$)", "i");
+    const separator = uri.indexOf('?') !== -1 ? "&" : "?";
+    if (uri.match(re)) {
+        return uri.replace(re, '$1' + key + "=" + value + '$2');
+    }
+    else {
+        return uri + separator + key + "=" + value;
+    }
+}

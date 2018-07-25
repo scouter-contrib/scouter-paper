@@ -23,18 +23,6 @@ export function options() {
                 }
             }
         },
-
-        /*{
-                text: "Active Speed",
-                mode: "nonexclusive",
-                type: "counter",
-                title: "Active Speed",
-                counterKey : "ActiveSpeed",
-                multiValue : ["L", "M", "S"],
-                objectType : "instance"
-            },*/
-
-
         flash: {
             icon: "fa-ellipsis-h",
             mode: "exclusive",
@@ -102,7 +90,40 @@ export function options() {
                 }
             }
         },
-
+        activeSpeed: {
+            icon: "fa-bars",
+            mode: "exclusive",
+            type: "ActiveSpeed",
+            title: "Active Speed",
+            counterKey : "ActiveSpeed",
+            config: {
+                instanceNameWidth: {
+                    name: 'Instance Name Width',
+                    type: "selector",
+                    data: ["10%", "20%", "30%", "40%", "50%", "60%", "70%"],
+                    value: "20%"
+                },
+                maxValue: {
+                    name: 'MAX VALUE',
+                    type: "input",
+                    value: "50",
+                    tooltip: {
+                        type: "text",
+                        content: "cnt"
+                    }
+                },
+                singleLine: {
+                    name: 'SINGLE LINE',
+                    type: "checkbox",
+                    value: false
+                },
+                showCnt: {
+                    name: 'SHOW COUNT',
+                    type: "checkbox",
+                    value: false
+                }
+            }
+        },
         WAS: [
             {
                 text: "TPS",

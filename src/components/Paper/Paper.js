@@ -7,7 +7,7 @@ import {addRequest, pushMessage, setControlVisibility, setRealTime, setRealTimeV
 import {Responsive, WidthProvider} from "react-grid-layout";
 import {Box, BoxConfig, PaperControl, XLogFilter} from "../../components";
 import jQuery from "jquery";
-import {errorHandler, getData, getHttpProtocol, getWithCredentials, setAuthHeader, setData, getSearchDays, getDivideDays} from "../../common/common";
+import {errorHandler, getData, getHttpProtocol, getWithCredentials, setAuthHeader, setData, getSearchDays, getDivideDays, getCurrentUser} from "../../common/common";
 import Profiler from "./XLog/Profiler/Profiler";
 import ServerDate from "../../common/ServerDate";
 import * as common from "../../common/common";
@@ -69,7 +69,7 @@ class Paper extends Component {
                 url: getHttpProtocol(this.props.config) + "/scouter/v1/kv/__scouter_paper_layout",
                 xhrFields: getWithCredentials(this.props.config),
                 beforeSend: (xhr) => {
-                    setAuthHeader(xhr, this.props.config, this.props.user);
+                    setAuthHeader(xhr, this.props.config, getCurrentUser(this.props.config, this.props.user));
                 }
             }).done((msg) => {
                 if (msg && Number(msg.status) === 200) {
@@ -290,7 +290,7 @@ class Paper extends Component {
         });
 
         if (this.props.config.alert.notification === "Y") {
-            if (Notification.permission !== "granted" || Notification.permission === "denied") {
+            if (Notification && (Notification.permission !== "granted" || Notification.permission === "denied")) {
                 Notification.requestPermission();
             }
         }
@@ -337,7 +337,6 @@ class Paper extends Component {
 
         if (this.props.instances && this.props.instances.length > 0) {
             let counterKeyMap = {};
-
             for (let i = 0; i < this.state.boxes.length; i++) {
                 let option = this.state.boxes[i].option;
 
@@ -348,6 +347,8 @@ class Paper extends Component {
                             counterKeyMap[innerOption.counterKey] = true;
                         }
                     }
+                } else if (option && option.type === "ActiveSpeed") {
+                    counterKeyMap[option.counterKey] = true;
                 }
             }
 
@@ -362,7 +363,7 @@ class Paper extends Component {
 
             let instancesAndHosts = this.props.instances.concat(this.props.hosts);
 
-            this.counterReady = counterKeys.every((key) => this.counterHistoriesLoaded[key]);
+            this.counterReady = counterKeys.filter((key) => key !== "ActiveSpeed").every((key) => this.counterHistoriesLoaded[key]);
 
             if (this.counterReady) {
                 let params = JSON.stringify(counterKeys.map((key) => encodeURI(key)));
@@ -376,7 +377,7 @@ class Paper extends Component {
                     })),
                     xhrFields: getWithCredentials(that.props.config),
                     beforeSend: function (xhr) {
-                        setAuthHeader(xhr, that.props.config, that.props.user);
+                        setAuthHeader(xhr, that.props.config, getCurrentUser(that.props.config, that.props.user));
                     }
                 }).done((msg) => {
                     if (!that.mounted) {
@@ -524,11 +525,11 @@ class Paper extends Component {
                     url: getHttpProtocol(this.props.config) + "/scouter/v1/alert/realTime/" + offset1 + "/" + offset2 + "?objType=" + objType,
                     xhrFields: getWithCredentials(that.props.config),
                     beforeSend: function (xhr) {
-                        setAuthHeader(xhr, that.props.config, that.props.user);
+                        setAuthHeader(xhr, that.props.config, getCurrentUser(that.props.config, that.props.user));
                     }
                 }).done((msg) => {
                     if (msg) {
-                        
+
                         let alert = this.state.alert;
                         if (!alert.offset[objType]) {
                             alert.offset[objType] = {};
@@ -564,7 +565,7 @@ class Paper extends Component {
                             });
 
 
-                            if (this.props.config.alert.notification === "Y" && Notification.permission === "granted") {
+                            if (Notification && this.props.config.alert.notification === "Y" && Notification.permission === "granted") {
                                 for (let i=0; i<alert.data.length; i++) {
                                     if (Number(alert.data[i].time) > this.mountTime && !alert.data[i]["_notificated"]) {
                                         alert.data[i]["_notificated"] = true;
@@ -729,7 +730,7 @@ class Paper extends Component {
                 })),
                 xhrFields: getWithCredentials(that.props.config),
                 beforeSend: function (xhr) {
-                    setAuthHeader(xhr, that.props.config, that.props.user);
+                    setAuthHeader(xhr, that.props.config, getCurrentUser(that.props.config, that.props.user));
                 }
             }).done((msg) => {
 
@@ -946,7 +947,7 @@ class Paper extends Component {
                 })),
                 xhrFields: getWithCredentials(that.props.config),
                 beforeSend: function (xhr) {
-                    setAuthHeader(xhr, that.props.config, that.props.user);
+                    setAuthHeader(xhr, that.props.config, getCurrentUser(that.props.config, that.props.user));
                 }
             }).done((msg) => {
                 if (!that.mounted) {
@@ -1020,7 +1021,7 @@ class Paper extends Component {
                 })),
                 xhrFields: getWithCredentials(that.props.config),
                 beforeSend: function (xhr) {
-                    setAuthHeader(xhr, that.props.config, that.props.user);
+                    setAuthHeader(xhr, that.props.config, getCurrentUser(that.props.config, that.props.user));
                 }
             }).done((msg) => {
                 if (!that.mounted) {
@@ -1048,7 +1049,7 @@ class Paper extends Component {
             url: url,
             xhrFields: getWithCredentials(that.props.config),
             beforeSend: function (xhr) {
-                setAuthHeader(xhr, that.props.config, that.props.user);
+                setAuthHeader(xhr, that.props.config, getCurrentUser(that.props.config, that.props.user));
             }
         }).done((msg) => {
             if (!this.mounted) {
@@ -1516,7 +1517,7 @@ class Paper extends Component {
             <div className="papers">
                 <div className={"fixed-alter-object " + (this.state.fixedControl ? 'show' : '')}></div>
                 <PaperControl addPaper={this.addPaper} addPaperAndAddMetric={this.addPaperAndAddMetric} clearLayout={this.clearLayout} fixedControl={this.state.fixedControl} toggleRangeControl={this.toggleRangeControl} realtime={this.props.range.realTime} alert={this.state.alert} clearAllAlert={this.clearAllAlert} clearOneAlert={this.clearOneAlert} setRewind={this.setRewind} showAlert={this.state.showAlert} toggleShowAlert={this.toggleShowAlert} />
-                <RangeControl visible={this.state.rangeControl} changeRealtime={this.changeRealtime} search={this.search} fixedControl={this.state.fixedControl} toggleRangeControl={this.toggleRangeControl} changeLongTerm={this.changeLongTerm}/>
+                <RangeControl visible={this.state.rangeControl} search={this.search} fixedControl={this.state.fixedControl} toggleRangeControl={this.toggleRangeControl} changeLongTerm={this.changeLongTerm}/>
                 {(instanceSelected && (!this.state.boxes || this.state.boxes.length === 0)) &&
                 <div className="quick-usage">
                     <div>

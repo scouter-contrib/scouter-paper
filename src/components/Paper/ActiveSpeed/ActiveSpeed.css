@@ -1,0 +1,134 @@
+.active-speed-wrapper {
+    position: relative;
+    width: 100%;
+    height: 100%;
+}
+
+.active-speed-wrapper .active-speed-content {
+    position: absolute;
+    width: 100%;
+    height: 100%;
+    overflow-y: auto;
+    text-align: left;
+    top : 0;
+    left : 0;
+    right : 0;
+    bottom : 0;
+    padding: 5px 0;
+    box-sizing: border-box;
+}
+
+.active-speed-wrapper .active-speed-content::-webkit-scrollbar {
+    width: 7px;
+    height: 7px;
+}
+
+.active-speed-wrapper .active-speed-content::-webkit-scrollbar-thumb {
+    background-color: rgba(0, 0, 0, 0.4);
+}
+
+.active-speed-wrapper .active-speed-content .no-search-support {
+    width: 100%;
+    height: 100%;
+    text-align: center;
+    display: table;
+    width: 100%;
+    height: 100%;
+}
+
+.active-speed-wrapper .active-speed-content .no-search-support > div {
+    display: table-cell;
+    width: 100%;
+    height: 100%;
+    vertical-align: middle;
+}
+
+.active-speed-wrapper .active-speed-content .row {
+    display: table;
+    width: 100%;
+    table-layout: fixed;
+}
+
+.active-speed-wrapper .active-speed-content .row.single-line {
+    display: block;
+}
+
+.active-speed-wrapper .active-speed-content .row > div {
+    display: table-cell;
+    vertical-align: middle;
+    padding: 2px 0;
+}
+
+.active-speed-wrapper .active-speed-content .row.single-line > div {
+    display: block;
+}
+
+.active-speed-wrapper .active-speed-content .row > div.instance-info-div {
+    text-transform: uppercase;
+    box-sizing: border-box;
+    padding: 2px 10px;
+}
+
+.active-speed-wrapper .active-speed-content .row > div.instance-info-div .instance-name {
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    font-size: 10px;
+}
+
+.active-speed-wrapper .active-speed-content .row > div.instance-info-div .bar-info {
+    text-align: center;
+    display: inline-block;
+    margin-right: 3px;
+}
+
+.active-speed-wrapper .active-speed-content .row > div.overflow {
+    width: 20px;
+    box-sizing: border-box;
+    font-size: 12px;
+    text-align: center;
+}
+
+.active-speed-wrapper .active-speed-content .row.single-line > div.active-speed-bar {
+    padding: 0 10px;
+}
+
+.active-speed-wrapper .active-speed-content .row > div.active-speed-bar .bar {
+    display: inline-block;
+    height: 20px;
+    width: 10px;
+    _border: 1px solid rgba(0,0,0,0.2);
+    background-color: #EEE;
+    margin-right: 2px;
+    box-sizing: border-box;
+    transition: background-color 0.4s;
+    border-radius: 2px;
+}
+
+.active-speed-wrapper .active-speed-content .row > div.instance-info-div .bar-info .separtor {
+    color: #777;
+}
+
+.active-speed-wrapper .active-speed-content .row > div.instance-info-div .bar-info .long {
+    color: #FF6103;
+}
+
+.active-speed-wrapper .active-speed-content .row > div.active-speed-bar .bar.L {
+    background-color: #FF6103;
+}
+
+.active-speed-wrapper .active-speed-content .row > div.instance-info-div .bar-info .medium {
+    color: #FFC125;
+}
+
+.active-speed-wrapper .active-speed-content .row > div.active-speed-bar .bar.M {
+    background-color: #FFC125;
+}
+
+.active-speed-wrapper .active-speed-content .row > div.instance-info-div .bar-info .short {
+    color: #007FFF;
+}
+
+.active-speed-wrapper .active-speed-content .row > div.active-speed-bar .bar.S {
+    background-color: #007FFF;
+}

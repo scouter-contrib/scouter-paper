@@ -12,10 +12,11 @@ import {
 import {connect} from 'react-redux';
 import jQuery from "jquery";
 import {withRouter} from 'react-router-dom';
-import {getHttpProtocol, errorHandler, getWithCredentials, setAuthHeader} from '../../../common/common';
+import {getHttpProtocol, errorHandler, getWithCredentials, setAuthHeader, getCurrentUser} from '../../../common/common';
 import 'url-search-params-polyfill';
 import * as common from '../../../common/common'
 import AgentColor from "../../../common/InstanceColor";
+import InnerLoading from "../../InnerLoading/InnerLoading";
 
 class InstanceSelector extends Component {
 
@@ -29,7 +30,8 @@ class InstanceSelector extends Component {
             activeServerId: null,
             selectedInstances: {},
             selectedHosts: {},
-            filter : ""
+            filter: "",
+            loading : false
         };
     }
 
@@ -37,9 +39,18 @@ class InstanceSelector extends Component {
         if (common.getDefaultServerConfig(this.props.config).authentification !== "bearer") {
             this.setTargetFromUrl(this.props);
         } else {
-            if (this.props.config || (this.props.user && this.props.user.id)) {
+
+            let defaultServerconfig = common.getDefaultServerConfig(this.props.config);
+            let origin = defaultServerconfig.protocol + "://" + defaultServerconfig.address + ":" + defaultServerconfig.port;
+            if (this.props.config || (this.props.user[origin] && this.props.user[origin].id)) {
                 this.setTargetFromUrl(this.props);
             }
+        }
+    }
+
+    componentWillReceiveProps(nextProps) {
+        if (nextProps.user.id) {
+            this.setTargetFromUrl(nextProps);
         }
     }
 
@@ -74,7 +85,7 @@ class InstanceSelector extends Component {
 
         let isAllSelected = true;
 
-        for (let i=0; i<filterdInstance.length; i++) {
+        for (let i = 0; i < filterdInstance.length; i++) {
             if (!this.state.selectedInstances[filterdInstance[i].objHash]) {
                 isAllSelected = false;
                 break;
@@ -84,13 +95,13 @@ class InstanceSelector extends Component {
         let selectedInstances = Object.assign(this.state.selectedInstances);
 
         if (isAllSelected) {
-            for (let i=0; i<filterdInstance.length; i++) {
+            for (let i = 0; i < filterdInstance.length; i++) {
                 if (this.state.selectedInstances[filterdInstance[i].objHash]) {
                     delete selectedInstances[filterdInstance[i].objHash];
                 }
             }
         } else {
-            for (let i=0; i<filterdInstance.length; i++) {
+            for (let i = 0; i < filterdInstance.length; i++) {
                 if (!this.state.selectedInstances[filterdInstance.objHash]) {
                     selectedInstances[filterdInstance[i].objHash] = filterdInstance[i];
                 }
@@ -131,7 +142,7 @@ class InstanceSelector extends Component {
                 url: getHttpProtocol(props.config) + '/scouter/v1/info/server',
                 xhrFields: getWithCredentials(props.config),
                 beforeSend: function (xhr) {
-                    setAuthHeader(xhr, props.config, props.user);
+                    setAuthHeader(xhr, props.config, getCurrentUser(props.config, props.user));
                 }
             }).done((msg) => {
                 if (msg && msg.result) {
@@ -170,7 +181,7 @@ class InstanceSelector extends Component {
                                 url: getHttpProtocol(this.props.config) + '/scouter/v1/object?serverId=' + server.id,
                                 xhrFields: getWithCredentials(props.config),
                                 beforeSend: function (xhr) {
-                                    setAuthHeader(xhr, props.config, props.user);
+                                    setAuthHeader(xhr, props.config, getCurrentUser(props.config, props.user));
                                 }
                             }).done(function (msg) {
                                 instances = msg.result;
@@ -261,15 +272,17 @@ class InstanceSelector extends Component {
         }
     };
 
-    componentWillReceiveProps(nextProps) {
-        if (nextProps.user.id) {
-            this.setTargetFromUrl(nextProps);
-        }
-    }
 
     getServers = (config) => {
+
+
         let that = this;
         this.props.addRequest();
+
+        this.setState({
+            loading : true
+        });
+
         jQuery.ajax({
             method: "GET",
             async: true,
@@ -281,7 +294,7 @@ class InstanceSelector extends Component {
                 activeServerId: null,
                 selectedInstances: {},
                 selectedHosts: {},
-                filter : ""
+                filter: ""
             });
         }).fail((xhr, textStatus, errorThrown) => {
             this.setState({
@@ -290,9 +303,13 @@ class InstanceSelector extends Component {
                 activeServerId: null,
                 selectedInstances: {},
                 selectedHosts: {},
-                filter : ""
+                filter: ""
             });
             errorHandler(xhr, textStatus, errorThrown, that.props);
+        }).always(() => {
+            this.setState({
+                loading : false
+            });
         });
 
     };
@@ -314,7 +331,7 @@ class InstanceSelector extends Component {
             url: getHttpProtocol(this.props.config) + '/scouter/v1/object?serverId=' + serverId,
             xhrFields: getWithCredentials(that.props.config),
             beforeSend: function (xhr) {
-                setAuthHeader(xhr, that.props.config, that.props.user);
+                setAuthHeader(xhr, that.props.config, getCurrentUser(that.props.config, that.props.user));
             },
         }).done((msg) => {
             if (msg.result) {
@@ -426,6 +443,80 @@ class InstanceSelector extends Component {
 
     };
 
+    savePreset = () => {
+
+        let instances = [];
+        let hosts = [];
+        let hostMap = {};
+        for (let hash in this.state.selectedInstances) {
+            let instance = this.state.selectedInstances[hash];
+            let host = instance.host;
+            instances.push(instance);
+            if (host) {
+                if (!hostMap[host.objHash]) {
+                    hostMap[host.objHash] = true;
+                    hosts.push(host);
+                }
+            }
+        }
+
+        let that = this;
+
+        jQuery.ajax({
+            method: "GET",
+            async: true,
+            url: getHttpProtocol(this.props.config) + "/scouter/v1/kv/__scouter_paper_preset",
+            xhrFields: getWithCredentials(this.props.config),
+            beforeSend: function (xhr) {
+                setAuthHeader(xhr, that.props.config, getCurrentUser(that.props.config, that.props.user));
+            }
+        }).done((msg) => {
+            if (msg && Number(msg.status) === 200) {
+                let presetList = [];
+                if (msg.result) {
+                    presetList = JSON.parse(msg.result);
+                }
+
+                presetList.push({
+                    no: presetList.length,
+                    name: "PRESET-" + (presetList.length + 1),
+                    creationTime: (new Date()).getTime(),
+                    instances: instances.map((d) => d.objHash),
+                    hosts: hosts.map((d) => d.objHash)
+                });
+
+                let data = {
+                    key : "__scouter_paper_preset",
+                    value : JSON.stringify(presetList)
+                };
+
+                jQuery.ajax({
+                    method: "PUT",
+                    async: true,
+                    url: getHttpProtocol(this.props.config) + "/scouter/v1/kv",
+                    xhrFields: getWithCredentials(this.props.config),
+                    contentType : "application/json",
+                    data : JSON.stringify(data),
+                    beforeSend: function (xhr) {
+                        setAuthHeader(xhr, that.props.config, getCurrentUser(that.props.config, that.props.user));
+                    }
+                }).done((msg) => {
+                    if (msg && Number(msg.status) === 200) {
+                        this.props.pushMessage("info", "DONE", "SAVED SUCCESSFULLY");
+                        this.props.setControlVisibility("Message", true);
+                        that.setState({
+                            presets : presetList
+                        });
+                    }
+                }).fail((xhr, textStatus, errorThrown) => {
+                    errorHandler(xhr, textStatus, errorThrown, this.props);
+                });
+            }
+        }).fail((xhr, textStatus, errorThrown) => {
+            errorHandler(xhr, textStatus, errorThrown, this.props);
+        });
+    };
+
     cancelClick = () => {
         this.props.toggleSelectorVisible();
     };
@@ -434,7 +525,7 @@ class InstanceSelector extends Component {
         let inx = Number(event.target.value);
         let config = this.props.config;
 
-        for (let i=0; i<config.servers.length; i++) {
+        for (let i = 0; i < config.servers.length; i++) {
             if (i === inx) {
                 config.servers[i].default = true;
             } else {
@@ -448,23 +539,34 @@ class InstanceSelector extends Component {
             localStorage.setItem("config", JSON.stringify(config));
         }
 
+        this.props.setTarget([], []);
+        this.setState({
+            servers: [],
+            instances: [],
+            activeServerId: null,
+            selectedInstances: {},
+            selectedHosts: {},
+            filter: ""
+        });
+
     };
 
     render() {
         return (
-            <div className={"instance-selector-bg " + (this.props.visible ? "" : "hidden")}>
+            <div className={"instance-selector-bg " + (this.props.visible ? "" : "hidden")}
+                 onClick={this.props.toggleSelectorVisible}>
                 <div className={"instance-selector-fixed-bg"}>
                 </div>
-                <div className="instance-selector popup-div">
+                <div className="instance-selector popup-div" onClick={(e) => e.stopPropagation()}>
                     <div className="scouter-servers">
-                        <div className="scouter-server-label">SCOUTER SERVER</div>
-                        <div>
+                        <div className="scouter-server-label">SCOUTER WEB API SERVER</div>
+                        <div className="scouter-server-select">
                             <select value={common.getDefaultServerConfigIndex(this.props.config)} onChange={this.onChangeScouterServer.bind(this)}>
-                            {this.props.config.servers.map((server, inx) => {
-                                return (
-                                    <option key={inx} value={inx}>{server.protocol + "://" + server.address + ":" + server.port}</option>
-                                )
-                            })}
+                                {this.props.config.servers.map((server, inx) => {
+                                    return (
+                                        <option key={inx} value={inx}>{server.protocol + "://" + server.address + ":" + server.port}</option>
+                                    )
+                                })}
                             </select>
                         </div>
                     </div>
@@ -476,12 +578,7 @@ class InstanceSelector extends Component {
                                 </div>
                                 <div className="list-content scrollbar">
                                     {this.state.servers && this.state.servers.map((host, i) => {
-                                            return (<div
-                                                className={'host ' + (i === 0 ? 'first ' : ' ') + (host.id === this.state.activeServerId ? 'active ' : ' ')}
-                                                key={i}
-                                                onClick={this.onServerClick.bind(this, host.id)}>{host.name}{host.selectedInstanceCount > 0 &&
-                                            <span
-                                                className="host-selected-count">{host.selectedInstanceCount}</span>}</div>)
+                                            return (<div className={'host ' + (i === 0 ? 'first ' : ' ') + (host.id === this.state.activeServerId ? 'active ' : ' ')} key={i} onClick={this.onServerClick.bind(this, host.id)}>{host.name}{host.selectedInstanceCount > 0 && <span className="host-selected-count">{host.selectedInstanceCount}</span>}</div>)
                                         }
                                     )}
                                 </div>
@@ -489,8 +586,9 @@ class InstanceSelector extends Component {
                         </div>
                         <div className="instance-list">
                             <div>
-                                <div className={"filter " + (this.state.filter && this.state.filter.length > 1 ? 'filtered' : '')}>
-                                    <span className="filter-icon" onClick={this.clearFilter}><i className="fa fa-filter" aria-hidden="true"></i></span><span className="filter-tag">INSTANCE</span><input type="search" onChange={this.onFilterChange.bind(this)} value={this.state.filter} /><span className="check-btn" onClick={this.selectAll}><i className="fa fa-check-circle-o" aria-hidden="true"></i> ALL</span>
+                                <div
+                                    className={"filter " + (this.state.filter && this.state.filter.length > 1 ? 'filtered' : '')}>
+                                    <span className="filter-icon" onClick={this.clearFilter}><i className="fa fa-filter" aria-hidden="true"></i></span><span className="filter-tag">INSTANCE</span><input type="search" onChange={this.onFilterChange.bind(this)} value={this.state.filter}/><span className="check-btn" onClick={this.selectAll}><i className="fa fa-check-circle-o" aria-hidden="true"></i> ALL</span>
                                 </div>
                                 <div className="list-content scrollbar">
                                     {(this.state.instances && this.state.instances.length > 0) && this.state.instances.filter((instance) => {
@@ -498,7 +596,7 @@ class InstanceSelector extends Component {
                                             if (this.state.filter && this.state.filter.length > 1) {
                                                 if ((instance.objType && instance.objType.toLowerCase().indexOf(this.state.filter.toLowerCase()) > -1) || (instance.objName && instance.objName.toLowerCase().indexOf(this.state.filter.toLowerCase()) > -1) || (instance.address && instance.address.toLowerCase().indexOf(this.state.filter.toLowerCase()) > -1)) {
                                                     return true;
-                                                }  else {
+                                                } else {
                                                     return false;
                                                 }
                                             } else {
@@ -509,19 +607,30 @@ class InstanceSelector extends Component {
                                         }
                                     }).map((instance, i) => {
                                         return (
-                                            <div key={i} className={"instance " + (i === 0 ? 'first ' : ' ') + (!(!this.state.selectedInstances[instance.objHash]) ? "selected" : " ")} onClick={this.instanceClick.bind(this, instance)}>
-                                                <div className="instance-name">{instance.objName}</div><div className="instance-other"><span>{instance.address}</span><span className="instance-objtype">{instance.objType}</span></div>
+                                            <div key={i}
+                                                 className={"instance " + (i === 0 ? 'first ' : ' ') + (!(!this.state.selectedInstances[instance.objHash]) ? "selected" : " ")}
+                                                 onClick={this.instanceClick.bind(this, instance)}>
+                                                <div className="instance-name">{instance.objName}</div>
+                                                <div className="instance-other"><span>{instance.address}</span><span
+                                                    className="instance-objtype">{instance.objType}</span></div>
                                             </div>)
                                     })}
-                                    {(!this.state.instances || this.state.instances.length < 1) && <div className="no-instance"><div><div>NO INSTANCE</div></div></div> }
+                                    {(!this.state.instances || this.state.instances.length < 1) &&
+                                    <div className="no-instance">
+                                        <div>
+                                            <div>NO INSTANCE</div>
+                                        </div>
+                                    </div>}
                                 </div>
                             </div>
                         </div>
                     </div>
                     <div className="buttons">
+                        <button className="save-preset-btn" onClick={this.savePreset}>SAVE AS PRESET</button>
                         <button onClick={this.cancelClick}>CANCEL</button>
                         <button onClick={this.setInstances}>APPLY</button>
                     </div>
+                    <InnerLoading visible={this.state.loading}></InnerLoading>
                 </div>
             </div>
         );

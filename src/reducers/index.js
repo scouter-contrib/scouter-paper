@@ -1,4 +1,4 @@
-import {ADD_REQUEST, SET_CONFIG, SET_USER_ID, SET_TARGET, SET_INSTANCES, PUSH_MESSAGE, SET_CONTROL_VISIBILITY, CLEAR_ALL_MESSAGE, SET_BG_COLOR, SET_SELECTION, SET_TEMPLATE, SET_REAL_TIME, SET_RANGE_DATE, SET_RANGE_HOURS, SET_RANGE_MINUTES, SET_RANGE_VALUE, SET_REAL_TIME_VALUE, SET_RANGE_DATE_HOURS_MINUTES, SET_REAL_TIME_RANGE_STEP_VALUE, SET_RANGE_DATE_HOURS_MINUTES_VALUE, SET_RANGE_ALL} from '../actions';
+import {ADD_REQUEST, SET_CONFIG, SET_USER_ID, SET_USER_DATA, SET_TARGET, SET_INSTANCES, PUSH_MESSAGE, SET_CONTROL_VISIBILITY, CLEAR_ALL_MESSAGE, SET_BG_COLOR, SET_SELECTION, SET_TEMPLATE, SET_REAL_TIME, SET_RANGE_DATE, SET_RANGE_HOURS, SET_RANGE_MINUTES, SET_RANGE_VALUE, SET_REAL_TIME_VALUE, SET_RANGE_DATE_HOURS_MINUTES, SET_REAL_TIME_RANGE_STEP_VALUE, SET_RANGE_DATE_HOURS_MINUTES_VALUE, SET_RANGE_ALL} from '../actions';
 import {combineReducers} from 'redux';
 import moment from 'moment';
 
@@ -13,7 +13,7 @@ const configState = {
         }
     ],
     interval: 2000,
-    numberFormat: "0,0",
+    numberFormat: "0,0.0",
     dateFormat: "%Y-%m-%d",
     timeFormat: "%H:%M:%S",
     minuteFormat: "%H:%M",
@@ -174,19 +174,24 @@ const config = (state = configState, action) => {
 };
 
 const userState = {
-    id: null,
-    token : null,
-    time : null
+    
 };
 
 const user = (state = userState, action) => {
     switch (action.type) {
         case SET_USER_ID:
-            return Object.assign({}, state, {
+            let currentState = Object.assign({}, state);
+            currentState[action.origin] = {
                 id: action.id,
                 token : action.token,
                 time : action.time
-            });
+            }
+            
+            return currentState;
+
+        case SET_USER_DATA:
+            return Object.assign({}, state, action.userData);
+
         default:
             return state;
     }

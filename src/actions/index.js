@@ -6,6 +6,7 @@ export const CLEAR_ALL_MESSAGE = 'CLEAR_ALL_MESSAGE';
 export const SET_BG_COLOR = 'SET_BG_COLOR';
 export const SET_CONFIG = 'SET_CONFIG';
 export const SET_USER_ID = 'SET_USER_ID';
+export const SET_USER_DATA = 'SET_USER_DATA';
 export const ADD_REQUEST = 'ADD_REQUEST';
 export const SET_SELECTION = 'SET_SELECTION';
 export const SET_TEMPLATE = 'SET_TEMPLATE';
@@ -27,12 +28,20 @@ export function setConfig(config) {
     };
 }
 
-export function setUserId(id, token, time) {
+export function setUserId(origin, id, token, time) {
     return {
         type: SET_USER_ID,
+        origin : origin,
         id : id,
         token : token,
         time : time
+    };
+}
+
+export function setUserData(userData) {
+    return {
+        type: SET_USER_DATA,
+        userData : userData
     };
 }
 

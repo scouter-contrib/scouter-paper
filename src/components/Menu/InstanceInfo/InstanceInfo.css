@@ -1,6 +1,5 @@
 .instance-info > div {
     background-color: rgba(0, 0, 0, 0.2);
-    padding: 5px 10px;
     border-radius: 5px;
     cursor: pointer;
     font-size: 9px;
@@ -11,6 +10,30 @@
     user-select: none;
     z-index: 50;
     position: relative;
+
+}
+
+.instance-info > div > div {
+    display: inline-block;
+}
+
+.instance-info > div > div.instance-btn {
+    border-radius: 5px 0 0 5px;
+    padding: 4px 10px;
+    border : 1px solid rgba(0,0,0,0.2);
+    border-right : none;
+}
+
+.instance-info > div > div.preset-btn {
+    border-left: 1px solid rgba(0,0,0,0.2);
+    padding: 4px 8px 4px 7px;
+    border-radius: 0 5px 5px 0;
+    border : 1px solid rgba(0,0,0,0.2);
+}
+
+.instance-info > div > div.instance-btn:hover,
+.instance-info > div > div.preset-btn:hover {
+    background-color: rgba(0,0,0,0.2);
 }
 
 .instance-info .small {
@@ -24,9 +47,9 @@
 
 @media screen and (max-width: 600px) {
     .instance-info > div {
-        padding: 4px 5px;
+        padding: 0;
         font-size: 8px;
-        border-radius: 3px;
+        border-radius: 5px;
     }
 
     .instance-info .big {
