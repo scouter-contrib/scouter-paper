@@ -44,7 +44,7 @@ class ActiveSpeed extends Component {
             <div className="active-speed-wrapper">
                 <div className="active-speed-content">
                 {(!this.props.realtime) && <div className="no-search-support"><div><div>REALTIME ONLY</div></div></div>}
-                {this.props.realtime && this.props.instances.map((d, i) => {
+                {this.props.realtime && this.props.objects.map((d, i) => {
                     let total = 0;
                     let short = 0;
                     let medium = 0;
@@ -112,8 +112,7 @@ class ActiveSpeed extends Component {
 
 let mapStateToProps = (state) => {
     return {
-        hosts: state.target.hosts,
-        instances: state.target.instances,
+        objects: state.target.objects,
         config: state.config
     };
 };

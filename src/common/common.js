@@ -258,8 +258,8 @@ export function getParam(props, key) {
 export function setRangePropsToUrl (props, pathname) {
     let search = new URLSearchParams(props.location.search);
 
-    if (props.instances.length > 0) {
-        search.set("instances", props.instances.map((d) => {
+    if (props.objects.length > 0) {
+        search.set("objects", props.objects.map((d) => {
             return d.objHash
         }));
     }

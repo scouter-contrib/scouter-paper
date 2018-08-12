@@ -22,7 +22,7 @@ class Box extends Component {
     }
 
     setTitle = (counterKey, title, color) => {
-        let titles = Object.assign(this.state.titles);
+        let titles = Object.assign({}, this.state.titles);
         titles[title] = {
             counterKey : counterKey,
             title : title,
@@ -34,7 +34,7 @@ class Box extends Component {
     };
 
     removeTitle = (counterKey) => {
-        let titles = Object.assign(this.state.titles);
+        let titles = Object.assign({}, this.state.titles);
         for (let title in titles) {
             if (titles[title].counterKey === counterKey) {
                 delete titles[title];
@@ -47,6 +47,8 @@ class Box extends Component {
     };
 
     onDrop(data) {
+
+        console.log(data);
         if (data) {
             let option = JSON.parse(data.metric);
             if (option.mode === "exclusive") {

@@ -73,7 +73,7 @@ class BoxConfig extends Component {
     };
 
     onRemoveToggle = ( counterKey) => {
-        let removeKeys = Object.assign(this.state.removeKeys);
+        let removeKeys = this.state.removeKeys.slice(0);
         let findIndex = removeKeys.findIndex(function (e) {
             return e === counterKey
         });

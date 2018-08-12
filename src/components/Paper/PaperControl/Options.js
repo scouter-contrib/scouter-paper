@@ -123,7 +123,7 @@ export function options() {
                     value: false
                 }
             }
-        },
+        }/*,
         WAS: [
             {
                 text: "TPS",
@@ -540,6 +540,6 @@ export function options() {
                 counterKey : "DiskWriteBytes",
                 objectType : "host"
             }
-        ]
+        ]*/
     }
 }

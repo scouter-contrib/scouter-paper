@@ -74,7 +74,7 @@ class XLogFilter extends Component {
     };
 
     onChangeCondition = (key, event) => {
-        let state = Object.assign(this.state);
+        let state = Object.assign({}, this.state);
         state[key] = event.target.value;
         this.setState(state);
     };

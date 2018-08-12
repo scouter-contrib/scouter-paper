@@ -140,7 +140,7 @@ class PresetManager extends Component {
                     this.props.togglePresetManagerVisible();
 
                     const server = getCurrentDefaultServer(this.props.config);
-                    let newUrl = updateQueryStringParameter(window.location.href, "instances", preset.instances);
+                    let newUrl = updateQueryStringParameter(window.location.href, "objects", preset.objects);
                     newUrl = updateQueryStringParameter(newUrl, "address", server.address);
                     newUrl = updateQueryStringParameter(newUrl, "port", server.port);
                     newUrl = updateQueryStringParameter(newUrl, "authentification", server.authentification);
@@ -215,7 +215,7 @@ class PresetManager extends Component {
                                                 {(d.no === this.state.selectedEditNo) && <span className="done-btn" onClick={this.updateClick.bind(this, d.no)}>DONE</span>}
                                             </div>
                                             <div className="summary-info">
-                                                <span>{d.instances.length} INSTANCES</span>
+                                                <span>{d.objects.length} INSTANCES</span>
                                             </div>
                                         </div>
                                     </div>
@@ -239,7 +239,7 @@ class PresetManager extends Component {
 
 let mapStateToProps = (state) => {
     return {
-        instances: state.target.instances,
+        objects: state.target.objects,
         config: state.config,
         user: state.user
     };

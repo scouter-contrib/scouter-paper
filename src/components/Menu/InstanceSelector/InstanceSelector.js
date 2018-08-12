@@ -4,7 +4,6 @@ import {
     addRequest,
     pushMessage,
     setTarget,
-    setInstances,
     clearAllMessage,
     setControlVisibility,
     setConfig
@@ -17,6 +16,15 @@ import 'url-search-params-polyfill';
 import * as common from '../../../common/common'
 import AgentColor from "../../../common/InstanceColor";
 import InnerLoading from "../../InnerLoading/InnerLoading";
+import java from '../../../img/icons/java.png';
+import kafka from '../../../img/icons/kafka.png';
+import mysql from '../../../img/icons/mysql.png';
+import nginx from '../../../img/icons/nginx.png';
+import redis from '../../../img/icons/redis.png';
+import tomcat from '../../../img/icons/tomcat.png';
+import linux from '../../../img/icons/linux.png';
+import jetty from '../../../img/icons/jetty.png';
+import object from '../../../img/icons/cube.png';
 
 class InstanceSelector extends Component {
 
@@ -26,10 +34,9 @@ class InstanceSelector extends Component {
         super(props);
         this.state = {
             servers: [],
-            instances: [],
             activeServerId: null,
-            selectedInstances: {},
-            selectedHosts: {},
+            objects: [],
+            selectedObjects: {},
             filter: "",
             loading : false
         };
@@ -39,7 +46,6 @@ class InstanceSelector extends Component {
         if (common.getDefaultServerConfig(this.props.config).authentification !== "bearer") {
             this.setTargetFromUrl(this.props);
         } else {
-
             let defaultServerconfig = common.getDefaultServerConfig(this.props.config);
             let origin = defaultServerconfig.protocol + "://" + defaultServerconfig.address + ":" + defaultServerconfig.port;
             if (this.props.config || (this.props.user[origin] && this.props.user[origin].id)) {
@@ -67,66 +73,60 @@ class InstanceSelector extends Component {
     };
 
     selectAll = () => {
-        let filterdInstance = this.state.instances.filter((instance) => {
-            if (instance.objFamily === 'javaee') {
-                if (this.state.filter && this.state.filter.length > 1) {
-                    if ((instance.objType && instance.objType.toLowerCase().indexOf(this.state.filter.toLowerCase()) > -1) || (instance.objName && instance.objName.toLowerCase().indexOf(this.state.filter.toLowerCase()) > -1) || (instance.address && instance.address.toLowerCase().indexOf(this.state.filter.toLowerCase()) > -1)) {
-                        return true;
-                    } else {
-                        return false;
-                    }
-                } else {
+        let filteredObjects = this.state.objects.filter((object) => {
+            if (this.state.filter && this.state.filter.length > 1) {
+                if ((object.objType && object.objType.toLowerCase().indexOf(this.state.filter.toLowerCase()) > -1) || (object.objName && object.objName.toLowerCase().indexOf(this.state.filter.toLowerCase()) > -1) || (object.address && object.address.toLowerCase().indexOf(this.state.filter.toLowerCase()) > -1)) {
                     return true;
+                } else {
+                    return false;
                 }
             } else {
-                return false;
+                return true;
             }
         });
 
         let isAllSelected = true;
-
-        for (let i = 0; i < filterdInstance.length; i++) {
-            if (!this.state.selectedInstances[filterdInstance[i].objHash]) {
+        for (let i = 0; i < filteredObjects.length; i++) {
+            if (!this.state.selectedObjects[filteredObjects[i].objHash]) {
                 isAllSelected = false;
                 break;
             }
         }
 
-        let selectedInstances = Object.assign(this.state.selectedInstances);
-
+        let selectedObjects = Object.assign({}, this.state.selectedObjects);
         if (isAllSelected) {
-            for (let i = 0; i < filterdInstance.length; i++) {
-                if (this.state.selectedInstances[filterdInstance[i].objHash]) {
-                    delete selectedInstances[filterdInstance[i].objHash];
+            for (let i = 0; i < filteredObjects.length; i++) {
+                if (this.state.selectedObjects[filteredObjects[i].objHash]) {
+                    delete selectedObjects[filteredObjects[i].objHash];
                 }
             }
         } else {
-            for (let i = 0; i < filterdInstance.length; i++) {
-                if (!this.state.selectedInstances[filterdInstance.objHash]) {
-                    selectedInstances[filterdInstance[i].objHash] = filterdInstance[i];
+            for (let i = 0; i < filteredObjects.length; i++) {
+                if (!this.state.selectedObjects[filteredObjects.objHash]) {
+                    selectedObjects[filteredObjects[i].objHash] = filteredObjects[i];
                 }
             }
         }
 
-        let selectedInstanceCount = 0;
-        for (let attr in selectedInstances) {
-            for (let i = 0; i < this.state.instances.length; i++) {
-                if (this.state.instances[i].objHash === attr) {
-                    selectedInstanceCount++;
+        let selectedObjectCount = 0;
+        for (let attr in selectedObjects) {
+            for (let i = 0; i < this.state.objects.length; i++) {
+                if (this.state.objects[i].objHash === attr) {
+                    selectedObjectCount++;
                 }
             }
         }
 
-        let servers = this.state.servers;
+        let servers = this.state.servers.slice(0);
         for (let i = 0; i < servers.length; i++) {
             if (servers[i].id === this.state.activeServerId) {
-                servers[i].selectedInstanceCount = selectedInstanceCount;
+                servers[i].selectedObjectCount = selectedObjectCount;
             }
         }
 
         this.setState({
             servers: servers,
-            selectedInstances: selectedInstances
+            selectedObjects: selectedObjects
         });
     };
 
@@ -154,22 +154,20 @@ class InstanceSelector extends Component {
                     });
 
                     // GET INSTANCES INFO FROM URL IF EXISTS
-                    let instancesParam = new URLSearchParams(this.props.location.search).get('instances');
-                    let urlInstanceObjHashes = null;
-                    if (instancesParam) {
-                        urlInstanceObjHashes = instancesParam.split(",");
-                        if (urlInstanceObjHashes) {
-                            urlInstanceObjHashes = urlInstanceObjHashes.map((d) => {
+                    let objectsParam = new URLSearchParams(this.props.location.search).get('objects');
+                    let urlObjectHashes = null;
+                    if (objectsParam) {
+                        urlObjectHashes = objectsParam.split(",");
+                        if (urlObjectHashes) {
+                            urlObjectHashes = urlObjectHashes.map((d) => {
                                 return Number(d)
                             });
                         }
                     }
 
-                    if (urlInstanceObjHashes) {
-                        let selectedHosts = [];
-                        let selectedHostMap = {};
-                        let selectedInstances = [];
-                        let instances = [];
+                    if (urlObjectHashes) {
+                        let selectedObjects = [];
+                        let objects = [];
                         let activeServerId = null;
                         servers.forEach((server) => {
                             //일단 단일 서버로 가정하고 서버 시간과 맞춘다.
@@ -184,40 +182,18 @@ class InstanceSelector extends Component {
                                     setAuthHeader(xhr, props.config, getCurrentUser(props.config, props.user));
                                 }
                             }).done(function (msg) {
-                                instances = msg.result;
+                                objects = msg.result;
 
-                                if (instances) {
-                                    instances.sort((a, b) => a.objName < b.objName ? -1 : 1);
-
-                                    const hosts = {};
-                                    instances.filter((o) => o.objFamily === 'host').forEach((o) => {
-                                        hosts[o.objName] = o;
-                                    });
-
-                                    instances.filter((o) => o.objFamily === 'javaee').forEach((o) => {
-                                        let instanceName = o.objName;
-                                        let hostName = instanceName.substring(0, instanceName.lastIndexOf('/'));
-                                        o.host = hosts[hostName];
-                                    });
-                                }
-
-                                if (instances && instances.length > 0) {
-                                    instances.forEach((instance) => {
-                                        urlInstanceObjHashes.forEach((objHash) => {
+                                if (objects && objects.length > 0) {
+                                    objects.sort((a, b) => a.objName < b.objName ? -1 : 1);
+                                    objects.forEach((instance) => {
+                                        urlObjectHashes.forEach((objHash) => {
                                             if (objHash === Number(instance.objHash)) {
-                                                selectedInstances.push(instance);
-                                                if (!server.selectedInstanceCount) {
-                                                    server.selectedInstanceCount = 0;
+                                                selectedObjects.push(instance);
+                                                if (!server.selectedObjectCount) {
+                                                    server.selectedObjectCount = 0;
                                                 }
-
-                                                if (instance.host) {
-                                                    if (!selectedHostMap[instance.host.objHash]) {
-                                                        selectedHostMap[instance.host.objHash] = instance.host;
-                                                        selectedHosts.push(instance.host);
-                                                    }
-                                                }
-
-                                                server.selectedInstanceCount++;
+                                                server.selectedObjectCount++;
                                                 // 마지막으로 찾은 서버 ID로 세팅
                                                 activeServerId = server.id;
                                             }
@@ -229,29 +205,23 @@ class InstanceSelector extends Component {
                             });
                         });
 
+                        if (selectedObjects.length > 0) {
+                            selectedObjects.sort((a, b) => a.objName < b.objName ? -1 : 1);
 
-                        // LUCKY! FIND ALL INSTANCE
-                        //if (urlInstanceObjHashes.length === selectedInstances.length) {
-                        if (selectedInstances.length > 0) {
-                            selectedInstances.sort((a, b) => a.objName < b.objName ? -1 : 1);
-                            selectedHosts && selectedHosts.sort((a, b) => a.objName < b.objName ? -1 : 1);
-
-                            let selectedInstanceMap = {};
-
-                            for (let i = 0; i < selectedInstances.length; i++) {
-                                selectedInstanceMap[selectedInstances[i].objHash] = selectedInstances[i];
+                            let selectedObjectMap = {};
+                            for (let i = 0; i < selectedObjects.length; i++) {
+                                selectedObjectMap[selectedObjects[i].objHash] = selectedObjects[i];
                             }
 
                             this.setState({
                                 servers: servers,
-                                instances: instances,
+                                objects: objects,
                                 activeServerId: activeServerId,
-                                selectedInstances: selectedInstanceMap
+                                selectedObjects: selectedObjectMap
                             });
 
-                            AgentColor.setHosts(selectedHosts, this.props.config.colorType);
-                            AgentColor.setInstances(selectedInstances, this.props.config.colorType);
-                            this.props.setTarget(selectedHosts, selectedInstances);
+                            AgentColor.setInstances(selectedObjects, this.props.config.colorType);
+                            this.props.setTarget(selectedObjects);
 
                         } else {
                             this.setState({
@@ -275,7 +245,6 @@ class InstanceSelector extends Component {
 
     getServers = (config) => {
 
-
         let that = this;
         this.props.addRequest();
 
@@ -290,19 +259,17 @@ class InstanceSelector extends Component {
         }).done((msg) => {
             this.setState({
                 servers: msg.result,
-                instances: [],
+                objects: [],
                 activeServerId: null,
-                selectedInstances: {},
-                selectedHosts: {},
+                selectedObjects: {},
                 filter: ""
             });
         }).fail((xhr, textStatus, errorThrown) => {
             this.setState({
                 servers: [],
-                instances: [],
+                objects: [],
                 activeServerId: null,
-                selectedInstances: {},
-                selectedHosts: {},
+                selectedObjects: {},
                 filter: ""
             });
             errorHandler(xhr, textStatus, errorThrown, that.props);
@@ -335,34 +302,18 @@ class InstanceSelector extends Component {
             },
         }).done((msg) => {
             if (msg.result) {
-
                 that.setState({
                     activeServerId: serverId
-
                 });
 
-                const instances = msg.result;
-                if (instances) {
-                    instances.sort((a, b) => a.objName < b.objName ? -1 : 1);
-
-                    // find host
-                    const hosts = {};
-                    instances.filter((o) => o.objFamily === 'host').forEach((o) => {
-                        hosts[o.objName] = o;
-                    });
-
-                    instances.filter((o) => o.objFamily === 'javaee').forEach((o) => {
-                        let instanceName = o.objName;
-                        let hostName = instanceName.substring(0, instanceName.lastIndexOf('/'));
-                        o.host = hosts[hostName];
+                const objects = msg.result;
+                if (objects) {
+                    objects.sort((a, b) => a.objName < b.objName ? -1 : 1);
+                    this.setState({
+                        objects: msg.result
                     });
                 }
             }
-
-            this.setState({
-                instances: msg.result
-            });
-
         }).fail((xhr, textStatus, errorThrown) => {
             errorHandler(xhr, textStatus, errorThrown, that.props);
         });
@@ -370,18 +321,20 @@ class InstanceSelector extends Component {
 
     instanceClick = (instance) => {
 
-        let selectedInstances = Object.assign(this.state.selectedInstances);
-        if (selectedInstances[instance.objHash]) {
-            delete selectedInstances[instance.objHash];
+        console.log(instance);
+
+        let selectedObjects = Object.assign({}, this.state.selectedObjects);
+        if (selectedObjects[instance.objHash]) {
+            delete selectedObjects[instance.objHash];
         } else {
-            selectedInstances[instance.objHash] = instance;
+            selectedObjects[instance.objHash] = instance;
         }
 
-        let selectedInstanceCount = 0;
-        for (let attr in selectedInstances) {
-            for (let i = 0; i < this.state.instances.length; i++) {
-                if (this.state.instances[i].objHash === attr) {
-                    selectedInstanceCount++;
+        let selectedObjectCount = 0;
+        for (let attr in selectedObjects) {
+            for (let i = 0; i < this.state.objects.length; i++) {
+                if (this.state.objects[i].objHash === attr) {
+                    selectedObjectCount++;
                 }
             }
         }
@@ -389,78 +342,41 @@ class InstanceSelector extends Component {
         let servers = this.state.servers;
         for (let i = 0; i < servers.length; i++) {
             if (servers[i].id === this.state.activeServerId) {
-                servers[i].selectedInstanceCount = selectedInstanceCount;
+                servers[i].selectedObjectCount = selectedObjectCount;
             }
         }
 
         this.setState({
             servers: servers,
-            selectedInstances: selectedInstances
+            selectedObjects: selectedObjects
         });
-
     };
 
-    setInstances = () => {
-        let instances = [];
-        let hosts = [];
-        let hostMap = {};
-        for (let hash in this.state.selectedInstances) {
-            let instance = this.state.selectedInstances[hash];
-            let host = instance.host;
-            instances.push(instance);
-            if (host) {
-                if (!hostMap[host.objHash]) {
-                    hostMap[host.objHash] = true;
-                    hosts.push(host);
-                }
-            }
+    setObjects = () => {
+        let objects = [];
+        for (let hash in this.state.selectedObjects) {
+            objects.push(this.state.selectedObjects[hash]);
         }
 
-        if (instances.length < 1) {
-            this.props.pushMessage("info", "NO MONITORING TARGET", "At least one instance must be selected");
+        if (objects.length < 1) {
+            this.props.pushMessage("info", "NO MONITORING TARGET", "At least one object must be selected");
             this.props.setControlVisibility("Message", true);
         } else {
-            instances && instances.sort((a, b) => a.objName < b.objName ? -1 : 1);
-            hosts && hosts.sort((a, b) => a.objName < b.objName ? -1 : 1);
-
-            AgentColor.setHosts(hosts, this.props.config.colorType);
-            AgentColor.setInstances(instances, this.props.config.colorType);
-
-            this.props.setTarget(hosts, instances);
+            objects.sort((a, b) => a.objName < b.objName ? -1 : 1);
+            AgentColor.setInstances(objects, this.props.config.colorType);
+            this.props.setTarget(objects);
             this.props.setControlVisibility("TargetSelector", false);
-
             common.setRangePropsToUrl(this.props, "/paper");
-            /*this.props.history.push({
-                pathname: '/paper',
-                search: '?instances=' + instances.map((d) => {
-                    return d.objHash
-                })
-            });*/
-
             this.props.toggleSelectorVisible();
         }
-
-
     };
 
     savePreset = () => {
-
-        let instances = [];
-        let hosts = [];
-        let hostMap = {};
-        for (let hash in this.state.selectedInstances) {
-            let instance = this.state.selectedInstances[hash];
-            let host = instance.host;
-            instances.push(instance);
-            if (host) {
-                if (!hostMap[host.objHash]) {
-                    hostMap[host.objHash] = true;
-                    hosts.push(host);
-                }
-            }
-        }
-
         let that = this;
+        let objects = [];
+        for (let hash in this.state.selectedObjects) {
+            objects.push(this.state.selectedObjects[hash]);
+        }
 
         jQuery.ajax({
             method: "GET",
@@ -481,8 +397,7 @@ class InstanceSelector extends Component {
                     no: presetList.length,
                     name: "PRESET-" + (presetList.length + 1),
                     creationTime: (new Date()).getTime(),
-                    instances: instances.map((d) => d.objHash),
-                    hosts: hosts.map((d) => d.objHash)
+                    objects: objects.map((d) => d.objHash)
                 });
 
                 let data = {
@@ -523,7 +438,7 @@ class InstanceSelector extends Component {
 
     onChangeScouterServer = (event) => {
         let inx = Number(event.target.value);
-        let config = this.props.config;
+        let config = JSON.parse(JSON.stringify(this.props.config));
 
         for (let i = 0; i < config.servers.length; i++) {
             if (i === inx) {
@@ -542,13 +457,51 @@ class InstanceSelector extends Component {
         this.props.setTarget([], []);
         this.setState({
             servers: [],
-            instances: [],
+            objects: [],
             activeServerId: null,
-            selectedInstances: {},
-            selectedHosts: {},
+            selectedObjects: {},
             filter: ""
         });
 
+    };
+
+    getIcon = (iconName) => {
+
+        switch (iconName) {
+            case "tomcat" : {
+                return <img alt="type-icon-img" className="type-icon" src={tomcat}/>;
+            }
+
+            case "java" : {
+                return <img alt="type-icon-img" className="type-icon" src={java}/>;
+            }
+
+            case "kafka" : {
+                return <img alt="type-icon-img" className="type-icon" src={kafka}/>;
+            }
+
+            case "mysql" : {
+                return <img alt="type-icon-img" className="type-icon" src={mysql}/>;
+            }
+
+            case "nginx" : {
+                return <img alt="type-icon-img" className="type-icon" src={nginx}/>;
+            }
+
+            case "redis" : {
+                return <img alt="type-icon-img" className="type-icon" src={redis}/>;
+            }
+
+            case "linux" : {
+                return <img alt="type-icon-img" className="type-icon" src={linux}/>;
+            }
+
+            case "jetty" : {
+                return <img alt="type-icon-img" className="type-icon" src={jetty}/>;
+            }
+        }
+
+        return <img alt="type-icon-img" className="type-icon" src={object}/>;
     };
 
     render() {
@@ -578,7 +531,7 @@ class InstanceSelector extends Component {
                                 </div>
                                 <div className="list-content scrollbar">
                                     {this.state.servers && this.state.servers.map((host, i) => {
-                                            return (<div className={'host ' + (i === 0 ? 'first ' : ' ') + (host.id === this.state.activeServerId ? 'active ' : ' ')} key={i} onClick={this.onServerClick.bind(this, host.id)}>{host.name}{host.selectedInstanceCount > 0 && <span className="host-selected-count">{host.selectedInstanceCount}</span>}</div>)
+                                            return (<div className={'host ' + (i === 0 ? 'first ' : ' ') + (host.id === this.state.activeServerId ? 'active ' : ' ')} key={i} onClick={this.onServerClick.bind(this, host.id)}>{host.name}{host.selectedObjectCount > 0 && <span className="host-selected-count">{host.selectedObjectCount}</span>}</div>)
                                         }
                                     )}
                                 </div>
@@ -588,37 +541,46 @@ class InstanceSelector extends Component {
                             <div>
                                 <div
                                     className={"filter " + (this.state.filter && this.state.filter.length > 1 ? 'filtered' : '')}>
-                                    <span className="filter-icon" onClick={this.clearFilter}><i className="fa fa-filter" aria-hidden="true"></i></span><span className="filter-tag">INSTANCE</span><input type="search" onChange={this.onFilterChange.bind(this)} value={this.state.filter}/><span className="check-btn" onClick={this.selectAll}><i className="fa fa-check-circle-o" aria-hidden="true"></i> ALL</span>
+                                    <span className="filter-icon" onClick={this.clearFilter}><i className="fa fa-filter" aria-hidden="true"></i></span><span className="filter-tag">OBJECT</span><input type="search" onChange={this.onFilterChange.bind(this)} value={this.state.filter}/><span className="check-btn" onClick={this.selectAll}><i className="fa fa-check-circle-o" aria-hidden="true"></i> ALL</span>
                                 </div>
                                 <div className="list-content scrollbar">
-                                    {(this.state.instances && this.state.instances.length > 0) && this.state.instances.filter((instance) => {
-                                        if (instance.objFamily === 'javaee') {
-                                            if (this.state.filter && this.state.filter.length > 1) {
-                                                if ((instance.objType && instance.objType.toLowerCase().indexOf(this.state.filter.toLowerCase()) > -1) || (instance.objName && instance.objName.toLowerCase().indexOf(this.state.filter.toLowerCase()) > -1) || (instance.address && instance.address.toLowerCase().indexOf(this.state.filter.toLowerCase()) > -1)) {
-                                                    return true;
-                                                } else {
-                                                    return false;
-                                                }
-                                            } else {
+                                    {(this.state.objects && this.state.objects.length > 0) && this.state.objects.filter((instance) => {
+
+                                        if (this.state.filter && this.state.filter.length > 1) {
+                                            if ((instance.objType && instance.objType.toLowerCase().indexOf(this.state.filter.toLowerCase()) > -1) || (instance.objName && instance.objName.toLowerCase().indexOf(this.state.filter.toLowerCase()) > -1) || (instance.address && instance.address.toLowerCase().indexOf(this.state.filter.toLowerCase()) > -1)) {
                                                 return true;
+                                            } else {
+                                                return false;
                                             }
                                         } else {
-                                            return false;
+                                            return true;
                                         }
+
                                     }).map((instance, i) => {
+                                        let objType = this.props.counterInfo.objTypesMap[instance.objType];
+                                        let icon = "";
+                                        let displayName = "";
+                                        if (objType) {
+                                            icon = objType.icon;
+                                            displayName = objType.displayName;
+                                        }
                                         return (
-                                            <div key={i}
-                                                 className={"instance " + (i === 0 ? 'first ' : ' ') + (!(!this.state.selectedInstances[instance.objHash]) ? "selected" : " ")}
-                                                 onClick={this.instanceClick.bind(this, instance)}>
-                                                <div className="instance-name">{instance.objName}</div>
-                                                <div className="instance-other"><span>{instance.address}</span><span
-                                                    className="instance-objtype">{instance.objType}</span></div>
+                                            <div key={i} className={"instance " + (i === 0 ? 'first ' : ' ') + (!(!this.state.selectedObjects[instance.objHash]) ? "selected" : " ")} onClick={this.instanceClick.bind(this, instance)}>
+                                                <div className="type-icon">
+                                                    <div className="type-icon-wrapper">
+                                                        {this.getIcon(icon)}
+                                                    </div>
+                                                </div>
+                                                <div className="instance-text-info">
+                                                    <div className="instance-name">{instance.objName}</div>
+                                                    <div className="instance-other"><span>{instance.address}</span><span className="instance-objtype">{displayName}</span></div>
+                                                </div>
                                             </div>)
                                     })}
-                                    {(!this.state.instances || this.state.instances.length < 1) &&
+                                    {(!this.state.objects || this.state.objects.length < 1) &&
                                     <div className="no-instance">
                                         <div>
-                                            <div>NO INSTANCE</div>
+                                            <div>NO OBJECT</div>
                                         </div>
                                     </div>}
                                 </div>
@@ -628,7 +590,7 @@ class InstanceSelector extends Component {
                     <div className="buttons">
                         <button className="save-preset-btn" onClick={this.savePreset}>SAVE AS PRESET</button>
                         <button onClick={this.cancelClick}>CANCEL</button>
-                        <button onClick={this.setInstances}>APPLY</button>
+                        <button onClick={this.setObjects}>APPLY</button>
                     </div>
                     <InnerLoading visible={this.state.loading}></InnerLoading>
                 </div>
@@ -639,7 +601,8 @@ class InstanceSelector extends Component {
 
 let mapStateToProps = (state) => {
     return {
-        instances: state.target.instances,
+        objects: state.target.objects,
+        counterInfo: state.counterInfo,
         config: state.config,
         user: state.user,
         range: state.range,
@@ -648,8 +611,7 @@ let mapStateToProps = (state) => {
 
 let mapDispatchToProps = (dispatch) => {
     return {
-        setTarget: (hosts, instances) => dispatch(setTarget(hosts, instances)),
-        setInstances: (instances) => dispatch(setInstances(instances)),
+        setTarget: (objects) => dispatch(setTarget(objects)),
         setControlVisibility: (name, value) => dispatch(setControlVisibility(name, value)),
         clearAllMessage: () => dispatch(clearAllMessage()),
         pushMessage: (category, title, content) => dispatch(pushMessage(category, title, content)),

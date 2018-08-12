@@ -572,7 +572,6 @@ class Profiler extends Component {
 
 let mapStateToProps = (state) => {
     return {
-        instances: state.target.instances,
         config: state.config,
         user: state.user
     };

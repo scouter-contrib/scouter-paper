@@ -161,7 +161,7 @@ class LayoutManager extends Component {
 
                     this.props.history.push({
                         pathname: '/paper',
-                        search: '?instances=' + this.props.instances.map((d) => {
+                        search: '?objects=' + this.props.objects.map((d) => {
                             return d.objHash
                         })
                     });
@@ -250,7 +250,7 @@ class LayoutManager extends Component {
 
 let mapStateToProps = (state) => {
     return {
-        instances: state.target.instances,
+        objects: state.target.objects,
         config: state.config,
         user: state.user
     };

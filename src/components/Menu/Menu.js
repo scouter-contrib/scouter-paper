@@ -64,7 +64,7 @@ class Menu extends Component {
     };
 
     render() {
-        let instanceParam = (this.props.instances && this.props.instances.length > 0) ? "?instances=" + this.props.instances.map((d) => {return d.objHash}) : "";
+        let instanceParam = (this.props.objects && this.props.objects.length > 0) ? "?objects=" + this.props.objects.map((d) => {return d.objHash}) : "";
 
         let defaultServerconfig = getDefaultServerConfig(this.props.config);
         let origin = defaultServerconfig.protocol + "://" + defaultServerconfig.address + ":" + defaultServerconfig.port;
@@ -116,7 +116,7 @@ class Menu extends Component {
 
 let mapStateToProps = (state) => {
     return {
-        instances: state.target.instances,
+        objects: state.target.objects,
         config: state.config,
         user: state.user
     };
