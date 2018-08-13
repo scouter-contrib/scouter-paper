@@ -91,8 +91,6 @@ class App extends Component {
     };
 
     getCounterModel = (config, user) => {
-        console.log(config);
-        let that = this;
         jQuery.ajax({
             method: "GET",
             async: true,

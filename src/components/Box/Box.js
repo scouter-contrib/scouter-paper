@@ -47,8 +47,6 @@ class Box extends Component {
     };
 
     onDrop(data) {
-
-        console.log(data);
         if (data) {
             let option = JSON.parse(data.metric);
             if (option.mode === "exclusive") {

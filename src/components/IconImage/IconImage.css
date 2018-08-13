@@ -1,0 +1,15 @@
+.icon-img-wrapper {
+    display: inline-block;
+    padding: 2px;
+    box-sizing: border-box;
+}
+
+.icon-img-wrapper > div {
+    background-color: white;
+    padding: 2px;
+    box-sizing: border-box;
+    border-radius: 3px;
+}
+.icon-img-wrapper .icon-img {
+    width: 100%;
+}

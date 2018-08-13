@@ -7,6 +7,7 @@ import 'url-search-params-polyfill';
 import jQuery from "jquery";
 import {errorHandler, setAuthHeader, getWithCredentials, getHttpProtocol, updateQueryStringParameter, getCurrentUser, getCurrentDefaultServer, getDefaultServerConfig} from '../../../common/common';
 import InnerLoading from "../../InnerLoading/InnerLoading";
+import IconImage from "../../IconImage/IconImage";
 
 class PresetManager extends Component {
 
@@ -65,7 +66,6 @@ class PresetManager extends Component {
     };
 
     loadPresets = (config, user) => {
-
         this.setState({
             loading : true
         });
@@ -109,22 +109,27 @@ class PresetManager extends Component {
             this.props.pushMessage("info", "NO PRESET SELECTED", "select preset to delete first");
             this.props.setControlVisibility("Message", true);
         } else {
-            let presets = Object.assign(this.state.presets);
+            let presets = this.state.presets.slice(0);
             for (let i=0; i<presets.length; i++) {
                 let preset = presets[i];
 
                 if (preset.no === this.state.selectedPresetNo) {
                     presets.splice(i, 1);
-                    this.setState({
-                        presets : presets,
-                        selectedPresetNo : null,
-                        selectedEditNo : null
-                    });
-
-                    this.savePreset(presets);
                     break;
                 }
             }
+
+            for (let i=0; i<presets.length; i++) {
+                presets[i].no = i+1;
+            }
+
+            this.setState({
+                presets : presets,
+                selectedPresetNo : null,
+                selectedEditNo : null
+            });
+
+            this.savePreset(presets);
         }
     };
 
@@ -168,11 +173,27 @@ class PresetManager extends Component {
     };
 
     updateClick = (no) => {
-        let presets = Object.assign(this.state.presets);
+        let presets = this.state.presets.slice(0);
         for (let i=0; i<presets.length; i++) {
             let preset = presets[i];
             if (preset.no === no) {
                 preset.name = this.state.editText;
+                if (preset.instances) {
+                    if (!preset.objects) {
+                        preset.objects = [];
+                    }
+                    preset.objects = preset.objects.concat(preset.instances);
+                    delete preset.instances;
+                }
+
+                if (preset.hosts) {
+                    if (!preset.objects) {
+                        preset.objects = [];
+                    }
+                    preset.objects = preset.objects.concat(preset.hosts);
+                    delete preset.hosts;
+                }
+
                 this.setState({
                     presets : presets,
                     selectedPresetNo : null,
@@ -202,10 +223,23 @@ class PresetManager extends Component {
                         {(this.state.presets && this.state.presets.length > 0) &&
                         <ul>
                             {this.state.presets.map((d, i) => {
+                                let objectLength = 0;
+
+                                if (d.objects) {
+                                    objectLength = d.objects.length;
+                                } else {
+                                    if (d.instances) {
+                                        objectLength = d.instances.length;
+                                    }
+                                    if (d.hosts) {
+                                        objectLength += d.hosts.length;
+                                    }
+                                }
+
                                 return (<li key={i} className={d.no === this.state.selectedPresetNo ? 'selected' : ''} onClick={this.presetClick.bind(this, d.no)}>
                                     <div>
                                         <div className="index">
-                                            <span className="no">{i+1}</span>
+                                            <span className="no">{d.no}</span>
                                         </div>
                                         <div>
                                             <div>
@@ -215,7 +249,12 @@ class PresetManager extends Component {
                                                 {(d.no === this.state.selectedEditNo) && <span className="done-btn" onClick={this.updateClick.bind(this, d.no)}>DONE</span>}
                                             </div>
                                             <div className="summary-info">
-                                                <span>{d.objects.length} INSTANCES</span>
+                                                <span>{objectLength} OBJECTS</span>
+                                                <div className="icon-list">
+                                                    {d.iconMap && Object.keys(d.iconMap).map((icon, i) => {
+                                                        return <div className="icon-item" key={i}><IconImage icon={icon}/></div>
+                                                    })}
+                                                </div>
                                             </div>
                                         </div>
                                     </div>
@@ -241,7 +280,8 @@ let mapStateToProps = (state) => {
     return {
         objects: state.target.objects,
         config: state.config,
-        user: state.user
+        user: state.user,
+        counterInfo: state.counterInfo
     };
 };
 

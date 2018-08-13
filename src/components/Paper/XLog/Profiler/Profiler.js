@@ -263,9 +263,9 @@ class Profiler extends Component {
 
             if (list && list.length > 0) {
 
-                let instanceMap = {};
-                for (let i = 0; i < this.props.instances.length; i++) {
-                    instanceMap[this.props.instances[i].objHash] = this.props.instances[i].objName;
+                let objectMap = {};
+                for (let i = 0; i < this.props.objects.length; i++) {
+                    objectMap[this.props.objects[i].objHash] = this.props.objects[i].objName;
                 }
 
                 let xlogs = (append ? this.state.xlogs : []);
@@ -273,7 +273,7 @@ class Profiler extends Component {
                     let xlog = list[i];
                     let elapsed = Number(xlog.elapsed);
                     if (y1 <= elapsed && y2 >= elapsed) {
-                        xlog.objName = instanceMap[xlog.objHash];
+                        xlog.objName = objectMap[xlog.objHash];
                         xlogs.push(xlog);
                     }
                 }
@@ -572,6 +572,7 @@ class Profiler extends Component {
 
 let mapStateToProps = (state) => {
     return {
+        objects: state.target.objects,
         config: state.config,
         user: state.user
     };

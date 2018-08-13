@@ -25,6 +25,7 @@ import tomcat from '../../../img/icons/tomcat.png';
 import linux from '../../../img/icons/linux.png';
 import jetty from '../../../img/icons/jetty.png';
 import object from '../../../img/icons/cube.png';
+import IconImage from "../../IconImage/IconImage";
 
 class InstanceSelector extends Component {
 
@@ -321,8 +322,6 @@ class InstanceSelector extends Component {
 
     instanceClick = (instance) => {
 
-        console.log(instance);
-
         let selectedObjects = Object.assign({}, this.state.selectedObjects);
         if (selectedObjects[instance.objHash]) {
             delete selectedObjects[instance.objHash];
@@ -374,8 +373,10 @@ class InstanceSelector extends Component {
     savePreset = () => {
         let that = this;
         let objects = [];
+        let iconMap = {};
         for (let hash in this.state.selectedObjects) {
             objects.push(this.state.selectedObjects[hash]);
+            iconMap[this.props.counterInfo.objTypesMap[this.state.selectedObjects[hash].objType].icon] = true;
         }
 
         jQuery.ajax({
@@ -394,10 +395,11 @@ class InstanceSelector extends Component {
                 }
 
                 presetList.push({
-                    no: presetList.length,
+                    no: presetList.length + 1,
                     name: "PRESET-" + (presetList.length + 1),
                     creationTime: (new Date()).getTime(),
-                    objects: objects.map((d) => d.objHash)
+                    objects: objects.map((d) => d.objHash),
+                    iconMap : iconMap
                 });
 
                 let data = {
@@ -465,46 +467,8 @@ class InstanceSelector extends Component {
 
     };
 
-    getIcon = (iconName) => {
-
-        switch (iconName) {
-            case "tomcat" : {
-                return <img alt="type-icon-img" className="type-icon" src={tomcat}/>;
-            }
-
-            case "java" : {
-                return <img alt="type-icon-img" className="type-icon" src={java}/>;
-            }
-
-            case "kafka" : {
-                return <img alt="type-icon-img" className="type-icon" src={kafka}/>;
-            }
-
-            case "mysql" : {
-                return <img alt="type-icon-img" className="type-icon" src={mysql}/>;
-            }
-
-            case "nginx" : {
-                return <img alt="type-icon-img" className="type-icon" src={nginx}/>;
-            }
-
-            case "redis" : {
-                return <img alt="type-icon-img" className="type-icon" src={redis}/>;
-            }
-
-            case "linux" : {
-                return <img alt="type-icon-img" className="type-icon" src={linux}/>;
-            }
-
-            case "jetty" : {
-                return <img alt="type-icon-img" className="type-icon" src={jetty}/>;
-            }
-        }
-
-        return <img alt="type-icon-img" className="type-icon" src={object}/>;
-    };
-
     render() {
+
         return (
             <div className={"instance-selector-bg " + (this.props.visible ? "" : "hidden")}
                  onClick={this.props.toggleSelectorVisible}>
@@ -556,6 +520,13 @@ class InstanceSelector extends Component {
                                             return true;
                                         }
 
+                                    }).sort((a, b) => {
+                                        let compare = a.objType.localeCompare(b.objType);
+                                        if (compare === 0) {
+                                            return a.objName.localeCompare(b.objName);
+                                        } else {
+                                            return compare;
+                                        }
                                     }).map((instance, i) => {
                                         let objType = this.props.counterInfo.objTypesMap[instance.objType];
                                         let icon = "";
@@ -568,7 +539,7 @@ class InstanceSelector extends Component {
                                             <div key={i} className={"instance " + (i === 0 ? 'first ' : ' ') + (!(!this.state.selectedObjects[instance.objHash]) ? "selected" : " ")} onClick={this.instanceClick.bind(this, instance)}>
                                                 <div className="type-icon">
                                                     <div className="type-icon-wrapper">
-                                                        {this.getIcon(icon)}
+                                                        <IconImage icon={icon}/>
                                                     </div>
                                                 </div>
                                                 <div className="instance-text-info">
