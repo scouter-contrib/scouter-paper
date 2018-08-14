@@ -34,7 +34,6 @@ class LineChart extends Component {
         noData: true,
         bisector: null,
         currentTooltipTime: null,
-        leftAxisFormat: ".2s",
         opacity : 0.3
     };
 
@@ -69,6 +68,13 @@ class LineChart extends Component {
     }
 
     loadHistoryCounter(countersHistory, counterKey, longTerm) {
+        let decimalPoint = this.props.config.decimalPoint;
+        let pow = 1;
+
+        if (decimalPoint > 0) {
+            pow = Math.pow(10, decimalPoint);
+        }
+
         let counters = this.state.counters;
         counters[counterKey] = [];
         const timeKeyRow = {};
@@ -88,7 +94,7 @@ class LineChart extends Component {
                 row.data = {};
                 row.data[objHash] = {
                     objHash: objHash,
-                    value: valueList[j],
+                    value: Math.round(valueList[j] * pow) / pow,
                     unit: unit
                 };
 
@@ -97,7 +103,7 @@ class LineChart extends Component {
                 } else {
                     timeKeyRow[row.time].data[objHash] = {
                         objHash: objHash,
-                        value: valueList[j],
+                        value: Math.round(valueList[j] * pow) / pow,
                         unit: unit
                     };
                 }
@@ -314,6 +320,10 @@ class LineChart extends Component {
         }
     };
 
+    leftAxisFormat = (d) => {
+        return numeral(d).format('0.0a');
+    };
+
     graphAxis = (width, height, init) => {
         this.graph.x = d3.scaleTime().range([0, width]);
         this.graph.y = d3.scaleLinear().range([height, 0]);
@@ -332,7 +342,7 @@ class LineChart extends Component {
         }
 
         if (init) {
-            this.graph.svg.insert("g", ":first-child").attr("class", "axis-y").call(d3.axisLeft(this.graph.y).tickFormat(d3.format(this.graph.leftAxisFormat)).ticks(yAxisCount));
+            this.graph.svg.insert("g", ":first-child").attr("class", "axis-y").call(d3.axisLeft(this.graph.y).tickFormat(this.leftAxisFormat).ticks(yAxisCount));
             this.graph.svg.insert("g", ":first-child").attr("class", "grid-y").style("stroke-dasharray", "5 5").style("opacity", this.graph.opacity).call(d3.axisLeft(this.graph.y).tickSize(-this.graph.width).tickFormat("").ticks(yAxisCount));
         } else {
             this.graph.svg.select(".axis-x").call(d3.axisBottom(this.graph.x).tickFormat(d3.timeFormat(this.graph.timeFormat)).ticks(xAxisCount));
@@ -343,16 +353,19 @@ class LineChart extends Component {
             this.graph.svg.insert("g", ":first-child").attr("class", "axis-x").attr("transform", "translate(0," + this.graph.height + ")").call(d3.axisBottom(this.graph.x).tickFormat(d3.timeFormat(this.graph.timeFormat)).ticks(xAxisCount));
             this.graph.svg.insert("g", ":first-child").attr("class", "grid-x").style("stroke-dasharray", "5 5").style("opacity", this.graph.opacity).attr("transform", "translate(0," + this.graph.height + ")").call(d3.axisBottom(this.graph.x).tickSize(-this.graph.height).tickFormat("").ticks(xAxisCount));
         } else {
-            this.graph.svg.select(".axis-y").transition().duration(500).call(d3.axisLeft(this.graph.y).tickFormat(d3.format(this.graph.leftAxisFormat)).ticks(yAxisCount));
+            this.graph.svg.select(".axis-y").transition().duration(500).call(d3.axisLeft(this.graph.y).tickFormat(this.leftAxisFormat).ticks(yAxisCount));
             this.graph.svg.select(".grid-y").transition().duration(500).call(d3.axisLeft(this.graph.y).tickSize(-this.graph.width).tickFormat("").ticks(yAxisCount));
         }
     };
 
+    replaceAll(str, searchStr, replaceStr) {
+        return str.split(searchStr).join(replaceStr);
+    }
+
     replaceName (name) {
         if (name) {
-            return name.replace(/%/gi, '_PCT_').replace('/$/gi', '_DOLLAR_');
+            return this.replaceAll(this.replaceAll(name, "%", "_PCT_"), '$', '_DOLLAR_');
         }
-
         return name;
     }
 
@@ -426,7 +439,7 @@ class LineChart extends Component {
                 .y1(function (counter) {
                     let objData = counter.data[obj.objHash];
                     if (objData) {
-                        return that.graph.y(Number(objData.value));
+                        return that.graph.y(objData.value);
                     } else {
                         return that.graph.y(0);
                     }
@@ -435,7 +448,7 @@ class LineChart extends Component {
             if (this.props.config.graph.break === "Y") {
                 valueArea.defined(function (d) {
                     let objData = d.data ? d.data[obj.objHash] : null;
-                    return objData && !isNaN(d.time) && !isNaN(objData.value) && !isNaN(that.graph.y(Number(objData.value)));
+                    return objData && !isNaN(d.time) && !isNaN(objData.value) && !isNaN(that.graph.y(objData.value));
                 })
             }
 
@@ -485,7 +498,7 @@ class LineChart extends Component {
             .y(function (counter) {
                 let objData = counter.data[obj.objHash];
                 if (objData) {
-                    return that.graph.y(Number(objData.value));
+                    return that.graph.y(objData.value);
                 } else {
                     return that.graph.y(0);
                 }
@@ -494,7 +507,7 @@ class LineChart extends Component {
         if (this.props.config.graph.break === "Y") {
             valueLine.defined(function (d) {
                 let objData = d.data ? d.data[obj.objHash] : null;
-                return objData && !isNaN(d.time) && !isNaN(objData.value) && !isNaN(that.graph.y(Number(objData.value)));
+                return objData && !isNaN(d.time) && !isNaN(objData.value) && !isNaN(that.graph.y(objData.value));
             })
         }
 
@@ -572,8 +585,8 @@ class LineChart extends Component {
                 instanceName: obj.objName,
                 circleKey: circleKey,
                 metricName: thisOption.title,
-                value: obj.objHash && that.state.counters[counterKey][dataIndex].data[obj.objHash] ? (Math.round(that.state.counters[counterKey][dataIndex].data[obj.objHash].value * 10) / 10) : null,
-                displayValue: obj.objHash && that.state.counters[counterKey][dataIndex].data[obj.objHash] ? numeral((Math.round(that.state.counters[counterKey][dataIndex].data[obj.objHash].value * 10) / 10)).format(this.props.config.numberFormat) + " " + unit : null,
+                value: obj.objHash && that.state.counters[counterKey][dataIndex].data[obj.objHash] ? that.state.counters[counterKey][dataIndex].data[obj.objHash].value : null,
+                displayValue: obj.objHash && that.state.counters[counterKey][dataIndex].data[obj.objHash] ? numeral(that.state.counters[counterKey][dataIndex].data[obj.objHash].value).format(this.props.config.numberFormat) + " " + unit : null,
                 color: color
             });
         } else {

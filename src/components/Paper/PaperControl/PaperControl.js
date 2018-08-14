@@ -55,7 +55,7 @@ class PaperControl extends Component {
                     </div>
                 })}
                 {this.props.counterInfo.families.map((family, i) => {
-                    return <div key={i} className="paper-control multi-control" data-tip={family.name} >
+                    return <div key={i} className="paper-control multi-control" >
                         {(!this.touch) && <div className="multi-metrics">
                             <div className="group-name">{family.name}</div>
                             <ul>

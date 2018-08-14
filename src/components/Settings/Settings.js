@@ -31,7 +31,7 @@ class Settings extends Component {
     }
 
     onChange = (attr, event) => {
-        let config = this.state.config;
+        let config = Object.assign({}, this.state.config);
         config[attr] = event.target.value;
         this.setState({
             config: config
@@ -39,7 +39,7 @@ class Settings extends Component {
     };
 
     onChangeServer = (attr, inx, event) => {
-        let config = this.state.config;
+        let config = Object.assign({}, this.state.config);
         let server = config.servers[inx];
 
         if (attr === "default") {
@@ -62,7 +62,7 @@ class Settings extends Component {
     };
 
     addServer = () => {
-        let config = this.state.config;
+        let config = Object.assign({}, this.state.config);
         let newServer = Object.assign({}, config.servers[config.servers.length - 1]);
         newServer.default = false;
         config.servers.push(newServer);
@@ -73,7 +73,7 @@ class Settings extends Component {
 
     removeServer = (inx) => {
         if (this.state.edit) {
-            let config = this.state.config;
+            let config = Object.assign({}, this.state.config);
             let servers = config.servers;
             let checked = false;
             if (servers[inx].default) {
@@ -92,8 +92,16 @@ class Settings extends Component {
     };
 
     onChangeRange = (attr, event) => {
-        let config = this.state.config;
+        let config = Object.assign({}, this.state.config);
         config.range[attr] = event.target.value;
+        this.setState({
+            config: config
+        });
+    };
+
+    onDecimalPointChange = (event) => {
+        let config = Object.assign({}, this.state.config);
+        config.decimalPoint = event.target.value;
         this.setState({
             config: config
         });
@@ -101,7 +109,7 @@ class Settings extends Component {
 
     onChangeFont = (attr, event) => {
 
-        let config = this.state.config;
+        let config = Object.assign({}, this.state.config);
         config.fontSetting[attr] = event.target.value;
 
         this.setState({
@@ -111,7 +119,7 @@ class Settings extends Component {
 
     onChangeGraph = (attr, event) => {
 
-        let config = this.state.config;
+        let config = Object.assign({}, this.state.config);
         config.graph[attr] = event.target.value;
 
         this.setState({
@@ -120,7 +128,7 @@ class Settings extends Component {
     };
 
     onChangeTheme = (event) => {
-        let config = this.state.config;
+        let config = Object.assign({}, this.state.config);
         config.theme = event.target.value;
 
         if (config.theme === "theme-blue/white") {
@@ -136,7 +144,7 @@ class Settings extends Component {
 
     onChangeAlert = (attr, event) => {
 
-        let config = this.state.config;
+        let config = Object.assign({}, this.state.config);
         config.alert[attr] = event.target.value;
 
         this.setState({
@@ -146,7 +154,7 @@ class Settings extends Component {
 
     onXLogOptionChange = (type, dir, event) => {
 
-        let config = this.state.config;
+        let config = Object.assign({}, this.state.config);
 
         config.xlog[type][dir] = event.target.value;
         this.setState({
@@ -292,7 +300,7 @@ class Settings extends Component {
         let cellId = this.state.selected.normal.cellId;
         let selected = this.state.selected;
         if (cellId) {
-            let config = this.state.config;
+            let config = Object.assign({}, this.state.config);
             if (config.xlog.normal.fills[cellId]) {
                 if (color.hex === "transparent") {
                     delete config.xlog.normal.fills[cellId];
@@ -322,7 +330,7 @@ class Settings extends Component {
         let cellId = this.state.selected.async.cellId;
         let selected = this.state.selected;
         if (cellId) {
-            let config = this.state.config;
+            let config = Object.assign({}, this.state.config);
             if (config.xlog.async.fills[cellId]) {
                 if (color.hex === "transparent") {
                     delete config.xlog.async.fills[cellId];
@@ -352,7 +360,7 @@ class Settings extends Component {
         let cellId = this.state.selected.error.cellId;
         let selected = this.state.selected;
         if (cellId) {
-            let config = this.state.config;
+            let config = Object.assign({}, this.state.config);
             if (config.xlog.error.fills[cellId]) {
                 if (color.hex === "transparent") {
                     delete config.xlog.error.fills[cellId];
@@ -727,10 +735,20 @@ class Settings extends Component {
                         <div className="setting-box">
                             <div className="row">
                                 <div className="label">
-                                    <div>NUMBER FORMAT</div>
+                                    <div>DISPLAY NUMBER FORMAT</div>
                                 </div>
                                 <div className="input">
                                     <input type="text" readOnly={!this.state.edit} onChange={this.onChange.bind(this, "numberFormat")} value={this.state.config.numberFormat} placeholder="0,0" />
+                                </div>
+                            </div>
+                            <div className="row">
+                                <div className="label">
+                                    <div>DATA DECIMAL POINT</div>
+                                </div>
+                                <div className="input">
+                                    <select value={this.state.config.decimalPoint} onChange={this.onDecimalPointChange} disabled={!this.state.edit}>
+                                        <option>0</option><option>1</option><option>2</option><option>3</option><option>4</option>
+                                    </select>
                                 </div>
                             </div>
                             <div className="row">
