@@ -462,29 +462,26 @@ class LineChart extends Component {
         if (path.size() < 1) {
             path = this.graph.svg.insert("path", ":first-child").attr("class", pathClass).style("stroke", color);
             if (this.props.config.graph.color === "instance") {
-
                 if (this.props.config.colorType === "white") {
-                    this.props.setTitle(counterKey, option.title, "#333");
+                    this.props.setTitle(counterKey, option.title, "#333", option.familyName);
                 } else {
-                    this.props.setTitle(counterKey, option.title, "white");
+                    this.props.setTitle(counterKey, option.title, "white", option.familyName);
                 }
-
             } else {
-                this.props.setTitle(counterKey, option.title, color);
+                this.props.setTitle(counterKey, option.title, color, option.familyName);
             }
-
         } else {
             path.style("stroke", color);
             if (this.props.config.graph.color === "instance") {
 
                 if (this.props.config.colorType === "white") {
-                    this.props.setTitle(counterKey, option.title, "#333");
+                    this.props.setTitle(counterKey, option.title, "#333", option.familyName);
                 } else {
-                    this.props.setTitle(counterKey, option.title, "white");
+                    this.props.setTitle(counterKey, option.title, "white", option.familyName);
                 }
 
             } else {
-                this.props.setTitle(counterKey, option.title, color);
+                this.props.setTitle(counterKey, option.title, color, option.familyName);
             }
 
             let circleKey = "circle-" + obj.objHash + "_" + this.replaceName(counterKey);

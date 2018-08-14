@@ -176,19 +176,24 @@ const config = (state = configState, action) => {
 
 const counterInfoState = {
     families : [],
-    objTypesMap : []
+    objTypesMap : {},
+    familyNameIcon : {}
 };
 
 const counterInfo = (state = counterInfoState, action) => {
     switch (action.type) {
         case SET_COUNTER_INFO:
             let objTypesMap = {};
+            let familyNameIcon = {};
             action.objTypes.forEach((objType) => {
                 objTypesMap[objType.name] = objType;
+                familyNameIcon[objType.familyName] = objType.icon;
             });
+
             return Object.assign({}, state, {
                 families: action.families,
-                objTypesMap : objTypesMap
+                objTypesMap : objTypesMap,
+                familyNameIcon : familyNameIcon
             });
 
         default:

@@ -7,6 +7,8 @@ import Visitor from "../Paper/Visitor/Visitor";
 import LineChart from "../Paper/LineChart/LineChart";
 import ActiveSpeed from "../Paper/ActiveSpeed/ActiveSpeed";
 import Tooltip from "./Tooltip/Tooltip";
+import {connect} from "react-redux";
+import IconImage from "../IconImage/IconImage";
 
 class Box extends Component {
 
@@ -21,16 +23,29 @@ class Box extends Component {
         };
     }
 
-    setTitle = (counterKey, title, color) => {
+    setTitle = (counterKey, title, color, familyName) => {
         let titles = Object.assign({}, this.state.titles);
+        let familyNameMap = {};
+        for (let title in titles) {
+            familyNameMap[titles[title].familyName] = true;
+        }
+
+        familyNameMap[familyName] = true;
+        let uniqueFamilyNameCnt = Object.keys(familyNameMap).length;
+
         titles[title] = {
             counterKey : counterKey,
-            title : title,
-            color : color
+            title : uniqueFamilyNameCnt > 1 ? title + " (" + familyName + ")" : title,
+            color : color,
+            icon : this.props.counterInfo.familyNameIcon[familyName],
+            familyName : familyName
         };
-        this.setState({
-            titles : this.state.titles
-        });
+
+        if (JSON.stringify(this.state.titles) !== JSON.stringify(titles)) {
+            this.setState({
+                titles : titles
+            });
+        }
     };
 
     removeTitle = (counterKey) => {
@@ -42,8 +57,9 @@ class Box extends Component {
         }
 
         this.setState({
-            titles : this.state.titles
+            titles : titles
         });
+
     };
 
     onDrop(data) {
@@ -98,7 +114,23 @@ class Box extends Component {
         return (
             <Droppable className="box-droppable" types={['metric']} onDrop={this.onDrop.bind(this)}>
                 <div className="box">
-                    <div className="title">{titleLength > 0 ? Object.values(this.state.titles).map((d, i) => (<span style={{color : d.color}} key={i}>{d.title} {(i < titleLength -1) ? ', ' : ''}</span>)) : this.props.box.title}</div>
+                    <div className="title">
+                        <div>
+                        {titleLength > 0 &&
+                            <div className="icons" style={{width : ((Object.values(this.state.titles).filter((d) => d.icon).length * 20) + 2) + "px"}}>
+                                {Object.values(this.state.titles).map((d, i) => (<div key={i} ><IconImage icon={d.icon}/></div>))}
+                            </div>
+                        }
+                        {titleLength > 0 &&
+                        <div className="title-text">
+                            {Object.values(this.state.titles).map((d, i) => (<span style={{color : d.color}} key={i}>{d.title} {(i < titleLength -1) ? ', ' : ''}</span>))}
+                        </div>
+                        }
+                        {titleLength < 1 &&
+                        <div className="title-text no-title">{this.props.box.title}</div>
+                        }
+                        </div>
+                    </div>
                     <div className="content-wrapper">
                         <div className="content">
                             {!type && <EmptyBox/>}
@@ -117,4 +149,11 @@ class Box extends Component {
     }
 }
 
+let mapStateToProps = (state) => {
+    return {
+        counterInfo: state.counterInfo
+    };
+};
+
+Box = connect(mapStateToProps, undefined)(Box);
 export default Box;

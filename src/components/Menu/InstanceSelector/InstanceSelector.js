@@ -16,15 +16,6 @@ import 'url-search-params-polyfill';
 import * as common from '../../../common/common'
 import AgentColor from "../../../common/InstanceColor";
 import InnerLoading from "../../InnerLoading/InnerLoading";
-import java from '../../../img/icons/java.png';
-import kafka from '../../../img/icons/kafka.png';
-import mysql from '../../../img/icons/mysql.png';
-import nginx from '../../../img/icons/nginx.png';
-import redis from '../../../img/icons/redis.png';
-import tomcat from '../../../img/icons/tomcat.png';
-import linux from '../../../img/icons/linux.png';
-import jetty from '../../../img/icons/jetty.png';
-import object from '../../../img/icons/cube.png';
 import IconImage from "../../IconImage/IconImage";
 
 class InstanceSelector extends Component {
