@@ -64,7 +64,7 @@ class IconImage extends Component {
         return (
             <div className="icon-img-wrapper">
                 <div>
-                    <img className="icon-img" src={icon}/>
+                    <img className="icon-img" alt={icon} src={icon}/>
                 </div>
             </div>
 

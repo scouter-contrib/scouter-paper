@@ -34,6 +34,8 @@ class Paper extends Component {
     needSearchFrom = null;
     needSearchTo = null;
 
+    boxesRef = {};
+
     constructor(props) {
         super(props);
         this.mountTime = (new Date()).getTime();
@@ -1127,6 +1129,7 @@ class Paper extends Component {
                     to: to
                 },
             });
+
             this.counterHistoriesLoaded[counterKey] = true;
         }).fail((xhr, textStatus, errorThrown) => {
             errorHandler(xhr, textStatus, errorThrown, this.props);
@@ -1278,7 +1281,7 @@ class Paper extends Component {
 
     setOption = (key, option) => {
 
-        let boxes = this.state.boxes;
+        let boxes = this.state.boxes.slice(0);
 
         boxes.forEach((box) => {
             if (box.key === key) {
@@ -1303,7 +1306,7 @@ class Paper extends Component {
 
                     let duplicated = false;
                     for (let i = 0; i < box.option.length; i++) {
-                        if (box.option[i].counterKey === option.name) {
+                        if (box.option[i].counterKey === option.name && box.option[i].familyName === option.familyName) {
                             duplicated = true;
                             break;
                         }
@@ -1361,6 +1364,49 @@ class Paper extends Component {
                 }
 
                 box.config = false;
+            }
+        });
+
+        this.setState({
+            boxes: boxes
+        });
+
+        setData("boxes", boxes);
+    };
+
+    removeMetrics = (boxKey, counterKeys) => {
+
+        if (this.boxesRef && this.boxesRef[boxKey]) {
+            this.boxesRef[boxKey].removeTitle(counterKeys);
+        }
+
+        let boxes = this.state.boxes.slice(0);
+        boxes.forEach((box) => {
+            if (box.key === boxKey) {
+                box.config = false;
+
+                let options = box.option.filter((option) => {
+                    let index = counterKeys.findIndex(function (e) {
+                        return e === option.counterKey;
+                    });
+
+                    return index < 0;
+                });
+
+                box.option = options;
+                box.config = false;
+                let title = "";
+                if (box.option.length > 0) {
+                    for (let i = 0; i < box.option.length; i++) {
+                        title += box.option[i].title;
+                        if (i < (box.option.length - 1)) {
+                            title += ", ";
+                        }
+                    }
+                    box.title = title
+                } else {
+                    box.title = "NO TITLE";
+                }
             }
         });
 
@@ -1451,48 +1497,9 @@ class Paper extends Component {
         this.setState({
             filters: filters
         });
-    }
-
-    removeMetrics = (boxKey, counterKeys) => {
-
-        let boxes = this.state.boxes;
-        boxes.forEach((box) => {
-            if (box.key === boxKey) {
-                box.config = false;
-
-                let options = box.option.filter((option) => {
-                    let index = counterKeys.findIndex(function (e) {
-                        return e === option.counterKey;
-                    });
-
-                    return index < 0;
-                });
-
-                box.option = options;
-
-                if (Array.isArray(box.option)) {
-                    box.config = false;
-                    let title = "";
-                    for (let i = 0; i < box.option.length; i++) {
-                        title += box.option[i].title;
-                        if (i < (box.option.length - 1)) {
-                            title += ", ";
-                        }
-                    }
-                    box.title = title
-                } else {
-                    box.config = false;
-                    box.title = box.option.title;
-                }
-            }
-        });
-
-        this.setState({
-            boxes: boxes
-        });
-
-        setData("boxes", boxes);
     };
+
+
 
     render() {
         let objectSelected = this.props.objects.length > 0;
@@ -1528,11 +1535,11 @@ class Paper extends Component {
                         return (
                             <div className="box-layout" key={box.key} data-grid={box.layout}>
                                 <button className="box-control box-layout-remove-btn last" onClick={this.removePaper.bind(null, box.key)}><i className="fa fa-times-circle-o" aria-hidden="true"></i></button>
-                                {box.option && (box.option.length > 1 || box.option.config ) && <button className="box-control box-layout-config-btn" onClick={this.toggleConfig.bind(null, box.key)}><i className="fa fa-cog" aria-hidden="true"></i></button>}
+                                {box.option && <button className="box-control box-layout-config-btn" onClick={this.toggleConfig.bind(null, box.key)}><i className="fa fa-cog" aria-hidden="true"></i></button>}
                                 {box.option && (box.option.length > 1 || box.option.config ) && box.option.type === "xlog" && <button className={"box-control filter-btn " + (filterInfo && filterInfo.data && filterInfo.data.filtering ? "filtered" : "")} onClick={this.toggleFilter.bind(null, box.key)}><i className="fa fa-filter" aria-hidden="true"></i></button>}                                
                                 {box.config && <BoxConfig box={box} setOptionValues={this.setOptionValues} setOptionClose={this.setOptionClose} removeMetrics={this.removeMetrics}/>}
                                 {filterInfo && filterInfo.show && <XLogFilter box={box} filterInfo={filterInfo ? filterInfo.data : {filtering : false}} setXlogFilter={this.setXlogFilter} closeFilter={this.closeFilter} />}
-                                <Box visible={this.state.visible} setOption={this.setOption} box={box} filter={filterInfo ? filterInfo.data : {filtering : false}} pastTimestamp={this.state.pastTimestamp} pageCnt={this.state.pageCnt} data={this.state.data} config={this.props.config} visitor={this.state.visitor} counters={this.state.counters} countersHistory={this.state.countersHistory.data} countersHistoryFrom={this.state.countersHistory.from} countersHistoryTo={this.state.countersHistory.to} countersHistoryTimestamp={this.state.countersHistory.time} longTerm={this.props.range.longTerm} layoutChangeTime={this.state.layoutChangeTime} realtime={this.props.range.realTime} xlogHistoryDoing={this.state.xlogHistoryDoing} xlogHistoryRequestCnt={this.state.xlogHistoryRequestCnt} setStopXlogHistory={this.setStopXlogHistory} xlogNotSupportedInRange={this.state.xlogNotSupportedInRange}/>
+                                <Box onRef={ref => this.boxesRef[box.key] = ref} visible={this.state.visible} setOption={this.setOption} box={box} filter={filterInfo ? filterInfo.data : {filtering : false}} pastTimestamp={this.state.pastTimestamp} pageCnt={this.state.pageCnt} data={this.state.data} config={this.props.config} visitor={this.state.visitor} counters={this.state.counters} countersHistory={this.state.countersHistory.data} countersHistoryFrom={this.state.countersHistory.from} countersHistoryTo={this.state.countersHistory.to} countersHistoryTimestamp={this.state.countersHistory.time} longTerm={this.props.range.longTerm} layoutChangeTime={this.state.layoutChangeTime} realtime={this.props.range.realTime} xlogHistoryDoing={this.state.xlogHistoryDoing} xlogHistoryRequestCnt={this.state.xlogHistoryRequestCnt} setStopXlogHistory={this.setStopXlogHistory} xlogNotSupportedInRange={this.state.xlogNotSupportedInRange}/>
                             </div>
                         )
                     })}

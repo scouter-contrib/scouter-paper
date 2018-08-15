@@ -2,7 +2,6 @@ import React, {Component} from 'react';
 import './ActiveSpeed.css';
 import {connect} from 'react-redux';
 import {withRouter} from 'react-router-dom';
-import InstanceColor from "../../../common/InstanceColor";
 
 class ActiveSpeed extends Component {
 

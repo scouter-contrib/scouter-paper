@@ -1,5 +1,5 @@
 import * as d3 from "d3";
-import {schemeSet3, schemeDark2} from "d3-scale-chromatic";
+import {schemeSet3} from "d3-scale-chromatic";
 import Color from "color-js";
 
 let instanceColors = {};

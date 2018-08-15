@@ -5,7 +5,7 @@ import {connect} from 'react-redux';
 import {withRouter} from 'react-router-dom';
 import 'url-search-params-polyfill';
 import jQuery from "jquery";
-import {errorHandler, setAuthHeader, getWithCredentials, getHttpProtocol, updateQueryStringParameter, getCurrentUser, getCurrentDefaultServer, getDefaultServerConfig} from '../../../common/common';
+import {errorHandler, setAuthHeader, getWithCredentials, getHttpProtocol, updateQueryStringParameter, getCurrentUser, getCurrentDefaultServer} from '../../../common/common';
 import InnerLoading from "../../InnerLoading/InnerLoading";
 import IconImage from "../../IconImage/IconImage";
 

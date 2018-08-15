@@ -17,20 +17,29 @@ class Box extends Component {
 
         this.state = {
             titles : {},
+            familyNameMap : {},
             tooltip : {
                 show : false
             }
         };
     }
 
+    componentDidMount() {
+        this.props.onRef(this);
+    }
+
+    componentWillUnmount() {
+        this.props.onRef(undefined);
+    }
+
     setTitle = (counterKey, title, color, familyName) => {
         let titles = Object.assign({}, this.state.titles);
         let familyNameMap = {};
         for (let title in titles) {
-            familyNameMap[titles[title].familyName] = true;
+            familyNameMap[titles[title].familyName] = this.props.counterInfo.familyNameIcon[titles[title].familyName];
         }
 
-        familyNameMap[familyName] = true;
+        familyNameMap[familyName] = this.props.counterInfo.familyNameIcon[familyName];
         let uniqueFamilyNameCnt = Object.keys(familyNameMap).length;
 
         titles[title] = {
@@ -43,23 +52,35 @@ class Box extends Component {
 
         if (JSON.stringify(this.state.titles) !== JSON.stringify(titles)) {
             this.setState({
-                titles : titles
+                titles : titles,
+                familyNameMap : familyNameMap
             });
         }
     };
 
     removeTitle = (counterKey) => {
         let titles = Object.assign({}, this.state.titles);
-        for (let title in titles) {
-            if (titles[title].counterKey === counterKey) {
-                delete titles[title];
+
+        if (Array.isArray(counterKey)) {
+            counterKey.forEach((c) => {
+                for (let title in titles) {
+                    if (titles[title].counterKey === c) {
+                        delete titles[title];
+                    }
+                }
+            });
+
+        } else {
+            for (let title in titles) {
+                if (titles[title].counterKey === counterKey) {
+                    delete titles[title];
+                }
             }
         }
 
         this.setState({
             titles : titles
         });
-
     };
 
     onDrop(data) {
@@ -108,17 +129,18 @@ class Box extends Component {
                     break;
                 }
             }
-        }        
+        }
 
         let titleLength = Object.values(this.state.titles).length;
+
         return (
             <Droppable className="box-droppable" types={['metric']} onDrop={this.onDrop.bind(this)}>
                 <div className="box">
                     <div className="title">
                         <div>
                         {titleLength > 0 &&
-                            <div className="icons" style={{width : ((Object.values(this.state.titles).filter((d) => d.icon).length * 20) + 2) + "px"}}>
-                                {Object.values(this.state.titles).map((d, i) => (<div key={i} ><IconImage icon={d.icon}/></div>))}
+                            <div className="icons" style={{width : ((Object.values(this.state.familyNameMap).length * 20) + 2) + "px"}}>
+                                {Object.values(this.state.familyNameMap).map((d, i) => (<div key={i} ><IconImage icon={d}/></div>))}
                             </div>
                         }
                         {titleLength > 0 &&

@@ -2,6 +2,7 @@
     position: absolute;
     background-color: rgba(0, 0, 0, 0.8);
     background-color: #104E8B;
+    background-color: #282828;
     top: 5px;
     left: 5px;
     height: calc(100% - 10px);
@@ -23,7 +24,25 @@
 
 .box-config .box-config-content {
     display: table-cell;
-    vertical-align: middle;
+    vertical-align: top;
+}
+
+.box-config .box-config-content .box-config-title {
+    color: white;
+    text-align: center;
+    font-size: 12px;
+    padding: 10px 0 15px;
+    position: relative;
+    border-bottom: 1px solid rgba(255,255,255,0.3);
+    margin-bottom: 10px;
+}
+
+.box-config .box-config-content .box-config-title .close-btn {
+    position: absolute;
+    top : 0;
+    right : 10px;
+    cursor: pointer;
+
 }
 
 .box-config .box-config-items {
@@ -80,7 +99,7 @@
 }
 
 .box-config .box-config-buttons {
-    padding: 0 10px 0;
+    padding: 5px 10px 0;
     text-align: center;
 }
 
@@ -105,8 +124,7 @@
 .box-config .exclusive-options {
     line-height: 100%;
     color: white;
-    padding: 10px;
-    display: none;
+    padding: 0 10px;
 }
 
 .box-config .exclusive-options.show {

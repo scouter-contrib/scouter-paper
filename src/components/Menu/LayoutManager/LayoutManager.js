@@ -3,7 +3,7 @@ import './LayoutManager.css';
 import {setTemplate, setControlVisibility, pushMessage} from '../../../actions';
 import {connect} from 'react-redux';
 import {withRouter} from 'react-router-dom';
-import {getData, setData, getDefaultServerConfig} from '../../../common/common';
+import {getData, setData} from '../../../common/common';
 import 'url-search-params-polyfill';
 import jQuery from "jquery";
 import {errorHandler, setAuthHeader, getWithCredentials, getHttpProtocol, getCurrentUser} from '../../../common/common';
