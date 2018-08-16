@@ -190,6 +190,15 @@ class Settings extends Component {
         return false;
     };
 
+    resetClick = () => {
+
+        if (localStorage) {
+            localStorage.removeItem("config");
+            window.location.reload();
+        }
+
+    };
+
     resetConfig = () => {
         if (this.props.config) {
             this.setState({
@@ -397,6 +406,19 @@ class Settings extends Component {
                     <form ref="root" onSubmit={this.submit}>
                 <div className={"settings " + (this.state.edit ? 'editable' : '')}>
                     <div className="forms">
+                        <div className="top-btns">
+                            {this.state.edit &&
+                            <div className="buttons">
+                                <button onClick={this.resetConfig}>CANCEL</button>
+                                <button type="submit">APPLY</button>
+                            </div>
+                            }
+                            {!this.state.edit &&
+                            <div className="buttons">
+                                <button onClick={this.editClick}>EDIT</button>
+                            </div>
+                            }
+                        </div>
                         <div className="category first">
                             <div>SCOUTER WEB API SERVER INFO</div>
                         </div>
@@ -498,7 +520,7 @@ class Settings extends Component {
                                     <div>SHORT HISTORY RANGE (minutes)</div>
                                 </div>
                                 <div className="input">
-                                    <input type="number" required min={10} max={180} readOnly={!this.state.edit} onChange={this.onChangeRange.bind(this, "shortHistoryRange")} value={this.state.config.range.shortHistoryRange} placeholder="MINUTES" />
+                                    <input type="number" required min={10} max={720} readOnly={!this.state.edit} onChange={this.onChangeRange.bind(this, "shortHistoryRange")} value={this.state.config.range.shortHistoryRange} placeholder="MINUTES" />
                                 </div>
                             </div>
                             <div className="row">
@@ -965,6 +987,7 @@ class Settings extends Component {
                     {!this.state.edit &&
                     <div className="buttons">
                         <button onClick={this.editClick}>EDIT</button>
+                        <span onClick={this.resetClick} className="restore-btn">RESTORE DEFAULT SETTING</span>
                     </div>
                     }
                 </div></form>}</div>

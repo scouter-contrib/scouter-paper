@@ -7,6 +7,7 @@ import {getData, setData} from '../../../common/common';
 import 'url-search-params-polyfill';
 import jQuery from "jquery";
 import {errorHandler, setAuthHeader, getWithCredentials, getHttpProtocol, getCurrentUser} from '../../../common/common';
+import ReactTooltip from 'react-tooltip'
 
 class LayoutManager extends Component {
 
@@ -24,6 +25,10 @@ class LayoutManager extends Component {
         if (!this.props.visible && nextProps.visible) {
             this.loadTemplates(nextProps.config, nextProps.user);
         }
+    }
+
+    componentDidUpdate(prevProps, prevState) {
+        ReactTooltip.rebuild();
     }
 
     saveTemplate = (templates) => {
@@ -71,6 +76,31 @@ class LayoutManager extends Component {
             if (msg && Number(msg.status) === 200) {
                 if (msg.result) {
                     let list = JSON.parse(msg.result);
+
+                    list.forEach((template) => {
+                        let valid = true;
+                        template.boxes.forEach((box) => {
+                            if (!valid) {
+                                return;
+                            }
+
+                            if (Array.isArray(box.option)) {
+                                box.option.forEach((o) => {
+                                    if (!o.familyName) {
+                                        valid = false;
+                                        return;
+                                    }
+                                })
+                            }
+
+                        });
+
+                        if (!valid) {
+                            template.deprecated = true;
+                            return;
+                        }
+                    });
+
                     if (list && list.length > 0) {
                         this.setState({
                             templates : list,
@@ -224,6 +254,7 @@ class LayoutManager extends Component {
                             {this.state.templates.map((d, i) => {
                                 return (<li key={i} className={d.no === this.state.selectedTemplateNo ? 'selected' : ''} onClick={this.templateClick.bind(this, d.no)}>
                                     <div>
+                                        {d.deprecated && <div className="deprecated"><span data-tip="this template is no longer working properly at this paper version">DEPRECATED</span></div>}
                                         <span className="no">{i+1}</span>
                                         {(d.no !== this.state.selectedEditNo) && <span className="name">{d.name}</span>}
                                         {(d.no === this.state.selectedEditNo) && <span className="name edit"><input type="text" value={this.state.editText} onChange={this.onTextChange.bind(this )} /></span>}
@@ -243,6 +274,7 @@ class LayoutManager extends Component {
                         <button className="load-btn" onClick={this.loadClick}>LOAD</button>
                     </div>
                 </div>
+                <ReactTooltip />
             </div>
         );
     }

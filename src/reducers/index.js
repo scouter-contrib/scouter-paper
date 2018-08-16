@@ -33,10 +33,10 @@ const configState = {
         notification : "Y"
     },
     range : {
-        shortHistoryRange : 60,
-        shortHistoryStep : 5,
-        longHistoryRange : 360,
-        longHistoryStep : 1440
+        shortHistoryRange : 360,
+        shortHistoryStep : 10,
+        longHistoryRange : 24 * 30,
+        longHistoryStep : 60
     },
     xlog: {
         normal: {

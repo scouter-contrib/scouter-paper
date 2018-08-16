@@ -28,6 +28,7 @@
 .settings .forms {
     padding: 0;
     margin: 0 200px 0;
+    position: relative;
 }
 
 .settings .setting-box {
@@ -387,8 +388,39 @@
 
 .settings .buttons {
     text-align: center;
-    padding: 20px 20px 10px;
+    padding: 10px 20px 10px;
+    position: relative;
+}
 
+.settings .top-btns .buttons {
+    position: absolute;
+    text-align: right;
+    right : 0;
+    padding: 0;
+}
+
+.settings .top-btns .buttons button {
+    margin: 0 0 0 2px;
+    padding: 4px 6px;
+}
+
+.settings .buttons .restore-btn {
+    position: absolute;
+    left : 30px;
+    top : 0;
+    font-size: 10px;
+    top : 17px;
+    color: white;
+    text-decoration: underline;
+    cursor: pointer;
+}
+
+@media screen and (max-width: 600px) {
+    .settings .buttons .restore-btn {
+        position: static;
+        display: block;
+        padding: 20px 0;
+    }
 }
 
 .settings .buttons button {
