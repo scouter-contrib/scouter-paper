@@ -473,13 +473,11 @@ class LineChart extends Component {
         } else {
             path.style("stroke", color);
             if (this.props.config.graph.color === "instance") {
-
                 if (this.props.config.colorType === "white") {
                     this.props.setTitle(counterKey, option.title, "#333", option.familyName);
                 } else {
                     this.props.setTitle(counterKey, option.title, "white", option.familyName);
                 }
-
             } else {
                 this.props.setTitle(counterKey, option.title, color, option.familyName);
             }

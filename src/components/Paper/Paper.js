@@ -629,24 +629,10 @@ class Paper extends Component {
                 let url;
                 if (longTerm) {
 
-                    let days = getSearchDays(from, to);
-                    let fromTos = getDivideDays(from, to);
-
-                    if (days > 1) {
-                        for (let i = 0; i < fromTos.length; i++) {
-                            url = getHttpProtocol(this.props.config) + '/scouter/v1/counter/stat/' + encodeURI(counterKey) + '?objHashes=' + JSON.stringify(objects.map((obj) => {
-                                    return Number(obj.objHash);
-                                })) + "&startYmd=" + moment(fromTos[i].from).format("YYYYMMDD") + "&endYmd=" + moment(fromTos[i].from).format("YYYYMMDD");
-
-                            this.getCounterHistoryData(url, counterKey, from, to, (new Date()).getTime(), true);
-                        }
-                    } else {
-                        url = getHttpProtocol(this.props.config) + '/scouter/v1/counter/stat/' + encodeURI(counterKey) + '?objHashes=' + JSON.stringify(objects.map((obj) => {
-                                return Number(obj.objHash);
-                            })) + "&startYmd=" + moment(startTime).format("YYYYMMDD") + "&endYmd=" + moment(endTime).format("YYYYMMDD");
-                        this.getCounterHistoryData(url, counterKey, from, to, now, false);
-                    }
-
+                    url = getHttpProtocol(this.props.config) + '/scouter/v1/counter/stat/' + encodeURI(counterKey) + '?objHashes=' + JSON.stringify(objects.map((obj) => {
+                            return Number(obj.objHash);
+                        })) + "&startYmd=" + moment(startTime).format("YYYYMMDD") + "&endYmd=" + moment(endTime).format("YYYYMMDD");
+                    this.getCounterHistoryData(url, counterKey, from, to, now, false);
 
                 } else {
                     url = getHttpProtocol(this.props.config) + '/scouter/v1/counter/' + encodeURI(counterKey) + '?objHashes=' + JSON.stringify(objects.map((obj) => {
@@ -662,6 +648,18 @@ class Paper extends Component {
         this.setState({
             longTerm: longTerm
         });
+    };
+
+    setLoading = (visible) => {
+        if (visible) {
+            this.refs.loading.style.display = "table";
+            this.refs.loading.style.opacity = "1";
+        } else {
+            setTimeout(() => {
+                this.refs.loading.style.opacity = "0";
+                this.refs.loading.style.display = "none";
+            }, 300);
+        }
     };
 
     search = (from, to, objects) => {
@@ -680,6 +678,7 @@ class Paper extends Component {
 
         this.getCounterHistory(objects || this.props.objects, from, to, this.props.range.longTerm);
         this.getXLogHistory(from, to, objects || this.props.objects, this.props.range.longTerm);
+
     };
 
     scroll = () => {
@@ -1034,11 +1033,12 @@ class Paper extends Component {
 
 
     getCounterHistoryData = (url, counterKey, from, to, now, append) => {
+        this.setLoading(true);
         let that = this;
         this.props.addRequest();
         jQuery.ajax({
             method: "GET",
-            async: false,
+            async: true,
             url: url,
             xhrFields: getWithCredentials(that.props.config),
             beforeSend: function (xhr) {
@@ -1048,7 +1048,7 @@ class Paper extends Component {
             if (!this.mounted) {
                 return;
             }
-            let countersHistory = this.state.countersHistory.data ? Object.assign(this.state.countersHistory.data) : {};
+            let countersHistory = this.state.countersHistory.data ? Object.assign({}, this.state.countersHistory.data) : {};
 
             let counterHistory;
             if (msg.result) {
@@ -1119,18 +1119,18 @@ class Paper extends Component {
                 }
             }
 
-            this.state.countersHistory.data = countersHistory;
-
             this.setState({
                 countersHistory: {
                     time: new Date().getTime(),
                     data: countersHistory,
                     from: from,
                     to: to
-                },
+                }
             });
 
             this.counterHistoriesLoaded[counterKey] = true;
+
+            this.setLoading(false);
         }).fail((xhr, textStatus, errorThrown) => {
             errorHandler(xhr, textStatus, errorThrown, this.props);
         });
@@ -1557,6 +1557,14 @@ class Paper extends Component {
                 </div>
                 }
                 <Profiler selection={this.props.selection} newXLogs={this.state.data.newXLogs} xlogs={this.state.data.xlogs} startTime={this.state.data.startTime} realtime={this.props.range.realTime}/>
+                <div className="loading" ref="loading">
+                    <div>
+                        <div className="spinner">
+                            <div className="cube1"></div>
+                            <div className="cube2"></div>
+                        </div>
+                    </div>
+                </div>
             </div>
         );
     }

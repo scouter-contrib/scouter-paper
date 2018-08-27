@@ -12,6 +12,7 @@ import IconImage from "../IconImage/IconImage";
 
 class Box extends Component {
 
+    iconMap = {};
     constructor(props) {
         super(props);
 
@@ -32,21 +33,45 @@ class Box extends Component {
         this.props.onRef(undefined);
     }
 
+    componentWillReceiveProps(nextProps) {
+        if (JSON.stringify(this.props.objects) !== JSON.stringify(nextProps.objects)) {
+            this.iconMap = {};
+        }
+    }
+
     setTitle = (counterKey, title, color, familyName) => {
         let titles = Object.assign({}, this.state.titles);
         let familyNameMap = {};
         for (let title in titles) {
+            if (title.icon) {
+                let icons = title.icon.split(",");
+                icons.forEach((d) => {
+                    this.iconMap[d] = true;
+                });
+            }
             familyNameMap[titles[title].familyName] = this.props.counterInfo.familyNameIcon[titles[title].familyName];
         }
 
         familyNameMap[familyName] = this.props.counterInfo.familyNameIcon[familyName];
         let uniqueFamilyNameCnt = Object.keys(familyNameMap).length;
 
+        let icon = "";
+        this.props.objects.filter((d) => {
+            return d.objFamily === familyName;
+        }).forEach((d, idx, array) => {
+            icon += this.props.counterInfo.objTypesMap[d.objType].icon;
+            if (idx !== array.length - 1) {
+                icon += ",";
+            }
+
+            this.iconMap[this.props.counterInfo.objTypesMap[d.objType].icon] = true;
+        });
+
         titles[title] = {
             counterKey : counterKey,
             title : uniqueFamilyNameCnt > 1 ? title + " (" + familyName + ")" : title,
             color : color,
-            icon : this.props.counterInfo.familyNameIcon[familyName],
+            icon : icon,
             familyName : familyName
         };
 
@@ -139,8 +164,8 @@ class Box extends Component {
                     <div className="title">
                         <div>
                         {titleLength > 0 &&
-                            <div className="icons" style={{width : ((Object.values(this.state.familyNameMap).length * 20) + 2) + "px"}}>
-                                {Object.values(this.state.familyNameMap).map((d, i) => (<div key={i} ><IconImage icon={d}/></div>))}
+                            <div className="icons" style={{width : ((Object.values(this.iconMap).length * 20) + 2) + "px"}}>
+                                {Object.keys(this.iconMap).map((d, i) => (<div key={i} ><IconImage icon={d}/></div>))}
                             </div>
                         }
                         {titleLength > 0 &&
@@ -173,7 +198,8 @@ class Box extends Component {
 
 let mapStateToProps = (state) => {
     return {
-        counterInfo: state.counterInfo
+        counterInfo: state.counterInfo,
+        objects: state.target.objects
     };
 };
 
