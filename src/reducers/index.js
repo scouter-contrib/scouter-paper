@@ -13,6 +13,7 @@ const configState = {
         }
     ],
     interval: 2000,
+    alertInterval : 60,
     numberFormat: "0,0.0",
     decimalPoint: 1,
     dateFormat: "%Y-%m-%d",

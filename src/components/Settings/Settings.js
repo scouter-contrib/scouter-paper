@@ -509,10 +509,18 @@ class Settings extends Component {
                         <div className="setting-box">
                             <div className="row">
                                 <div className="label">
-                                    <div>INTERVAL (milliseconds)</div>
+                                    <div>REALTIME DATA INTERVAL (milliseconds)</div>
                                 </div>
                                 <div className="input">
-                                    <input type="number" required min={2000} step={500} readOnly={!this.state.edit} onChange={this.onChange.bind(this, "interval")} value={this.state.config.interval} placeholder="POLLING INTERVAL (MS)" />
+                                    <input type="number" required min={2000} step={500} readOnly={!this.state.edit} onChange={this.onChange.bind(this, "interval")} value={this.state.config.interval} placeholder="REALTIME POLLING INTERVAL (MS)" />
+                                </div>
+                            </div>
+                            <div className="row">
+                                <div className="label">
+                                    <div>ALERT DATA INTERVAL (seconds)</div>
+                                </div>
+                                <div className="input">
+                                    <input type="number" required min={1} step={1} readOnly={!this.state.edit} onChange={this.onChange.bind(this, "alertInterval")} value={this.state.config.alertInterval} placeholder="ALERT POLLING INTERVAL (s)" />
                                 </div>
                             </div>
                             <div className="row">

@@ -36,6 +36,8 @@ class Paper extends Component {
 
     boxesRef = {};
 
+    alertTimer = null;
+
     constructor(props) {
         super(props);
         this.mountTime = (new Date()).getTime();
@@ -233,6 +235,10 @@ class Paper extends Component {
             }
         }
 
+        if (JSON.stringify(this.props.objects) !== JSON.stringify(nextProps.objects) || JSON.stringify(this.props.user) !== JSON.stringify(nextProps.user) || JSON.stringify(this.props.config) !== JSON.stringify(nextProps.config)) {
+            this.checkRealtimeAlert();
+        }
+
         if (this.props.range.realTime !== nextProps.range.realTime) {
             this.setState({
                 counters: {
@@ -296,13 +302,30 @@ class Paper extends Component {
                 Notification.requestPermission();
             }
         }
+
+        this.checkRealtimeAlert();
     }
 
+    checkRealtimeAlert = () => {
+        if (this.alertTimer === null) {
+            let seconds = this.props.config.alertInterval;
+            if (!seconds) {
+                seconds = 60;
+            }
+            this.alertTimer = setInterval(() => {
+                this.getRealTimeAlert(this.props.objects);
+            }, seconds * 1000);
+        }
+    };
 
     componentWillUnmount() {
         this.mounted = false;
         clearInterval(this.dataRefreshTimer);
         this.dataRefreshTimer = null;
+
+        clearInterval(this.alertTimer);
+        this.alertTimer = null;
+
         document.removeEventListener("scroll", this.scroll.bind(this));
         document.removeEventListener('visibilitychange', this.visibilitychange.bind(this));
     }
@@ -322,7 +345,6 @@ class Paper extends Component {
 
         this.getVisitor();
         this.getRealTimeCounter();
-        this.getRealTimeAlert(objects);
 
         clearInterval(this.dataRefreshTimer);
         this.dataRefreshTimer = null;
@@ -501,8 +523,6 @@ class Paper extends Component {
         const that = this;
 
         let objTypes = [];
-
-
         if (objects && objects.length > 0) {
             objTypes = _.chain(objects).map((d) => d.objType).uniq().value();
         }
@@ -559,7 +579,6 @@ class Paper extends Component {
                                 }
                             });
 
-
                             if (Notification && this.props.config.alert.notification === "Y" && Notification.permission === "granted") {
                                 for (let i=0; i<alert.data.length; i++) {
                                     if (Number(alert.data[i].time) > this.mountTime && !alert.data[i]["_notificated"]) {
@@ -580,6 +599,8 @@ class Paper extends Component {
                         }
                     }
                 }).fail((xhr, textStatus, errorThrown) => {
+                    clearInterval(this.alertTimer);
+                    this.alertTimer = null;
                     errorHandler(xhr, textStatus, errorThrown, this.props);
                 });
             });
