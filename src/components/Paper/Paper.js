@@ -601,7 +601,10 @@ class Paper extends Component {
                         let innerOption = option[j];
                         if (innerOption.type === "counter") {
                             counterKeyMap[innerOption.counterKey] = true;
-                            counterHistoryKeyMap[innerOption.counterKey] = true;
+                            counterHistoryKeyMap[innerOption.counterKey] = {
+                                key : innerOption.counterKey,
+                                familyName : innerOption.familyName
+                            };
                         }
                     }
                 }
@@ -614,7 +617,7 @@ class Paper extends Component {
 
             let counterHistoryKeys = [];
             for (let attr in counterHistoryKeyMap) {
-                counterHistoryKeys.push(attr);
+                counterHistoryKeys.push(counterHistoryKeyMap[attr]);
             }
 
             if (counterKeys.length < 1) {
@@ -622,20 +625,25 @@ class Paper extends Component {
             }
 
             for (let i = 0; i < counterHistoryKeys.length; i++) {
-                let counterKey = counterHistoryKeys[i];
+                let counterKey = counterHistoryKeys[i].key;
+                let familyName = counterHistoryKeys[i].familyName;
                 let now = (new Date()).getTime();
                 let startTime = from;
                 let endTime = to;
                 let url;
                 if (longTerm) {
 
-                    url = getHttpProtocol(this.props.config) + '/scouter/v1/counter/stat/' + encodeURI(counterKey) + '?objHashes=' + JSON.stringify(objects.map((obj) => {
+                    url = getHttpProtocol(this.props.config) + '/scouter/v1/counter/stat/' + encodeURI(counterKey) + '?objHashes=' + JSON.stringify(objects.filter((d) => {
+                        return d.objFamily === familyName;
+                    }).map((obj) => {
                             return Number(obj.objHash);
                         })) + "&startYmd=" + moment(startTime).format("YYYYMMDD") + "&endYmd=" + moment(endTime).format("YYYYMMDD");
                     this.getCounterHistoryData(url, counterKey, from, to, now, false);
 
                 } else {
-                    url = getHttpProtocol(this.props.config) + '/scouter/v1/counter/' + encodeURI(counterKey) + '?objHashes=' + JSON.stringify(objects.map((obj) => {
+                    url = getHttpProtocol(this.props.config) + '/scouter/v1/counter/' + encodeURI(counterKey) + '?objHashes=' + JSON.stringify(objects.filter((d) => {
+                        return d.objFamily === familyName;
+                    }).map((obj) => {
                             return Number(obj.objHash);
                         })) + "&startTimeMillis=" + startTime + "&endTimeMillis=" + endTime;
                     this.getCounterHistoryData(url, counterKey, from, to, now, false);
