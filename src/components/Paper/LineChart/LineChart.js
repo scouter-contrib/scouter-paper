@@ -16,7 +16,7 @@ class LineChart extends Component {
 
     graph = {
         margin: {
-            top: 24, right: 20, bottom: 30, left: 40
+            top: 15, right: 15, bottom: 25, left: 40
         },
         svg: null,
         overlay: null,
@@ -785,11 +785,8 @@ class LineChart extends Component {
         return (
             <div className="line-chart-wrapper" ref="lineChartRoot">
                 <div className="line-chart" ref="lineChart"></div>
-                <div className="axis-button axis-up noselect" onClick={this.axisUp} onMouseDown={this.stopProgation}>+
-                </div>
-                <div className="axis-button axis-down noselect" onClick={this.axisDown}
-                     onMouseDown={this.stopProgation}>-
-                </div>
+                <div className="axis-button axis-up noselect" onClick={this.axisUp} onMouseDown={this.stopProgation}><i className="fa fa-angle-up" aria-hidden="true"></i></div>
+                <div className="axis-button axis-down noselect" onClick={this.axisDown} onMouseDown={this.stopProgation}><i className="fa fa-angle-down" aria-hidden="true"></i></div>
                 {this.state.noData && <div className="no-data">
                     <div>
                         <div>NO DATA RECEIVED</div>
@@ -806,7 +803,6 @@ let mapStateToProps = (state) => {
         config: state.config
     };
 };
-
 
 LineChart = connect(mapStateToProps, undefined)(LineChart);
 export default withRouter(LineChart);

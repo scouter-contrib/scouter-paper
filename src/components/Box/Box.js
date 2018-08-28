@@ -8,7 +8,6 @@ import LineChart from "../Paper/LineChart/LineChart";
 import ActiveSpeed from "../Paper/ActiveSpeed/ActiveSpeed";
 import Tooltip from "./Tooltip/Tooltip";
 import {connect} from "react-redux";
-import IconImage from "../IconImage/IconImage";
 
 class Box extends Component {
 
@@ -164,8 +163,10 @@ class Box extends Component {
                     <div className="title">
                         <div>
                         {titleLength > 0 &&
-                            <div className="icons" style={{width : ((Object.values(this.iconMap).length * 20) + 2) + "px"}}>
-                                {Object.keys(this.iconMap).map((d, i) => (<div key={i} ><IconImage icon={d}/></div>))}
+                            <div className="icons">
+                                {/*{Object.keys(this.iconMap).map((d, i) => (<div key={i} ><IconImage icon={d}/></div>))}*/}
+                                {Object.keys(this.iconMap).map((d, i) => (<div key={i} ><div className="icon-text">{d}</div></div>))}
+                                <div className="separator"></div>
                             </div>
                         }
                         {titleLength > 0 &&

@@ -27,7 +27,6 @@
 
 .box .title > div {
     display: table;
-    width: calc(100% - 50px);
     height: 100%;
     position: absolute;
     top :0;
@@ -41,8 +40,10 @@
 
 .box .title > div > div.icons {
     white-space: nowrap;
-    padding-left: 2px;
+    padding-left: 4px;
+    padding-top: 2px;
     box-sizing: border-box;
+    position: relative;
 }
 
 .box .title > div > div.icons .icon-img-wrapper > div {
@@ -59,7 +60,6 @@
 
 .box .title .icons > div {
     display: inline-block;
-    width: 20px;
     box-sizing: border-box;
 }
 
@@ -79,6 +79,25 @@
     text-align: center;
     line-height: 100%;
     border-radius: 0 0 4px 4px;
+}
+
+.box .title .icons .icon-text {
+    display: inline-block;
+    padding: 2px 4px;
+    border: 1px solid rgba(0,0,0,0.5);
+    border-radius: 1px;
+    margin-right: 3px;
+    font-size: 7px;
+    text-transform: uppercase;
+}
+
+.box .title .icons .separator {
+    width: 1px;
+    height: 10px;
+    margin: 0 2px 0 2px;
+    background-color: rgba(0,0,0,0.4);
+    position: relative;
+    top : 3px;
 }
 
 
