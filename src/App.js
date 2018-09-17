@@ -1,6 +1,7 @@
 import React, {Component} from 'react';
 import './App.css';
 import './Theme.css';
+import './fonts/technology-icons-gh-pages/styles/technology-icons.css';
 import {
     Settings,
     Paper,
@@ -21,6 +22,7 @@ import Unsupport from "./components/Unsupport/Unsupport";
 import jQuery from "jquery";
 import {errorHandler, mergeDeep, getParam, setAuthHeader, getWithCredentials, getHttpProtocol, getDefaultServerConfig, getCurrentUser} from './common/common';
 import Home from "./components/Home/Home";
+import Topology from "./components/Topology/Topology";
 
 const browser = detect();
 const support = (browser.name !== "ie" && browser.name !== "edge");
@@ -230,6 +232,7 @@ class App extends Component {
                         <Route exact path='/' component={Home}/>
                         <Route exact path='/login' component={Login}/>
                         <Route exact path='/paper' component={Paper}/>
+                        <Route exact path='/topology' component={Topology}/>
                         <Route exact path='/settings' component={Settings}/>
                     </Switch>
                     {this.props.control.Message &&

@@ -1,0 +1,65 @@
+.topology-wrapper {
+    height: calc(100% - 71px);
+    margin: 10px;
+    box-sizing: border-box;
+}
+
+.topology-wrapper svg text {
+    -webkit-touch-callout: none; /* iOS Safari */
+    -webkit-user-select: none; /* Safari */
+    -khtml-user-select: none; /* Konqueror HTML */
+    -moz-user-select: none; /* Firefox */
+    -ms-user-select: none; /* Internet Explorer/Edge */
+    user-select: none;
+    font-family: 'Righteous','Nanum Gothic',cursive;
+}
+
+@keyframes flow {
+    from {
+        stroke-dashoffset: 14;
+    }
+
+    to {
+        stroke-dashoffset: 0;
+    }
+}
+
+@-webkit-keyframes flow {
+    from {
+        stroke-dashoffset: 14;
+    }
+
+    to {
+        stroke-dashoffset: 0;
+    }
+}
+
+.flowline {
+    fill: none;
+    stroke: white;
+    opacity: 0.5;
+    stroke-width: 4;
+    stroke-dasharray: 10, 4;
+    animation: flow 1s linear infinite;
+    -webkit-animation: flow 1s linear infinite;
+}
+
+
+.edge-label-path {
+    font-size: 10px;
+    fill: white;
+}
+
+.error-rate-text {
+    fill: red;
+
+}
+
+.edgepath {
+    fill: none;
+    stroke: black;
+    stroke: none;
+    stroke-width: 1.5px;
+}
+
+

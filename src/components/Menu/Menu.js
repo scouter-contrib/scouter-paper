@@ -82,6 +82,12 @@ class Menu extends Component {
                             </div>
                         </NavLink>
                     </div>
+                    <NavLink className={"menu-item " + (this.state.menu === "/topology" ? "active" : "")} to={"/topology"  + instanceParam} onClick={this.menuClick.bind(this, "/topology")}>
+                        <div>
+                            <div className="icon"><i className="fa fa-braille" aria-hidden="true"></i></div>
+                            <div className="text">TOPOLOGY</div>
+                        </div>
+                    </NavLink>
                     <NavLink className={"menu-item " + (this.state.menu === "/paper" ? "active" : "")} to={"/paper"  + instanceParam} onClick={this.menuClick.bind(this, "/paper")}>
                         <div>
                             <div className="icon"><i className="fa fa-newspaper-o" aria-hidden="true"></i></div>

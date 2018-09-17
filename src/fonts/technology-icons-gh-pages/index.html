@@ -1,0 +1,701 @@
+<!DOCTYPE html> <html class=no-js> <head> <meta charset=utf-8> <title>technology-icons</title> <meta name=description content=""> <meta name=viewport content="width=device-width"> <meta name=google-site-verification content="xpUYuCkxQzlOUEyYOwCm0wqW1jhNQvGUxyKpkjqpP7E"> <link rel="shortcut icon" href=/favicon.ico> <!-- Place favicon.ico and apple-touch-icon.png in the root directory --> <link rel=stylesheet href=styles/main.css> <link rel=stylesheet href=styles/technology-icons.css> <link href="http://fonts.googleapis.com/css?family=Dosis:300,400,500,600" rel=stylesheet type=text/css> <script src=scripts/vendor/3e1dbd5e.modernizr.js></script>  <body ng-app=technologyIconsApp> <!--[if lt IE 10]>
+      <p class="browsehappy">You are using an <strong>outdated</strong> browser. Please <a href="http://browsehappy.com/">upgrade your browser</a> to improve your experience.</p>
+    <![endif]--> <div class=container-fluid ng-controller=mainCtrl> <div class=row-fluid> <div class=col-md-8> <a href="./" class=brand><h1 class=nomargin>technology-icons</h1></a> <h4>Technology icon font</h4> </div> <div class=col-md-4> <br> <a class="btn btn-success btn-sm" target=_blank href=https://github.com/websiddu/technology-icons/archive/gh-pages.zip> Download </a> &nbsp;&nbsp;&nbsp;&nbsp; <a class="btn btn-info btn-sm" href=https://github.com/websiddu/technology-icons target=_blank> Fork on Github </a> <br> <br> <a href=https://twitter.com/websiddu class=twitter-follow-button data-show-count=false>Follow @websiddu</a> <script>!function(d,s,id){var js,fjs=d.getElementsByTagName(s)[0],p=/^http:/.test(d.location)?'http':'https';if(!d.getElementById(id)){js=d.createElement(s);js.id=id;js.src=p+'://platform.twitter.com/widgets.js';fjs.parentNode.insertBefore(js,fjs);}}(document, 'script', 'twitter-wjs');</script> &nbsp;&nbsp; <a href=https://twitter.com/share class=twitter-share-button data-via=websiddu data-hashtags=technology-icons>Tweet</a> <script>!function(d,s,id){var js,fjs=d.getElementsByTagName(s)[0],p=/^http:/.test(d.location)?'http':'https';if(!d.getElementById(id)){js=d.createElement(s);js.id=id;js.src=p+'://platform.twitter.com/widgets.js';fjs.parentNode.insertBefore(js,fjs);}}(document, 'script', 'twitter-wjs');</script> </div> </div> <div class=clearfix></div> <div class=row-fluid> <input class=search placeholder="Start typing eg. jqery, web, adobe etc..." ng-model=q> </div> <div class=clearfix></div> <script>window.icons = [ {
+          baseClass: '',
+          classPrefix: 'icon-',
+          folder: 'app/icons/adobe/aftereffects.svg',
+          glyph: 'aftereffects'
+        },
+         {
+          baseClass: '',
+          classPrefix: 'icon-',
+          folder: 'app/icons/adobe/bridge.svg',
+          glyph: 'bridge'
+        },
+         {
+          baseClass: '',
+          classPrefix: 'icon-',
+          folder: 'app/icons/adobe/dreamweaver.svg',
+          glyph: 'dreamweaver'
+        },
+         {
+          baseClass: '',
+          classPrefix: 'icon-',
+          folder: 'app/icons/adobe/fireworks.svg',
+          glyph: 'fireworks'
+        },
+         {
+          baseClass: '',
+          classPrefix: 'icon-',
+          folder: 'app/icons/adobe/flash.svg',
+          glyph: 'flash'
+        },
+         {
+          baseClass: '',
+          classPrefix: 'icon-',
+          folder: 'app/icons/adobe/illustrator.svg',
+          glyph: 'illustrator'
+        },
+         {
+          baseClass: '',
+          classPrefix: 'icon-',
+          folder: 'app/icons/adobe/indesign.svg',
+          glyph: 'indesign'
+        },
+         {
+          baseClass: '',
+          classPrefix: 'icon-',
+          folder: 'app/icons/adobe/lightroom.svg',
+          glyph: 'lightroom'
+        },
+         {
+          baseClass: '',
+          classPrefix: 'icon-',
+          folder: 'app/icons/adobe/photoshop.svg',
+          glyph: 'photoshop'
+        },
+         {
+          baseClass: '',
+          classPrefix: 'icon-',
+          folder: 'app/icons/cms-ecommers/cockpit.svg',
+          glyph: 'cockpit'
+        },
+         {
+          baseClass: '',
+          classPrefix: 'icon-',
+          folder: 'app/icons/cms-ecommers/drupal.svg',
+          glyph: 'drupal'
+        },
+         {
+          baseClass: '',
+          classPrefix: 'icon-',
+          folder: 'app/icons/cms-ecommers/joomla.svg',
+          glyph: 'joomla'
+        },
+         {
+          baseClass: '',
+          classPrefix: 'icon-',
+          folder: 'app/icons/cms-ecommers/magento.svg',
+          glyph: 'magento'
+        },
+         {
+          baseClass: '',
+          classPrefix: 'icon-',
+          folder: 'app/icons/cms-ecommers/october.svg',
+          glyph: 'october'
+        },
+         {
+          baseClass: '',
+          classPrefix: 'icon-',
+          folder: 'app/icons/cms-ecommers/wordpress.svg',
+          glyph: 'wordpress'
+        },
+         {
+          baseClass: '',
+          classPrefix: 'icon-',
+          folder: 'app/icons/code-editors/visual-studio.svg',
+          glyph: 'visual-studio'
+        },
+         {
+          baseClass: '',
+          classPrefix: 'icon-',
+          folder: 'app/icons/css-frameworks/bootstrap.svg',
+          glyph: 'bootstrap'
+        },
+         {
+          baseClass: '',
+          classPrefix: 'icon-',
+          folder: 'app/icons/css-preprocessors/emmet.svg',
+          glyph: 'emmet'
+        },
+         {
+          baseClass: '',
+          classPrefix: 'icon-',
+          folder: 'app/icons/css-preprocessors/less.svg',
+          glyph: 'less'
+        },
+         {
+          baseClass: '',
+          classPrefix: 'icon-',
+          folder: 'app/icons/css-preprocessors/postcss.svg',
+          glyph: 'postcss'
+        },
+         {
+          baseClass: '',
+          classPrefix: 'icon-',
+          folder: 'app/icons/css-preprocessors/sass.svg',
+          glyph: 'sass'
+        },
+         {
+          baseClass: '',
+          classPrefix: 'icon-',
+          folder: 'app/icons/database/cassandra.svg',
+          glyph: 'cassandra'
+        },
+         {
+          baseClass: '',
+          classPrefix: 'icon-',
+          folder: 'app/icons/database/database.svg',
+          glyph: 'database'
+        },
+         {
+          baseClass: '',
+          classPrefix: 'icon-',
+          folder: 'app/icons/database/hadoop.svg',
+          glyph: 'hadoop'
+        },
+         {
+          baseClass: '',
+          classPrefix: 'icon-',
+          folder: 'app/icons/database/mariadb.svg',
+          glyph: 'mariadb'
+        },
+         {
+          baseClass: '',
+          classPrefix: 'icon-',
+          folder: 'app/icons/database/mongodb.svg',
+          glyph: 'mongodb'
+        },
+         {
+          baseClass: '',
+          classPrefix: 'icon-',
+          folder: 'app/icons/database/mysql-alt.svg',
+          glyph: 'mysql-alt'
+        },
+         {
+          baseClass: '',
+          classPrefix: 'icon-',
+          folder: 'app/icons/database/mysql.svg',
+          glyph: 'mysql'
+        },
+         {
+          baseClass: '',
+          classPrefix: 'icon-',
+          folder: 'app/icons/database/postgres.svg',
+          glyph: 'postgres'
+        },
+         {
+          baseClass: '',
+          classPrefix: 'icon-',
+          folder: 'app/icons/database/sql.svg',
+          glyph: 'sql'
+        },
+         {
+          baseClass: '',
+          classPrefix: 'icon-',
+          folder: 'app/icons/editors/sublime.svg',
+          glyph: 'sublime'
+        },
+         {
+          baseClass: '',
+          classPrefix: 'icon-',
+          folder: 'app/icons/frameworks/express.svg',
+          glyph: 'express'
+        },
+         {
+          baseClass: '',
+          classPrefix: 'icon-',
+          folder: 'app/icons/frameworks/grails.svg',
+          glyph: 'grails'
+        },
+         {
+          baseClass: '',
+          classPrefix: 'icon-',
+          folder: 'app/icons/frameworks/grailsalt.svg',
+          glyph: 'grailsalt'
+        },
+         {
+          baseClass: '',
+          classPrefix: 'icon-',
+          folder: 'app/icons/frameworks/laravel-alt.svg',
+          glyph: 'laravel-alt'
+        },
+         {
+          baseClass: '',
+          classPrefix: 'icon-',
+          folder: 'app/icons/frameworks/laravel.svg',
+          glyph: 'laravel'
+        },
+         {
+          baseClass: '',
+          classPrefix: 'icon-',
+          folder: 'app/icons/frameworks/phonegap.svg',
+          glyph: 'phonegap'
+        },
+         {
+          baseClass: '',
+          classPrefix: 'icon-',
+          folder: 'app/icons/frameworks/platter.svg',
+          glyph: 'platter'
+        },
+         {
+          baseClass: '',
+          classPrefix: 'icon-',
+          folder: 'app/icons/frameworks/playframework.svg',
+          glyph: 'playframework'
+        },
+         {
+          baseClass: '',
+          classPrefix: 'icon-',
+          folder: 'app/icons/frameworks/rails-alt.svg',
+          glyph: 'rails-alt'
+        },
+         {
+          baseClass: '',
+          classPrefix: 'icon-',
+          folder: 'app/icons/frameworks/rails.svg',
+          glyph: 'rails'
+        },
+         {
+          baseClass: '',
+          classPrefix: 'icon-',
+          folder: 'app/icons/issue-tracking/jira-alt.svg',
+          glyph: 'jira-alt'
+        },
+         {
+          baseClass: '',
+          classPrefix: 'icon-',
+          folder: 'app/icons/issue-tracking/jira.svg',
+          glyph: 'jira'
+        },
+         {
+          baseClass: '',
+          classPrefix: 'icon-',
+          folder: 'app/icons/js-libraries-frameworks/angular.svg',
+          glyph: 'angular'
+        },
+         {
+          baseClass: '',
+          classPrefix: 'icon-',
+          folder: 'app/icons/js-libraries-frameworks/backbone.svg',
+          glyph: 'backbone'
+        },
+         {
+          baseClass: '',
+          classPrefix: 'icon-',
+          folder: 'app/icons/js-libraries-frameworks/d3.svg',
+          glyph: 'd3'
+        },
+         {
+          baseClass: '',
+          classPrefix: 'icon-',
+          folder: 'app/icons/js-libraries-frameworks/ember.svg',
+          glyph: 'ember'
+        },
+         {
+          baseClass: '',
+          classPrefix: 'icon-',
+          folder: 'app/icons/js-libraries-frameworks/jquery-alt.svg',
+          glyph: 'jquery-alt'
+        },
+         {
+          baseClass: '',
+          classPrefix: 'icon-',
+          folder: 'app/icons/js-libraries-frameworks/jquery.svg',
+          glyph: 'jquery'
+        },
+         {
+          baseClass: '',
+          classPrefix: 'icon-',
+          folder: 'app/icons/js-libraries-frameworks/react.svg',
+          glyph: 'react'
+        },
+         {
+          baseClass: '',
+          classPrefix: 'icon-',
+          folder: 'app/icons/languages/c.svg',
+          glyph: 'c'
+        },
+         {
+          baseClass: '',
+          classPrefix: 'icon-',
+          folder: 'app/icons/languages/cplusplus.svg',
+          glyph: 'cplusplus'
+        },
+         {
+          baseClass: '',
+          classPrefix: 'icon-',
+          folder: 'app/icons/languages/csharp.svg',
+          glyph: 'csharp'
+        },
+         {
+          baseClass: '',
+          classPrefix: 'icon-',
+          folder: 'app/icons/languages/haskell.svg',
+          glyph: 'haskell'
+        },
+         {
+          baseClass: '',
+          classPrefix: 'icon-',
+          folder: 'app/icons/languages/java.svg',
+          glyph: 'java'
+        },
+         {
+          baseClass: '',
+          classPrefix: 'icon-',
+          folder: 'app/icons/languages/nodejs.svg',
+          glyph: 'nodejs'
+        },
+         {
+          baseClass: '',
+          classPrefix: 'icon-',
+          folder: 'app/icons/languages/objectivec.svg',
+          glyph: 'objectivec'
+        },
+         {
+          baseClass: '',
+          classPrefix: 'icon-',
+          folder: 'app/icons/languages/perl.svg',
+          glyph: 'perl'
+        },
+         {
+          baseClass: '',
+          classPrefix: 'icon-',
+          folder: 'app/icons/languages/php-alt.svg',
+          glyph: 'php-alt'
+        },
+         {
+          baseClass: '',
+          classPrefix: 'icon-',
+          folder: 'app/icons/languages/php.svg',
+          glyph: 'php'
+        },
+         {
+          baseClass: '',
+          classPrefix: 'icon-',
+          folder: 'app/icons/languages/python.svg',
+          glyph: 'python'
+        },
+         {
+          baseClass: '',
+          classPrefix: 'icon-',
+          folder: 'app/icons/languages/ruby.svg',
+          glyph: 'ruby'
+        },
+         {
+          baseClass: '',
+          classPrefix: 'icon-',
+          folder: 'app/icons/languages/scala.svg',
+          glyph: 'scala'
+        },
+         {
+          baseClass: '',
+          classPrefix: 'icon-',
+          folder: 'app/icons/linux/debian.svg',
+          glyph: 'debian'
+        },
+         {
+          baseClass: '',
+          classPrefix: 'icon-',
+          folder: 'app/icons/linux/fedora.svg',
+          glyph: 'fedora'
+        },
+         {
+          baseClass: '',
+          classPrefix: 'icon-',
+          folder: 'app/icons/linux/freebsd.svg',
+          glyph: 'freebsd'
+        },
+         {
+          baseClass: '',
+          classPrefix: 'icon-',
+          folder: 'app/icons/linux/gnome.svg',
+          glyph: 'gnome'
+        },
+         {
+          baseClass: '',
+          classPrefix: 'icon-',
+          folder: 'app/icons/linux/java-duke.svg',
+          glyph: 'java-duke'
+        },
+         {
+          baseClass: '',
+          classPrefix: 'icon-',
+          folder: 'app/icons/linux/kde.svg',
+          glyph: 'kde'
+        },
+         {
+          baseClass: '',
+          classPrefix: 'icon-',
+          folder: 'app/icons/linux/linux-mint.svg',
+          glyph: 'linux-mint'
+        },
+         {
+          baseClass: '',
+          classPrefix: 'icon-',
+          folder: 'app/icons/linux/netbsd.svg',
+          glyph: 'netbsd'
+        },
+         {
+          baseClass: '',
+          classPrefix: 'icon-',
+          folder: 'app/icons/linux/rasbaerrypi.svg',
+          glyph: 'rasbaerrypi'
+        },
+         {
+          baseClass: '',
+          classPrefix: 'icon-',
+          folder: 'app/icons/linux/redhat.svg',
+          glyph: 'redhat'
+        },
+         {
+          baseClass: '',
+          classPrefix: 'icon-',
+          folder: 'app/icons/linux/solaris.svg',
+          glyph: 'solaris'
+        },
+         {
+          baseClass: '',
+          classPrefix: 'icon-',
+          folder: 'app/icons/linux/suse.svg',
+          glyph: 'suse'
+        },
+         {
+          baseClass: '',
+          classPrefix: 'icon-',
+          folder: 'app/icons/linux/ubuntu.svg',
+          glyph: 'ubuntu'
+        },
+         {
+          baseClass: '',
+          classPrefix: 'icon-',
+          folder: 'app/icons/misc/autoit.svg',
+          glyph: 'autoit'
+        },
+         {
+          baseClass: '',
+          classPrefix: 'icon-',
+          folder: 'app/icons/misc/browsersync.svg',
+          glyph: 'browsersync'
+        },
+         {
+          baseClass: '',
+          classPrefix: 'icon-',
+          folder: 'app/icons/misc/confluence.svg',
+          glyph: 'confluence'
+        },
+         {
+          baseClass: '',
+          classPrefix: 'icon-',
+          folder: 'app/icons/misc/dynamicweb.svg',
+          glyph: 'dynamicweb'
+        },
+         {
+          baseClass: '',
+          classPrefix: 'icon-',
+          folder: 'app/icons/npm/babel.svg',
+          glyph: 'babel'
+        },
+         {
+          baseClass: '',
+          classPrefix: 'icon-',
+          folder: 'app/icons/npm/webpack.svg',
+          glyph: 'webpack'
+        },
+         {
+          baseClass: '',
+          classPrefix: 'icon-',
+          folder: 'app/icons/os/osx.svg',
+          glyph: 'osx'
+        },
+         {
+          baseClass: '',
+          classPrefix: 'icon-',
+          folder: 'app/icons/php/codeignitor.svg',
+          glyph: 'codeignitor'
+        },
+         {
+          baseClass: '',
+          classPrefix: 'icon-',
+          folder: 'app/icons/php/composer.svg',
+          glyph: 'composer'
+        },
+         {
+          baseClass: '',
+          classPrefix: 'icon-',
+          folder: 'app/icons/php/zend.svg',
+          glyph: 'zend'
+        },
+         {
+          baseClass: '',
+          classPrefix: 'icon-',
+          folder: 'app/icons/server/apache.svg',
+          glyph: 'apache'
+        },
+         {
+          baseClass: '',
+          classPrefix: 'icon-',
+          folder: 'app/icons/server/jetty.svg',
+          glyph: 'jetty'
+        },
+         {
+          baseClass: '',
+          classPrefix: 'icon-',
+          folder: 'app/icons/server/memcached.svg',
+          glyph: 'memcached'
+        },
+         {
+          baseClass: '',
+          classPrefix: 'icon-',
+          folder: 'app/icons/server/nginx-alt.svg',
+          glyph: 'nginx-alt'
+        },
+         {
+          baseClass: '',
+          classPrefix: 'icon-',
+          folder: 'app/icons/server/nginx.svg',
+          glyph: 'nginx'
+        },
+         {
+          baseClass: '',
+          classPrefix: 'icon-',
+          folder: 'app/icons/server/redis.svg',
+          glyph: 'redis'
+        },
+         {
+          baseClass: '',
+          classPrefix: 'icon-',
+          folder: 'app/icons/server/tomcat.svg',
+          glyph: 'tomcat'
+        },
+         {
+          baseClass: '',
+          classPrefix: 'icon-',
+          folder: 'app/icons/services/ec3.svg',
+          glyph: 'ec3'
+        },
+         {
+          baseClass: '',
+          classPrefix: 'icon-',
+          folder: 'app/icons/services/github-circle-alt.svg',
+          glyph: 'github-circle-alt'
+        },
+         {
+          baseClass: '',
+          classPrefix: 'icon-',
+          folder: 'app/icons/services/github-circle.svg',
+          glyph: 'github-circle'
+        },
+         {
+          baseClass: '',
+          classPrefix: 'icon-',
+          folder: 'app/icons/services/github.svg',
+          glyph: 'github'
+        },
+         {
+          baseClass: '',
+          classPrefix: 'icon-',
+          folder: 'app/icons/services/google-code.svg',
+          glyph: 'google-code'
+        },
+         {
+          baseClass: '',
+          classPrefix: 'icon-',
+          folder: 'app/icons/services/heroku.svg',
+          glyph: 'heroku'
+        },
+         {
+          baseClass: '',
+          classPrefix: 'icon-',
+          folder: 'app/icons/shell/shell-alt.svg',
+          glyph: 'shell-alt'
+        },
+         {
+          baseClass: '',
+          classPrefix: 'icon-',
+          folder: 'app/icons/shell/shell.svg',
+          glyph: 'shell'
+        },
+         {
+          baseClass: '',
+          classPrefix: 'icon-',
+          folder: 'app/icons/shell/shellscript.svg',
+          glyph: 'shellscript'
+        },
+         {
+          baseClass: '',
+          classPrefix: 'icon-',
+          folder: 'app/icons/standards/opensource.svg',
+          glyph: 'opensource'
+        },
+         {
+          baseClass: '',
+          classPrefix: 'icon-',
+          folder: 'app/icons/task-runner/bower.svg',
+          glyph: 'bower'
+        },
+         {
+          baseClass: '',
+          classPrefix: 'icon-',
+          folder: 'app/icons/task-runner/grunt.svg',
+          glyph: 'grunt'
+        },
+         {
+          baseClass: '',
+          classPrefix: 'icon-',
+          folder: 'app/icons/task-runner/gulp.svg',
+          glyph: 'gulp'
+        },
+         {
+          baseClass: '',
+          classPrefix: 'icon-',
+          folder: 'app/icons/testing/selenium.svg',
+          glyph: 'selenium'
+        },
+         {
+          baseClass: '',
+          classPrefix: 'icon-',
+          folder: 'app/icons/version/git-squared.svg',
+          glyph: 'git-squared'
+        },
+         {
+          baseClass: '',
+          classPrefix: 'icon-',
+          folder: 'app/icons/version/git.svg',
+          glyph: 'git'
+        },
+         {
+          baseClass: '',
+          classPrefix: 'icon-',
+          folder: 'app/icons/version/svn.svg',
+          glyph: 'svn'
+        },
+         {
+          baseClass: '',
+          classPrefix: 'icon-',
+          folder: 'app/icons/web-languages/css-alt.svg',
+          glyph: 'css-alt'
+        },
+         {
+          baseClass: '',
+          classPrefix: 'icon-',
+          folder: 'app/icons/web-languages/css3-alt.svg',
+          glyph: 'css3-alt'
+        },
+         {
+          baseClass: '',
+          classPrefix: 'icon-',
+          folder: 'app/icons/web-languages/css3.svg',
+          glyph: 'css3'
+        },
+         {
+          baseClass: '',
+          classPrefix: 'icon-',
+          folder: 'app/icons/web-languages/html5.svg',
+          glyph: 'html5'
+        },
+         {
+          baseClass: '',
+          classPrefix: 'icon-',
+          folder: 'app/icons/web-languages/js.svg',
+          glyph: 'js'
+        }
+      ];</script> <div class="row-fluid content"> <div class="col-md-4 col-sm-6 col-xs-12 block-container animate" ng-repeat="icon in icons | filter:q"> <div class=block data-name={{icon.glyph}}> <em class="{{icon.baseClass}} {{icon.classPrefix}}{{icon.glyph}}"> </em> <div class=block-name> {{icon.classPrefix}}{{icon.glyph}} </div> </div> </div> <div ng-show="(icons | filter:q).length == 0" class=center-align> <span class="muted center-align">I don't think we have that icon, please create an <a href=https://github.com/websiddu/technology-icons/issues target=_blank>issue</a>.</span> </div> </div> <div class=clearfix></div> <div class=row-fluid> <div class=col-md-8> <h3>Usage</h3> <p>Firstly, you have to declare the font in your CSS stylesheet:</p> <h4>CSS</h4> <pre data-src=styles/technology-icons.css></pre> <h4>HTML</h4> <pre><code class=language-html>&lt;em class="icon-photoshop"&gt;&lt;/em&gt;
+&lt;em class="icon-mysql"&gt;&lt;/em&gt;
+&lt;span class="icon-redis"&gt;&lt;/span&gt;
+&lt;a href="#" class="icon-rails"&gt;&lt;/a&gt;</code></pre> </div> <div class=col-md-4> <h3>Use it</h3> <a class="btn btn-success btn-lg" target=_blank href=https://github.com/websiddu/technology-icons/archive/gh-pages.zip> Download </a> <br> <br> <a class="btn btn-success" href=https://github.com/websiddu/technology-icons target=_blank> Fork on Github </a> <br><br> <a href=https://twitter.com/share class=twitter-share-button data-via=websiddu data-hashtags=technology-icons>Tweet</a> <script>!function(d,s,id){var js,fjs=d.getElementsByTagName(s)[0],p=/^http:/.test(d.location)?'http':'https';if(!d.getElementById(id)){js=d.createElement(s);js.id=id;js.src=p+'://platform.twitter.com/widgets.js';fjs.parentNode.insertBefore(js,fjs);}}(document, 'script', 'twitter-wjs');</script> <br><br> <a href=https://twitter.com/websiddu class=twitter-follow-button data-show-count=false>Follow @websiddu</a> <script>!function(d,s,id){var js,fjs=d.getElementsByTagName(s)[0],p=/^http:/.test(d.location)?'http':'https';if(!d.getElementById(id)){js=d.createElement(s);js.id=id;js.src=p+'://platform.twitter.com/widgets.js';fjs.parentNode.insertBefore(js,fjs);}}(document, 'script', 'twitter-wjs');</script> <br><br> <h4>License</h4> <p>It's <strong>free</strong> for whatever use ( commercial or personal ), both for web or for printing purpose. Licensed under the <a href="http://scripts.sil.org/cms/scripts/page.php?site_id=nrsi&amp;id=OFL">Open Font License</a>.</p> </div> </div> <div class=clearfix> </div> <div class=row-fluid> <div class=col-md-8> <h3>Contributing</h3> <p> You are welcome to add svg icons to the icons folder and submit a pull request or If you want any specific logo to be added to the list please create an <a href=https://github.com/websiddu/technology-icons/issues>issue</a>.</p> </div> <div class=col-md-4> </div> </div> <div class=clearfix></div> <div class=row-fluid> <div class=col-md-12> <h3>Thanks</h3> <p> Few icons are taken from <a href=http://mfizz.com/oss/font-mfizz>mfizz</a>. </p> <p class=muted> All icons representing commercial companies are trademarks of their respective owners. The use of these trademarks does not indicate endorsement of the trademark holder by technology-icons, nor vice versa. </p> </div> </div> </div> <script src=scripts/6ecbcc63.vendor.js></script> <!-- Google Analytics: change UA-XXXXX-X to be your site's ID. --> <script>(function(b,o,i,l,e,r){b.GoogleAnalyticsObject=l;b[l]||(b[l]=
+      function(){(b[l].q=b[l].q||[]).push(arguments)});b[l].l=+new Date;
+      e=o.createElement(i);r=o.getElementsByTagName(i)[0];
+      e.src='//www.google-analytics.com/analytics.js';
+      r.parentNode.insertBefore(e,r)}(window,document,'script','ga'));
+      ga('create','UA-55363605-1', 'auto');ga('send','pageview');</script> <script src=scripts/7aacdfe6.main.js></script>  
