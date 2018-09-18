@@ -2,9 +2,33 @@ import React, {Component} from "react";
 import "./Topology.css";
 import {connect} from "react-redux";
 import {withRouter} from 'react-router-dom';
-import {addRequest, pushMessage, setControlVisibility, setRealTime, setRealTimeValue, setRangeDate, setRangeHours, setRangeMinutes, setRangeValue, setRangeDateHoursMinutes, setRangeDateHoursMinutesValue, setRangeAll, setTemplate} from "../../actions";
+import {
+    addRequest,
+    pushMessage,
+    setControlVisibility,
+    setRealTime,
+    setRealTimeValue,
+    setRangeDate,
+    setRangeHours,
+    setRangeMinutes,
+    setRangeValue,
+    setRangeDateHoursMinutes,
+    setRangeDateHoursMinutesValue,
+    setRangeAll,
+    setTemplate
+} from "../../actions";
 import jQuery from "jquery";
-import {errorHandler, getData, getHttpProtocol, getWithCredentials, setAuthHeader, setData, getSearchDays, getDivideDays, getCurrentUser} from "../../common/common";
+import {
+    errorHandler,
+    getData,
+    getHttpProtocol,
+    getWithCredentials,
+    setAuthHeader,
+    setData,
+    getSearchDays,
+    getDivideDays,
+    getCurrentUser
+} from "../../common/common";
 import * as d3 from "d3";
 import _ from "lodash";
 import numeral from "numeral";
@@ -24,51 +48,61 @@ class Topology extends Component {
 
     instances = {};
 
+    option = {
+        zoom: false,
+        fontSize: 9
+    };
+
     objCategoryInfo = {
-        REDIS : {
-            fontFamily : "technology-icons",
-            fontSize : "18px",
-            text : "\uf15c",
-            color : "red"
+        REDIS: {
+            fontFamily: "technology-icons",
+            fontSize: "18px",
+            text: "\uf15c",
+            color: "#a42122"
         },
-        DB : {
-            fontFamily : "technology-icons",
-            fontSize : "18px",
-            text : "\uf117",
-            color : "blue"
+        DB: {
+            fontFamily: "technology-icons",
+            fontSize: "18px",
+            text: "\uf117",
+            color: "#1B3F8B"
         },
-        javaee : {
-            fontFamily : "technology-icons",
-            fontSize : "18px",
-            text : "\uf137",
-            color : "orange"
+        javaee: {
+            fontFamily: "technology-icons",
+            fontSize: "18px",
+            text: "\uf137",
+            color: "#e76f00"
         },
-        CLIENT : {
-            fontFamily : "FontAwesome",
-            fontSize : "18px",
-            text : "\uF007",
-            color : "black"
+        CLIENT: {
+            fontFamily: "FontAwesome",
+            fontSize: "18px",
+            text: "\uF007",
+            color: "#68b030"
         },
-        EXTERNAL : {
-            fontFamily : "FontAwesome",
-            fontSize : "18px",
-            text : "\uF0C1",
-            color : "green"
+        EXTERNAL: {
+            fontFamily: "FontAwesome",
+            fontSize: "18px",
+            text: "\uF0C1",
+            color: "#6331ae"
         },
-        NEO_DEFAULT : {
-            fontFamily : "FontAwesome",
-            fontSize : "18px",
-            text : "\uF0C1",
-            color : "green"
+        NEO_DEFAULT: {
+            fontFamily: "FontAwesome",
+            fontSize: "18px",
+            text: "\uF0C1",
+            color: "#282828"
         }
-    }
+    };
+
+    serverCnt = 0;
+    doneServerCnt = 0;
 
     constructor(props) {
         super(props);
 
         this.state = {
             list: [],
-            topology : []
+            topology: [],
+            nodes : [],
+            links : []
         }
     }
 
@@ -87,6 +121,7 @@ class Topology extends Component {
     componentDidMount() {
         if (!this.polling) {
             this.polling = setInterval(() => {
+                console.log(1);
                 this.getTopology(this.props.config, this.props.objects, this.props.user);
             }, this.interval);
         }
@@ -103,11 +138,14 @@ class Topology extends Component {
     }
 
     componentDidUpdate(prevProps, prevState) {
-        //console.log(this.state.list);
-        //console.log(this.instances);
-        console.log(this.props.counterInfo);
+        if (!this.init && this.state.topology.length > 0) {
+            this.draw();
+            this.init = true;
+        }
 
-        this.draw();
+        if (this.init && JSON.stringify(this.state.topology) !== JSON.stringify(prevState.topology)) {
+            this.update();
+        }
     }
 
     getAllInstanceInfo = (config) => {
@@ -115,7 +153,7 @@ class Topology extends Component {
         this.props.addRequest();
 
         this.setState({
-            loading : true
+            loading: true
         });
 
         jQuery.ajax({
@@ -126,7 +164,9 @@ class Topology extends Component {
             let servers = msg.result;
             this.instances = {};
             if (servers && servers.length > 0) {
-                for (let i=0; i<servers.length; i++) {
+                this.serverCnt = servers.length;
+                this.doneServerCnt = 0;
+                for (let i = 0; i < servers.length; i++) {
                     this.getInstanceList(servers[i].id);
                 }
             }
@@ -139,7 +179,7 @@ class Topology extends Component {
             errorHandler(xhr, textStatus, errorThrown, that.props);
         }).always(() => {
             this.setState({
-                loading : false
+                loading: false
             });
         });
     };
@@ -158,10 +198,15 @@ class Topology extends Component {
         }).done((msg) => {
             if (msg.result) {
                 const objects = msg.result;
+                this.doneServerCnt++;
                 if (objects && objects.length > 0) {
-                    objects.forEach((o)=> {
+                    objects.forEach((o) => {
                         that.instances[Number(o.objHash)] = o;
                     });
+                }
+
+                if (this.doneServerCnt >= this.serverCnt) {
+                    this.getTopology(this.props.config, this.props.objects, this.props.user);
                 }
             }
         }).fail((xhr, textStatus, errorThrown) => {
@@ -184,7 +229,7 @@ class Topology extends Component {
             }
 
             case "INTR_API_OUTGOING" : {
-                result["objType"]= "API" + data[position + "ObjHash"];
+                result["objType"] = "API" + data[position + "ObjHash"];
                 result["objTypeName"] = "API";
                 break;
             }
@@ -257,8 +302,6 @@ class Topology extends Component {
 
                 let list = msg.result;
                 if (list && list.length > 0) {
-                    console.log(list);
-                    console.log(that.instances);
                     let objectTypeTopologyMap = {};
                     let cnt = 0;
                     list.forEach((d) => {
@@ -296,34 +339,75 @@ class Topology extends Component {
                         } else {
                             cnt++;
                             objectTypeTopologyMap[d.fromObjType + "_" + d.toObjType] = {
-                                fromObjHash : d.fromObjType,
-                                fromObjName : d.fromObjTypeName,
-                                fromObjTypeFamily : d.fromObjTypeFamily,
-                                fromObjCategory : d.fromObjCategory,
-                                toObjHash : d.toObjType,
-                                toObjName : d.toObjTypeName,
-                                toObjTypeFamily : d.toObjTypeFamily,
-                                toObjCategory : d.toObjCategory,
-                                count : Number(d.count),
-                                errorCount : Number(d.errorCount),
-                                period : Number(d.period),
+                                fromObjHash: d.fromObjType,
+                                fromObjName: d.fromObjTypeName,
+                                fromObjTypeFamily: d.fromObjTypeFamily,
+                                fromObjCategory: d.fromObjCategory,
+                                toObjHash: d.toObjType,
+                                toObjName: d.toObjTypeName,
+                                toObjTypeFamily: d.toObjTypeFamily,
+                                toObjCategory: d.toObjCategory,
+                                count: Number(d.count),
+                                errorCount: Number(d.errorCount),
+                                period: Number(d.period),
                                 totalElapsed: Number(d.totalElapsed)
                             };
                         }
-
-
                     });
 
-                    console.log(objectTypeTopologyMap);
-
                     let topology = [];
+                    let outCount = 0;
                     for (let attr in objectTypeTopologyMap) {
-                        topology.push(objectTypeTopologyMap[attr])
+                        let obj = objectTypeTopologyMap[attr];
+                        if (obj.fromObjHash === "0" || obj.fromObjHash === "") {
+                            obj.fromObjHash = "OUTSIDE-" + (outCount++);
+                            obj.fromObjName = "OUTSIDE";
+                        }
+
+                        if (obj.toObjHash === "0" || obj.toObjHash === "") {
+                            obj.toObjHash = "OUTSIDE-" + (outCount++);
+                            obj.toObjName = "OUTSIDE";
+                        }
+                        topology.push(obj);
                     }
 
+                    let links = [];
+                    _.forEach(list, (obj) => {
+                        links.push({
+                            source: obj.fromObjHash,
+                            target: obj.toObjHash,
+                            count: obj.count,
+                            errorCount: obj.errorCount,
+                            interactionType: obj.interactionType,
+                            period: obj.period,
+                            totalElapsed: obj.totalElapsed
+                        });
+                    });
+
+                    // from, to 정보에서 유일한 노드 정보 추출
+                    let nodes = _.uniqBy(_.map(list, (d) => {
+                        return {
+                            id: d.fromObjHash,
+                            objName: d.fromObjName,
+                            objCategory: d.fromObjCategory,
+                            objTypeFamily: d.fromObjTypeFamily
+                        }
+                    }).concat(_.map(list, (d) => {
+                        return {
+                            id: d.toObjHash,
+                            objName: d.toObjName,
+                            objCategory: d.toObjCategory,
+                            objTypeFamily: d.toObjTypeFamily
+                        }
+                    })), (d) => {
+                        return d.id;
+                    });
+
                     this.setState({
-                        list : msg.result,
-                        topology : topology
+                        list: msg.result,
+                        topology: topology,
+                        nodes : this.mergeNode(this.state.nodes, nodes),
+                        links : this.mergeLink(this.state.links, links)
                     });
                 }
 
@@ -332,6 +416,98 @@ class Topology extends Component {
             });
         }
     };
+
+
+
+    mergeLink = (currentLinks, newLinks) => {
+
+        let linkMap = {};
+
+        currentLinks.forEach((link) => {
+            let id = "";
+            if (typeof(link.source) === "object") {
+                id = link.source.id + "_" + link.target.id;
+            } else {
+                id = link.source + "_" + link.target;
+            }
+
+            linkMap[id] = {
+                update : false,
+                link : link
+            };
+        });
+
+        newLinks.forEach((link) => {
+            let id = link.source + "_" + link.target;
+            if (linkMap[id]) {
+                linkMap[id].update = true;
+                linkMap[id].link.count = link.count;
+                linkMap[id].link.errorCount = link.errorCount;
+                linkMap[id].link.interactionType = link.interactionType;
+                linkMap[id].link.period = link.period;
+                linkMap[id].link.totalElapsed = link.totalElapsed;
+            } else {
+                linkMap[id] = {
+                    update : true,
+                    link : link
+                };
+            }
+        });
+
+        for (let id in linkMap) {
+            if (!linkMap[id].update) {
+                delete linkMap[id];
+            }
+        }
+
+        let mergedLink = [];
+
+        for (let id in linkMap) {
+            mergedLink.push(linkMap[id].link);
+        }
+
+        return mergedLink;
+    };
+
+    mergeNode = (currentNodes, newNodes) => {
+        let nodeMap = {};
+
+        currentNodes.forEach((node) => {
+            nodeMap[node.id] = {
+                update : false,
+                node : node
+            };
+        });
+
+        newNodes.forEach((node) => {
+            if (nodeMap[node.id]) {
+                nodeMap[node.id].update = true;
+                nodeMap[node.id].node.objCategory = node.objCategory;
+                nodeMap[node.id].node.objName = node.objName;
+                nodeMap[node.id].node.objTypeFamily = node.objTypeFamily;
+            } else {
+                nodeMap[node.id] = {
+                    update : true,
+                    node : node
+                };
+            }
+        });
+
+
+        for (let id in nodeMap) {
+            if (!nodeMap[id].update) {
+                delete nodeMap[id];
+            }
+        }
+
+        let mergedNode = [];
+
+        for (let id in nodeMap) {
+            mergedNode.push(nodeMap[id].node);
+        }
+
+        return mergedNode;
+    }
 
     dragstarted = (d) => {
         if (!d3.event.active) this.simulation.alphaTarget(0.3).restart();
@@ -350,53 +526,6 @@ class Topology extends Component {
         d.fy = null;
     };
 
-
-    /*
-    function tick() {
-  link.attr("d", function(d) {
-  var x1 = d.source.x,
-      y1 = d.source.y,
-      x2 = d.target.x,
-      y2 = d.target.y,
-      dx = x2 - x1,
-      dy = y2 - y1,
-      dr = Math.sqrt(dx * dx + dy * dy),
-
-      // Defaults for normal edge.
-      drx = dr,
-      dry = dr,
-      xRotation = 0, // degrees
-      largeArc = 0, // 1 or 0
-      sweep = 1; // 1 or 0
-
-      // Self edge.
-      if ( x1 === x2 && y1 === y2 ) {
-        // Fiddle with this angle to get loop oriented.
-        xRotation = -45;
-
-        // Needs to be 1.
-        largeArc = 1;
-
-        // Change sweep to change orientation of loop.
-        //sweep = 0;
-
-        // Make drx and dry different to get an ellipse
-        // instead of a circle.
-        drx = 30;
-        dry = 20;
-
-        // For whatever reason the arc collapses to a point if the beginning
-        // and ending points of the arc are the same, so kludge it.
-        x2 = x2 + 1;
-        y2 = y2 + 1;
-      }
-
- return "M" + x1 + "," + y1 + "A" + drx + "," + dry + " " + xRotation + "," + largeArc + "," + sweep + " " + x2 + "," + y2;
-});
-
-     */
-
-
     getCatgegoryInfo = (category) => {
         if (this.objCategoryInfo[category]) {
             return this.objCategoryInfo[category];
@@ -405,402 +534,284 @@ class Topology extends Component {
         }
     };
 
+    makeEdge = (d) => {
+        let x1 = d.source.x;
+        let y1 = d.source.y;
+        let x2 = d.target.x;
+        let y2 = d.target.y;
+        let dx = x2 - x1;
+        let dy = y2 - y1;
+        let dr = Math.sqrt(dx * dx + dy * dy);
+        let drx = dr;
+        let dry = dr;
+        let xRotation = 0;
+        let largeArc = 0;
+        let sweep = 1;
 
-    marker = () => {
-        this.svg.append('svg:defs').selectAll('marker')
-            .data([{ id: 'end-arrow', opacity: 1 }, { id: 'end-arrow-fade', opacity: 0.1 }])
-            .enter().append('marker')
-            .attr('id', d => d.id)
-            .attr('viewBox', '0 0 40 40')
-            .attr('refX', 58)
-            .attr('refY', 20)
-            .attr('markerWidth', 20)
-            .attr('markerHeight', 20)
-            .attr('orient', 'auto')
-            .attr('stroke', this.lineColor)
-            .attr('stroke-width', 8)
-            .attr('opacity', 0.5)
+        if (x1 === x2 && y1 === y2) {
+            xRotation = -45;
+            largeArc = 1;
+            drx = 30;
+            dry = 30;
+            x2 = x2 + 1;
+            y2 = y2 + 1;
+        }
 
-            .attr('fill', "transparent")
-            .append('svg:path')
-            .attr('d', 'M0,0 L20,20 L0,40')
-            .style('opacity', d => d.opacity);
+        return "M" + x1 + "," + y1 + "A" + drx + "," + dry + " " + xRotation + "," + largeArc + "," + sweep + " " + x2 + "," + y2;
     };
 
     draw = () => {
 
         let that = this;
 
-
-
         let wrapper = this.refs.topologyChart.parentNode;
         this.width = wrapper.offsetWidth;
         this.height = wrapper.offsetHeight;
 
-        let list = this.state.topology.slice(0);
+        let nodes = this.state.nodes;
+        let links = this.state.links;
 
-        console.log(list);
-
-        let outCount = 0;
-        let links = [];
         //console.log(list);
-        _.forEach(list, (obj) => {
-            if (obj.fromObjHash === "0" || obj.fromObjHash === "" ) {
-                obj.fromObjHash = "OUTSIDE-" + (outCount++);
-                obj.fromObjName = "OUTSIDE";
-            }
+        //console.log(that.instances);
 
-            if (obj.toObjHash === "0" || obj.toObjHash === "" ) {
-                obj.toObjHash = "OUTSIDE-" + (outCount++);
-                obj.toObjName = "OUTSIDE";
-            }
+        d3.select(this.refs.topologyChart).selectAll("svg");
+        this.svg = d3.select(this.refs.topologyChart).append("svg").attr("width", this.width).attr("height", this.height);
 
-            links.push({
-                source: obj.fromObjHash,
-                target: obj.toObjHash,
-                count : obj.count,
-                errorCount : obj.errorCount,
-                interactionType : obj.interactionType,
-                period : obj.period,
-                totalElapsed : obj.totalElapsed
-            });
-        });
-
-        let nodes = _.uniqBy(_.map(list, (d) => {
-            return {
-                id : d.fromObjHash,
-                objName : d.fromObjName,
-                objCategory : d.fromObjCategory,
-                objTypeFamily : d.fromObjTypeFamily
-            }
-        }).concat(_.map(list, (d) => {
-            return {
-                id : d.toObjHash,
-                objName : d.toObjName,
-                objCategory : d.toObjCategory,
-                objCategory : d.toObjCategory,
-                objTypeFamily : d.toObjTypeFamily
-            }
-        })), (d) => {
-            return d.id;
-        });
-
-        if (!this.init && nodes.length > 0) {
-            this.svg = d3.select(this.refs.topologyChart).append("svg").attr("width", this.width).attr("height", this.height)
-                /*.call(d3.zoom().on("zoom", function () {
-                    that.svg.attr("transform", d3.event.transform)
-                }));*/
-
-            //this.marker();
-
-            this.simulation = d3.forceSimulation();
-            this.simulation.force("link", d3.forceLink().id(function(d) { return d.id; }));
-            this.simulation.force('charge', d3.forceManyBody().strength([-10]));
-            this.simulation.force("center", d3.forceCenter(this.width / 2, this.height / 2));
-            this.simulation.force("collide", d3.forceCollide(40));
-            this.simulation.nodes(nodes).on("tick", this.ticked);
-
-            this.link = this.svg.append("g").style("stroke", "transparent").selectAll("line").data(links).enter().append("line")/*.attr('marker-end', 'url(#end-arrow)')*/;
-
-            this.edgepaths = this.svg.selectAll(".edgepath")
-                .data(links)
-                .enter()
-                .append('path')
-                .attr('class', 'edgepath')
-                .attr('id', function (d, i) {return 'edgepath' + i})
-                .style("pointer-events", "none");
-
-            this.edgelabels = this.svg.selectAll(".edgelabel")
-                .data(links)
-                .enter()
-                .append('text')
-                .style("pointer-events", "none")
-                .attr('class', 'edgelabel')
-                .attr('dy', -10)
-                .attr('id', function (d, i) {return 'edgelabel' + i});
-
-            this.edgeLabelsTextPath = this.edgelabels.append('textPath')
-                .attr('xlink:href', function (d, i) {return '#edgepath' + i})
-                .style("text-anchor", "middle")
-                .style("pointer-events", "none")
-                .attr("startOffset", "50%")
-                .attr('class', 'edge-label-path');
-
-            this.edgeLabelsTextPath
-                .append("tspan")
-                .attr('class', 'tps-text')
-                .text(function(d) {
-                    let tps = numeral(d.count / d.period).format(that.props.config.numberFormat);
-                    return tps + "TPS ";
-                });
-
-            this.edgeLabelsTextPath
-                .append("tspan")
-                .attr('class', 'error-rate-text')
-                .text(function(d) {
-                    let errorRate = numeral((d.errorCount / d.count) * 100).format(that.props.config.numberFormat);
-                    return errorRate + "% ";
-                });
-
-            this.edgeLabelsTextPath
-                .append("tspan")
-                .attr('class', 'avg-elapsed-text')
-                .text(function(d) {
-                    let avgElapsedTime  = numeral(d.totalElapsed / d.count).format(that.props.config.numberFormat);
-                    return avgElapsedTime + "ms";
-                });
-
-                //.attr('class', 'edge-label-text');
-                /*.text(function (d, i, e) {
-
-                    e[i].append("tspan").text("tst");
-                    console.log(e[i]);
-                    let tps = numeral(d.count / d.period).format(that.props.config.numberFormat);
-                    let errorRate = numeral((d.errorCount / d.count) * 100).format(that.props.config.numberFormat);
-                    let avgElapsedTime  = numeral(d.totalElapsed / d.count).format(that.props.config.numberFormat);
-                    return  "<tspan>" + tps + " TPS, " + errorRate + "%, " + avgElapsedTime + "ms</tspan>";
-                })*/
-                /*.text(function (d) {
-                    let tps = numeral(d.count / d.period).format(that.props.config.numberFormat);
-                    let errorRate = numeral((d.errorCount / d.count) * 100).format(that.props.config.numberFormat);
-                    let avgElapsedTime  = numeral(d.totalElapsed / d.count).format(that.props.config.numberFormat);
-                    return  tps + " TPS, " + errorRate + "%, " + avgElapsedTime + "ms";
-                })*/
-
-
-
-            this.flowline = this.svg.selectAll(".flowline")
-                .data(links)
-                .enter()
-                .append('path')
-                .attr('class', 'flowline')
-                .attr('id', function (d, i) {return 'flowline' + i})
-                .style("pointer-events", "none");
-
-
-
-
-
-
-
-
-
-
-
-
-            this.objectTypeLabel = this.svg.append("g").attr("class", "labels").selectAll("text").data(nodes).enter().append("text").attr("class", "label");
-            this.objectTypeLabel.text(function(d) { return d.objName; });
-
-            this.node = this.svg.append("g").attr("class", "nodes").selectAll("circle").data(nodes).enter().append("circle");
-            this.node.call(d3.drag().on("start", this.dragstarted).on("drag", this.dragged).on("end", this.dragended));
-
-            this.nodeLabelGroup = this.svg.append("g").attr("class", "node-labels").selectAll("text").data(nodes).enter().append("g");
-            this.nodeLabel = this.nodeLabelGroup.append("text").attr("class", "label").text(function(d) {
-                return (d.objTypeFamily ? d.objTypeFamily : d.objCategory).toUpperCase();
-            });
-
-            this.nodeIconGroup = this.svg.append("g").attr("class", "node-icon-group").selectAll("text").data(nodes).enter().append("g");
-            this.nodeIcon = this.nodeIconGroup.append("text").attr("class", "node-icon")
-                .style("font-family", function(d) {
-                    return that.getCatgegoryInfo(d.objCategory).fontFamily;
-                })
-                .style("font-size", function(d) {
-                    return that.getCatgegoryInfo(d.objCategory).fontSize;
-                }).style("fill", function(d) {
-                    return that.getCatgegoryInfo(d.objCategory).color;
-                })
-                .text(function(d) {
-                    return that.getCatgegoryInfo(d.objCategory).text;
-                });
-
-            this.simulation.force("link").links(links).distance([300]);
-            this.init = true;
+        if (this.option.zoom) {
+            this.svg.call(d3.zoom().on("zoom", function () {
+                that.svg.attr("transform", d3.event.transform);
+            }));
         }
+
+        this.simulation = d3.forceSimulation();
+        this.simulation.force("link", d3.forceLink().id(function (d) {
+            return d.id;
+        }));
+        this.simulation.force('charge', d3.forceManyBody().strength([-10]));
+        this.simulation.force("center", d3.forceCenter(this.width / 2, this.height / 2));
+        this.simulation.force("collide", d3.forceCollide(40));
+        this.simulation.nodes(nodes).on("tick", this.ticked);
+
+        // 노드에 표시되는 텍스트
+        this.edgePathGroup = this.svg.append("g").attr("class", "edge-path-group");
+        this.edgePathList = this.edgePathGroup.selectAll(".edge-path").data(links).enter().append('path').attr('class', 'edge-path').attr('id', function (d, i) {
+            return 'edgePath' + d.source + "_" + d.target;
+        }).style("pointer-events", "none");
+        this.edgeTextGroup = this.svg.append("g").attr("class", "edge-text-group");
+        this.edgeTextList = this.edgeTextGroup.selectAll(".edge-text").data(links).enter().append('text').style("pointer-events", "none").attr('class', 'edge-text').attr('dy', -10).attr('id', function (d, i) {
+            return 'edgeLabel' + i
+        });
+        this.edgeTextPath = this.edgeTextList.append('textPath').attr('xlink:href', function (d, i) {
+            return '#edgePath' + d.source + "_" + d.target;
+        }).style("text-anchor", "middle").style("pointer-events", "none").attr("startOffset", "50%").attr('class', 'edge-text-path');
+
+        this.edgeTextPath.append("tspan").attr('class', 'tps-tspan').text(function (d) {
+            let tps = numeral(d.count / d.period).format(that.props.config.numberFormat);
+            return tps + "r/s ";
+        });
+
+        this.edgeTextPath.append("tspan").attr('class', 'error-rate-tspan').text(function (d) {
+            let errorRate = numeral((d.errorCount / d.count) * 100).format(that.props.config.numberFormat);
+            return errorRate + "% ";
+        });
+
+        this.edgeTextPath.append("tspan").attr('class', 'avg-elapsed-tspan').text(function (d) {
+            let avgElapsedTime = numeral(d.totalElapsed / d.count).format(that.props.config.numberFormat);
+            return avgElapsedTime + "ms";
+        });
+
+        // 노드간의 연결 선
+        this.edgeFlowPathGroup = this.svg.append("g").attr("class", "edge-flow-path-group");
+
+
+
+        // 노드 아래에 표시되는 명칭
+        this.nodeNameTextGroup = this.svg.append("g").attr("class", "node-name-text-group");
+        this.nodeNameText = this.nodeNameTextGroup.selectAll(".node-name").data(nodes).enter().append("text").attr("class", "node-name").style("font-size", this.option.fontSize + "px").style("fill", "white").text(function (d) {
+            return d.objName;
+        });
+
+        // 노드
+        this.nodeGroup = this.svg.append("g").attr("class", "node-group");
+        this.node = this.nodeGroup.selectAll("circle").data(nodes).enter().append("circle").attr("r", this.r).style("stroke-width", "4px").style("fill", "white").style("stroke", function (d) {
+            return that.getCatgegoryInfo(d.objCategory).color;
+        });
+        this.node.call(d3.drag().on("start", this.dragstarted).on("drag", this.dragged).on("end", this.dragended));
+
+        this.nodeLabelGroup = this.svg.append("g").attr("class", "node-labels").selectAll("text").data(nodes).enter().append("g");
+        this.nodeLabel = this.nodeLabelGroup.append("text").attr("class", "label").style("font-size", this.option.fontSize + "px").text(function (d) {
+            return (d.objTypeFamily ? d.objTypeFamily : d.objCategory).toUpperCase();
+        }).style("fill", function (d) {
+            return that.getCatgegoryInfo(d.objCategory).color;
+        });
+
+        this.nodeIconGroup = this.svg.append("g").attr("class", "node-icon-group").selectAll("text").data(nodes).enter().append("g");
+        this.nodeIcon = this.nodeIconGroup.append("text").attr("class", "node-icon").style("font-family", function (d) {
+            return that.getCatgegoryInfo(d.objCategory).fontFamily;
+        }).style("font-size", function (d) {
+            return that.getCatgegoryInfo(d.objCategory).fontSize;
+        }).style("fill", function (d) {
+            return that.getCatgegoryInfo(d.objCategory).color;
+        }).text(function (d) {
+            return that.getCatgegoryInfo(d.objCategory).text;
+        });
+        this.nodeIcon.call(d3.drag().on("start", this.dragstarted).on("drag", this.dragged).on("end", this.dragended));
+
+        this.simulation.force("link").links(links).distance([300]);
+        this.init = true;
+
+    };
+
+    update = () => {
+
+        console.log("update");
+        let that = this;
+
+        //this.state.topology
+
+       /* console.log(this.state.links);
+        this.state.links.forEach((link) => {
+
+            let id = '#edgePath' + link.source + "_" + link.target;
+            console.log(link);
+            console.log(id);
+
+            this.edgePathList.select(id).text("123123123");
+        })*/
+        //d.source + "_" + d.target
+
+        let nodes = this.state.nodes;
+        let links = this.state.links;
+
+   /*     node = node.data(nodes, function(d) { return d.id;});
+        node.exit().remove();
+        node = node.enter().append("circle").attr("fill", function(d) { return color(d.id); }).attr("r", 8).merge(node);
+
+        // Apply the general update pattern to the links.
+        link = link.data(links, function(d) { return d.source.id + "-" + d.target.id; });
+        link.exit().remove();
+        link = link.enter().append("line").merge(link);*/
+
+
+
+
+
+
+    // 노드에 표시되는 텍스트
+        this.edgePathList = this.edgePathGroup.selectAll(".edge-path").data(links);
+        this.edgePathList.exit().remove();
+        this.edgePathList = this.edgePathList.enter().append('path').merge(this.edgePathList).attr('class', 'edge-path').attr('id', function (d, i) {
+            if (typeof(d.source) === "object") {
+                return 'edgePath' + d.source.id + "_" + d.target.id;
+            } else {
+                return 'edgePath' + d.source + "_" + d.target;
+            }
+        }).style("pointer-events", "none");
+
+        this.edgeTextList = this.edgeTextGroup.selectAll(".edge-text").data(links);
+        this.edgeTextList.exit().remove();
+        this.edgeTextList = this.edgeTextList.enter().append('text').merge(this.edgeTextList).style("pointer-events", "none").attr('class', 'edge-text').attr('dy', -10).attr('id', function (d, i) {
+            return 'edgeLabel' + i
+        });
+
+        this.edgeTextList.selectAll("textPath").remove();
+        this.edgeTextPath = this.edgeTextList.append('textPath').attr('xlink:href', function (d, i) {
+            if (typeof(d.source) === "object") {
+                return '#edgePath' + d.source.id + "_" + d.target.id;
+            } else {
+                return '#edgePath' + d.source + "_" + d.target;
+            }
+        }).style("text-anchor", "middle").style("pointer-events", "none").attr("startOffset", "50%").attr('class', 'edge-text-path');
+
+        this.edgeTextPath.append("tspan").attr('class', 'tps-tspan').text(function (d) {
+            let tps = numeral(d.count / d.period).format(that.props.config.numberFormat);
+            return tps + "r/s ";
+        });
+
+        this.edgeTextPath.append("tspan").attr('class', 'error-rate-tspan').text(function (d) {
+            let errorRate = numeral((d.errorCount / d.count) * 100).format(that.props.config.numberFormat);
+            return errorRate + "% ";
+        });
+
+        this.edgeTextPath.append("tspan").attr('class', 'avg-elapsed-tspan').text(function (d) {
+            let avgElapsedTime = numeral(d.totalElapsed / d.count).format(that.props.config.numberFormat);
+            return avgElapsedTime + "ms";
+        });
+
+        // 노드간의 연결 선
+        this.edgeFlowPath = this.edgeFlowPathGroup.selectAll(".edge-flow-path").data(links);
+        this.edgeFlowPath.exit().remove();
+        this.edgeFlowPath = this.edgeFlowPath.enter().append('path').merge(this.edgeFlowPath).attr('class', 'edge-flow-path').attr('id', function (d, i) {
+            return 'edgeFlowPath' + i
+        }).style("pointer-events", "none");
+
+
+
+        // 노드 아래에 표시되는 명칭
+        this.nodeNameText = this.nodeNameTextGroup.selectAll(".node-name").data(nodes);
+        this.nodeNameText.exit().remove();
+        this.nodeNameText = this.nodeNameText.enter().append("text").merge(this.nodeNameText).attr("class", "node-name").style("font-size", this.option.fontSize + "px").style("fill", "white").text(function (d) {
+            return d.objName;
+        });
+
+        // 노드
+        this.node.data(nodes);
+        this.node.exit().remove();
+        this.node.enter().append("circle").merge(this.node).attr("r", this.r).style("stroke-width", "4px").style("fill", "white").style("stroke", function (d) {
+            return that.getCatgegoryInfo(d.objCategory).color;
+        });
+
+
+        // Update and restart the simulation.
+
+
+
+        this.simulation.nodes(nodes);
+        this.simulation.force("link").links(links);
+        this.simulation.alpha(1).restart();
     };
 
     ticked = () => {
 
         let that = this;
-        let fontSize = 9;
-        let nodeLabelFontSize = 8;
-        this.link.attr("x1", function(d) { return d.source.x; });
-        this.link.attr("y1", function(d) { return d.source.y; });
-        this.link.attr("x2", function(d) { return d.target.x; });
-        this.link.attr("y2", function(d) { return d.target.y; });
 
-        this.node.attr("r", this.r).style("fill", "#efefef").style("stroke", "#424242").style("stroke-width", "4px");
+        // 노드 위치
         this.node.attr("cx", function (d) {
             return d.x;
-        });
-        this.node.attr("cy", function(d) {
+        }).attr("cy", function (d) {
             return d.y;
         });
 
-        this.nodeLabel.attr("x", function(d) {
+        // 노드 명 아래 가운데 위치 하도록
+        this.nodeNameText.attr("x", function (d) {
             let width = this.getComputedTextLength();
             return d.x - (width / 2);
         }).attr("y", function (d) {
-            return d.y + nodeLabelFontSize / 2 - 24;
-        }).style("font-size", nodeLabelFontSize + "px").style("fill", "white");
+            return d.y + that.r + (that.option.fontSize / 2) + 5;
+        });
 
-        this.nodeIcon.attr("x", function(d) {
+        // 노드 타입 명칭 상단 가운데 위치 하도록
+        this.nodeLabel.attr("x", function (d) {
             let width = this.getComputedTextLength();
             return d.x - (width / 2);
         }).attr("y", function (d) {
-            return d.y + nodeLabelFontSize / 2 + 3;
+            return d.y + (that.option.fontSize / 2) - 24;
         });
 
-        let padding = {
-            left : 4,
-            right : 4,
-            bottom : 2,
-            top : 2
-        };
-
-
-
-
-        this.objectTypeLabel.attr("x", function(d) {
+        // 노드 타입 명칭 상단 가운데 위치 하도록
+        this.nodeIcon.attr("x", function (d) {
             let width = this.getComputedTextLength();
             return d.x - (width / 2);
+        }).attr("y", function (d) {
+            return d.y + that.option.fontSize / 2 + 3;
         });
 
-        this.objectTypeLabel.attr("y", function (d) {
-            return d.y + that.r + (fontSize/2) + 5;
-        });
-
-        this.objectTypeLabel.style("font-size", fontSize + "px").style("fill", "white");
-
-        this.edgepaths.attr('d', function (d) {
-            // 직선
-            //return 'M ' + d.source.x + ' ' + d.source.y + ' L ' + d.target.x + ' ' + d.target.y;
-
-
-            // 곡선
-            /*var dx = d.target.x - d.source.x,
-                dy = d.target.y - d.source.y,
-                dr = Math.sqrt(dx * dx + dy * dy);
-            return "M" +
-                d.source.x + "," +
-                d.source.y + "A" +
-                dr + "," + dr + " 0 0,1 " +
-                d.target.x + "," +
-                d.target.y;*/
-
-          var x1 = d.source.x,
-                y1 = d.source.y,
-                x2 = d.target.x,
-                y2 = d.target.y,
-                dx = x2 - x1,
-                dy = y2 - y1,
-                dr = Math.sqrt(dx * dx + dy * dy),
-
-                // Defaults for normal edge.
-                drx = dr,
-                dry = dr,
-                xRotation = 0, // degrees
-                largeArc = 0, // 1 or 0
-                sweep = 1; // 1 or 0
-
-            // Self edge.
-            if ( x1 === x2 && y1 === y2 ) {
-                // Fiddle with this angle to get loop oriented.
-                xRotation = -45;
-
-                // Needs to be 1.
-                largeArc = 1;
-
-                // Change sweep to change orientation of loop.
-                //sweep = 0;
-
-                // Make drx and dry different to get an ellipse
-                // instead of a circle.
-                drx = 30;
-                dry = 30;
-
-                // For whatever reason the arc collapses to a point if the beginning
-                // and ending points of the arc are the same, so kludge it.
-                x2 = x2 + 1;
-                y2 = y2 + 1;
-            }
-
-            return "M" + x1 + "," + y1 + "A" + drx + "," + dry + " " + xRotation + "," + largeArc + "," + sweep + " " + x2 + "," + y2;
-        });
-
-        this.flowline.attr('d', function (d) {
-            // 직선
-            //return 'M ' + d.source.x + ' ' + d.source.y + ' L ' + d.target.x + ' ' + d.target.y;
-
-            // 곡선
-            /*var dx = d.target.x - d.source.x,
-                dy = d.target.y - d.source.y,
-                dr = Math.sqrt(dx * dx + dy * dy);
-            return "M" +
-                d.source.x + "," +
-                d.source.y + "A" +
-                dr + "," + dr + " 0 0,1 " +
-                d.target.x + "," +
-                d.target.y;*/
-
-            var x1 = d.source.x,
-                y1 = d.source.y,
-                x2 = d.target.x,
-                y2 = d.target.y,
-                dx = x2 - x1,
-                dy = y2 - y1,
-                dr = Math.sqrt(dx * dx + dy * dy),
-
-                // Defaults for normal edge.
-                drx = dr,
-                dry = dr,
-                xRotation = 0, // degrees
-                largeArc = 0, // 1 or 0
-                sweep = 1; // 1 or 0
-
-            // Self edge.
-            if ( x1 === x2 && y1 === y2 ) {
-                // Fiddle with this angle to get loop oriented.
-                xRotation = -45;
-
-                // Needs to be 1.
-                largeArc = 1;
-
-                // Change sweep to change orientation of loop.
-                //sweep = 0;
-
-                // Make drx and dry different to get an ellipse
-                // instead of a circle.
-                drx = 30;
-                dry = 30;
-
-                // For whatever reason the arc collapses to a point if the beginning
-                // and ending points of the arc are the same, so kludge it.
-                x2 = x2 + 1;
-                y2 = y2 + 1;
-            }
-
-            return "M" + x1 + "," + y1 + "A" + drx + "," + dry + " " + xRotation + "," + largeArc + "," + sweep + " " + x2 + "," + y2;
-        });
-
-       /* this.edgelabels.attr('transform', function (d) {
-
-
-
-            if (d.target.x < d.source.x) {
-                var bbox = this.getBBox();
-                var rx = bbox.x + bbox.width / 2;
-                var ry = bbox.y + bbox.height / 2;
-                return 'rotate(180 ' + rx + ' ' + ry + ')';
-            }
-            else {
-                return 'rotate(0)';
-            }
-        });*/
+        // 에지 선
+        this.edgePathList.attr('d', that.makeEdge);
+        this.edgeFlowPath.attr('d', that.makeEdge);
     };
 
     render() {
-
-
         return (
             <div className="topology-wrapper">
                 <div className="topology-chart" ref="topologyChart"></div>
@@ -810,37 +821,37 @@ class Topology extends Component {
 }
 
 let mapStateToProps = (state) => {
-        return {
-            objects: state.target.objects,
-            selection: state.target.selection,
-            config: state.config,
-            user: state.user,
-            template: state.template,
-            range: state.range,
-            counterInfo: state.counterInfo,
-        };
+    return {
+        objects: state.target.objects,
+        selection: state.target.selection,
+        config: state.config,
+        user: state.user,
+        template: state.template,
+        range: state.range,
+        counterInfo: state.counterInfo,
     };
+};
 
 let mapDispatchToProps = (dispatch) => {
-        return {
-            addRequest: () => dispatch(addRequest()),
-            pushMessage: (category, title, content) => dispatch(pushMessage(category, title, content)),
-            setControlVisibility: (name, value) => dispatch(setControlVisibility(name, value)),
+    return {
+        addRequest: () => dispatch(addRequest()),
+        pushMessage: (category, title, content) => dispatch(pushMessage(category, title, content)),
+        setControlVisibility: (name, value) => dispatch(setControlVisibility(name, value)),
 
-            setRealTime : (realTime, longTerm) => dispatch(setRealTime(realTime, longTerm)),
-            setRealTimeValue: (realTime, longTerm, value) => dispatch(setRealTimeValue(realTime, longTerm, value)),
-            setRangeDate: (date) => dispatch(setRangeDate(date)),
-            setRangeHours: (hours) => dispatch(setRangeHours(hours)),
-            setRangeMinutes: (minutes) => dispatch(setRangeMinutes(minutes)),
-            setRangeValue: (value) => dispatch(setRangeValue(value)),
-            setRangeDateHoursMinutes: (date, hours, minutes) => dispatch(setRangeDateHoursMinutes(date, hours, minutes)),
-            setRangeDateHoursMinutesValue: (date, hours, minutes, value) => dispatch(setRangeDateHoursMinutesValue(date, hours, minutes, value)),
-            setRangeAll: (date, hours, minutes, value, realTime, longTerm, range, step) => dispatch(setRangeAll(date, hours, minutes, value, realTime, longTerm, range, step)),
+        setRealTime: (realTime, longTerm) => dispatch(setRealTime(realTime, longTerm)),
+        setRealTimeValue: (realTime, longTerm, value) => dispatch(setRealTimeValue(realTime, longTerm, value)),
+        setRangeDate: (date) => dispatch(setRangeDate(date)),
+        setRangeHours: (hours) => dispatch(setRangeHours(hours)),
+        setRangeMinutes: (minutes) => dispatch(setRangeMinutes(minutes)),
+        setRangeValue: (value) => dispatch(setRangeValue(value)),
+        setRangeDateHoursMinutes: (date, hours, minutes) => dispatch(setRangeDateHoursMinutes(date, hours, minutes)),
+        setRangeDateHoursMinutesValue: (date, hours, minutes, value) => dispatch(setRangeDateHoursMinutesValue(date, hours, minutes, value)),
+        setRangeAll: (date, hours, minutes, value, realTime, longTerm, range, step) => dispatch(setRangeAll(date, hours, minutes, value, realTime, longTerm, range, step)),
 
-            setTemplate: (boxes, layouts) => dispatch(setTemplate(boxes, layouts))
+        setTemplate: (boxes, layouts) => dispatch(setTemplate(boxes, layouts))
 
-        };
     };
+};
 
 Topology = connect(mapStateToProps, mapDispatchToProps)(Topology);
 export default withRouter(Topology);

@@ -11,7 +11,7 @@
     -moz-user-select: none; /* Firefox */
     -ms-user-select: none; /* Internet Explorer/Edge */
     user-select: none;
-    font-family: 'Righteous','Nanum Gothic',cursive;
+    font-family: 'Righteous', 'Nanum Gothic', cursive;
 }
 
 @keyframes flow {
@@ -34,7 +34,7 @@
     }
 }
 
-.flowline {
+.edge-flow-path {
     fill: none;
     stroke: white;
     opacity: 0.5;
@@ -44,22 +44,24 @@
     -webkit-animation: flow 1s linear infinite;
 }
 
-
-.edge-label-path {
+.edge-text-path {
     font-size: 10px;
     fill: white;
 }
 
-.error-rate-text {
+.error-rate-tspan {
     fill: red;
-
 }
 
-.edgepath {
+.edge-path {
     fill: none;
     stroke: black;
     stroke: none;
     stroke-width: 1.5px;
+}
+
+.edge-text {
+
 }
 
 
