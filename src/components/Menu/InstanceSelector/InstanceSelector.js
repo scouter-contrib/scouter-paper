@@ -352,11 +352,14 @@ class InstanceSelector extends Component {
             this.props.pushMessage("info", "NO MONITORING TARGET", "At least one object must be selected");
             this.props.setControlVisibility("Message", true);
         } else {
+
+
             objects.sort((a, b) => a.objName < b.objName ? -1 : 1);
             AgentColor.setInstances(objects, this.props.config.colorType);
             this.props.setTarget(objects);
             this.props.setControlVisibility("TargetSelector", false);
-            common.setRangePropsToUrl(this.props, "/paper");
+            //console.log(this.props.location.pathname);
+            common.setRangePropsToUrl(this.props);
             this.props.toggleSelectorVisible();
         }
     };
