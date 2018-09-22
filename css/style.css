@@ -90,6 +90,8 @@ h1 {
   background: transparent;
   color: #fff;
   border-top: 6px solid #1ab394;
+  border-top: 6px solid #003F87;
+
 }
 .navbar-default .navbar-nav > li > a:hover {
   color: #1ab394;
@@ -104,7 +106,7 @@ h1 {
 }
 .navbar-default .navbar-brand:hover,
 .navbar-default .navbar-brand:focus {
-  background: #17a185;
+
   color: #fff;
 }
 .navbar-default .navbar-brand {
@@ -112,12 +114,37 @@ h1 {
   height: auto;
   display: block;
   font-size: 14px;
-  background: #1ab394;
+  margin-top: 5px;
+
   padding: 15px 20px 15px 20px;
+  padding: 10px;
   border-radius: 0 0px 5px 5px;
   font-weight: 700;
   transition: all 0.3s ease-in-out 0s;
 }
+
+.navbar-default .navbar-brand .img-wrapper {
+  text-align: center;
+}
+
+.navbar-default .navbar-brand .text-wrapper {
+  font-size: 14px;
+}
+
+.navbar-scroll .navbar-brand .text-wrapper {
+  color: #282828;
+}
+
+.navbar-default .navbar-brand img {
+  width: 24px;
+  box-sizing: border-box;
+  display: inline-block;
+}
+
+.navbar-brand>img {
+
+}
+
 .navbar-scroll.navbar-default .nav li a {
   color: #676a6c;
 }
@@ -137,7 +164,7 @@ h1 {
   padding: 20px 10px;
 }
 .navbar.navbar-scroll .navbar-brand {
-  margin-top: 15px;
+  margin-top: 5px;
   border-radius: 5px;
   font-size: 12px;
   padding: 10px;
