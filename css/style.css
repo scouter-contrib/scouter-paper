@@ -145,6 +145,15 @@ h1 {
 
 }
 
+.img5 {
+  width: 500px;
+}
+
+.img6 {
+  width: 70%;
+  margin-right: 0 !important;
+}
+
 .navbar-scroll.navbar-default .nav li a {
   color: #676a6c;
 }
@@ -177,10 +186,12 @@ h1 {
   width: 100%;
 }
 .header-back.one {
-  background: url('../img/header_one.jpg') 50% 0 no-repeat;
+  background: url('../img/img1.png') 30% 10% no-repeat;
+  background-size: 100%;
 }
 .header-back.two {
-  background: url('../img/header_two.jpg') 50% 0 no-repeat;
+  background: url('../img/img2.png') 100% 0 no-repeat;
+  background-size: 100%;
 }
 /* CUSTOMIZE THE CAROUSEL
 -------------------------------------------------- */
