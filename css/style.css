@@ -1,4 +1,5 @@
 @import url("//fonts.googleapis.com/css?family=Open+Sans:300,400,600,700&amp;lang=en");
+@import url("//fonts.googleapis.com/earlyaccess/nanumgothic.css");
 /*
  *
  *   INSPINIA Landing Page - Responsive Admin Theme
@@ -9,23 +10,23 @@
 -------------------------------------------------- */
 body {
   color: #676a6c;
-  font-family: 'Open Sans', helvetica, arial, sans-serif;
+  font-family: "Nanum Gothic", 'Open Sans', helvetica, arial, sans-serif;
 }
 span.navy {
-  color: #1ab394;
+  color: #003F87;
 }
 p.text-color {
   color: #676a6c;
 }
 a.navy-link {
-  color: #1ab394;
+  color: #003F87;
   text-decoration: none;
 }
 a.navy-link:hover {
   color: #17a185;
 }
 section p {
-  color: #aeaeae;
+  color: #666;
   font-size: 13px;
 }
 address {
@@ -40,10 +41,10 @@ h1 {
   width: 60px;
   height: 1px;
   margin: 60px auto 0;
-  border-bottom: 2px solid #1ab394;
+  border-bottom: 2px solid #003F87;
 }
 .navy-bg {
-  background-color: #1ab394;
+  background-color: #003F87;
   color: #ffffff;
 }
 /* CUSTOMIZE THE NAVBAR
@@ -63,6 +64,7 @@ h1 {
 .navbar-wrapper .navbar {
   padding-right: 15px;
   padding-left: 15px;
+  background-color: rgba(0,0,0,0.6);
 }
 .navbar-default.navbar-scroll {
   background-color: #fff;
@@ -89,12 +91,12 @@ h1 {
 .navbar-default .navbar-nav > .active > a:hover {
   background: transparent;
   color: #fff;
-  border-top: 6px solid #1ab394;
+  border-top: 6px solid #003F87;
   border-top: 6px solid #003F87;
 
 }
 .navbar-default .navbar-nav > li > a:hover {
-  color: #1ab394;
+  color: #003F87;
 }
 .navbar-default .navbar-nav > .active > a:focus {
   background: transparent;
@@ -158,16 +160,17 @@ h1 {
   color: #676a6c;
 }
 .navbar-scroll.navbar-default .nav li a:hover {
-  color: #1ab394;
+  color: #003F87;
 }
 .navbar-wrapper .navbar.navbar-scroll {
   padding-top: 0;
-  padding-bottom: 5px;
+  padding-bottom: 0px;
   border-bottom: 1px solid #e7eaec;
   border-radius: 0;
 }
 .nav > li > a {
   padding: 25px 10px 15px 10px;
+  padding: 20px 10px;
 }
 .navbar-scroll .navbar-nav > li > a {
   padding: 20px 10px;
@@ -186,12 +189,14 @@ h1 {
   width: 100%;
 }
 .header-back.one {
-  background: url('../img/img1.png') 30% 10% no-repeat;
-  background-size: 100%;
+  background: #313232;
+  background : url('../img/img10.png') 50% 0 no-repeat;
+  background : url('../img/img10.png') 50% 0 no-repeat, linear-gradient(to right, #3c3c3d, #313232);
 }
 .header-back.two {
-  background: url('../img/img2.png') 100% 0 no-repeat;
-  background-size: 100%;
+  background: #313232;
+  background : url('../img/img11.png') 50% 0 no-repeat;
+  background : url('../img/img11.png') 50% 0 no-repeat, linear-gradient(to right, #f0f0f0, #e2e1e1);
 }
 /* CUSTOMIZE THE CAROUSEL
 -------------------------------------------------- */
@@ -202,6 +207,10 @@ h1 {
 /* Since positioning the image, we need to help out the caption */
 .carousel-caption {
   z-index: 10;
+}
+
+.carousel-caption.two {
+  color: #333;
 }
 /* Declare heights because of positioning of img element */
 .carousel .item {
@@ -316,7 +325,7 @@ h1 {
   margin-top: 40px;
 }
 .features small {
-  color: #1ab394;
+  color: #003F87;
 }
 .features h2 {
   font-size: 18px;
@@ -329,12 +338,12 @@ h1 {
   font-weight: 200;
 }
 .features-icon {
-  color: #1ab394;
+  color: #003F87;
   font-size: 40px;
 }
 .navy-section {
   margin-top: 60px;
-  background: #1ab394;
+  background: #003F87;
   color: #fff;
   padding: 20px 0;
 }
@@ -349,7 +358,7 @@ h1 {
   margin: auto;
 }
 .social-icon a {
-  background: #1ab394;
+  background: #003F87;
   color: #fff;
   padding: 4px 8px;
   height: 28px;
@@ -380,7 +389,7 @@ h1 {
 }
 .pricing-plan .pricing-price span {
   font-weight: 700;
-  color: #1ab394;
+  color: #003F87;
 }
 li.pricing-desc {
   font-size: 13px;
@@ -388,7 +397,7 @@ li.pricing-desc {
   padding: 20px 16px ;
 }
 li.pricing-title {
-  background: #1ab394;
+  background: #003F87;
   color: #fff;
   padding: 10px;
   border-radius: 4px 4px 0 0;
@@ -398,14 +407,14 @@ li.pricing-title {
 .testimonials {
   padding-top: 80px;
   padding-bottom: 90px;
-  background-color: #1ab394;
+  background-color: #003F87;
   background-image: url('../img/avatar_all.png');
 }
 .big-icon {
   font-size: 56px;
 }
 .features .big-icon {
-  color: #1ab394;
+  color: #003F87;
 }
 .contact {
   background-image: url('../img/word_map.png');
@@ -423,8 +432,8 @@ li.pricing-title {
   color: #fff;
 }
 .btn-primary {
-  background-color: #1ab394;
-  border-color: #1ab394;
+  background-color: #003F87;
+  border-color: #003F87;
   color: #FFFFFF;
   font-size: 14px;
   padding: 10px 20px;
@@ -521,7 +530,7 @@ fieldset[disabled] .btn-primary.active {
     color: #676a6c;
   }
   .navbar-default .nav li a:hover {
-    color: #1ab394;
+    color: #003F87;
   }
   .navbar-wrapper .navbar {
     padding-top: 0;
@@ -1008,7 +1017,7 @@ section.comments {
   font-weight: 500;
 }
 .vertical-date small {
-  color: #1ab394;
+  color: #003F87;
   font-weight: 400;
 }
 .vertical-timeline-content::before {
