@@ -34,13 +34,14 @@ address {
 }
 h1 {
   margin-top: 10px;
-  font-size: 30px;
+  font-size: 20px;
   font-weight: 200;
+  padding: 0 20px;
 }
 .navy-line {
   width: 60px;
   height: 1px;
-  margin: 60px auto 0;
+  margin: 80px auto 0;
   border-bottom: 2px solid #003F87;
 }
 .navy-bg {
@@ -145,6 +146,10 @@ h1 {
 
 .navbar-brand>img {
 
+}
+
+.feature-text {
+  margin-top: 100px;
 }
 
 
@@ -315,7 +320,7 @@ h1 {
   margin-top: 40px;
 }
 .features-text {
-  margin-top: 40px;
+
 }
 .features small {
   color: #003F87;
@@ -410,10 +415,45 @@ li.pricing-title {
   color: #003F87;
 }
 .contact {
-  background-image: url('../img/word_map.png');
+  /*background-image: url('../img/word_map.png');
   background-position: 50% 50%;
   background-repeat: no-repeat;
-  margin-top: 60px;
+  margin-top: 60px;*/
+}
+
+.git-hub {
+  font-size: 100px;
+}
+
+.scouter-img {
+  padding: 10px 0 0;
+}
+.scouter-img img {
+  width: 100px;
+  height: 100px;
+  border-radius: 50%;
+}
+
+.paper-link a {
+  display: inline-block;
+  padding: 5px 10px;
+}
+
+.paper-link a:hover {
+  color: #003F87;
+  text-decoration: none;
+}
+
+.contact-section {
+  padding-bottom: 40px;
+}
+
+.intro-text {
+  margin-top: 30px;
+}
+
+.git-hub-section{
+  padding-bottom: 60px;
 }
 /* Buttons - only primary custom button
 ------------------------- */
@@ -1023,14 +1063,14 @@ section.comments {
   border: 7px solid transparent;
   border-right: 7px solid white;
 }
-@media only screen and (min-width: 768px) {
+
   .vertical-timeline-content h2 {
     font-size: 18px;
   }
   .vertical-timeline-content p {
     font-size: 13px;
   }
-}
+
 @media only screen and (min-width: 1170px) {
   .center-orientation .vertical-timeline-content {
     margin-left: 0;
