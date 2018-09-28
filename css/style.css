@@ -97,7 +97,7 @@ h1 {
 
 }
 .navbar-default .navbar-nav > li > a:hover {
-  color: #003F87;
+  color: #90caf9;
 }
 .navbar-default .navbar-nav > .active > a:focus {
   background: transparent;
@@ -131,11 +131,21 @@ h1 {
 }
 
 .navbar-default .navbar-brand .text-wrapper {
-  font-size: 14px;
+  font-size: 18px;
+  text-align: center;
+}
+
+.navbar-default .navbar-brand .text-wrapper .small-logo {
+  font-size: 12px;
 }
 
 .navbar-scroll .navbar-brand .text-wrapper {
   color: #282828;
+}
+
+.navbar-scroll .navbar-brand .text-wrapper > div {
+  margin:  0 auto;
+  text-align: center;
 }
 
 .navbar-default .navbar-brand img {
@@ -429,8 +439,8 @@ li.pricing-title {
   padding: 10px 0 0;
 }
 .scouter-img img {
-  width: 100px;
-  height: 100px;
+  width: 85px;
+  height: 85px;
   border-radius: 50%;
 }
 
@@ -538,6 +548,14 @@ fieldset[disabled] .btn-primary.active {
     display: none;
   }
 }
+
+.main-text{
+  line-height: 120%;
+}
+.navbar-toggle {
+  margin-top: 14px;
+  margin-right: 6px;
+}
 @media (max-width: 768px) {
   .carousel-caption,
   .carousel-caption.blank {
@@ -548,7 +566,7 @@ fieldset[disabled] .btn-primary.active {
     font-size: 28px;
   }
   .navbar.navbar-scroll .navbar-brand {
-    margin-top: 6px;
+    margin-top: 0px;
   }
   .navbar-default {
     background-color: #fff;
@@ -563,11 +581,11 @@ fieldset[disabled] .btn-primary.active {
     color: #676a6c;
   }
   .navbar-default .nav li a:hover {
-    color: #003F87;
+    _color: #003F87;
   }
   .navbar-wrapper .navbar {
     padding-top: 0;
-    padding-bottom: 5px;
+    padding-bottom: 0;
     border-bottom: 1px solid #e7eaec;
     border-radius: 0;
   }
@@ -578,7 +596,7 @@ fieldset[disabled] .btn-primary.active {
     padding: 20px 10px;
   }
   .navbar .navbar-brand {
-    margin-top: 6px;
+    margin-top: 0px;
     border-radius: 5px;
     font-size: 12px;
     padding: 10px;

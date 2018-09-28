@@ -40,20 +40,23 @@
                         <span class="icon-bar"></span>
                     </button>
                     <a class="navbar-brand" href="#">
-                        <div class="img-wrapper">
-                            <img src="./img/scouter.png" />
+                        <div class="text-wrapper">
+                            <!--<div class="img-wrapper">
+                                <img src="./img/scouter.png" />
+                            </div>-->
+                            <div class="small-logo">SCOUTER</div>
+                            <div>PAPER</div>
                         </div>
-                        <div class="text-wrapper">SCOUTER PAPER</div>
                     </a>
                 </div>
                 <div id="navbar" class="navbar-collapse collapse">
                     <ul class="nav navbar-nav navbar-right">
                         <li><a class="page-scroll" href="#page-top">Home</a></li>
                         <li><a class="page-scroll" href="#features">Features</a></li>
-                        <li><a class="page-scroll" href="#install">Install</a></li>
-                        <li><a class="page-scroll" href="#manual">Manual</a></li>
+                        <li><a class="page-scroll" href="#release">Release</a></li>
+                        <li><a class="page-scroll" href="#guide">Guide</a></li>
                         <li><a class="page-scroll" href="#team">Team</a></li>
-                        <li><a class="page-scroll" href="#contact">Contact</a></li>
+                        <li><a class="page-scroll" href="#github">GITHUB</a></li>
                     </ul>
                 </div>
             </div>
@@ -141,8 +144,8 @@
     <div class="row">
         <div class="col-lg-12 text-center">
             <div class="navy-line"></div>
-            <h1 lang="ko"><span class="navy">웹 브라우저</span>를 통해 스카우터의 <span class="navy">성능 데이터를 최적화된 형태로 모니터</span>링 할 수 있습니다. <br/>또한 텔레그라프와의 연동을 통해 다양한 소프트웨어 성능 정보를 스카우터 성능 데이터와 함께 유기적으로 분석이 가능합니다.</h1>
-            <h1 lang="en">You can monitor the Scouter performance data in an optimized form through a web browser. <br>
+            <h1 class="main-text" lang="ko"><span class="navy">페이퍼는</span><br/>스카우터의 <span class="navy">성능 데이터를 <br/>웹을 통해 최적화된 형태로 모니터</span>링 할 수 있는 <br/>성능 대시보드 소프트웨어입니다.<br/><br/>텔레그라프와의 연동을 통해 <br/>다양한 소프트웨어 성능 정보를 스카우터 성능 데이터와 함께 <br/>유기적으로 분석 할 수 있습니다.</h1>
+            <h1 class="main-text" lang="en">You can monitor the Scouter performance data in an optimized form through a web browser. <br>
                 In addition, through interworking with Telegraf, various software performance information <br> can be organically analyzed along with scout performance data.</h1>
             <p lang="ko">스카우터 제공하는 XLOG 기반의 강력한 프로파일 데이터에 텔레그라프의 모니터링 정보를 더해서, 하나의 대시보드로 모든 성능 데이터를 확인해보세요.</p>
             <p lang="en">Add Telegraf's monitoring information to the powerful XLOG-based profile data provided by Scouter, and view all performance data in one dashboard.</p>
@@ -263,7 +266,9 @@
     </div>
 </section>
 
-<section class="timeline gray-section">
+
+
+<section id="release" class="timeline gray-section">
     <div class="container">
         <div class="row">
             <div class="col-lg-12 text-center">
@@ -274,7 +279,6 @@
             </div>
         </div>
         <div class="row features-block">
-
             <div class="col-lg-12">
                 <div id="vertical-timeline" class="vertical-container light-timeline center-orientation">
                     <div class="vertical-timeline-block">
@@ -388,7 +392,26 @@
         </div>
     </div>
 </section>
-<section id="team" class="team">
+
+<section id="guide" class=" contact contact-section">
+    <div class="container">
+        <div class="row m-b-lg">
+            <div class="col-lg-12 text-center">
+                <div class="navy-line"></div>
+                <h1 lang="ko">설치 및 사용 가이드</h1>
+                <h1 lang="en">Guide</h1>
+                <div class="scouter-img">
+                    <img src="./img/scouter.png" />
+                </div>
+                <p class="intro-text">
+                <div class="paper-link"><a href="manual.html">설치 및 사용 가이드 바로가기</a></div>
+                </p>
+            </div>
+        </div>
+    </div>
+</section>
+
+<section id="team" class="team gray-section">
     <div class="container">
         <div class="row m-b-lg">
             <div class="col-lg-12 text-center">
@@ -435,7 +458,7 @@
         </div>
     </div>
 </section>
-<section class="features gray-section git-hub-section" >
+<section id="github" class="features git-hub-section" >
     <div class="container">
         <div class="row">
             <div class="col-lg-12 text-center">
@@ -452,7 +475,7 @@
         </div>
     </div>
 </section>
-<section id="contact" class=" contact contact-section">
+<section class=" contact gray-section contact-section">
     <div class="container">
         <div class="row m-b-lg">
             <div class="col-lg-12 text-center">
