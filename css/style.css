@@ -292,7 +292,7 @@ h1 {
 }
 .carousel-caption p {
   font-weight: 700;
-  text-transform: uppercase;
+  /*text-transform: uppercase;*/
   text-shadow: none;
 }
 .caption-link {
