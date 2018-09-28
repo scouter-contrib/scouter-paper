@@ -134,7 +134,9 @@ class Topology extends Component {
             let wrapper = this.refs.topologyChart;
             this.width = wrapper.offsetWidth;
             this.height = wrapper.offsetHeight;
-            this.svg.attr("width", this.width).attr("height", this.height);
+            if (this.svg) {
+                this.svg.attr("width", this.width).attr("height", this.height);
+            }
         }, 1000);
 
 
@@ -328,6 +330,7 @@ class Topology extends Component {
             }).done((msg) => {
 
                 let list = msg.result;
+
                 if (list && list.length > 0) {
                     let objectTypeTopologyMap = {};
                     let cnt = 0;
@@ -399,7 +402,7 @@ class Topology extends Component {
                     }
 
                     let links = [];
-                    _.forEach(list, (obj) => {
+                    _.forEach(topology, (obj) => {
                         links.push({
                             source: obj.fromObjHash,
                             target: obj.toObjHash,
@@ -412,14 +415,14 @@ class Topology extends Component {
                     });
 
                     // from, to 정보에서 유일한 노드 정보 추출
-                    let nodes = _.uniqBy(_.map(list, (d) => {
+                    let nodes = _.uniqBy(_.map(topology, (d) => {
                         return {
                             id: d.fromObjHash,
                             objName: d.fromObjName,
                             objCategory: d.fromObjCategory,
                             objTypeFamily: d.fromObjTypeFamily
                         }
-                    }).concat(_.map(list, (d) => {
+                    }).concat(_.map(topology, (d) => {
                         return {
                             id: d.toObjHash,
                             objName: d.toObjName,

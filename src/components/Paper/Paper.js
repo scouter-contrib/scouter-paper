@@ -685,8 +685,10 @@ class Paper extends Component {
             this.refs.loading.style.opacity = "1";
         } else {
             setTimeout(() => {
-                this.refs.loading.style.opacity = "0";
-                this.refs.loading.style.display = "none";
+                if (this.refs.loading) {
+                    this.refs.loading.style.opacity = "0";
+                    this.refs.loading.style.display = "none";
+                }
             }, 300);
         }
     };
