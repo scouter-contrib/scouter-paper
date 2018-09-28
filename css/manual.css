@@ -447,6 +447,10 @@ table td {
     color: #333;
 }
 
+.img {
+    text-align: center;
+}
+
 .img-text {
     display: table;
     width: 100%;
