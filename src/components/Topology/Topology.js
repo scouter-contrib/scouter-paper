@@ -640,8 +640,12 @@ class Topology extends Component {
         d3.select(this.refs.topologyChart).selectAll("svg").remove();
         this.svg = d3.select(this.refs.topologyChart).append("svg").attr("width", this.width).attr("height", this.height).append("g");
 
+        this.zoom = d3.zoom().on("zoom", this.zoomed);
+
         if (this.state.zoom) {
-            d3.select(this.refs.topologyChart).selectAll("svg").call(d3.zoom().scaleExtent([0.2, 5]).on("zoom", this.zoomed));
+            d3.select(this.refs.topologyChart).selectAll("svg").call(this.zoom.scaleExtent([0.2, 5]));
+        } else {
+            d3.select(this.refs.topologyChart).selectAll("svg").call(this.zoom.scaleExtent([1, 1]));
         }
 
         this.simulation = d3.forceSimulation();
@@ -915,9 +919,10 @@ class Topology extends Component {
             if (state[property]) {
                 //this.svg.call(d3.zoom().on("zoom", this.zoomed));
                 //d3.select(this.refs.topologyChart).selectAll("svg").call(d3.zoom().on("zoom", this.zoomed));
-                d3.select(this.refs.topologyChart).selectAll("svg").call(d3.zoom().scaleExtent([0.2, 5]).on("zoom", this.zoomed));
+                d3.select(this.refs.topologyChart).selectAll("svg").call(this.zoom.scaleExtent([0.2, 5]).on("zoom", this.zoomed));
             } else {
-                this.svg.call(d3.zoom().on("zoom", null));
+                d3.select(this.refs.topologyChart).selectAll("svg").call(this.zoom.scaleExtent([1, 1]).on("zoom", this.zoomed));
+                this.svg.attr("transform", d3.zoomIdentity.scale(1));
             }
         }
 
