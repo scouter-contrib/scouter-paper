@@ -132,16 +132,21 @@ class LayoutManager extends Component {
     };
 
     saveClick = () => {
-        let templates = this.state.templates;
+        let templates = this.state.templates.slice(0);
         if (!templates) {
             templates = [];
         }
         let layouts = getData("layouts");
         let boxes = getData("boxes");
 
+        let inx = 0;
+        templates.forEach((template) => {
+            template.no = inx++;
+        });
+
         templates.push({
             no : templates.length,
-            name : "template-" + (templates.length + 1),
+            name : "template-" + (inx + 1),
             creationTime : (new Date()).getTime(),
             boxes : boxes,
             layouts : layouts
@@ -208,6 +213,7 @@ class LayoutManager extends Component {
     };
 
     templateClick = (no) => {
+        console.log(no);
         this.setState({
             selectedTemplateNo : no
         });
@@ -259,7 +265,7 @@ class LayoutManager extends Component {
                                 return (<li key={i} className={d.no === this.state.selectedTemplateNo ? 'selected' : ''} onClick={this.templateClick.bind(this, d.no)}>
                                     <div>
                                         {d.deprecated && <div className="deprecated"><span data-tip="this template is no longer working properly at this paper version">DEPRECATED</span></div>}
-                                        <span className="no">{i+1}</span>
+                                        <span className="no">{d.no}</span>
                                         {(d.no !== this.state.selectedEditNo) && <span className="name">{d.name}</span>}
                                         {(d.no === this.state.selectedEditNo) && <span className="name edit"><input type="text" value={this.state.editText} onChange={this.onTextChange.bind(this )} /></span>}
                                         {(d.no !== this.state.selectedEditNo) && <span className="edit-btn" onClick={this.editClick.bind(this, d.no, d.name)}>EDIT</span>}
