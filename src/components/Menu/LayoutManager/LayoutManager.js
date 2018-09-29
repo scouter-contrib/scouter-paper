@@ -213,7 +213,6 @@ class LayoutManager extends Component {
     };
 
     templateClick = (no) => {
-        console.log(no);
         this.setState({
             selectedTemplateNo : no
         });
