@@ -205,6 +205,57 @@ class Paper extends Component {
         };
     }
 
+    componentDidUpdate = (prevProps, prevState) => {
+
+        let counterKeyMap = {};
+        for (let i = 0; i < this.state.boxes.length; i++) {
+            let option = this.state.boxes[i].option;
+
+            if (option && option.length > 0) {
+                for (let j = 0; j < option.length; j++) {
+                    let innerOption = option[j];
+                    if (innerOption.type === "counter") {
+                        counterKeyMap[innerOption.counterKey] = true;
+                    }
+                }
+            }
+        }
+
+        let prevCounterKeyMap = {};
+        for (let i = 0; i < prevState.boxes.length; i++) {
+            let option = prevState.boxes[i].option;
+
+            if (option && option.length > 0) {
+                for (let j = 0; j < option.length; j++) {
+                    let innerOption = option[j];
+                    if (innerOption.type === "counter") {
+                        prevCounterKeyMap[innerOption.counterKey] = true;
+                    }
+                }
+            }
+        }
+
+        // 카운터들이 변경되었을때, 다시 조회
+        if (JSON.stringify(prevCounterKeyMap) !== JSON.stringify(counterKeyMap)) {
+            if (this.props.range.realTime) {
+                let now = (new ServerDate()).getTime();
+                let ten = 1000 * 60 * 10;
+                this.getCounterHistory(this.props.objects, now - ten, now, false);
+                this.getLatestData(true, this.props.objects);
+            } else {
+                if (this.needSearch) {
+                    this.needSearch = false;
+                    this.search(this.needSearchFrom, this.needSearchTo, this.props.objects);
+                } else {
+                    if (this.lastFrom && this.lastTo) {
+                        this.getXLogHistory(this.lastFrom, this.lastTo, this.props.objects, this.props.range.longTerm);
+                    }
+                }
+            }
+        }
+
+    };
+
     componentWillReceiveProps(nextProps) {
 
         if (JSON.stringify(nextProps.template) !== JSON.stringify(this.props.template)) {

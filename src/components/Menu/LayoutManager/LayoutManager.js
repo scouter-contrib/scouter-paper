@@ -189,12 +189,16 @@ class LayoutManager extends Component {
                     this.props.setTemplate(template.boxes, template.layouts);
                     this.props.toggleLayoutManagerVisible();
 
-                    this.props.history.push({
-                        pathname: '/paper',
-                        search: '?objects=' + this.props.objects.map((d) => {
-                            return d.objHash
-                        })
+                    let search = '?objects=' + this.props.objects.map((d) => {
+                        return d.objHash
                     });
+
+                    if (!(this.props.history.location.pathname === "/paper" &&  this.props.history.location.search === search)) {
+                        this.props.history.push({
+                            pathname: '/paper',
+                            search: search
+                        });
+                    }
 
                     break;
                 }

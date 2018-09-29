@@ -36,6 +36,11 @@ class Box extends Component {
         if (JSON.stringify(this.props.objects) !== JSON.stringify(nextProps.objects)) {
             this.iconMap = {};
         }
+
+        if (JSON.stringify(this.props.countersHistoryFrom) !== JSON.stringify(nextProps.countersHistoryFrom) && JSON.stringify(this.props.countersHistoryTo) !== JSON.stringify(nextProps.countersHistoryTo)) {
+            this.iconMap = {};
+        }
+
     }
 
     setTitle = (counterKey, title, color, familyName) => {

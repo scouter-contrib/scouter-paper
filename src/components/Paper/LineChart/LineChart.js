@@ -486,18 +486,7 @@ class LineChart extends Component {
             that.graph.focus.select("circle." + circleKey).attr("stroke", color);
         }
 
-        let valueLine = d3.line().curve(d3[this.props.config.graph.curve])
-            .x(function (d) {
-                return that.graph.x(d.time);
-            })
-            .y(function (counter) {
-                let objData = counter.data[obj.objHash];
-                if (objData) {
-                    return that.graph.y(objData.value);
-                } else {
-                    return that.graph.y(0);
-                }
-            });
+        let valueLine = d3.line().curve(d3[this.props.config.graph.curve]);
 
         if (this.props.config.graph.break === "Y") {
             valueLine.defined(function (d) {
@@ -506,8 +495,18 @@ class LineChart extends Component {
             })
         }
 
-        path.data([that.state.counters[counterKey]]).attr("d", valueLine).style("stroke-width", this.props.config.graph.width).style("opacity", this.props.config.graph.opacity);
+        valueLine.x(function (d) {
+            return that.graph.x(d.time);
+        }).y(function (counter) {
+            let objData = counter.data[obj.objHash];
+            if (objData) {
+                return that.graph.y(objData.value);
+            } else {
+                return that.graph.y(0);
+            }
+        });
 
+        path.data([that.state.counters[counterKey]]).attr("d", valueLine).style("stroke-width", this.props.config.graph.width).style("opacity", this.props.config.graph.opacity);
     };
 
 
