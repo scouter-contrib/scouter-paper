@@ -966,6 +966,8 @@ class Topology extends Component {
         });
 
         this.simulation.force("link").distance([distance]);
+        this.simulation.alpha(1).restart();
+
     };
 
     render() {
@@ -982,7 +984,7 @@ class Topology extends Component {
                             <div className="check-btn" onClick={this.changeDistance.bind(this, "minus")}>DISTANCE-</div>
                         </div>
                         <div className="group">
-                            <div className={"check-btn " + (this.state.zoom ? "on" : "off")} onClick={this.checkBtnClick.bind(this, "zoom")}>ZOOM</div>
+                            {/*<div className={"check-btn " + (this.state.zoom ? "on" : "off")} onClick={this.checkBtnClick.bind(this, "zoom")}>ZOOM</div>*/}
                             <div className={"check-btn " + (this.state.pin ? "on" : "pin")} onClick={this.checkBtnClick.bind(this, "pin")}>PIN</div>
                             <div className={"check-btn " + (this.state.redLine ? "on" : "redLine")} onClick={this.checkBtnClick.bind(this, "redLine")}>RED LINE</div>
                         </div>

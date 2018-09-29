@@ -79,6 +79,7 @@
 
 .topology-wrapper .topology-chart {
     height: calc(100% - 30px);
+    overflow: hidden;
 }
 
 .topology-wrapper svg text {
