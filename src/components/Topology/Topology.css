@@ -118,6 +118,18 @@
     opacity: 0.5;
     stroke-width: 4;
     stroke-dasharray: 10, 4;
+    /*transform: translateZ(0);*/
+    /*transform: translateZ(0);*/
+    /*-webkit-transform: translateZ(0);*/
+
+    /*-webkit-transform: translateX(-100%);*/
+    /*transform: translateX(-100%);*/
+    /*transition: transform 300ms linear;*/
+    -webkit-transform: translateX(0%);
+    transform: translateX(0%);
+    transition: transform 300ms linear;
+    will-change: transform;
+
     animation: flow 1s linear infinite;
     -webkit-animation: flow 1s linear infinite;
 }

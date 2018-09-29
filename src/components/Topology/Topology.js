@@ -538,11 +538,13 @@ class Topology extends Component {
         return mergedNode;
     }
 
+    dragChanged = false;
     dragstarted = (d) => {
         if (!d3.event.active) this.simulation.alphaTarget(0.3).restart();
         d3.event.sourceEvent.stopPropagation();
         d.fx = d.x;
         d.fy = d.y;
+        this.dragChanged = true;
     };
 
     dragged = (d) => {
@@ -568,6 +570,7 @@ class Topology extends Component {
                 d.fy = null;
             }
         }
+        this.dragChanged = false;
     };
 
     getCatgegoryInfo = (category) => {
@@ -819,10 +822,23 @@ class Topology extends Component {
         this.simulation.alpha(1).restart();
     };
 
+
+    lastTicked = 0;
     ticked = () => {
+        const now = new Date().valueOf();
+        if(now - this.lastTicked < 100) {
+            return;
+        }
+        this.lastTicked = new Date().valueOf();
+
+        const posChanged = _.find(this.state.nodes, function(n) {
+            return n.vx !== 0 || n.vy !== 0 || n.x !== n.fx || n.y !== n.fy;
+        });
+        if (!posChanged && !this.dragChanged) {
+            return;
+        }
 
         let that = this;
-
         // 노드 위치
         this.node.attr("cx", function (d) {
             return d.x;
@@ -832,7 +848,7 @@ class Topology extends Component {
 
         // 노드 명 아래 가운데 위치 하도록
         this.nodeNameText.attr("x", function (d) {
-            let width = this.getComputedTextLength();
+            const width = this.getComputedTextLength();
             return d.x - (width / 2);
         }).attr("y", function (d) {
             return d.y + that.r + (that.option.fontSize / 2) + 5;
