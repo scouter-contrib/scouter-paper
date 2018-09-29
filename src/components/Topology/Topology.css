@@ -2,25 +2,26 @@
     height: calc(100% - 71px);
     margin: 10px;
     box-sizing: border-box;
+    position: relative;
 }
 
 .topology-wrapper .controller {
     height: 30px;
     text-align: right;
     position: relative;
-    background-color: rgba(0,0,0,0.1);
+    background-color: rgba(0, 0, 0, 0.1);
 }
 
 .topology-wrapper .controller > div {
     height: 100%;
     display: inline-block;
     position: absolute;
-    top :0;
+    top: 0;
     box-sizing: border-box;
 }
 
 .topology-wrapper .controller .right {
-    right : 6px;
+    right: 6px;
     padding-top: 6px;
 }
 
@@ -30,7 +31,7 @@
 }
 
 .topology-wrapper .controller .left {
-    left : 6px;
+    left: 6px;
     padding-top: 8px;
 }
 
@@ -42,12 +43,11 @@
     padding: 2px 4px;
 }
 
-
 .topology-wrapper .controller .check-btn {
     display: inline-block;
     font-size: 9px;
     padding: 2px 4px;
-    border: 1px solid rgba(0,0,0,0.3);
+    border: 1px solid rgba(0, 0, 0, 0.3);
     border-right: none;
     width: 60px;
     box-sizing: border-box;
@@ -73,14 +73,13 @@
 }
 
 .topology-wrapper .controller .check-btn:last-child {
-    border-right: 1px solid rgba(0,0,0,0.3);
+    border-right: 1px solid rgba(0, 0, 0, 0.3);
     border-radius: 0 3px 3px 0;
 }
 
 .topology-wrapper .topology-chart {
     height: calc(100% - 30px);
 }
-
 
 .topology-wrapper svg text {
     -webkit-touch-callout: none; /* iOS Safari */
@@ -139,27 +138,52 @@
 }
 
 .edge-flow-path.error {
-stroke: red;
+    stroke: red;
 }
 
 .edge-text-path {
-font-size: 10px;
-fill: white;
+    font-size: 10px;
+    fill: white;
 }
 
 .error-rate-tspan {
-fill: red;
+    fill: red;
 }
 
 .edge-path {
-fill: none;
-stroke: black;
-stroke: none;
-stroke-width: 1.5px;
+    fill: none;
+    stroke: black;
+    stroke: none;
+    stroke-width: 1.5px;
 }
 
 .edge-text {
 
 }
 
+.topology-wrapper .no-topology-data {
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    text-align: center;
+    color: white;
+    display: table;
+}
 
+.topology-wrapper .no-topology-data > div {
+    display: table-cell;
+    width: 100%;
+    height: 100%;
+    vertical-align: middle;
+    background-color: rgba(0, 0, 0, 0.3);
+}
+
+.topology-wrapper .no-topology-data > div .logo-div {
+    margin-bottom: 10px;
+}
+
+.topology-wrapper .no-topology-data > div .logo-div img {
+    width: 60px;
+}

@@ -2,6 +2,8 @@ import React, {Component} from "react";
 import "./Topology.css";
 import {connect} from "react-redux";
 import {withRouter} from 'react-router-dom';
+import logo from '../../img/scouter.png';
+import logoBlack from '../../img/scouter_black.png';
 import {
     addRequest,
     pushMessage,
@@ -122,6 +124,10 @@ class Topology extends Component {
 
         if (JSON.stringify(this.props.config) !== JSON.stringify(nextProps.config)) {
             this.getAllInstanceInfo(nextProps.config);
+        }
+
+        if (JSON.stringify(this.props.objects) !== JSON.stringify(nextProps.objects)) {
+            this.getTopology(nextProps.config, nextProps.objects, nextProps.user);
         }
     }
 
@@ -316,6 +322,7 @@ class Topology extends Component {
     };
 
     getTopology = (config, objects, user) => {
+
         let that = this;
 
         if (objects && objects.length > 0) {
@@ -334,7 +341,9 @@ class Topology extends Component {
 
                 let list = msg.result;
 
-                if (list && list.length > 0) {
+
+
+                if (list) {
                     let objectTypeTopologyMap = {};
                     let cnt = 0;
                     list.forEach((d) => {
@@ -579,10 +588,10 @@ class Topology extends Component {
     };
 
     getCatgegoryInfo = (category) => {
-        if (this.objCategoryInfo[category]) {
+        if (category && this.objCategoryInfo[category]) {
             return this.objCategoryInfo[category];
         } else {
-            this.objCategoryInfo["NEO_DEFAULT"];
+            return this.objCategoryInfo["NEO_DEFAULT"];
         }
     };
 
@@ -613,6 +622,7 @@ class Topology extends Component {
     };
 
     draw = () => {
+
 
         let that = this;
 
@@ -711,6 +721,14 @@ class Topology extends Component {
 
 
         this.simulation.force("link").links(links).distance([this.state.distance]);
+        this.simulation.stop();
+
+        for (var i = 0, n = Math.ceil(Math.log(this.simulation.alphaMin()) / Math.log(1 - this.simulation.alphaDecay())); i < n; ++i) {
+            this.simulation.tick();
+        }
+
+        this.simulation.restart();
+
         this.init = true;
 
     };
@@ -790,7 +808,7 @@ class Topology extends Component {
         // 노드
         this.node = this.nodeGroup.selectAll(".node").data(nodes);
         this.node.exit().remove();
-        this.node.enter().append("circle").merge(this.node).attr("class", "node").attr("r", this.r).style("stroke-width", "4px").style("fill", "white").style("stroke", function (d) {
+        this.node = this.node.enter().append("circle").merge(this.node).attr("class", "node").attr("r", this.r).style("stroke-width", "4px").style("fill", "white").style("stroke", function (d) {
             return that.getCatgegoryInfo(d.objCategory).color;
         });
         this.node.on("dblclick", this.dblclick)
@@ -799,7 +817,7 @@ class Topology extends Component {
         // 노드 라벨
         this.nodeLabel = this.nodeLabelGroup.selectAll(".node-label").data(nodes);
         this.nodeLabel.exit().remove();
-        this.nodeLabel.enter().append("text").merge(this.nodeLabel).attr("class", "node-label").style("font-size", this.option.fontSize + "px").text(function (d) {
+        this.nodeLabel = this.nodeLabel.enter().append("text").merge(this.nodeLabel).attr("class", "node-label").style("font-size", this.option.fontSize + "px").text(function (d) {
             return (d.objTypeFamily ? d.objTypeFamily : d.objCategory).toUpperCase();
         }).style("fill", function (d) {
             return that.getCatgegoryInfo(d.objCategory).color;
@@ -808,7 +826,7 @@ class Topology extends Component {
         // 노드 아이콘
         this.nodeIcon = this.nodeIconGroup.selectAll(".node-icon").data(nodes);
         this.nodeIcon.exit().remove();
-        this.nodeIcon.enter().append("text").merge(this.nodeIcon).attr("class", "node-icon").style("font-family", function (d) {
+        this.nodeIcon = this.nodeIcon.enter().append("text").merge(this.nodeIcon).attr("class", "node-icon").style("font-family", function (d) {
             return that.getCatgegoryInfo(d.objCategory).fontFamily;
         }).style("font-size", function (d) {
             return that.getCatgegoryInfo(d.objCategory).fontSize;
@@ -818,17 +836,24 @@ class Topology extends Component {
             return that.getCatgegoryInfo(d.objCategory).text;
         }).on("dblclick", this.dblclick).call(d3.drag().on("start", this.dragstarted).on("drag", this.dragged).on("end", this.dragended));
 
-        // Update and restart the simulation.
 
 
-
-        this.simulation.nodes(nodes).on("tick", this.ticked);;
+        this.simulation.nodes(nodes).on("tick", this.ticked);
         this.simulation.force("link").links(links);
-        this.simulation.alpha(1).restart();
+
+        if (this.simulation) {
+            this.simulation.stop();
+            for (var i = 0, n = Math.ceil(Math.log(this.simulation.alphaMin()) / Math.log(1 - this.simulation.alphaDecay())); i < n; ++i) {
+                this.simulation.tick();
+            }
+            this.simulation.restart();
+        }
     };
 
     ticked = () => {
-        const now = new Date().valueOf();
+
+
+        /*const now = new Date().valueOf();
         if(now - this.lastTicked < 100) {
             return;
         }
@@ -839,7 +864,7 @@ class Topology extends Component {
         });
         if (!posChanged && !this.dragChanged) {
             return;
-        }
+        }*/
 
         let that = this;
         // 노드 위치
@@ -963,6 +988,14 @@ class Topology extends Component {
                         </div>
                     </div>
                 </div>
+                {(!this.state.topology || this.state.topology.length < 1) &&
+                <div className="no-topology-data">
+                    <div>
+                        <div className="logo-div"><img alt="scouter-logo" className="logo" src={this.props.config.theme === "theme-gray" ? logoBlack : logo}/></div>
+                        <div>NO TOPOLOGY DATA</div>
+                    </div>
+                </div>
+                }
                 <div className="topology-chart" ref="topologyChart"></div>
             </div>
         );
