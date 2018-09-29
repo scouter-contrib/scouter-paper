@@ -621,6 +621,10 @@ class Topology extends Component {
         return "M" + x1 + "," + y1 + "A" + drx + "," + dry + " " + xRotation + "," + largeArc + "," + sweep + " " + x2 + "," + y2;
     };
 
+    zoomed = () => {
+        this.svg.attr("transform", d3.event.transform);
+    };
+
     draw = () => {
 
 
@@ -634,12 +638,10 @@ class Topology extends Component {
         let links = this.state.links;
 
         d3.select(this.refs.topologyChart).selectAll("svg").remove();
-        this.svg = d3.select(this.refs.topologyChart).append("svg").attr("width", this.width).attr("height", this.height);
+        this.svg = d3.select(this.refs.topologyChart).append("svg").attr("width", this.width).attr("height", this.height).append("g");
 
         if (this.state.zoom) {
-            this.svg.call(d3.zoom().on("zoom", function () {
-                that.svg.attr("transform", d3.event.transform);
-            }));
+            d3.select(this.refs.topologyChart).selectAll("svg").call(d3.zoom().scaleExtent([0.2, 5]).on("zoom", this.zoomed));
         }
 
         this.simulation = d3.forceSimulation();
@@ -696,7 +698,7 @@ class Topology extends Component {
         this.node = this.nodeGroup.selectAll("circle").data(nodes).enter().append("circle").attr("class", "node").attr("r", this.r).style("stroke-width", "4px").style("fill", "white").style("stroke", function (d) {
             return that.getCatgegoryInfo(d.objCategory).color;
         });
-        this.node.on("dblclick", this.dblclick)
+        //this.node.on("dblclick", this.dblclick)
         this.node.call(d3.drag().on("start", this.dragstarted).on("drag", this.dragged).on("end", this.dragended));
 
         this.nodeLabelGroup = this.svg.append("g").attr("class", "node-labels").selectAll("text").data(nodes).enter();
@@ -716,7 +718,7 @@ class Topology extends Component {
         }).text(function (d) {
             return that.getCatgegoryInfo(d.objCategory).text;
         });
-        this.nodeIcon.on("dblclick", this.dblclick);
+        //this.nodeIcon.on("dblclick", this.dblclick);
         this.nodeIcon.call(d3.drag().on("start", this.dragstarted).on("drag", this.dragged).on("end", this.dragended));
 
 
@@ -811,7 +813,7 @@ class Topology extends Component {
         this.node = this.node.enter().append("circle").merge(this.node).attr("class", "node").attr("r", this.r).style("stroke-width", "4px").style("fill", "white").style("stroke", function (d) {
             return that.getCatgegoryInfo(d.objCategory).color;
         });
-        this.node.on("dblclick", this.dblclick)
+        //this.node.on("dblclick", this.dblclick)
         this.node.call(d3.drag().on("start", this.dragstarted).on("drag", this.dragged).on("end", this.dragended));
 
         // 노드 라벨
@@ -834,7 +836,7 @@ class Topology extends Component {
             return that.getCatgegoryInfo(d.objCategory).color;
         }).text(function (d) {
             return that.getCatgegoryInfo(d.objCategory).text;
-        }).on("dblclick", this.dblclick).call(d3.drag().on("start", this.dragstarted).on("drag", this.dragged).on("end", this.dragended));
+        })/*.on("dblclick", this.dblclick)*/.call(d3.drag().on("start", this.dragstarted).on("drag", this.dragged).on("end", this.dragended));
 
 
 
@@ -911,9 +913,9 @@ class Topology extends Component {
 
         if (property === "zoom") {
             if (state[property]) {
-                this.svg.call(d3.zoom().on("zoom", function () {
-                    that.svg.attr("transform", d3.event.transform);
-                }));
+                //this.svg.call(d3.zoom().on("zoom", this.zoomed));
+                //d3.select(this.refs.topologyChart).selectAll("svg").call(d3.zoom().on("zoom", this.zoomed));
+                d3.select(this.refs.topologyChart).selectAll("svg").call(d3.zoom().scaleExtent([0.2, 5]).on("zoom", this.zoomed));
             } else {
                 this.svg.call(d3.zoom().on("zoom", null));
             }
@@ -984,7 +986,7 @@ class Topology extends Component {
                             <div className="check-btn" onClick={this.changeDistance.bind(this, "minus")}>DISTANCE-</div>
                         </div>
                         <div className="group">
-                            {/*<div className={"check-btn " + (this.state.zoom ? "on" : "off")} onClick={this.checkBtnClick.bind(this, "zoom")}>ZOOM</div>*/}
+                            <div className={"check-btn " + (this.state.zoom ? "on" : "off")} onClick={this.checkBtnClick.bind(this, "zoom")}>ZOOM</div>
                             <div className={"check-btn " + (this.state.pin ? "on" : "pin")} onClick={this.checkBtnClick.bind(this, "pin")}>PIN</div>
                             <div className={"check-btn " + (this.state.redLine ? "on" : "redLine")} onClick={this.checkBtnClick.bind(this, "redLine")}>RED LINE</div>
                         </div>
