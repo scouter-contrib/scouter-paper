@@ -177,7 +177,11 @@ class InstanceSelector extends Component {
                                 objects = msg.result;
 
                                 if (objects && objects.length > 0) {
-                                    objects.sort((a, b) => a.objName < b.objName ? -1 : 1);
+                                    objects = objects
+                                        .filter(instance => {
+                                            return (instance.objName.match(new RegExp("/", "g")) || []).length < 3;
+                                        });
+
                                     objects.forEach((instance) => {
                                         urlObjectHashes.forEach((objHash) => {
                                             if (objHash === Number(instance.objHash)) {
