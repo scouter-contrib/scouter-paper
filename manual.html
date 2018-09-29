@@ -38,7 +38,11 @@
     <div class="content">
         <div class="inner-content intro-content">
             <h2><span>INTRO</span></h2>
-            <p>SCOUTER PAPER는 오픈 소스 APM 도구인 스카우처 WEB API를 활용하여, 성능 데이터를 웹을 통해 확인할 수 있도록 제공하는 대시보드 소프트웨어입니다. 많은 사람들과 기업에서 사용하는 대표적인 APM 도구의 클라이언트가 성능과 사용성면에서 매우 훌륭하지만, 플랫폼의 특성으로 접근성의 한계가 존재하여, 이를 보완하는 보조 도구의 역할로 사용될 수 있도록 하기 위해 웹을 통해 다양한 디바이스에서 접근 가능한 형태의 클라이언트를 만들어 배포하게되었습니다. <span class="scouter-paper-tag"><a href="https://github.com/mindplates/scouter-paper" target="_blank">SCOUTER PAPER</a></span>는 <a href="https://www.apache.org/licenses/LICENSE-2.0" target="_blank">아파치 라이선스 2.0</a>을 따르는 오픈 소스 소프트웨어입니다. 해당 라이선스의 배포시 의무사항을 준수하는 방식으로 상업/비상업적인 용도로 자유롭게 사용, 수정 및 재배포가 가능합니다.</p>
+            <p>SCOUTER PAPER 프로젝트는 오픈 소스 APM인 SCOUTER WEB API를 활용하여, 성능 데이터를 웹을 통해 확인할 수 있도록 제공하는 대시보드 소프트웨어입니다. <br />
+                많은 사람들과 기업에서 사용하는 APM인 SCOUTER 클라이언트가 성능과 사용성면에서 매우 훌륭하지만, 플랫폼의 특성으로인한 접근성의 한계가 존재하여, 이를 보완하는 보조 도구의 역할로 사용될 수 있도록 하기 위해 다양한 디바이스에서 접근 가능한 형태의 웹 클라이언트를 만들어 배포하며 시작되었습니다. <br />
+                PAPER 2.0 부터는 Telegraf 데이터를 지원하고 전체 시스템 성능 상황을 한눈에 파악할 수 있는 토폴로지 뷰를 탑재하면서, 어플리케이션과 인프라 소프트웨어를 아우르는 통합 모니터링 대시보드로 발전하고 있습니다.<br />
+                <span class="scouter-paper-tag"><a href="https://github.com/mindplates/scouter-paper" target="_blank">SCOUTER PAPER</a></span>는 <a href="https://www.apache.org/licenses/LICENSE-2.0" target="_blank">아파치 라이선스 2.0</a>을 따르는 오픈 소스 소프트웨어입니다. 해당 라이선스의 배포시 의무사항을 준수하는 방식으로 상업/비상업적인 용도로 자유롭게 사용, 수정 및 재배포가 가능합니다.</p>
+
             <!--<h3><span>반응형 웹</span></h3>
             <p><span class="scouter-paper-tag">SCOUTER PAPER</span>는 오픈소스 성능 모니터링 도구인 <span class="scouter-tag"><a href="https://github.com/scouter-project/scouter" target="_blank">SCOUTER</a></span>의 성능 데이터를 웹 브라우저를 통해 모니터링 하기 위한 웹 클라이언트 프로그램입니다. <span class="scouter-paper-tag">SCOUTER PAPER</span>를 통해 언제, 어디에서든 다양한 디바이스를 통해 <span class="scouter-tag">SCOUTER</span>의 성능 정보를 쉽게 확인할 수 있습니다. <span class="scouter-paper-tag">SCOUTER PAPER</span>는 반응형 웹 방식으로 제작되어, 모바일, 태블릿, PC 등의 다양한 디바이스를 통해 접속이 가능합니다.</p>
             <div class="img-text">
@@ -122,6 +126,7 @@
             <h3><span>지원하는 SCOUTER 버전</span></h3>
             <p><span class="scouter-paper-tag">SCOUTER PAPER 1.X</span>는 SCOUTER 1.8.4.1 이상의 버전이 필요하며, <span class="scouter-paper-tag">SCOUTER PAPER 2.X</span>는 SCOUTER 2.0 이상의 버전이 필요합니다. 텔레그라프와의 연동으로 모니터링 영역이 대폭 넓어진 SCOUTER 2.0 이상을 사용하시는 것을 권장드립니다.</p>
             <p></p>
+
             <h3><span>SCOUTER 웹 API 서버 활성화</span></h3>
             <p>설치된 <span class="scouter-tag">SCOUTER</span>가 1.8.0 이상의 버전이라면, SCOUTER 컬렉터 서버에 포함된 웹 API 서버를 아래 설정을 통하여 컬렉터 서버 구동시 함께 웹 API 서버를 활성화 할 수 있습니다. 만약 콜렉터 서버와 웹 API 서버를 분리하여 구성하고 싶다면, <span class="scouter-tag">SCOUTER</span> 배포 버전에 포함된 별도의 웹 API 서버를 통해 구성할 수 도 있습니다.</p>
             <p>SCOUTER 컬렉터 서버에 포함된 웹 API를 활성화하기 위해서는 설정 파일에 아래 내용이 기본적으로 추가되어야 합니다.</p>
@@ -137,6 +142,7 @@ net_http_port=6180</div>
                 <div class="file-content">http://{SERVER-ADDRESS}:{PORT}/scouter/v1/info/server</div>
             </div>
             <p>정상적으로 JSON 형식의 문자열이 수신된다면, 웹 API 서버에 접속할 수 있는 환경이 구성된 것입니다.</p>
+
             <h3><span>SCOUTER 웹 API 서버 인증 관련 설정</span></h3>
             <p><span class="scouter-tag">SCOUTER</span> 웹 API 서버는 인증 관련 설정 방법에 따라 아래와 같은 인증 방법을 지원합니다. 아래 인증 방법은 꼭 하나만이 설정되는 것이 아니며, 설정의 특성에 따라 조합하여 설정될 수 있습니다. 아무런 설정을 하지 않았다면, 모든 HTTP 요청이 허용되는 상태로 열려있습니다. 방화벽 등으로 보호 받는 네트워크 환경이 아니라면, 하나 이상의 인증 설정을 하는 것을 권장합니다.</p>
             <table>
@@ -194,6 +200,12 @@ net_http_api_auth_bearer_token_enabled=true
             </div>
             <p>ID/PASSWORD 기반으로 사용자를 인증하고, 인증 토큰을 요청 헤더를 통해 전송하는 방식으로 인증을 하려면 위와 같이 설정 내용을 추가합니다.</p>
             <p>토큰 방식을 인증 매커니즘으로 사용하는 경우, [SCOUTER PAPER > SETTINGS > AUTHENTIFICATION CONFIGURATION]에 반드시 token(bearer)가 선택되어야 합니다.</p>
+
+            <h3><span>Telegraf 연동</span></h3>
+            <p>SCOUTER의 Collector가 Telegraf Server 역할을 할 수 있게 되었으며 Telegraf inputs를 통해 수집된 성능 정보는 PAPER를 통해 모니터링 할 수 있습니다.</p>
+            <p>Telegraf를 연동하기 위해서는 SCOUTER 2.0 이상을 사용하여야 하며, 상세한 설정은 SCOUTER의 도움말을 참고하시기 바랍니다.</p>
+            <p><a href="https://github.com/scouter-project/scouter/blob/master/scouter.document/main/Telegraf-Server.md">SCOUTER Telegraf Server feature</a> 바로가기</p>
+
             <h3><span>SCOUTER PAPAER SETTINGS</span></h3>
             <p>SCOUTER PAPER는 상단의 SETTINGS 메뉴를 통해서 설정 정보를 관리할 수 있습니다. 단 설정 정보는 브라우저 스토리지를 통해 관리되므로, 접속 환경이나 브라우저가 변경되는 경우 설정 정보가 유지되지 않습니다.</p>
             <div class="img-text">
@@ -366,6 +378,7 @@ net_http_api_auth_bearer_token_enabled=true
                 <div class="text">
                     <h3 class="first">토폴로지</h3>
                     <p>현재 선택된 인스턴스들을 논리적 집합으로 모아서, 네트워크 그래프 형태로 사용자의 어플리케이션간의 연결 관계 및 처리 요약 정보, 외부 시스템간의 연결 관계 등을 직관적으로 파악할 수 있습니다. </p>
+                    <p>PAPER에서 토폴로지 뷰를 사용하기 위해서는 SCOUTER 2.0 이상을 사용하여야 하며 java agent의 counter_interaction_enabled 옵션이 true 로 설정되어야 합니다.</p>
                 </div>
             </div>
         </div>
