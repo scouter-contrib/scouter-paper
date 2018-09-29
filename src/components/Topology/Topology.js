@@ -897,8 +897,15 @@ class Topology extends Component {
         if (property === "pin") {
             if (!state[property]) {
                 this.node.each((d) => {
+                    d.fixed = false;
                     d.fx = null;
                     d.fy = null;
+                })
+            } else {
+                this.node.each((d) => {
+                    d.fixed = true;
+                    d.fx = d.x;
+                    d.fy = d.y;
                 })
             }
         }
