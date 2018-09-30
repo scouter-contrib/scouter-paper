@@ -181,27 +181,6 @@
     background-color: rgba(0, 0, 0, 0.5);
 }
 
-.xlog-profiler .size-control-btns > button i {
-    position: absolute;
-    top: 4px;
-}
-
-.xlog-profiler .size-control-btns > button i.icon-1 {
-    left: 6px;
-}
-
-.xlog-profiler .size-control-btns > button i.icon-2 {
-    left: 7px;
-}
-
-.xlog-profiler .size-control-btns > button i.icon-3 {
-    left: 8px;
-}
-
-.xlog-profiler .size-control-btns > button i.icon-4 {
-    left: 7px;
-}
-
 .xlog-profiler .profiler-layout.right .summary {
     background-color: #444;
 }

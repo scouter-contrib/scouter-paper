@@ -524,10 +524,10 @@ class Profiler extends Component {
             <div className={"xlog-profiler " + (this.state.paramTxid ? 'param-mode ' : ' ') + (this.state.show ? ' ' : 'hidden')}>
                 <div>
                     <div className="size-control-btns">
-                        {!this.state.paramTxid && <button onClick={this.changeListWidth.bind(this, "min")}><i className="fa fa-angle-double-left icon-1"></i></button>}
-                        {!this.state.paramTxid && <button onClick={this.changeListWidth.bind(this, "small")}><i className="fa fa-angle-left icon-2"></i></button>}
-                        {!this.state.paramTxid && <button onClick={this.changeListWidth.bind(this, "big")}><i className="fa fa-angle-right icon-3"></i></button>}
-                        {!this.state.paramTxid && <button onClick={this.changeListWidth.bind(this, "max")}><i className="fa fa-angle-double-right icon-4"></i></button>}
+                        {!this.state.paramTxid && <button onClick={this.changeListWidth.bind(this, "min")}><i className="fa fa-angle-double-left"></i></button>}
+                        {!this.state.paramTxid && <button onClick={this.changeListWidth.bind(this, "small")}><i className="fa fa-angle-left"></i></button>}
+                        {!this.state.paramTxid && <button onClick={this.changeListWidth.bind(this, "big")}><i className="fa fa-angle-right"></i></button>}
+                        {!this.state.paramTxid && <button onClick={this.changeListWidth.bind(this, "max")}><i className="fa fa-angle-double-right"></i></button>}
                         <div className="close-btn" onClick={this.close}></div>
                     </div>
                     {!this.state.paramTxid &&
