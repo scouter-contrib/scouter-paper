@@ -188,7 +188,7 @@ class Box extends Component {
                         <div className="content">
                             {!type && <EmptyBox/>}
                             {type === "clock" && <ClockBox layoutChangeTime={this.props.layoutChangeTime} box={this.props.box} />}
-                            {type === "xlogBar" && <XLogBar visible={this.props.visible} layoutChangeTime={this.props.layoutChangeTime} box={this.props.box} data={this.props.data} />}
+                            {type === "xlogBar" && <XLogBar visible={this.props.visible} layoutChangeTime={this.props.layoutChangeTime} box={this.props.box} data={this.props.data} interval={this.props.config.interval} />}
                             {type === "xlog" && <XLog visible={this.props.visible} layoutChangeTime={this.props.layoutChangeTime} box={this.props.box} filter={this.props.filter} pastTimestamp={this.props.pastTimestamp} pageCnt={this.props.pageCnt} data={this.props.data} config={this.props.config} startTime={this.props.data.startTime} longTerm={this.props.longTerm} xlogHistoryDoing={this.props.xlogHistoryDoing} xlogHistoryRequestCnt={this.props.xlogHistoryRequestCnt} setStopXlogHistory={this.props.setStopXlogHistory} xlogNotSupportedInRange={this.props.xlogNotSupportedInRange}/>}
                             {type === "visitor" && <Visitor visible={this.props.visible} layoutChangeTime={this.props.layoutChangeTime} visitor={this.props.visitor} box={this.props.box} realtime={this.props.realtime} />}
                             {type === "counter" && <LineChart visible={this.props.visible} layoutChangeTime={this.props.layoutChangeTime} time={this.props.counters.time} box={this.props.box} counters={this.props.counters.data} countersHistory={this.props.countersHistory} countersHistoryTimestamp={this.props.countersHistoryTimestamp} countersHistoryFrom={this.props.countersHistoryFrom} countersHistoryTo={this.props.countersHistoryTo} longTerm={this.props.longTerm} setTitle={this.setTitle} removeTitle={this.removeTitle} showTooltip={this.showTooltip} hideTooltip={this.hideTooltip} />}
@@ -204,6 +204,7 @@ class Box extends Component {
 
 let mapStateToProps = (state) => {
     return {
+        config: state.config,
         counterInfo: state.counterInfo,
         objects: state.target.objects
     };

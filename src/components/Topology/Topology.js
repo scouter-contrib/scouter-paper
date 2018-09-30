@@ -274,7 +274,7 @@ class Topology extends Component {
 
             case "INTR_NORMAL_INCOMING" : {
                 result["objType"] = "NORMAL" + data[position + "ObjHash"];
-                result["objTypeName"] = "NORMAL";
+                result["objTypeName"] = "";
                 if (position === "from") {
                     result["category"] = "CLIENT";
                 }
@@ -431,15 +431,15 @@ class Topology extends Component {
                         return {
                             id: d.fromObjHash,
                             objName: d.fromObjName,
-                            objCategory: d.fromObjCategory,
-                            objTypeFamily: d.fromObjTypeFamily
+                            objCategory: d.fromObjCategory ? d.fromObjCategory : "",
+                            objTypeFamily: d.fromObjTypeFamily ? d.fromObjTypeFamily : ""
                         }
                     }).concat(_.map(topology, (d) => {
                         return {
                             id: d.toObjHash,
                             objName: d.toObjName,
-                            objCategory: d.toObjCategory,
-                            objTypeFamily: d.toObjTypeFamily
+                            objCategory: d.toObjCategory ? d.toObjCategory : "",
+                            objTypeFamily: d.toObjTypeFamily ? d.toObjTypeFamily : ""
                         }
                     })), (d) => {
                         return d.id;
@@ -707,7 +707,12 @@ class Topology extends Component {
 
         this.nodeLabelGroup = this.svg.append("g").attr("class", "node-labels").selectAll("text").data(nodes).enter();
         this.nodeLabel = this.nodeLabelGroup.append("text").attr("class", "node-label").style("font-size", this.option.fontSize + "px").text(function (d) {
-            return (d.objTypeFamily ? d.objTypeFamily : d.objCategory).toUpperCase();
+            let name = d.objTypeFamily ? d.objTypeFamily : d.objCategory;
+            if (name) {
+                return name.toUpperCase();
+            } else {
+                return "";
+            }
         }).style("fill", function (d) {
             return that.getCatgegoryInfo(d.objCategory).color;
         });
