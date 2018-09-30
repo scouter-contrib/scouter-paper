@@ -1,4 +1,4 @@
-import {ADD_REQUEST, SET_CONFIG, SET_USER_ID, SET_USER_DATA, SET_TARGET, SET_INSTANCES, PUSH_MESSAGE, SET_CONTROL_VISIBILITY, CLEAR_ALL_MESSAGE, SET_BG_COLOR, SET_SELECTION, SET_TEMPLATE, SET_REAL_TIME, SET_RANGE_DATE, SET_RANGE_HOURS, SET_RANGE_MINUTES, SET_RANGE_VALUE, SET_REAL_TIME_VALUE, SET_RANGE_DATE_HOURS_MINUTES, SET_REAL_TIME_RANGE_STEP_VALUE, SET_RANGE_DATE_HOURS_MINUTES_VALUE, SET_RANGE_ALL} from '../actions';
+import {ADD_REQUEST, SET_CONFIG, SET_USER_ID, SET_USER_DATA, SET_TARGET, PUSH_MESSAGE, SET_CONTROL_VISIBILITY, CLEAR_ALL_MESSAGE, SET_BG_COLOR, SET_SELECTION, SET_TEMPLATE, SET_REAL_TIME, SET_RANGE_DATE, SET_RANGE_HOURS, SET_RANGE_MINUTES, SET_RANGE_VALUE, SET_REAL_TIME_VALUE, SET_RANGE_DATE_HOURS_MINUTES, SET_REAL_TIME_RANGE_STEP_VALUE, SET_RANGE_DATE_HOURS_MINUTES_VALUE, SET_RANGE_ALL, SET_COUNTER_INFO} from '../actions';
 import {combineReducers} from 'redux';
 import moment from 'moment';
 
@@ -13,7 +13,9 @@ const configState = {
         }
     ],
     interval: 2000,
+    alertInterval : 60,
     numberFormat: "0,0.0",
+    decimalPoint: 1,
     dateFormat: "%Y-%m-%d",
     timeFormat: "%H:%M:%S",
     minuteFormat: "%H:%M",
@@ -32,10 +34,10 @@ const configState = {
         notification : "Y"
     },
     range : {
-        shortHistoryRange : 60,
-        shortHistoryStep : 5,
-        longHistoryRange : 360,
-        longHistoryStep : 1440
+        shortHistoryRange : 360,
+        shortHistoryStep : 10,
+        longHistoryRange : 24 * 30,
+        longHistoryStep : 60
     },
     xlog: {
         normal: {
@@ -173,9 +175,34 @@ const config = (state = configState, action) => {
     }
 };
 
-const userState = {
-    
+const counterInfoState = {
+    families : [],
+    objTypesMap : {},
+    familyNameIcon : {}
 };
+
+const counterInfo = (state = counterInfoState, action) => {
+    switch (action.type) {
+        case SET_COUNTER_INFO:
+            let objTypesMap = {};
+            let familyNameIcon = {};
+            action.objTypes.forEach((objType) => {
+                objTypesMap[objType.name] = objType;
+                familyNameIcon[objType.familyName] = objType.icon;
+            });
+
+            return Object.assign({}, state, {
+                families: action.families,
+                objTypesMap : objTypesMap,
+                familyNameIcon : familyNameIcon
+            });
+
+        default:
+            return state;
+    }
+};
+
+const userState = {};
 
 const user = (state = userState, action) => {
     switch (action.type) {
@@ -185,7 +212,7 @@ const user = (state = userState, action) => {
                 id: action.id,
                 token : action.token,
                 time : action.time
-            }
+            };
             
             return currentState;
 
@@ -199,8 +226,7 @@ const user = (state = userState, action) => {
 
 
 const targetState = {
-    hosts : [],
-    instances: [],
+    objects: [],
     selection : {
         x1: null,
         x2: null,
@@ -211,14 +237,9 @@ const targetState = {
 
 const target = (state = targetState, action) => {
     switch (action.type) {
-        case SET_INSTANCES:
-            return Object.assign({}, state, {
-                instances: action.instances
-            });
         case SET_TARGET:
             return Object.assign({}, state, {
-                hosts: action.hosts,
-                instances: action.instances
+                objects: action.objects
             });
         case SET_SELECTION:
             return Object.assign({}, state, {
@@ -370,6 +391,7 @@ const range = (state = rangeState, action) => {
 
 const scouterApp = combineReducers({
     target,
+    counterInfo,
     user,
     message,
     control,

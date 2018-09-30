@@ -263,9 +263,9 @@ class Profiler extends Component {
 
             if (list && list.length > 0) {
 
-                let instanceMap = {};
-                for (let i = 0; i < this.props.instances.length; i++) {
-                    instanceMap[this.props.instances[i].objHash] = this.props.instances[i].objName;
+                let objectMap = {};
+                for (let i = 0; i < this.props.objects.length; i++) {
+                    objectMap[this.props.objects[i].objHash] = this.props.objects[i].objName;
                 }
 
                 let xlogs = (append ? this.state.xlogs : []);
@@ -273,7 +273,7 @@ class Profiler extends Component {
                     let xlog = list[i];
                     let elapsed = Number(xlog.elapsed);
                     if (y1 <= elapsed && y2 >= elapsed) {
-                        xlog.objName = instanceMap[xlog.objHash];
+                        xlog.objName = objectMap[xlog.objHash];
                         xlogs.push(xlog);
                     }
                 }
@@ -524,10 +524,10 @@ class Profiler extends Component {
             <div className={"xlog-profiler " + (this.state.paramTxid ? 'param-mode ' : ' ') + (this.state.show ? ' ' : 'hidden')}>
                 <div>
                     <div className="size-control-btns">
-                        {!this.state.paramTxid && <button onClick={this.changeListWidth.bind(this, "min")}><i className="fa fa-angle-double-left icon-1"></i></button>}
-                        {!this.state.paramTxid && <button onClick={this.changeListWidth.bind(this, "small")}><i className="fa fa-angle-left icon-2"></i></button>}
-                        {!this.state.paramTxid && <button onClick={this.changeListWidth.bind(this, "big")}><i className="fa fa-angle-right icon-3"></i></button>}
-                        {!this.state.paramTxid && <button onClick={this.changeListWidth.bind(this, "max")}><i className="fa fa-angle-double-right icon-4"></i></button>}
+                        {!this.state.paramTxid && <button onClick={this.changeListWidth.bind(this, "min")}><i className="fa fa-angle-double-left"></i></button>}
+                        {!this.state.paramTxid && <button onClick={this.changeListWidth.bind(this, "small")}><i className="fa fa-angle-left"></i></button>}
+                        {!this.state.paramTxid && <button onClick={this.changeListWidth.bind(this, "big")}><i className="fa fa-angle-right"></i></button>}
+                        {!this.state.paramTxid && <button onClick={this.changeListWidth.bind(this, "max")}><i className="fa fa-angle-double-right"></i></button>}
                         <div className="close-btn" onClick={this.close}></div>
                     </div>
                     {!this.state.paramTxid &&
@@ -572,7 +572,7 @@ class Profiler extends Component {
 
 let mapStateToProps = (state) => {
     return {
-        instances: state.target.instances,
+        objects: state.target.objects,
         config: state.config,
         user: state.user
     };

@@ -255,14 +255,23 @@ export function getParam(props, key) {
     }
 }
 
-export function setRangePropsToUrl (props, pathname) {
+export function setRangePropsToUrl (props, pathname, objects) {
     let search = new URLSearchParams(props.location.search);
 
-    if (props.instances.length > 0) {
-        search.set("instances", props.instances.map((d) => {
-            return d.objHash
-        }));
+    if (objects) {
+        if (objects.length > 0) {
+            search.set("objects", objects.map((d) => {
+                return d.objHash
+            }));
+        }
+    } else {
+        if (props.objects.length > 0) {
+            search.set("objects", props.objects.map((d) => {
+                return d.objHash
+            }));
+        }
     }
+
 
     search.set("realtime", props.range.realTime);
     search.set("longterm", props.range.longTerm);

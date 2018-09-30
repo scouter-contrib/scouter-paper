@@ -2,6 +2,8 @@
     max-width: 1600px;
     margin: 0 auto;
     height: calc(100% - 61px);
+    position: relative;
+
 }
 
 .papers .box-layout {
@@ -20,6 +22,7 @@
     position: relative;
     top: 4px;
     padding: 1px 4px;
+    z-index: 2;
 }
 
 .papers .box-layout .box-control.filter-btn.filtered {

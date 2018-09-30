@@ -83,12 +83,6 @@ class Message extends Component {
     }
 }
 
-let mapStateToProps = (state) => {
-    return {
-        instances: state.target.instances
-    };
-};
-
 let mapDispatchToProps = (dispatch) => {
     return {
         setControlVisibility: (name, value) => dispatch(setControlVisibility(name, value)),
@@ -96,6 +90,6 @@ let mapDispatchToProps = (dispatch) => {
     };
 };
 
-Message = connect(mapStateToProps, mapDispatchToProps)(Message);
+Message = connect(undefined, mapDispatchToProps)(Message);
 
 export default withRouter(Message);

@@ -1,0 +1,407 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
+    <link rel="manifest" href="%PUBLIC_URL%/manifest.json">
+    <link rel="shortcut icon" href="%PUBLIC_URL%/favicon.ico">
+    <link rel="stylesheet" media="screen" href="./css/manual.css">
+    <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.3.1/jquery.min.js"></script>
+    <title>Paper</title>
+</head>
+<body>
+<div id="logo" class="wrapper logo">
+    <div class="content">
+        <div class="logo-content">
+            <div class="logo-div">
+                <img alt="scouter-logo" src="./img/scouter.png"/>
+            </div>
+            <div class="logo-text-div">
+                <span class="logo-text">SCOUTER PAPER</span>
+                <div class="manual-version"><span>USER GUIDE V2.0</span></div>
+            </div>
+            <div class="separator">
+                <span></span>
+            </div>
+            <div class="menu">
+                <a href="#intro">INTRO</a>
+                <a href="#download">DOWNLOAD</a>
+                <a href="#install">INSTALL</a>
+                <!--<a href="#build">BUILD</a>-->
+                <a href="#setting">SETTING</a>
+                <a href="#features">GUIDE</a>
+            </div>
+        </div>
+    </div>
+</div>
+<div id="intro" class="wrapper intro">
+    <div class="content">
+        <div class="inner-content intro-content">
+            <h2><span>INTRO</span></h2>
+            <p>SCOUTER PAPER 프로젝트는 오픈 소스 APM인 SCOUTER WEB API를 활용하여, 성능 데이터를 웹을 통해 확인할 수 있도록 제공하는 대시보드 소프트웨어입니다. <br />
+                많은 사람들과 기업에서 사용하는 APM인 SCOUTER 클라이언트가 성능과 사용성면에서 매우 훌륭하지만, 플랫폼의 특성으로인한 접근성의 한계가 존재하여, 이를 보완하는 보조 도구의 역할로 사용될 수 있도록 하기 위해 다양한 디바이스에서 접근 가능한 형태의 웹 클라이언트를 만들어 배포하며 시작되었습니다. <br />
+                PAPER 2.0 부터는 Telegraf 데이터를 지원하고 전체 시스템 성능 상황을 한눈에 파악할 수 있는 토폴로지 뷰를 탑재하면서, 어플리케이션과 인프라 소프트웨어를 아우르는 통합 모니터링 대시보드로 발전하고 있습니다.<br />
+                <span class="scouter-paper-tag"><a href="https://github.com/mindplates/scouter-paper" target="_blank">SCOUTER PAPER</a></span>는 <a href="https://www.apache.org/licenses/LICENSE-2.0" target="_blank">아파치 라이선스 2.0</a>을 따르는 오픈 소스 소프트웨어입니다. 해당 라이선스의 배포시 의무사항을 준수하는 방식으로 상업/비상업적인 용도로 자유롭게 사용, 수정 및 재배포가 가능합니다.</p>
+
+            <!--<h3><span>반응형 웹</span></h3>
+            <p><span class="scouter-paper-tag">SCOUTER PAPER</span>는 오픈소스 성능 모니터링 도구인 <span class="scouter-tag"><a href="https://github.com/scouter-project/scouter" target="_blank">SCOUTER</a></span>의 성능 데이터를 웹 브라우저를 통해 모니터링 하기 위한 웹 클라이언트 프로그램입니다. <span class="scouter-paper-tag">SCOUTER PAPER</span>를 통해 언제, 어디에서든 다양한 디바이스를 통해 <span class="scouter-tag">SCOUTER</span>의 성능 정보를 쉽게 확인할 수 있습니다. <span class="scouter-paper-tag">SCOUTER PAPER</span>는 반응형 웹 방식으로 제작되어, 모바일, 태블릿, PC 등의 다양한 디바이스를 통해 접속이 가능합니다.</p>
+            <div class="img-text">
+                <div class="img">
+                    <img alt="setting" src="./img/multi.png"/>
+                </div>
+                <div class="text">
+                    <h3 class="first"><span>사용자 정의 차트</span></h3>
+                    <p><span class="scouter-paper-tag">SCOUTER PAPER</span>는 <span class="scouter-tag">SCOUTER</span>에서 제공하는 다양한 성능 매트릭을 조합하여, 어플리케이션과 사용자의 특성에 따른 최적화된 성능 정보를 하나의 그래프를 통해 확인할 수 있습니다. 이를 통해 다양한 매트릭의 상호 연관성을 쉽게 파악할 수 있습니다. 또한 어플리케이션의 특성에 따라 필요한 그래프 조합을 구성하여, 어플리케이션에 따른 최적화된 성능 대시보드의 구성이 가능합니다.</p>
+                    <h3><span>최적화된 레이아웃의 구성</span></h3>
+                    <p><span class="scouter-paper-tag">SCOUTER PAPER</span>는 화면 해상도(>1200, 1200, 1000, 800)에 따라 총 4단계의 레이아웃을 구성할 수 있습니다. 각각의 해상도에 사용자가 최적의 레이아웃을 설정할 수 있으며, 이렇게 설정된 정보는 클라이언트 스토리지에 저장되어 유지되며, 해상도가 변경되는 것에 따라 설정된 레이아웃이 즉시 반영됩니다. 또한 레이아웃 관리 기능을 통해서 사용자가 정의한 레이아웃과 차트를 저장하고, 관리하여 다양한 레이아웃을 쉽게 사용할 수 있습니다.</p>
+                    <h3><span>다양한 사용자 설정 기능</span></h3>
+                    <p><span class="scouter-tag">SCOUTER</span> 서버의 인증 설정에 따르는 인증 방법을 비롯하여, 폰트, 성능 데이터 폴링(polling) 주기, 날짜와 숫자 등의 포멧, XLOG의 점 그래픽 등을 설정하여 사용자 환경에 맞는 클라이언트 환경을 구성할 수 있습니다.</p>
+                </div>
+            </div>
+            <h3><span>이슈 등록</span></h3>
+            <p>사용하면서 발생하는 이슈는 아래 URL을 통해서 등록해주세요. 수정 및 기능 개선 Contribution은 언제나 환영입니다.</p>
+            <div class="link"><a href="https://github.com/mindplates/scouter-paper/issues" target="_blank">https://github.com/mindplates/scouter-paper/issues</a></div>-->
+        </div>
+    </div>
+</div>
+<div id="download" class="wrapper build">
+    <div class="content">
+        <div class="inner-content build-content">
+            <h2><span>DOWNLOAD</span></h2>
+            <article>
+                <p><span class="scouter-paper-tag">SCOUTER PAPER</span>의 최신 버전은 아래 URL을 통해 다운로드 할 수 있으며, GITHUB을 통해 소스 코드를 관리하고 있습니다.</p>
+                <div class="link"><a href="https://github.com/mindplates/scouter-paper/releases" target="_blank">https://github.com/mindplates/scouter-paper/releases</a></div>
+            </article>
+        </div>
+    </div>
+</div>
+<div id="install" class="wrapper install">
+    <div class="content">
+        <div class="inner-content install-content">
+            <h2><span>INSTALL</span></h2>
+            <p><span class="scouter-paper-tag">SCOUTER PAPER</span>는 일반적인 HTML을 사용하는 것과 동일하게 사용할 수 있습니다. 즉 별도의 설치가 필요 없으며, 로컬에서 웹 브라우저를 통해 접근하여 사용하거나, 웹 서버에 올려서 사용할 수 있습니다. 다만 SCOUTER PAPER를 사용하기 위해서는 SCOUTER APM 서버가 구성되어 있어야하므로, 이미 구성된 SCOUTER 서버를 활용하는 것이 가장 간편한 사용 방법이라고 할 수 있습니다. 아래와 같은 방법으로 간단하게 SCOUTER WEB API에 SCOUTER PAPER를 업로드하여 바로 사용할 수 있습니다.</p>
+            <!--<p>BUILD 단계에서 다운로드하거나 생성된 실행 파일을 SCOUTER 프로젝트의 scouter.webapp 서브 프로젝트 하위의 scouter.webapp/src/main/resources/webroot 하위에 복사한 후 SCOUTER 프로젝트를 빌드합니다. 이 후 빌드된 SCOUTER 웹 API 서버를 실행하면, 바로 SCOUTER PAPER에 접속하여 사용할 수 있습니다.</p>-->
+            <div class="tree">scouter
+<span class="bold">   └</span> webapp
+<span class="bold">      └</span> conf
+<span class="bold">      └</span> <span class="target">extweb</span> <-- 폴더 하위에 SCOUTER PAPER 파일을 복사합니다.
+<span class="bold">      └</span> lib
+<span class="bold">      └</span> logs
+        </div>
+        <p>위와 같이 extweb 폴더에 SCOUTER PAPER 파일을 업로드하였다면, http://서버주소:6188/extweb 혹은 http://서버주소:6188/extweb/index.html로 접근하면 아래와 같이 SCOUTER PAPER를 사용할 수 있습니다. (포트 번호는 설정에 따라 달라질 수 있습니다.)</p>
+        <div class="img">
+            <img alt="setting" src="./img/guide/1.png"/>
+            <div>&lt;SCOUTER PAPER&gt;</div>
+        </div>
+    </div>
+</div>
+<!--<div id="build" class="wrapper build">
+    <div class="content">
+        <div class="inner-content build-content">
+            <h2><span>BUILD</span></h2>
+            <article>
+                <h3><span>SCOUTER PAPER 빌드</span></h3>
+                <p><span class="scouter-paper-tag">SCOUTER PAPER</span>는 <a href="https://reactjs.org/" target="_blank">리액트</a> 기반으로 만들어졌으며, <a href="https://github.com/facebook/create-react-app" target="_blank">CREATE REACT APP</a>을 이용하여 환경을 구성하였습니다. 소스 코드를 다운로드 받은 후 일반적으로 아래와 같이 간단하게 빌드할 수 있습니다. 빌드를 위해 <a href="https://www.npmjs.com/get-npm" target="_blank">NPM</a>이 설치되어 있어야 합니다. 빌드 파일은 프로젝트 build 폴더에 생성됩니다.</p>
+                <div class="cmd">
+                    <div class="desc">아래 URL 혹은 Clone한 프로젝트를 체크아웃합니다</div>
+                    <div class="command">https://github.com/mindplates/scouter-paper.git</div>
+                </div>
+                <div class="cmd">
+                    <div class="desc">의존성 패키지를 설치합니다.</div>
+                    <div class="command">npm install</div>
+                </div>
+                <div class="cmd">
+                    <div class="desc">실행 파일을 생성합니다.</div>
+                    <div class="command">npm run build</div>
+                </div>
+            </article>
+        </div>
+    </div>
+</div>-->
+<div id="setting" class="wrapper setting">
+    <div class="content">
+        <div class="inner-content setting-content">
+            <h2><span>SETTING</span></h2>
+            <p><span class="scouter-paper-tag">SCOUTER PAPER</span>는 SCOUTER 웹 API가 필수적으로 구성되어 있어야 합니다. 또한 SCOUTER PAPER의 접속과 인증 관련 옵션은 필연적으로 SCOUTER 웹 API 서버의 옵션에 맞도록 세팅되어야 올바르게 동작합니다. 따라서 SCOUTER 웹 API의 구성과 옵션에 관해 간략하게 함께 다룹니다. <span class="scouter-tag">SCOUTER</span>의 설치와 웹 API 서버를 구성하는 자세한 방법은 <a href="https://github.com/scouter-project/scouter" target="_blank">SCOUTER</a>와 <a href="https://github.com/scouter-project/scouter/blob/master/scouter.document/tech/Web-API-Guide.md">SCOUTER 웹 API 가이드</a>를 확인해주세요. </p>
+            <h3><span>지원하는 SCOUTER 버전</span></h3>
+            <p><span class="scouter-paper-tag">SCOUTER PAPER 1.X</span>는 SCOUTER 1.8.4.1 이상의 버전이 필요하며, <span class="scouter-paper-tag">SCOUTER PAPER 2.X</span>는 SCOUTER 2.0 이상의 버전이 필요합니다. 텔레그라프와의 연동으로 모니터링 영역이 대폭 넓어진 SCOUTER 2.0 이상을 사용하시는 것을 권장드립니다.</p>
+            <p></p>
+
+            <h3><span>SCOUTER 웹 API 서버 활성화</span></h3>
+            <p>설치된 <span class="scouter-tag">SCOUTER</span>가 1.8.0 이상의 버전이라면, SCOUTER 컬렉터 서버에 포함된 웹 API 서버를 아래 설정을 통하여 컬렉터 서버 구동시 함께 웹 API 서버를 활성화 할 수 있습니다. 만약 콜렉터 서버와 웹 API 서버를 분리하여 구성하고 싶다면, <span class="scouter-tag">SCOUTER</span> 배포 버전에 포함된 별도의 웹 API 서버를 통해 구성할 수 도 있습니다.</p>
+            <p>SCOUTER 컬렉터 서버에 포함된 웹 API를 활성화하기 위해서는 설정 파일에 아래 내용이 기본적으로 추가되어야 합니다.</p>
+            <div class="conf">
+                <div class="file-path">conf/scouter.conf</div>
+                <div class="file-content">net_http_server_enabled=true
+net_http_api_enabled=true
+net_http_port=6180</div>
+            </div>
+            <p>정상적으로 웹 API가 활성화되었는지, 웹 브라우저를 통해 HTTP 요청을 수행하여 확인할 수 있습니다. 아래 PORT는 위 설정의 net_http_port 번호를 입력해야 합니다.</p>
+            <div class="conf">
+                <div class="file-path">웹 API 동작 여부 확인</div>
+                <div class="file-content">http://{SERVER-ADDRESS}:{PORT}/scouter/v1/info/server</div>
+            </div>
+            <p>정상적으로 JSON 형식의 문자열이 수신된다면, 웹 API 서버에 접속할 수 있는 환경이 구성된 것입니다.</p>
+
+            <h3><span>SCOUTER 웹 API 서버 인증 관련 설정</span></h3>
+            <p><span class="scouter-tag">SCOUTER</span> 웹 API 서버는 인증 관련 설정 방법에 따라 아래와 같은 인증 방법을 지원합니다. 아래 인증 방법은 꼭 하나만이 설정되는 것이 아니며, 설정의 특성에 따라 조합하여 설정될 수 있습니다. 아무런 설정을 하지 않았다면, 모든 HTTP 요청이 허용되는 상태로 열려있습니다. 방화벽 등으로 보호 받는 네트워크 환경이 아니라면, 하나 이상의 인증 설정을 하는 것을 권장합니다.</p>
+            <table>
+                <tr>
+                    <th>인증 옵션</th>
+                    <th>내용</th>
+                    <th>기타</th>
+                </tr>
+                <tr>
+                    <td>별도의 설정 없음</td>
+                    <td>모든 HTTP 요청을 허용</td>
+                    <td></td>
+                </tr>
+                <tr>
+                    <td>IP 기반 인증</td>
+                    <td>설정된 IP의 요청만을 허용</td>
+                    <td></td>
+                </tr>
+                <tr>
+                    <td>ID / PASSWORD 기반 인증</td>
+                    <td>인증된 사용자의 요청만을 허용</td>
+                    <td>쿠키 또는 토큰(BEARER)</td>
+                </tr>
+            </table>
+            <p><span class="scouter-paper-tag">SCOUTER PAPER</span>는 결국 SCOUTER 웹 API 서버에 HTTP 요청을 통해 성능 정보를 서버로부터 가져와서 화면에 보여주므로, 위 인증 방식에 따라 SETTINGS 페이지에 세팅을 해야 올바르게 인증을 처리하여 데이터를 수신할 수 있습니다. 아래 내용을 통해서 각 SCOUTER 웹 API의 인증 옵션과 해당 인증 옵션에 해당하는 SCOUTER PAPER 옵션을 확인할 수 있습니다.</p>
+            <h3><span>SCOUTER 웹 API 서버 인증 관련 설정 (별도의 설정 없음)</span></h3>
+            <p>별도의 인증 설정이 없는 경우, 모든 요청을 허용하므로, SCOUTER PAPER 또한 [SCOUTER PAPER > SETTINGS > AUTHENTIFICATION CONFIGURATION]에 어떤 값이 선택되어 있어도 정상적으로 데이터를 수신할 수 있습니다.</p>
+            <h3><span>SCOUTER 웹 API 서버 인증 관련 설정 (IP 기반 인증)</span></h3>
+            <div class="conf">
+                <div class="file-path">conf/scouter.conf</div>
+                <div class="file-content">...
+net_http_api_auth_ip_enabled=true
+net_http_api_allow_ips={IP-1},{IP-2}
+...</div>
+            </div>
+            <p>IP 기반으로 인증을 하도록 설정하기 위해서는 위와 같이 설정 파일에 추가하고, 허용할 IP 목록을 net_http_api_allow_ips에 추가합니다. 즉, SCOUTER PAPER를 통해 접속할 사용자의 IP를 추가하여, 해당 IP 사용자만 SCOUTER PAPER를 통해 접속 할 수 있도록 설정 할 수 있습니다.</p>
+            <p>IP 기반으로 인증만 설정된 경우, SCOUTER PAPER는 [SCOUTER PAPER > SETTINGS > AUTHENTIFICATION CONFIGURATION]에 어떤 값이 선택되어 있어도 IP 목록에만 포함되어 있다면 정상적으로 데이터를 수신할 수 있습니다.</p>
+            <h3><span>SCOUTER 웹 API 서버 인증 관련 설정 (ID / PASSWORD 기반 인증 + 쿠키)</span></h3>
+            <div class="conf">
+                <div class="file-path">conf/scouter.conf</div>
+                <div class="file-content">...
+net_http_api_auth_session_enabled=true
+net_http_api_cors_allow_credentials=true
+...</div>
+            </div>
+            <p>ID/PASSWORD 기반으로 사용자를 인증하고, 이 후 인증된 키 값을 송/수신하는 매커니즘에 따라 쿠키 방식과 토큰 방식으로 나눌 수 있습니다. 만약 쿠키 방식으로 인증 정보를 관리하기 위해서는 위와 같이 설정 내용을 추가합니다.</p>
+            <p>만약 <span class="scouter-paper-tag">SCOUTER PAPER</span>를 SCOUTER 웹 API에 올려서 사용한다면, 즉 SAME ORIGIN에서 요청이 이루어지는 상황이라면, net_http_api_cors_allow_credentials는 설정에서 제외해도 상관없습니다.</p>
+            <p>쿠키를 인증 매커니즘으로 사용하는 경우, [SCOUTER PAPER > SETTINGS > AUTHENTIFICATION CONFIGURATION]에 반드시 cookie가 선택되어야 합니다.</p>
+            <h3><span>SCOUTER 웹 API 서버 인증 관련 설정 (ID / PASSWORD 기반 인증 + 토큰)</span></h3>
+            <div class="conf">
+                <div class="file-path">conf/scouter.conf</div>
+                <div class="file-content">...
+net_http_api_auth_bearer_token_enabled=true
+...</div>
+            </div>
+            <p>ID/PASSWORD 기반으로 사용자를 인증하고, 인증 토큰을 요청 헤더를 통해 전송하는 방식으로 인증을 하려면 위와 같이 설정 내용을 추가합니다.</p>
+            <p>토큰 방식을 인증 매커니즘으로 사용하는 경우, [SCOUTER PAPER > SETTINGS > AUTHENTIFICATION CONFIGURATION]에 반드시 token(bearer)가 선택되어야 합니다.</p>
+
+            <h3><span>Telegraf 연동</span></h3>
+            <p>SCOUTER의 Collector가 Telegraf Server 역할을 할 수 있게 되었으며 Telegraf inputs를 통해 수집된 성능 정보는 PAPER를 통해 모니터링 할 수 있습니다.</p>
+            <p>Telegraf를 연동하기 위해서는 SCOUTER 2.0 이상을 사용하여야 하며, 상세한 설정은 SCOUTER의 도움말을 참고하시기 바랍니다.</p>
+            <p><a href="https://github.com/scouter-project/scouter/blob/master/scouter.document/main/Telegraf-Server.md">SCOUTER Telegraf Server feature</a> 바로가기</p>
+
+            <h3><span>SCOUTER PAPAER SETTINGS</span></h3>
+            <p>SCOUTER PAPER는 상단의 SETTINGS 메뉴를 통해서 설정 정보를 관리할 수 있습니다. 단 설정 정보는 브라우저 스토리지를 통해 관리되므로, 접속 환경이나 브라우저가 변경되는 경우 설정 정보가 유지되지 않습니다.</p>
+            <div class="img-text">
+                <div class="img">
+                    <img alt="setting" src="./img/guide/2.png"/>
+                    <div>&lt;SETTINGS&gt;</div>
+                </div>
+                <div class="text">
+                    <h3 class="first">SCOUTER WEB API SERVER INFO</h3>
+                    <p>'PAPER'에서 접속할 SCOUTER 웹 API 서버 정보를 등록합니다. 등록된 서버 정보를 OBJECT 선택 팝업 상단에서 콤보 박스로 출력되며, 서버를 바꾸면서 여러 SCOUTER 서버의 성능 데이터를 모니터링 할 수 있습니다.</p>
+                    <h3>POLLING & RANGE</h3>
+                    <p>SCOUTER PAPER가 실시간 데이터를 조회하는 간격, ALERT 데이터를 조회하는 간격, 과거 데이터 조회 구간을 설정할 수 있습니다. SHORT HISTORY / LONG HISTORY로 나눌 수 있으며, 각 구간에서 최대 조회 가능 범위와 시간 범위 선택 컨트롤의 단위를 설정 할 수 있습니다. SHORT HISTORY / LONG HISTORY 구간의 차이점은 매트릭 데이터의 다운 샘플링 기준이 달라지며, XLOG와 같은 대량의 RAW 데이터를 가지는 성능 매트릭은 LONG HISTORY 구간에서는 조회되지 않는 차이점이 있습니다.</p>
+                    <h3>ALERT</h3>
+                    <p>새로운 ALERT 정보를 수신한 경우, 브라우저 알림을 통해 ALERT을 출력할지를 선택할 수 있습니다.</p>
+                    <h3>GRAPH</h3>
+                    <p>라인 그래프 관련 설정을 할 수 있습니다. 라인 그래프의 색상 인스턴스별로 구분할지, 매트릭 별로 구분할지 선택할 수 있으며, 라인 그래프를 표현하는 선의 굴기, 곡선 함수, 채움 여부 등을 설정 할 수 있습니다.</p>
+                    <h3>THEME</h3>
+                    <p>'PAPER'의 테마를 선택할 수 있습니다.</p>
+                    <h3>FONTS CONFIGURATION</h3>
+                    <p>'PAPER'의 각 구성 요소들의 폰트를 설정 할 수 있습니다.</p>
+                    <h3>DATA FORMAT CONFIGURATION</h3>
+                    <p>SCOUTER에서 표현되는 날짜와 숫자의 표현 형식을 설정합니다.</p>
+                    <p>숫자 형식에 입력 가능한 값은 <a href="http://numeraljs.com/" target="_blank">http://numeraljs.com/</a> 페이지를 참고하시기 바랍니다.</p>
+                    <p>날짜 형식에 입력 가능한 값은 <a href="https://github.com/d3/d3-3.x-api-reference/blob/master/Time-Formatting.md" target="_blank">https://github.com/d3/d3-3.x-api-reference/blob/master/Time-Formatting.md</a> 페이지를 참고하시기 바랍니다.</p>
+                    <h3>XLOG CONFIGURATION</h3>
+                    <p>XLOG 차트에 그려지는 XLOG의 샘플링 값과 모양을 설정합니다. XLOG는 종류에 따라서 NORMAL, ASYNC, ERROR로 구분됩니다. 일반적으로 서블릿 기반의 WAS를 모니터링 한다면, 일반적인 HTTP 요청을 NORMAL XLOG, 비동기 방식으로 처리되는 경우 ASYNC XLOG, 요청 처리 중 에러가 발생한 경우 ERROR XLOG로 그려지게 됩니다. 3가지 유형의 XLOG의 크기 및 색상과 점들의 배치를 통해 그려지는 모양을 설정할 수 있습니다.</p>
+                    <p>데이터의 양이 많을 경우에는 XLOG 차트를 그리는 속도가 늦어질 수 있는데, 이러한 경우 SAMPLING 옵션을 조절하는 것도 고려할 수 있습니다. 기본적으로 100%는 모든 데이터를 XLOG 차트에 그리며, 50%로 설정한 경우 수신된 XLOG 데이터 중에서 50%만 차트에 그리게 됩니다.</p>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<div id="features" class="wrapper features">
+    <div class="content">
+        <div class="inner-content features-content">
+            <h2><span>GUIDE</span></h2>
+            <p><span class="scouter-paper-tag">SCOUTER PAPER</span>를 이용하여 모니터링 대상을 선택하고, 레이아웃을 구성하는 방법에 대해 설명하며, 전체적인 기능에 대해 함께 소개합니다.</p>
+            <div class="img-text">
+                <div class="img">
+                    <img alt="setting" src="./img/guide/3.png"/>
+                </div>
+                <div class="text">
+                    <h3 class="first">로그인</h3>
+                    <p>[SETTINGS > AUTHENTIFICATION TYPE]이 none이 아닐 경우, 우측 상단에 LOGIN 메뉴가 활성화됩니다. 사용자 ID와 PASSWORD를 입력하여 SCOUTER 웹 API에 로그인합니다.</p>
+                </div>
+            </div>
+            <div class="img-text">
+                <div class="img">
+                    <img alt="setting" src="./img/guide/4.png"/>
+                </div>
+                <div class="text">
+                    <h3 class="first">모니터링 대상 선택</h3>
+                    <p>모니터링을 시작하기 위해서는 먼저 성능 정보를 확인할 인스턴스를 선택해야 합니다. 우측 상단의 [OBJECTS] 버튼을 클릭하면, 인스턴스 선택을 위한 팝업이 출력됩니다. 해당 팝업 상단에 SETTINGS에 추가했던 SCOUTER 서버 콤보 박스가 있으며, 해당 콤보 박스를 변경할때마다, 해당 SCOUTER 서버에 등록된 모니터링 대상이 변경됩니다.<p>
+                    <p>팝업에서 좌측의 SERVER를 클릭하여 선택하면, 해당 서버에 포함된 인스턴스 목록이 출력됩니다. 인스턴스 명칭으로 필터링하거나, 목록을 클릭을 통해 토글(toggle)하여 모니터링을 시작할 대상을 선택할 수 있습니다. 선택을 모두 완료한 후 APPLY 버튼을 클릭하여 선택을 완료합니다. 또한 자주 사용하는 모니터링 대상들이거나, 용도따라 구분된 모니터링 목록들을 그룹으로 관리하고 싶은 경우, 우측 하단의 [SAVE AS PRESET] 버튼을 클릭하여, 현재 선택된 대상 정보를 저장할 수 있습니다.</p>
+                </div>
+            </div>
+            <div class="img-text">
+                <div class="img">
+                    <img alt="setting" src="./img/guide/6.png"/>
+                </div>
+                <div class="text">
+                    <h3 class="first">PRESET 관리</h3>
+                    <p>현재 선택한 모니터링 대상을 자주 사용하는 경우, 이를 PRESET으로 저장하여, 관리할 수 있습니다. [OBJECTS] [우측의 화살표 버튼]을 클릭하여, PRESET을 불러오거나, 삭제할 수 있습니다.</p>
+                </div>
+            </div>
+            <div class="img-text">
+                <div class="img">
+                    <img alt="setting" src="./img/guide/15.png"/>
+                </div>
+                <div class="text">
+                    <h3 class="first">PAPERS</h3>
+                    <p>모니터링 대상이 선택되면 성능을 모니터링하는 주요 화면인 PAPER로 이동합니다. 상단 컨트롤 부분을 이용하여, 화면의 중앙 영역에 모니터링 관련 대시보드를 구성합니다. 가운데 빈 영역에 PAPER를 추가하고, PAPER에 모니터링하고자하는 매트릭을 드래그 & 드랍하여 모니터링을 모니터링 차트를 구성할 수 있습니다.</p>
+                </div>
+            </div>
+            <div class="img-text">
+                <div class="img">
+                    <img alt="setting" src="./img/guide/16.png"/>
+                </div>
+                <div class="text">
+                    <h3 class="first">PAPER CONTROLS</h3>
+                    <p>상단의 컨트롤 영역을 통해 레이아웃을 구성하고, 과거 데이터를 조회할 수 있습니다. 먼저 좌측의 R 버튼의 경우, 현재의 성능 데이터를 주기적으로 가져올지, 혹은 과거 데이터를 조회할지를 선택하는 버튼입니다.</p>
+                    <p>R 버튼 우측의 + 버튼을 클릭하면 화면에 빈 PAPER가 추가됩니다. PAPER는 레이아웃을 관리하는 컴포넌트이며, PAPER에는 매트릭을 드래그해야 모니터링 데이터가 출력되는 하나의 대시보드 구성요소를 만들 수 있습니다.</p>
+                    <p>METRICS 우측의 컨트롤들이 PAPER에 드랍 가능한 하나의 성능 매트릭을 의미합니다. 모니터링할 매트릭을 PAPER에 드래그 & 드롭하면, 드롭한 PAPER 영역에 드랍한 매트릭의 성능 데이터가 그래프로 출력됩니다.</p>
+                    <p>가장 우측의 휴지통 모양의 아이콘을 클릭하면, 화면의 모든 PAPER를 삭제하여 초기화합니다.</p>
+                    <p>화면에 추가된 PAPER는 우측 상단에 설정 버튼과 닫기 버튼을 가지고 있습니다. 각 매트릭별로 추가적인 옵션이 있는 경우, 설정 버튼을 클릭하여 옵션을 변경할 수 있습니다. 닫기 버튼은 해당 PAPER를 화면에서 삭제합니다.</p>
+                    <p>화면에 추가된 PAPER의 우측 하단에 마우스를 올리면, PAPER의 크기를 자유롭게 조절할 수 있습니다. PAPER의 크기는 화면 해상도에 따라 4단계로 구분되어 적용됩니다. 각 해상도별로 적용된 크기는 로컬 스토리지에 기록되어, 각 해상도로 다시 변경되었을때 적용된 크기와 레이아웃으로 자동으로 적용됩니다. 또한 PAPER를 드래그하여 위치를 이동할 수 있습니다.</p>
+                </div>
+            </div>
+            <div class="img-text">
+                <div class="img">
+                    <img alt="setting" src="./img/guide/17.png"/>
+                </div>
+                <div class="text">
+                    <h3 class="first">매트릭 종류</h3>
+                    <p>각 매트릭은 단독으로 표현 가능한 매트릭과 중첩 가능한 매트릭으로 나눌 수 있습니다. 좌측 첫번째 붉은 영역이 단독으로만 표현 가능한 매트릭이며, 우측의 노란 영역의 중첩 가능한 매트릭을 의미합니다. 중첩 가능한 매트릭들은 하나의 PAPER에 여러 매트릭을 중첩하여, 데이터를 함께 모니터링 할 수 있습니다.</p>
+                    <p>단독 매트릭과 중첩 가능 매트릭은 상호 배타적인 성격을 가지고 있습니다. 즉, 단독 매트릭이 있는 PAPER에 중첩 가능 매트릭을 드랍하는 경우, 기존의 매트릭이 사라지고 중첩 가능한 매트릭이 표시됩니다.</p>
+                </div>
+            </div>
+            <div class="img-text">
+                <div class="img">
+                    <img alt="setting" src="./img/guide/10.png"/>
+                </div>
+                <div class="text">
+                    <h3 class="first">METRIC OPTION</h3>
+                    <p>각 매트릭 별로 추가적으로 제공하는 옵션들이 있는 경우, PAPER 우측 상단의 설정 버튼을 클릭하여, 옵션을 조절할 수 있습니다.</p>
+                </div>
+            </div>
+            <div class="img-text">
+                <div class="img">
+                    <img alt="setting" src="./img/guide/7.png"/>
+                </div>
+                <div class="text">
+                    <h3 class="first">레이아웃 관리</h3>
+                    <p>PAPER와 METRIC이 결합된 정보와 PAPER의 크기와 위치 정보 전체 레이아웃이라고 정의합니다. 이러한 레이아웃 정보를 우측 상단의 LAYOUT 버튼을 클릭하여, 관리할 수 있습니다. 기본적으로 제공되는 레이아웃 샘플이 있으며, 하단의 버튼을 이용하여 레이아웃 저장하고, 삭제하고, 저장된 레이아웃을 불러 올 수 있습니다.</p>
+                    <p>모니터링 대상에 따라서 구성해야 차트가 다르거나, 상황에 따라서 봐야하는 대시보드가 다른 경우, 레이아웃 관리를 통해 쉽게 저장하고, 불러 올 수 있습니다.</p>
+                </div>
+            </div>
+            <div class="img-text">
+                <div class="img">
+                    <img alt="setting" src="./img/guide/18.png"/>
+                </div>
+                <div class="text">
+                    <h3 class="first">모니터링 및 XLOG 선택</h3>
+                    <p>XLOG 차트는 트랜잭션을 하나의 점프로 표현하는 XLOG 차트를 제공합니다. 이러한 XLOG 대시보드를 활용하여, 트랜잭션이 처리되는 패턴, 에러 발생 여부, 현재 트랜잭션의 처리 상태 등을 직관적으로 파악할 수 있습니다.</p>
+                    <p>또한 그래프의 패턴 중 보다 세밀하게 프로파일을 확인해야 하는 영역을 드래그 트랜잭션의 상세한 프로파일 데이터를 확인할 수 있습니다.</p>
+                </div>
+            </div>
+            <div class="img-text">
+                <div class="img">
+                    <img alt="setting" src="./img/guide/11.png"/>
+                </div>
+                <div class="text">
+                    <h3 class="first">XLOG 필터링</h3>
+                    <p>트랜잭션의 처리 시간, 에러 발생 여부, 트랜잭션 ID, URL 등 다양한 조건을 통해서 XLOG 차트를 필터링 할 수 있습니다. 필터링 중인지의 여부는 필터링되어 있는 경우에는 차트 우측 상단에 필터링 버튼을 통해 확인 할 수 있습니다.</p>
+                </div>
+            </div>
+            <div class="img-text">
+                <div class="img">
+                    <img alt="setting" src="./img/guide/12.png"/>
+                </div>
+                <div class="text">
+                    <h3 class="first">프로파일 조회</h3>
+                    <p>팝업을 통해 드래그로 선택된 영역의 XLOG가 목록으로 나타납니다. 목록에서 하나의 XLOG를 선택하면, 선택된 XLOG의 상세 프로파일이 오른쪽 영역에 나타납니다. 프로파일의 상단의 컨트롤을 통해서 프로파일 관련 옵션을 조절하면서 프로파일을 확인할 수 있습니다.</p>
+                </div>
+            </div>
+            <div class="img-text">
+                <div class="img">
+                    <img alt="setting" src="./img/guide/14.png"/>
+                </div>
+                <div class="text">
+                    <h3 class="first">ALERT 확인</h3>
+                    <p>새로운 ALERT이 발생하며, 우측 상단이 경고 알림 부분에 배지로 ALERT이 수신되었음을 알립니다. ALERT 아이콘을 클릭하여, 발생한 ALERT 정보를 확인 할 수 있으며, 목록의 시계 모양을 클릭하면, 해당 ALERT이 발생한 과거 시각의 데이터를 바로 조회합니다.</p>
+                </div>
+            </div>
+            <div class="img-text">
+                <div class="img">
+                    <img alt="setting" src="./img/guide/13.png"/>
+                </div>
+                <div class="text">
+                    <h3 class="first">과거 데이터 조회</h3>
+                    <p>현재 데이터를 실시간으로 확인하거나, 과거 데이터를 조회 할 수 있습니다. 과거 데이터 조회 범위는 먼저 조회 범위의 시작 일시를 입력하고, 시작 시점부터 얼마간의 시간을 조회할지 범위를 선택하는 방식으로 구성되어있습니다.</p>
+                    <p>어플리케이션 간의 평균 응답 시간, TPS, 에러 발생율 정보와 함께, 연결 선의 애니메이션과 색상을 통해 데이터의 흐름과 에러 발생 여부를 쉽게 파악 할 수 있습니다.</p>
+                </div>
+            </div>
+            <div class="img-text">
+                <div class="img">
+                    <img alt="setting" src="./img/guide/8.png"/>
+                </div>
+                <div class="text">
+                    <h3 class="first">토폴로지</h3>
+                    <p>현재 선택된 인스턴스들을 논리적 집합으로 모아서, 네트워크 그래프 형태로 사용자의 어플리케이션간의 연결 관계 및 처리 요약 정보, 외부 시스템간의 연결 관계 등을 직관적으로 파악할 수 있습니다. </p>
+                    <p>PAPER에서 토폴로지 뷰를 사용하기 위해서는 SCOUTER 2.0 이상을 사용하여야 하며 java agent의 counter_interaction_enabled 옵션이 true 로 설정되어야 합니다.</p>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+</body>
+</html>
+<script>
+    $(function() {
+        $(window).scroll(function(event){
+            if ($(this).scrollTop() > 0) {
+                $("body").addClass("fixed");
+            } else {
+                $("body").removeClass("fixed");
+            }
+        });
+    });
+
+    $(".menu a").click(function(e) {
+        var offset = $($(this).attr("href")).offset();
+        $('html, body').animate({scrollTop : offset.top - $("#logo").outerHeight()}, 400);
+        e.preventDefault();
+    });
+
+
+</script>

@@ -1,5 +1,4 @@
 export const SET_TARGET = 'SET_TARGET';
-export const SET_INSTANCES = 'SET_INSTANCES';
 export const SET_CONTROL_VISIBILITY = 'SET_CONTROL_VISIBILITY';
 export const PUSH_MESSAGE = 'PUSH_MESSAGE';
 export const CLEAR_ALL_MESSAGE = 'CLEAR_ALL_MESSAGE';
@@ -20,6 +19,7 @@ export const SET_RANGE_DATE_HOURS_MINUTES = 'SET_RANGE_DATE_HOURS_MINUTES';
 export const SET_REAL_TIME_RANGE_STEP_VALUE = 'SET_REAL_TIME_RANGE_STEP_VALUE';
 export const SET_RANGE_DATE_HOURS_MINUTES_VALUE = 'SET_RANGE_DATE_HOURS_MINUTES_VALUE';
 export const SET_RANGE_ALL = 'SET_RANGE_ALL';
+export const SET_COUNTER_INFO = 'SET_COUNTER_INFO';
 
 export function setConfig(config) {
     return {
@@ -38,6 +38,14 @@ export function setUserId(origin, id, token, time) {
     };
 }
 
+export function setCounterInfo(families, objTypes) {
+    return {
+        type: SET_COUNTER_INFO,
+        families : families,
+        objTypes : objTypes
+    };
+}
+
 export function setUserData(userData) {
     return {
         type: SET_USER_DATA,
@@ -45,18 +53,10 @@ export function setUserData(userData) {
     };
 }
 
-export function setInstances(instances) {
-    return {
-        type: SET_INSTANCES,
-        instances : instances
-    };
-}
-
-export function setTarget(hosts, instances) {
+export function setTarget(objects) {
     return {
         type: SET_TARGET,
-        hosts : hosts,
-        instances : instances
+        objects : objects
     };
 }
 

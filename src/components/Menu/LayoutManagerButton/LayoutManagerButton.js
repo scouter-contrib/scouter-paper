@@ -14,12 +14,6 @@ class LayoutManagerButton extends Component {
     }
 }
 
-let mapStateToProps = (state) => {
-    return {
-        instances: state.target.instances
-    };
-};
-
 let mapDispatchToProps = (dispatch) => {
     return {
         setControlVisibility: (name, value) => dispatch(setControlVisibility(name, value)),
@@ -27,6 +21,6 @@ let mapDispatchToProps = (dispatch) => {
     };
 };
 
-LayoutManagerButton = connect(mapStateToProps, mapDispatchToProps)(LayoutManagerButton);
+LayoutManagerButton = connect(undefined, mapDispatchToProps)(LayoutManagerButton);
 
 export default LayoutManagerButton;

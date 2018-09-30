@@ -73,7 +73,7 @@ class BoxConfig extends Component {
     };
 
     onRemoveToggle = ( counterKey) => {
-        let removeKeys = Object.assign(this.state.removeKeys);
+        let removeKeys = this.state.removeKeys.slice(0);
         let findIndex = removeKeys.findIndex(function (e) {
             return e === counterKey
         });
@@ -93,8 +93,12 @@ class BoxConfig extends Component {
         return (
             <div className={"box-config popup-div " + (this.state.singleRow ? "single-row" : "")} onMouseDown={(e) => {e.stopPropagation();}} onMouseUp={(e) => {e.stopPropagation();}} ref="boxConfig">
                 <div className="box-config-content">
-                    <div className={"exclusive-options " + (this.props.box.option.length > 1 ? 'show' : '')}>
-                    {(this.props.box.option && this.props.box.option.length > 1) &&
+                    <div className="box-config-title">
+                        <span>CONFIG</span>
+                        <span className="close-btn" onClick={this.onCancel}><i className="fa fa-times-circle-o" aria-hidden="true"></i></span>
+                    </div>
+                    <div className={"exclusive-options " + (this.props.box.option.length > 0 ? 'show' : '')}>
+                    {(this.props.box.option && this.props.box.option.length > 0) &&
                     this.props.box.option.map((d, i) => {
 
                         let removed = false;

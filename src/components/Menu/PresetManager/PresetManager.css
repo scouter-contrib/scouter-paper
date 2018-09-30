@@ -123,8 +123,26 @@
     padding: 8px;
     line-height: 100%;
 }
+
+.preset-manager ul li .summary-info {
+    position: relative;
+}
+
 .preset-manager ul li .summary-info span {
     padding-top: 0;
+    display: inline-block;
+}
+
+.preset-manager ul li .summary-info .icon-list {
+    display: inline-block;
+    position: absolute;
+    bottom : 2px;
+    right : 5px;
+}
+
+.preset-manager ul li .summary-info .icon-list .icon-item {
+    display: inline-block;
+    width: 20px;
 }
 
 .preset-manager ul li .no {

@@ -99,7 +99,19 @@
 }
 
 .layout-manager ul li > div {
-    line-height: 0;
+    line-height: 9%;
+}
+
+.layout-manager ul li > div .deprecated {
+    padding: 5px 0 0 5px;
+    font-size: 10px;
+}
+
+.layout-manager ul li > div .deprecated > span {
+    background-color: red;
+    color: white;
+    padding: 2px 4px;
+    border-radius: 3px;
 }
 
 .layout-manager ul li span {
@@ -184,4 +196,9 @@
 .layout-manager .empty-content {
     text-align: center;
     padding-top: 100px;
+}
+
+.layout-manager-bg  .__react_component_tooltip {
+    font-size: 8px !important;
+    padding: 4px 8px !important;
 }

@@ -1,9 +1,8 @@
 import * as d3 from "d3";
-import {schemeSet3, schemeDark2} from "d3-scale-chromatic";
+import {schemeSet3} from "d3-scale-chromatic";
 import Color from "color-js";
 
 let instanceColors = {};
-let hostColors = {};
 let metricColors = {};
 class InstanceColor {
     static setInstances(instances, colorType) {
@@ -29,35 +28,8 @@ class InstanceColor {
         });
     }
 
-    static setHosts(hosts, colorType) {
-        hostColors = {};
-        hosts.forEach((host, n) => {
-            hostColors[host.objHash] = [];
-            let hostBaseColor;
-            if (n > 7) {
-                let cnt = Math.floor(n / 8);
-                hostBaseColor = Color(schemeDark2[n % 8]).shiftHue(20 * cnt);
-            } else {
-                hostBaseColor = schemeDark2[n]; //8
-            }
-            hostColors[host.objHash].push(hostBaseColor);
-            for (let i=0; i<4; i++) {
-                let color = Color(hostBaseColor);
-                if (colorType === "white") {
-                    hostColors[host.objHash].push(color.darkenByRatio(0.15 * (i + 1)).toCSS());
-                } else {
-                    hostColors[host.objHash].push(color.lightenByRatio(0.15 * (i + 1)).toCSS());
-                }
-            }
-        });
-    }
-
     static getInstanceColors() {
         return instanceColors;
-    }
-
-    static getHostColors() {
-        return hostColors;
     }
 
     static getMetricColor(metric, colorType) {

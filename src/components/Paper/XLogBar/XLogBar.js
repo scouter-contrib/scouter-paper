@@ -53,7 +53,7 @@ class XLogBar extends Component {
 
         this.resize();
 
-        let interval = 1000;
+        let interval = this.props.interval;
 
         let now = (new ServerDate()).getTime();
         let divs = this.refs.xlogBar.querySelectorAll("div");
@@ -106,7 +106,7 @@ class XLogBar extends Component {
 
                     div.style.right = "-100px";
                     div.style.transitionDelay = (delay) + "ms";
-                    div.style.transitionDuration = "1s";
+                    div.style.transitionDuration = interval + "ms";
                     div.style.transitionProperty = "all";
                     div.style.transitionTimingFunction = "ease-in-out";
 

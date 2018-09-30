@@ -3,10 +3,11 @@ import './LayoutManager.css';
 import {setTemplate, setControlVisibility, pushMessage} from '../../../actions';
 import {connect} from 'react-redux';
 import {withRouter} from 'react-router-dom';
-import {getData, setData, getDefaultServerConfig} from '../../../common/common';
+import {getData, setData} from '../../../common/common';
 import 'url-search-params-polyfill';
 import jQuery from "jquery";
 import {errorHandler, setAuthHeader, getWithCredentials, getHttpProtocol, getCurrentUser} from '../../../common/common';
+import ReactTooltip from 'react-tooltip'
 
 class LayoutManager extends Component {
 
@@ -24,6 +25,10 @@ class LayoutManager extends Component {
         if (!this.props.visible && nextProps.visible) {
             this.loadTemplates(nextProps.config, nextProps.user);
         }
+    }
+
+    componentDidUpdate(prevProps, prevState) {
+        ReactTooltip.rebuild();
     }
 
     saveTemplate = (templates) => {
@@ -71,6 +76,31 @@ class LayoutManager extends Component {
             if (msg && Number(msg.status) === 200) {
                 if (msg.result) {
                     let list = JSON.parse(msg.result);
+
+                    list.forEach((template) => {
+                        let valid = true;
+                        template.boxes.forEach((box) => {
+                            if (!valid) {
+                                return;
+                            }
+
+                            if (Array.isArray(box.option)) {
+                                box.option.forEach((o) => {
+                                    if (!o.familyName) {
+                                        valid = false;
+                                        return;
+                                    }
+                                })
+                            }
+
+                        });
+
+                        if (!valid) {
+                            template.deprecated = true;
+                            return;
+                        }
+                    });
+
                     if (list && list.length > 0) {
                         this.setState({
                             templates : list,
@@ -102,16 +132,21 @@ class LayoutManager extends Component {
     };
 
     saveClick = () => {
-        let templates = this.state.templates;
+        let templates = this.state.templates.slice(0);
         if (!templates) {
             templates = [];
         }
         let layouts = getData("layouts");
         let boxes = getData("boxes");
 
+        let inx = 0;
+        templates.forEach((template) => {
+            template.no = inx++;
+        });
+
         templates.push({
             no : templates.length,
-            name : "template-" + (templates.length + 1),
+            name : "template-" + (inx + 1),
             creationTime : (new Date()).getTime(),
             boxes : boxes,
             layouts : layouts
@@ -159,12 +194,16 @@ class LayoutManager extends Component {
                     this.props.setTemplate(template.boxes, template.layouts);
                     this.props.toggleLayoutManagerVisible();
 
-                    this.props.history.push({
-                        pathname: '/paper',
-                        search: '?instances=' + this.props.instances.map((d) => {
-                            return d.objHash
-                        })
+                    let search = '?objects=' + this.props.objects.map((d) => {
+                        return d.objHash
                     });
+
+                    if (!(this.props.history.location.pathname === "/paper" &&  this.props.history.location.search === search)) {
+                        this.props.history.push({
+                            pathname: '/paper',
+                            search: search
+                        });
+                    }
 
                     break;
                 }
@@ -224,7 +263,8 @@ class LayoutManager extends Component {
                             {this.state.templates.map((d, i) => {
                                 return (<li key={i} className={d.no === this.state.selectedTemplateNo ? 'selected' : ''} onClick={this.templateClick.bind(this, d.no)}>
                                     <div>
-                                        <span className="no">{i+1}</span>
+                                        {d.deprecated && <div className="deprecated"><span data-tip="this template is no longer working properly at this paper version">DEPRECATED</span></div>}
+                                        <span className="no">{d.no}</span>
                                         {(d.no !== this.state.selectedEditNo) && <span className="name">{d.name}</span>}
                                         {(d.no === this.state.selectedEditNo) && <span className="name edit"><input type="text" value={this.state.editText} onChange={this.onTextChange.bind(this )} /></span>}
                                         {(d.no !== this.state.selectedEditNo) && <span className="edit-btn" onClick={this.editClick.bind(this, d.no, d.name)}>EDIT</span>}
@@ -243,6 +283,7 @@ class LayoutManager extends Component {
                         <button className="load-btn" onClick={this.loadClick}>LOAD</button>
                     </div>
                 </div>
+                <ReactTooltip />
             </div>
         );
     }
@@ -250,7 +291,7 @@ class LayoutManager extends Component {
 
 let mapStateToProps = (state) => {
     return {
-        instances: state.target.instances,
+        objects: state.target.objects,
         config: state.config,
         user: state.user
     };

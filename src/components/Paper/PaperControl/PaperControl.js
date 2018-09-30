@@ -4,6 +4,7 @@ import * as Options from './Options';
 import {Draggable} from 'react-drag-and-drop'
 import ReactTooltip from 'react-tooltip'
 import AlertList from "./AlertList";
+import {connect} from 'react-redux';
 
 class PaperControl extends Component {
 
@@ -13,6 +14,8 @@ class PaperControl extends Component {
     constructor(props) {
         super(props);
         this.options = Options.options();
+
+
         if ("ontouchstart" in document.documentElement) {
             this.touch = true;
         }
@@ -36,42 +39,48 @@ class PaperControl extends Component {
                 }
                 <div className="label" data-tip="DRAG RIGHT ICON TO THE PAPER">METRICS</div>
                 {Object.keys(this.options).map((name, i) => {
-                    let isArray = Array.isArray(this.options[name]);
-
-                    return <div key={i} className={"paper-control " + (isArray ? 'multi-control' : '')} data-tip={this.options[name].title} >
-                        {(!isArray && !this.touch) &&
+                    return <div key={i} className="paper-control" data-tip={this.options[name].title} >
+                        {(!this.touch) &&
                         <Draggable type="metric" className="draggable control-item" data={JSON.stringify(this.options[name])} >
                             {this.options[name].icon && <i className={"fa " + this.options[name].icon} aria-hidden="true"></i>}
                             {this.options[name].text && <span className="text-icon">{this.options[name].text}</span>}
                         </Draggable>
                         }
-                        {(isArray && !this.touch) && <div className="multi-metrics">
-                            <div className="group-name">{name}</div>
-                            <ul>
-                                {this.options[name].map((counterName, j) => {
-                                    return <li key={j}>
-                                        <Draggable type="metric" className="draggable control-item" data={JSON.stringify(counterName)}>
-                                            {counterName.icon && <i className={"fa " + counterName.icon} aria-hidden="true"></i>}
-                                            {counterName.text && <span className="text-icon">{counterName.text}</span>}
-                                        </Draggable>
-                                    </li>
-                            })}
-                            </ul>
-                        </div>}
-                        {(!isArray && this.touch) &&
+                        {(this.touch) &&
                         <div onClick={this.props.addPaperAndAddMetric.bind(this, JSON.stringify(this.options[name]))}>
                             {this.options[name].icon && <i className={"fa " + this.options[name].icon} aria-hidden="true"></i>}
                             {this.options[name].text && <span className="text-icon">{this.options[name].text}</span>}
                         </div>
                         }
-                        {(isArray && this.touch) && <div className="multi-metrics">
-                            <div className="group-name">{name}</div>
+                    </div>
+                })}
+                {this.props.counterInfo.families.map((family, i) => {
+                    return <div key={i} className="paper-control multi-control" >
+                        {(!this.touch) && <div className="multi-metrics">
+                            <div className="group-name">{family.name}</div>
                             <ul>
-                                {this.options[name].map((counterName, j) => {
+                                {family.counters.sort((a,b) => {
+                                    return a.displayName.localeCompare(b.displayName);
+                                }).map((counter, j) => {
+                                    counter.familyName = family.name;
                                     return <li key={j}>
-                                        <div className="control-item" onClick={this.props.addPaperAndAddMetric.bind(this, JSON.stringify(counterName))}>
-                                            {counterName.icon && <i className={"fa " + counterName.icon} aria-hidden="true"></i>}
-                                            {counterName.text && <span className="text-icon">{counterName.text}</span>}
+                                        <Draggable type="metric" className="draggable control-item" data={JSON.stringify(counter)}>
+                                            <span className="text-icon">{counter.displayName}</span>
+                                        </Draggable>
+                                    </li>
+                                })}
+                            </ul>
+                        </div>}
+                        {(this.touch) && <div className="multi-metrics">
+                            <div className="group-name">{family.name}</div>
+                            <ul>
+                                {family.counters.sort((a,b) => {
+                                    return a.displayName.localeCompare(b.displayName);
+                                }).map((counter, j) => {
+                                    counter.familyName = family.name;
+                                    return <li key={j}>
+                                        <div className="control-item" onClick={this.props.addPaperAndAddMetric.bind(this, JSON.stringify(counter))}>
+                                            <span className="text-icon">{counter.displayName}</span>
                                         </div>
                                     </li>
                                 })}
@@ -99,6 +108,14 @@ class PaperControl extends Component {
         );
     }
 }
+
+let mapStateToProps = (state) => {
+    return {
+        counterInfo: state.counterInfo
+    };
+};
+
+PaperControl = connect(mapStateToProps, undefined)(PaperControl);
 
 export default PaperControl;
 

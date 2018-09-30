@@ -55,7 +55,7 @@ class Login extends Component {
         document["cookie"] = 'JSESSIONID=; expires=Thu, 01 Jan 1970 00:00:01 GMT;';
         this.props.setUserId(origin, null, null, null);
 
-        let user = Object.assign(this.props.user);
+        let user = Object.assign({}, this.props.user);
         user[origin] = {
             id: null,
             token : null,
@@ -97,7 +97,7 @@ class Login extends Component {
                 if (msg.status === "200") {
                     let now = (new Date()).getTime();
                     this.props.setUserId(origin, this.state.control.id, null, now);
-                    let user = Object.assign(this.props.user);
+                    let user = Object.assign({}, this.props.user);
                     user[origin] = {
                         id: this.state.control.id,
                         token : null,
@@ -113,7 +113,7 @@ class Login extends Component {
                 if (msg.result.success) {
                     let now = (new Date()).getTime();
                     this.props.setUserId(origin, this.state.control.id, msg.result.bearerToken, now);
-                    let user = Object.assign(this.props.user);
+                    let user = Object.assign({}, this.props.user);
                     user[origin] = {
                         id: this.state.control.id,
                         token : msg.result.bearerToken,

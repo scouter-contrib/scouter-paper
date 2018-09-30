@@ -97,9 +97,9 @@ class RangeControl extends Component {
         this.search(startDate, endDate);
     };
 
-    search = (startDateParam, endDateParam, instances, hosts) => {
+    search = (startDateParam, endDateParam, instances) => {
         if (startDateParam && endDateParam) {
-            this.props.search(startDateParam.valueOf(), endDateParam.valueOf(), instances, hosts);
+            this.props.search(startDateParam.valueOf(), endDateParam.valueOf(), instances);
         } else {
             let startDate = this.props.range.date.clone();
             startDate.seconds(0);
@@ -109,7 +109,7 @@ class RangeControl extends Component {
             let endDate = startDate.clone();
             endDate.add(this.props.range.value, "minutes");
 
-            this.props.search(startDate.valueOf(), endDate.valueOf(), instances, hosts);
+            this.props.search(startDate.valueOf(), endDate.valueOf(), instances);
         }
     };
 
@@ -201,8 +201,6 @@ class RangeControl extends Component {
 
 let mapStateToProps = (state) => {
     return {
-        hosts: state.target.hosts,
-        instances: state.target.instances,
         config: state.config,
         range: state.range
     };

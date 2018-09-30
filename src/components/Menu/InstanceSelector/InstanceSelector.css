@@ -217,9 +217,36 @@
 }
 
 .instance-selector .instance-list div.instance {
-    padding: 8px 8px 7px;
+    padding: 0;
     cursor: pointer;
     border-bottom: 1px solid rgba(0, 0, 0, 0.2);
+    display: table;
+    table-layout: fixed;
+    width: 100%;
+    box-sizing: border-box;
+}
+
+.instance-selector .instance-list div.instance > div {
+    display: table-cell;
+    vertical-align: middle;
+}
+
+.instance-selector .instance-list div.instance > div.type-icon {
+    width: 40px;
+    height: 40px;
+    text-align: center;
+    box-sizing: border-box;
+    padding: 8px;
+}
+
+.instance-selector .instance-list div.instance > div.instance-text-info {
+
+}
+
+.instance-selector .instance-list div.instance > div.type-icon .type-icon-wrapper {
+    background-color: rgba(255,255,255,0.7);
+    background-color: white;
+    border-radius: 3px;
 }
 
 .instance-selector .instance-list div.instance .instance-name {
@@ -240,7 +267,6 @@
 
 .instance-selector .instance-list div.instance .instance-other .instance-objtype {
     margin-left: 5px;
-    text-transform: uppercase;
 }
 
 .instance-selector .instance-list div.instance.first {

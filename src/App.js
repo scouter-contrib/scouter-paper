@@ -1,6 +1,7 @@
 import React, {Component} from 'react';
 import './App.css';
 import './Theme.css';
+import './fonts/technology-icons-gh-pages/styles/technology-icons.css';
 import {
     Settings,
     Paper,
@@ -15,12 +16,13 @@ import {
 import {Route, Switch} from 'react-router-dom';
 import {connect} from 'react-redux';
 import {withRouter} from 'react-router-dom';
-import {setConfig, addRequest, clearAllMessage, setControlVisibility, setUserId, setUserData, pushMessage} from './actions';
+import {setConfig, addRequest, clearAllMessage, setControlVisibility, setUserId, setUserData, pushMessage, setCounterInfo} from './actions';
 import {detect} from 'detect-browser';
 import Unsupport from "./components/Unsupport/Unsupport";
 import jQuery from "jquery";
-import {errorHandler, mergeDeep, getParam, setAuthHeader, getWithCredentials, getHttpProtocol, getDefaultServerConfig} from './common/common';
+import {errorHandler, mergeDeep, getParam, setAuthHeader, getWithCredentials, getHttpProtocol, getDefaultServerConfig, getCurrentUser} from './common/common';
 import Home from "./components/Home/Home";
+import Topology from "./components/Topology/Topology";
 
 const browser = detect();
 const support = (browser.name !== "ie" && browser.name !== "edge");
@@ -75,6 +77,37 @@ class App extends Component {
         if (this.props.config.theme !== nextProps.config.theme) {
             document.querySelector("html").setAttribute("class", nextProps.config.theme);
         }
+
+        // 스카우터 API 서버가 변경되었는지 확인
+        if  (nextProps.config) {
+            let currentApiServer = this.props.config.servers.filter((server) => {
+                return server.default;
+            });
+            let nextApiServer = nextProps.config.servers.filter((server) => {
+                return server.default;
+            });
+            if (JSON.stringify(currentApiServer) !== JSON.stringify(nextApiServer)) {
+                this.getCounterModel(nextProps.config, nextProps.user);
+            }
+        }
+    };
+
+    getCounterModel = (config, user) => {
+        jQuery.ajax({
+            method: "GET",
+            async: true,
+            url: getHttpProtocol(config) + "/scouter/v1/info/counter-model",
+            xhrFields: getWithCredentials(config),
+            beforeSend: function (xhr) {
+                setAuthHeader(xhr, config, getCurrentUser(config, user));
+            }
+        }).done((msg) => {
+            if (Number(msg.status) === 200) {
+                this.props.setCounterInfo(msg.result.families, msg.result.objTypes);
+            }
+        }).fail((xhr, textStatus, errorThrown) => {
+            errorHandler(xhr, textStatus, errorThrown, this.props);
+        });
     };
 
     componentWillMount() {
@@ -150,6 +183,10 @@ class App extends Component {
     componentDidMount() {
         document.querySelector("html").setAttribute("class", this.props.config.theme);
         this.setFontSetting(this.props.config.fontSetting);
+
+        if (this.props.config) {
+            this.getCounterModel(this.props.config, this.props.user);
+        }
     }
 
     getFontGeneric = (val) => {
@@ -195,6 +232,7 @@ class App extends Component {
                         <Route exact path='/' component={Home}/>
                         <Route exact path='/login' component={Login}/>
                         <Route exact path='/paper' component={Paper}/>
+                        <Route exact path='/topology' component={Topology}/>
                         <Route exact path='/settings' component={Settings}/>
                     </Switch>
                     {this.props.control.Message &&
@@ -215,7 +253,7 @@ class App extends Component {
 let mapStateToProps = (state) => {
     return {
         control: state.control,
-        instances: state.target.instances,
+        counterInfo: state.counterInfo,
         messages: state.message.messages,
         bgColor: state.style.bgColor,
         config: state.config,
@@ -231,7 +269,8 @@ let mapDispatchToProps = (dispatch) => {
         setConfig: (config) => dispatch(setConfig(config)),
         setUserId: (origin, id, token, time) => dispatch(setUserId(origin, id, token, time)),
         setUserData: (userData) => dispatch(setUserData(userData)),
-        pushMessage: (category, title, content) => dispatch(pushMessage(category, title, content))
+        pushMessage: (category, title, content) => dispatch(pushMessage(category, title, content)),
+        setCounterInfo: (families, objTypes) => dispatch(setCounterInfo(families, objTypes))
     };
 };
 

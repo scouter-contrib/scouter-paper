@@ -64,7 +64,7 @@ class Menu extends Component {
     };
 
     render() {
-        let instanceParam = (this.props.instances && this.props.instances.length > 0) ? "?instances=" + this.props.instances.map((d) => {return d.objHash}) : "";
+        let instanceParam = (this.props.objects && this.props.objects.length > 0) ? "?objects=" + this.props.objects.map((d) => {return d.objHash}) : "";
 
         let defaultServerconfig = getDefaultServerConfig(this.props.config);
         let origin = defaultServerconfig.protocol + "://" + defaultServerconfig.address + ":" + defaultServerconfig.port;
@@ -82,6 +82,12 @@ class Menu extends Component {
                             </div>
                         </NavLink>
                     </div>
+                    <NavLink className={"menu-item " + (this.state.menu === "/topology" ? "active" : "")} to={"/topology"  + instanceParam} onClick={this.menuClick.bind(this, "/topology")}>
+                        <div>
+                            <div className="icon"><i className="fa fa-braille" aria-hidden="true"></i></div>
+                            <div className="text">TOPOLOGY</div>
+                        </div>
+                    </NavLink>
                     <NavLink className={"menu-item " + (this.state.menu === "/paper" ? "active" : "")} to={"/paper"  + instanceParam} onClick={this.menuClick.bind(this, "/paper")}>
                         <div>
                             <div className="icon"><i className="fa fa-newspaper-o" aria-hidden="true"></i></div>
@@ -116,7 +122,7 @@ class Menu extends Component {
 
 let mapStateToProps = (state) => {
     return {
-        instances: state.target.instances,
+        objects: state.target.objects,
         config: state.config,
         user: state.user
     };
