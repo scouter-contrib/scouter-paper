@@ -39,11 +39,14 @@ class ActiveSpeed extends Component {
         let maxValue = this.props.box.values["maxValue"];
         let singleLine = this.props.box.values["singleLine"];
 
+        console.log(this.props.objects);
         return (
             <div className="active-speed-wrapper">
                 <div className="active-speed-content">
                 {(!this.props.realtime) && <div className="no-search-support"><div><div>REALTIME ONLY</div></div></div>}
-                {this.props.realtime && this.props.objects.map((d, i) => {
+                {this.props.realtime && this.props.objects.filter((d) => {
+                    return d.objFamily === "javaee";
+                }).map((d, i) => {
                     let total = 0;
                     let short = 0;
                     let medium = 0;
