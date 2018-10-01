@@ -15,6 +15,7 @@ import RangeControl from "./RangeControl/RangeControl";
 import moment from "moment";
 import _ from "lodash";
 import notificationIcon from '../../img/notification.png';
+import OldVersion from "../OldVersion/OldVersion";
 
 const ResponsiveReactGridLayout = WidthProvider(Responsive);
 
@@ -1594,6 +1595,9 @@ class Paper extends Component {
 
         return (
             <div className="papers">
+                {!this.props.supported.supported && <OldVersion />}
+                {this.props.supported.supported &&
+                <div>
                 <div className={"fixed-alter-object " + (this.state.fixedControl ? 'show' : '')}></div>
                 <PaperControl addPaper={this.addPaper} addPaperAndAddMetric={this.addPaperAndAddMetric} clearLayout={this.clearLayout} fixedControl={this.state.fixedControl} toggleRangeControl={this.toggleRangeControl} realtime={this.props.range.realTime} alert={this.state.alert} clearAllAlert={this.clearAllAlert} clearOneAlert={this.clearOneAlert} setRewind={this.setRewind} showAlert={this.state.showAlert} toggleShowAlert={this.toggleShowAlert} />
                 <RangeControl visible={this.state.rangeControl} search={this.search} fixedControl={this.state.fixedControl} toggleRangeControl={this.toggleRangeControl} changeLongTerm={this.changeLongTerm}/>
@@ -1647,6 +1651,7 @@ class Paper extends Component {
                         </div>
                     </div>
                 </div>
+                </div>}
             </div>
         );
     }
@@ -1659,7 +1664,8 @@ let mapStateToProps = (state) => {
             config: state.config,
             user: state.user,
             template: state.template,
-            range: state.range
+            range: state.range,
+            supported : state.supported
         };
     };
 

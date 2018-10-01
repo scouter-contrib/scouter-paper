@@ -1,3 +1,4 @@
+export const SET_SUPPORTED = 'SET_SUPPORTED';
 export const SET_TARGET = 'SET_TARGET';
 export const SET_CONTROL_VISIBILITY = 'SET_CONTROL_VISIBILITY';
 export const PUSH_MESSAGE = 'PUSH_MESSAGE';
@@ -197,6 +198,13 @@ export function setRangeValue(value) {
     return {
         type: SET_RANGE_VALUE,
         value : value
+    };
+}
+
+export function setSupported(value) {
+    return {
+        type: SET_SUPPORTED,
+        supported: value
     };
 }
 

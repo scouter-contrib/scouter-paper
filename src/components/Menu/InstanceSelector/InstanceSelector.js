@@ -137,9 +137,19 @@ class InstanceSelector extends Component {
                     setAuthHeader(xhr, props.config, getCurrentUser(props.config, props.user));
                 }
             }).done((msg) => {
+
                 if (msg && msg.result) {
                     that.init = true;
                     let servers = msg.result;
+
+                    if (servers.length > 0) {
+                        if (!servers[0].version) {
+                            props.pushMessage("error", "Not Supported", "Paper 2.0 is available only on Scout Server 2.0 and later.");
+                            props.setControlVisibility("Message", true);
+                            return;
+                        }
+                    }
+
                     //현재 멀티서버와 연결된 scouter webapp은 지원하지 않으므로 일단 단일 서버로 가정하고 마지막 서버 시간과 맞춘다.
                     servers.forEach((server) => {
                         common.setServerTimeGap(Number(server.serverTime) - new Date().valueOf());
@@ -253,8 +263,17 @@ class InstanceSelector extends Component {
             async: true,
             url: getHttpProtocol(config) + '/scouter/v1/info/server'
         }).done((msg) => {
+
+            let servers = msg.result;
+            if (servers.length > 0) {
+                if (!servers[0].version) {
+                    this.props.pushMessage("error", "Not Supported", "Paper 2.0 is available only on Scout Server 2.0 and later.");
+                    this.props.setControlVisibility("Message", true);
+                }
+            }
+
             this.setState({
-                servers: msg.result,
+                servers: servers,
                 objects: [],
                 activeServerId: null,
                 selectedObjects: {},

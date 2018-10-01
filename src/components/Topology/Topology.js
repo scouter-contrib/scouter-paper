@@ -34,6 +34,7 @@ import {
 import * as d3 from "d3";
 import _ from "lodash";
 import numeral from "numeral";
+import OldVersion from "../OldVersion/OldVersion";
 
 class Topology extends Component {
 
@@ -141,10 +142,12 @@ class Topology extends Component {
 
         this.resizeTimer = setTimeout(() => {
             let wrapper = this.refs.topologyChart;
-            this.width = wrapper.offsetWidth;
-            this.height = wrapper.offsetHeight;
-            if (this.svg) {
-                this.svg.attr("width", this.width).attr("height", this.height);
+            if (wrapper) {
+                this.width = wrapper.offsetWidth;
+                this.height = wrapper.offsetHeight;
+                if (this.svg) {
+                    this.svg.attr("width", this.width).attr("height", this.height);
+                }
             }
         }, 1000);
 
@@ -985,6 +988,9 @@ class Topology extends Component {
     render() {
         return (
             <div className="topology-wrapper">
+                {!this.props.supported.supported && <OldVersion />}
+                {this.props.supported.supported &&
+                <div>
                 <div className="controller noselect">
                     <div className="left">
                         <div className="summary">{this.state.nodes.length} NODES</div>
@@ -1011,6 +1017,7 @@ class Topology extends Component {
                 </div>
                 }
                 <div className="topology-chart" ref="topologyChart"></div>
+                </div>}
             </div>
         );
     }
@@ -1025,6 +1032,7 @@ let mapStateToProps = (state) => {
         template: state.template,
         range: state.range,
         counterInfo: state.counterInfo,
+        supported : state.supported
     };
 };
 

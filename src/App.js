@@ -16,7 +16,7 @@ import {
 import {Route, Switch} from 'react-router-dom';
 import {connect} from 'react-redux';
 import {withRouter} from 'react-router-dom';
-import {setConfig, addRequest, clearAllMessage, setControlVisibility, setUserId, setUserData, pushMessage, setCounterInfo} from './actions';
+import {setSupported, setConfig, addRequest, clearAllMessage, setControlVisibility, setUserId, setUserData, pushMessage, setCounterInfo} from './actions';
 import {detect} from 'detect-browser';
 import Unsupport from "./components/Unsupport/Unsupport";
 import jQuery from "jquery";
@@ -45,11 +45,16 @@ class App extends Component {
         }).done((msg) => {
             if (msg && Number(msg.status) === 200) {
                 if (getDefaultServerConfig(config).authentification === "bearer") {
-                    this.props.setUserId(origin, user.id, user.token, user.time);
+                    if (user) {
+                        this.props.setUserId(origin, user.id, user.token, user.time);
+                    }
                 }
 
                 if (getDefaultServerConfig(config).authentification === "cookie") {
-                    this.props.setUserId(origin, user.id, null, user.time);
+                    if (user) {
+                        this.props.setUserId(origin, user.id, null, user.time);
+                    }
+
                 }
 
             } else {
@@ -103,10 +108,17 @@ class App extends Component {
             }
         }).done((msg) => {
             if (Number(msg.status) === 200) {
+                this.props.setSupported(true);
                 this.props.setCounterInfo(msg.result.families, msg.result.objTypes);
             }
         }).fail((xhr, textStatus, errorThrown) => {
-            errorHandler(xhr, textStatus, errorThrown, this.props);
+            if (xhr.status === 404) {
+                this.props.setSupported(false);
+                this.props.pushMessage("error", "Not Supported", "failed to get matrix information. paper 2.0 is available only on scouter 2.0 and later.");
+                this.props.setControlVisibility("Message", true);
+            } else {
+                errorHandler(xhr, textStatus, errorThrown, this.props);
+            }
         });
     };
 
@@ -257,7 +269,8 @@ let mapStateToProps = (state) => {
         messages: state.message.messages,
         bgColor: state.style.bgColor,
         config: state.config,
-        user: state.user
+        user: state.user,
+        supported : state.supported
     };
 };
 
@@ -270,7 +283,8 @@ let mapDispatchToProps = (dispatch) => {
         setUserId: (origin, id, token, time) => dispatch(setUserId(origin, id, token, time)),
         setUserData: (userData) => dispatch(setUserData(userData)),
         pushMessage: (category, title, content) => dispatch(pushMessage(category, title, content)),
-        setCounterInfo: (families, objTypes) => dispatch(setCounterInfo(families, objTypes))
+        setCounterInfo: (families, objTypes) => dispatch(setCounterInfo(families, objTypes)),
+        setSupported: (supported) => dispatch(setSupported(supported))
     };
 };
 
