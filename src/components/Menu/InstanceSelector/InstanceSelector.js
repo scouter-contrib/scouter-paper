@@ -50,6 +50,11 @@ class InstanceSelector extends Component {
         if (nextProps.user.id) {
             this.setTargetFromUrl(nextProps);
         }
+
+        if (JSON.stringify(this.props.user) !== JSON.stringify(nextProps.user)) {
+            this.getServers(nextProps.config);
+        }
+
     }
 
     onFilterChange = (event) => {

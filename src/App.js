@@ -20,7 +20,7 @@ import {setSupported, setConfig, addRequest, clearAllMessage, setControlVisibili
 import {detect} from 'detect-browser';
 import Unsupport from "./components/Unsupport/Unsupport";
 import jQuery from "jquery";
-import {errorHandler, mergeDeep, getParam, setAuthHeader, getWithCredentials, getHttpProtocol, getDefaultServerConfig, getCurrentUser} from './common/common';
+import {errorHandler, mergeDeep, getParam, setAuthHeader, getWithCredentials, getHttpProtocol, getDefaultServerConfig, getCurrentUser, getCurrentDefaultServer} from './common/common';
 import Home from "./components/Home/Home";
 import Topology from "./components/Topology/Topology";
 
@@ -94,10 +94,22 @@ class App extends Component {
             if (JSON.stringify(currentApiServer) !== JSON.stringify(nextApiServer)) {
                 this.getCounterModel(nextProps.config, nextProps.user);
             }
+
+
+            // 사용자 정보가 변경된다면, 카운터 정보를 다시 가져온다
+            let defaultServerconfig = getDefaultServerConfig(this.props.config);
+            let origin = defaultServerconfig.protocol + "://" + defaultServerconfig.address + ":" + defaultServerconfig.port;
+            if (this.props.config && defaultServerconfig.authentification !== "none") {
+                let nextUser = nextProps.user[origin];
+                let currentUser = this.props.user[origin];
+                if (nextUser && (JSON.stringify(currentUser) !== JSON.stringify(nextUser))) {
+                    this.getCounterModel(nextProps.config, nextProps.user);
+                }
+            }
         }
     };
 
-    getCounterModel = (config, user) => {
+    getCounterModel = (config, user, handleError) => {
         jQuery.ajax({
             method: "GET",
             async: true,
@@ -112,12 +124,14 @@ class App extends Component {
                 this.props.setCounterInfo(msg.result.families, msg.result.objTypes);
             }
         }).fail((xhr, textStatus, errorThrown) => {
-            if (xhr.status === 404) {
-                this.props.setSupported(false);
-                this.props.pushMessage("error", "Not Supported", "failed to get matrix information. paper 2.0 is available only on scouter 2.0 and later.");
-                this.props.setControlVisibility("Message", true);
-            } else {
-                errorHandler(xhr, textStatus, errorThrown, this.props);
+            if (handleError) {
+                if (xhr.status === 404) {
+                    this.props.setSupported(false);
+                    this.props.pushMessage("error", "Not Supported", "failed to get matrix information. paper 2.0 is available only on scouter 2.0 and later.");
+                    this.props.setControlVisibility("Message", true);
+                } else {
+                    errorHandler(xhr, textStatus, errorThrown, this.props);
+                }
             }
         });
     };
@@ -196,9 +210,9 @@ class App extends Component {
         document.querySelector("html").setAttribute("class", this.props.config.theme);
         this.setFontSetting(this.props.config.fontSetting);
 
-        if (this.props.config) {
-            this.getCounterModel(this.props.config, this.props.user);
-        }
+        // 처음 카운터 모델을 조회하는데, 에러 처리는 하지 않는다
+        this.getCounterModel(this.props.config, this.props.user, false);
+
     }
 
     getFontGeneric = (val) => {
