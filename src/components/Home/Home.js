@@ -5,7 +5,7 @@ import logoBlack from '../../img/scouter_black.png';
 import {connect} from 'react-redux';
 import jQuery from "jquery";
 const git = "https://github.com/mindplates/scouter-paper";
-const version = "2.0.287";
+const version = "2.1.301";
 
 class Home extends Component {
 
