@@ -4,8 +4,9 @@
     left: 0;
     right: 0;
     bottom: 0;
-    background-color: rgba(0, 0, 0, 0.3);
     z-index: 30;
+    max-width: 1600px;
+    margin: 0 auto;
 }
 
 .instance-selector-bg .instance-selector-fixed-bg {
@@ -26,8 +27,7 @@
     height: 350px;
     position: absolute;
     top: 47px;
-    right: 24px;
-    _border-radius: 5px;
+    right: 0px;
     z-index: 5;
     padding: 0;
     -webkit-touch-callout: none;

@@ -1,8 +1,13 @@
 .topology-wrapper {
     height: calc(100% - 71px);
-    margin: 10px;
+    margin: 10px  auto;
     box-sizing: border-box;
     position: relative;
+    max-width: 1600px;
+}
+
+.topology-wrapper > div {
+    height: 100%;
 }
 
 .topology-wrapper .controller {
@@ -47,12 +52,12 @@
     display: inline-block;
     font-size: 9px;
     padding: 2px 4px;
-    border: 1px solid rgba(0, 0, 0, 0.3);
+    border: 1px solid rgba(0, 0, 0, 0.4);
     border-right: none;
     width: 60px;
     box-sizing: border-box;
     text-align: center;
-    background-color: #CCC;
+    background-color: white;
     cursor: pointer;
 }
 
@@ -73,7 +78,7 @@
 }
 
 .topology-wrapper .controller .check-btn:last-child {
-    border-right: 1px solid rgba(0, 0, 0, 0.3);
+    border-right: 1px solid rgba(0, 0, 0, 0.4);
     border-radius: 0 3px 3px 0;
 }
 
@@ -115,7 +120,7 @@
 .edge-flow-path {
     fill: none;
     stroke: white;
-    opacity: 0.5;
+    stroke-opacity: 0.5;
     stroke-width: 4;
     stroke-dasharray: 10, 4;
     animation: flow 1s infinite steps(20);
