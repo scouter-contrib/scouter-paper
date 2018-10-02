@@ -1,8 +1,9 @@
 .topology-wrapper {
     height: calc(100% - 71px);
-    margin: 10px;
+    margin: 10px  auto;
     box-sizing: border-box;
     position: relative;
+    max-width: 1600px;
 }
 
 .topology-wrapper > div {

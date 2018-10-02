@@ -92,7 +92,7 @@ class App extends Component {
                 return server.default;
             });
             if (JSON.stringify(currentApiServer) !== JSON.stringify(nextApiServer)) {
-                this.getCounterModel(nextProps.config, nextProps.user);
+                this.getCounterModel(nextProps.config, nextProps.user, true);
             }
 
 
@@ -103,7 +103,7 @@ class App extends Component {
                 let nextUser = nextProps.user[origin];
                 let currentUser = this.props.user[origin];
                 if (nextUser && (JSON.stringify(currentUser) !== JSON.stringify(nextUser))) {
-                    this.getCounterModel(nextProps.config, nextProps.user);
+                    this.getCounterModel(nextProps.config, nextProps.user, true);
                 }
             }
         }

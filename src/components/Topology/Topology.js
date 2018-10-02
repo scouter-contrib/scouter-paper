@@ -146,6 +146,7 @@ class Topology extends Component {
                 this.width = wrapper.offsetWidth;
                 this.height = wrapper.offsetHeight;
                 if (this.svg) {
+                    d3.select(this.refs.topologyChart).selectAll("svg").attr("width", this.width).attr("height", this.height);
                     this.svg.attr("width", this.width).attr("height", this.height);
                 }
             }

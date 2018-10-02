@@ -490,8 +490,7 @@ class InstanceSelector extends Component {
     render() {
 
         return (
-            <div className={"instance-selector-bg " + (this.props.visible ? "" : "hidden")}
-                 onClick={this.props.toggleSelectorVisible}>
+            <div className={"instance-selector-bg " + (this.props.visible ? "" : "hidden")} onClick={this.props.toggleSelectorVisible}>
                 <div className={"instance-selector-fixed-bg"}>
                 </div>
                 <div className="instance-selector popup-div" onClick={(e) => e.stopPropagation()}>
