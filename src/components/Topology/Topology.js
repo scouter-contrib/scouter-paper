@@ -44,6 +44,7 @@ class Topology extends Component {
     polling = null;
     interval = 5000;
     init = false;
+    completeInstanceList = false;
 
     svg = null;
     width = 100;
@@ -108,10 +109,12 @@ class Topology extends Component {
             topology: [],
             nodes : [],
             links : [],
+            linked : {},
 
             zoom : false,
             pin : false,
             redLine : false,
+            highlight : false,
             distance : 300
         }
     }
@@ -127,7 +130,7 @@ class Topology extends Component {
             this.getAllInstanceInfo(nextProps.config);
         }
 
-        if (JSON.stringify(this.props.objects) !== JSON.stringify(nextProps.objects)) {
+        if (this.completeInstanceList && JSON.stringify(this.props.objects) !== JSON.stringify(nextProps.objects)) {
             this.getTopology(nextProps.config, nextProps.objects, nextProps.user);
         }
     }
@@ -184,6 +187,7 @@ class Topology extends Component {
             this.draw();
             this.init = true;
         }
+
 
         if (this.init && JSON.stringify(this.state.topology) !== JSON.stringify(prevState.topology)) {
             this.update();
@@ -249,6 +253,7 @@ class Topology extends Component {
 
                 if (this.doneServerCnt >= this.serverCnt) {
                     this.getTopology(this.props.config, this.props.objects, this.props.user);
+                    this.completeInstanceList = true;
                 }
             }
         }).fail((xhr, textStatus, errorThrown) => {
@@ -449,11 +454,18 @@ class Topology extends Component {
                         return d.id;
                     });
 
+                    let linked = {};
+
+                    links.forEach((d) => {
+                        linked[`${d.source},${d.target}`] = true;
+                    });
+
                     this.setState({
                         list: msg.result,
                         topology: topology,
                         nodes : this.mergeNode(this.state.nodes, nodes),
-                        links : this.mergeLink(this.state.links, links)
+                        links : this.mergeLink(this.state.links, links),
+                        linked : linked
                     });
                 }
 
@@ -557,6 +569,10 @@ class Topology extends Component {
         return mergedNode;
     };
 
+    isConnected = (a, b) => {
+        return this.state.linked[`${a},${b}`] || this.state.linked[`${b},${a}`];
+    }
+
     dragstarted = (d) => {
         if (!d3.event.active) this.simulation.alphaTarget(0.3).restart();
         d3.event.sourceEvent.stopPropagation();
@@ -629,9 +645,63 @@ class Topology extends Component {
         this.svg.attr("transform", d3.event.transform);
     };
 
+    nodeTypeHover = (d, o)=> {
+        if (o.id === d.id) {
+            return 1.0;
+        }
+
+        const isConnectedValue = this.isConnected(o.id, d.id);
+        if (isConnectedValue) {
+            return 1.0;
+        }
+        return 0.4;
+    };
+
+    linkTypeHover = (d, o)=> {
+        if (d.id === o.source.id || d.id === o.target.id) {
+            return 1;
+        } else {
+            return 0.5;
+        }
+    };
+
+    hover = (d) => {
+
+        if (this.state.highlight) {
+            this.node.transition(500).style('opacity', o => {
+                return this.nodeTypeHover(d, o);
+            });
+
+            this.nodeNameText.transition(500).style('opacity', o => {
+                return this.nodeTypeHover(d, o);
+            });
+
+            this.nodeLabel.transition(500).style('opacity', o => {
+                return this.nodeTypeHover(d, o);
+            });
+
+            this.edgeTextList.transition(500).style('opacity', o => {
+                return this.linkTypeHover(d, o);
+            });
+
+            this.edgeFlowPath.transition(500).style('stroke-opacity', o => {
+                return this.linkTypeHover(d, o);
+            });
+        }
+
+    };
+
+    leave = () => {
+        if (this.state.highlight) {
+            this.node.transition(500).style('opacity', 1.0);
+            this.nodeNameText.transition(500).style('opacity', 1.0);
+            this.nodeLabel.transition(500).style('opacity', 1.0);
+            this.edgeTextList.transition(500).style('opacity', 1);
+            this.edgeFlowPath.transition(500).style('stroke-opacity', 0.5);
+        }
+    };
+
     draw = () => {
-
-
         let that = this;
 
         let wrapper = this.refs.topologyChart;
@@ -658,7 +728,7 @@ class Topology extends Component {
         }));
         this.simulation.force('charge', d3.forceManyBody().strength([-10]));
         this.simulation.force("center", d3.forceCenter(this.width / 2, this.height / 2));
-        this.simulation.force("collide", d3.forceCollide(40));
+        this.simulation.force("collide", d3.forceCollide(30));
         this.simulation.nodes(nodes).on("tick", this.ticked);
 
         // 노드에 표시되는 텍스트
@@ -708,6 +778,8 @@ class Topology extends Component {
         });
         //this.node.on("dblclick", this.dblclick)
         this.node.call(d3.drag().on("start", this.dragstarted).on("drag", this.dragged).on("end", this.dragended));
+        this.node.on("mouseover",that.hover);
+        this.node.on("mouseout", that.leave);
 
         this.nodeLabelGroup = this.svg.append("g").attr("class", "node-labels").selectAll("text").data(nodes).enter();
         this.nodeLabel = this.nodeLabelGroup.append("text").attr("class", "node-label").style("font-size", this.option.fontSize + "px").text(function (d) {
@@ -733,6 +805,8 @@ class Topology extends Component {
         });
         //this.nodeIcon.on("dblclick", this.dblclick);
         this.nodeIcon.call(d3.drag().on("start", this.dragstarted).on("drag", this.dragged).on("end", this.dragended));
+        this.nodeIcon.on("mouseover",that.hover);
+        this.nodeIcon.on("mouseout", that.leave);
 
 
         this.simulation.force("link").links(links).distance([this.state.distance]);
@@ -743,7 +817,6 @@ class Topology extends Component {
         }
 
         this.simulation.restart();
-
         this.init = true;
 
     };
@@ -828,6 +901,8 @@ class Topology extends Component {
         });
         //this.node.on("dblclick", this.dblclick)
         this.node.call(d3.drag().on("start", this.dragstarted).on("drag", this.dragged).on("end", this.dragended));
+        this.node.on("mouseover",that.hover);
+        this.node.on("mouseout", that.leave);
 
         // 노드 라벨
         this.nodeLabel = this.nodeLabelGroup.selectAll(".node-label").data(nodes);
@@ -850,8 +925,8 @@ class Topology extends Component {
         }).text(function (d) {
             return that.getCatgegoryInfo(d.objCategory).text;
         })/*.on("dblclick", this.dblclick)*/.call(d3.drag().on("start", this.dragstarted).on("drag", this.dragged).on("end", this.dragended));
-
-
+        this.nodeIcon.on("mouseover",that.hover);
+        this.nodeIcon.on("mouseout", that.leave);
 
         this.simulation.nodes(nodes).on("tick", this.ticked);
         this.simulation.force("link").links(links);
@@ -998,6 +1073,9 @@ class Topology extends Component {
                         <div className="summary">{this.state.links.length} LINKS</div>
                     </div>
                     <div className="right">
+                        <div className="group">
+                            <div className={"check-btn " + (this.state.highlight ? "on" : "off")} onClick={this.checkBtnClick.bind(this, "highlight")}>HIGHLIGHT</div>
+                        </div>
                         <div className="group">
                             <div className="check-btn" onClick={this.changeDistance.bind(this, "plus")} >DISTANCE+</div>
                             <div className="check-btn" onClick={this.changeDistance.bind(this, "minus")}>DISTANCE-</div>
