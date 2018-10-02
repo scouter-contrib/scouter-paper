@@ -345,7 +345,7 @@ body::-webkit-scrollbar-thumb {
 
 @media only screen and (max-width: 800px) {
     .wrapper {
-        padding: 10px 10px;
+        padding: 10px 0;
     }
 
     .wrapper .img-list-3 {
@@ -393,6 +393,12 @@ _.wrapper.install {
 
 .wrapper .inner-content {
     padding: 20px 10px 40px;
+}
+
+@media only screen and (max-width: 600px) {
+    .wrapper .inner-content {
+        padding: 20px 5px 40px;
+    }
 }
 
 .wrapper h2 {
@@ -520,6 +526,13 @@ table td {
 img {
     max-width: 400px;
     border-radius: 2px;
+}
+
+@media only screen and (max-width: 600px) {
+    img {
+        width: 100%;
+
+    }
 }
 
 #intro {
