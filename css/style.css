@@ -215,11 +215,24 @@ h1 {
 /* Since positioning the image, we need to help out the caption */
 .carousel-caption {
   z-index: 10;
+  text-align: center !important;
+  margin-left: 60px;
 }
 
-.carousel-caption.two {
-  color: #333;
+
+.carousel-caption h1 {
+  background-color: rgba(0,0,0,0.5);
+  display: inline-block;
+  padding: 20px;
+  border-radius: 10px;
 }
+
+.carousel-caption p {
+  background-color: rgba(0,0,0,0.5);
+  padding: 10px;
+  border-radius: 5px;
+}
+
 /* Declare heights because of positioning of img element */
 .carousel .item {
   height: 470px;
@@ -283,7 +296,7 @@ h1 {
   text-align: left;
 }
 .carousel-caption.blank {
-  top: 140px;
+  top: 100px;
 }
 .carousel-image {
   position: absolute;
@@ -291,7 +304,7 @@ h1 {
   top: 150px;
 }
 .carousel-indicators {
-  padding-right: 60px;
+
 }
 .carousel-caption h1 {
   font-weight: 700;
@@ -563,7 +576,8 @@ fieldset[disabled] .btn-primary.active {
     top: 80px;
   }
   .carousel-caption h1 {
-    font-size: 28px;
+    font-size: 24px;
+    line-height: 140%;
   }
   .navbar.navbar-scroll .navbar-brand {
     margin-top: 0px;
@@ -1132,4 +1146,66 @@ section.comments {
   .center-orientation .cssanimations .vertical-timeline-content.is-hidden {
     visibility: hidden;
   }
+}
+
+
+.demo-video {
+  width: 800px;
+  height: 460px;
+  border: 1px solid #333;
+}
+
+@media (max-width: 1000px) {
+  .demo-video {
+    width: 600px;
+    height: 360px;
+  }
+}
+
+@media (max-width: 700px) {
+  .demo-video {
+    width: 400px;
+    height: 240px;
+  }
+}
+
+@media (max-width: 500px) {
+  .demo-video {
+    width: 300px;
+    height: 180px;
+  }
+}
+
+@media (max-width: 1000px) {
+  .carousel-caption {
+    width: 100%;
+    text-align: center !important;
+    margin-left: 0;
+    left : 0;
+  }
+
+  .carousel-caption p {
+    background-color: rgba(0,0,0,0.5);
+    padding: 10px;
+    border-radius: 5px;
+    display: inline-block;
+    margin: 0 20px;
+  }
+
+  .carousel-caption, .carousel-caption.blank {
+    left : 0;
+  }
+
+}
+
+@media (max-width: 700px) {
+  .carousel-caption h1 {
+    padding: 10px;
+  }
+
+  .carousel-caption p {
+    padding: 5px;
+
+  }
+
 }
