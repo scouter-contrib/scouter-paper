@@ -5,6 +5,10 @@
     position: relative;
 }
 
+.topology-wrapper > div {
+    height: 100%;
+}
+
 .topology-wrapper .controller {
     height: 30px;
     text-align: right;
