@@ -883,8 +883,44 @@ class Topology extends Component {
             }
         }).attr('id', function (d, i) {
             return 'edgeFlowPath' + i
-        }).style("pointer-events", "none");
+        }).style("pointer-events", "none")
+        .style("animation", (d) => {
+            return styleAnimateEdge(d, this);
+        }).style("webkit-animation", (d) => {
+            return styleAnimateEdge(d, this);
+        });
 
+        function styleAnimateEdge(d, edge) {
+            const tps = (d.count / d.period);
+            let step = getStepCountByTps(tps, "low");
+            if (step < 4) step = 4;
+            if (step > 250) step = 250;
+            let flow = step / 20;
+
+            if (edge.prevStepCount && step < edge.prevStepCount * 1.5 && step > edge.prevStepCount * 0.7) {
+                return edge.prevStyle;
+            } else {
+                edge.prevStepCount = step;
+                edge.prevStyle = `flow ${flow}s infinite steps(${step})`;
+                return edge.prevStyle;
+            }
+        }
+
+        //TODO 어딘가에다 옵션으로...
+        function getStepCountByTps(tps, tpsMode) {
+            if (tpsMode === "normal") {
+                return Math.round(71 * (tps ** (-0.452)));
+
+            } else if (tpsMode === "low") {
+                return Math.round(55 * (tps ** (-0.529)));
+
+            } else if (tpsMode === "high") {
+                return Math.round(150 * (tps ** (-0.421)));
+
+            }
+
+            return Math.round(71 * (tps ** (-0.452)));
+        }
 
         // 노드 아래에 표시되는 명칭
         this.nodeNameText = this.nodeNameTextGroup.selectAll(".node-name").data(nodes);
@@ -941,8 +977,6 @@ class Topology extends Component {
     };
 
     ticked = () => {
-
-
         /*const now = new Date().valueOf();
         if(now - this.lastTicked < 100) {
             return;

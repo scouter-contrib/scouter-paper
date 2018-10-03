@@ -123,23 +123,24 @@
     stroke-opacity: 0.5;
     stroke-width: 4;
     stroke-dasharray: 10, 4;
-    animation: flow 1s infinite steps(20);
-    webkit-animation: flow 1s infinite steps(20);
+
+    /*animation: flow 1s infinite steps(20);*/
+    /*webkit-animation: flow 1s infinite steps(20);*/
 
     /* animation speed optimized in human eyes by speed & frame.*/
     /*animation: flow 8s infinite steps(160);*/
     /*webkit-animation: flow 8s infinite steps(160);*/
     /*animation: flow 4s infinite steps(80);*/
     /*webkit-animation: flow 4s infinite steps(80);*/
-    /*animation: flow 2s infinite steps(40);*/
+    /*animation: flow 2s infinite steps(40); */
     /*webkit-animation: flow 2s infinite steps(40);*/
-    /*animation: flow 1s infinite steps(20);*/
+    /*animation: flow 1s infinite steps(20); */
     /*webkit-animation: flow 1s infinite steps(20);*/
-    /*animation: flow 0.7s infinite steps(14);*/
+    /*animation: flow 0.7s infinite steps(14); */
     /*webkit-animation: flow 0.7s infinite steps(14);*/
-    /*animation: flow 0.4s infinite steps(8);*/
+    /*animation: flow 0.4s infinite steps(8); */
     /*webkit-animation: flow 0.4s infinite steps(8);*/
-    /*animation: flow 0.2s infinite steps(4);*/
+    /*animation: flow 0.2s infinite steps(4); */
     /*webkit-animation: flow 0.2s infinite steps(4);*/
 }
 
