@@ -892,6 +892,10 @@ section.timeline {
 section.comments {
   padding-bottom: 80px;
 }
+.gh-star {
+  text-align: center;
+  padding-bottom: 30px;
+}
 .comments-avatar {
   margin-top: 25px;
   margin-left: 22px;
