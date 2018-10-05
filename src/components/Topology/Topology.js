@@ -349,9 +349,6 @@ class Topology extends Component {
             }).done((msg) => {
 
                 let list = msg.result;
-
-
-
                 if (list) {
                     let objectTypeTopologyMap = {};
                     let cnt = 0;
@@ -627,8 +624,10 @@ class Topology extends Component {
         let dry = dr;
         let xRotation = 0;
         let largeArc = 0;
-        let sweep = 1;
-
+        if(d.sweep == undefined) {
+            d.sweep = true;
+        }
+        let sweep = d.sweep ? 1 : 0;
         if (x1 === x2 && y1 === y2) {
             xRotation = -45;
             largeArc = 1;
@@ -736,13 +735,15 @@ class Topology extends Component {
         this.edgePathList = this.edgePathGroup.selectAll(".edge-path").data(links).enter().append('path').attr('class', 'edge-path').attr('id', function (d, i) {
             return 'edgePath' + d.source + "_" + d.target;
         }).style("pointer-events", "none");
+
         this.edgeTextGroup = this.svg.append("g").attr("class", "edge-text-group");
         this.edgeTextList = this.edgeTextGroup.selectAll(".edge-text").data(links).enter().append('text').style("pointer-events", "none").attr('class', 'edge-text').attr('dy', -10).attr('id', function (d, i) {
             return 'edgeLabel' + i
         });
+
         this.edgeTextPath = this.edgeTextList.append('textPath').attr('xlink:href', function (d, i) {
             return '#edgePath' + d.source + "_" + d.target;
-        }).style("text-anchor", "middle").style("pointer-events", "none").attr("startOffset", "50%").attr('class', 'edge-text-path');
+        }).style("text-anchor", "middle").style("pointer-events", "all").attr("startOffset", "50%").attr('class', 'edge-text-path');
 
         this.edgeTextPath.append("tspan").attr('class', 'tps-tspan').text(function (d) {
             let tps = numeral(d.count / d.period).format(that.props.config.numberFormat);
@@ -763,7 +764,9 @@ class Topology extends Component {
         this.edgeFlowPathGroup = this.svg.append("g").attr("class", "edge-flow-path-group");
         this.edgeFlowPath = this.edgeFlowPathGroup.selectAll(".edge-flow-path").data(links).enter().append('path').attr('class', 'edge-flow-path').attr('id', function (d, i) {
             return 'edgeFlowPath' + i
-        }).style("pointer-events", "none");
+        }).style("pointer-events", "stroke");
+
+        this.edgeFlowPath.on("click", this.edgeClicked);
 
         // 노드 아래에 표시되는 명칭
         this.nodeNameTextGroup = this.svg.append("g").attr("class", "node-name-text-group");
@@ -840,19 +843,21 @@ class Topology extends Component {
 
         this.edgeTextList = this.edgeTextGroup.selectAll(".edge-text").data(links);
         this.edgeTextList.exit().remove();
-        this.edgeTextList = this.edgeTextList.enter().append('text').merge(this.edgeTextList).style("pointer-events", "none").attr('class', 'edge-text').attr('dy', -10).attr('id', function (d, i) {
-            return 'edgeLabel' + i
-        });
+        this.edgeTextList = this.edgeTextList.enter().append('text').merge(this.edgeTextList).style("pointer-events", "none").attr('class', 'edge-text')
+            .attr('dy', this.calcEdgeTextDy)
+            .attr('id', (d, i) => 'edgeLabel' + i);
 
         this.edgeTextList.selectAll("textPath").remove();
+
         this.edgeTextPath = this.edgeTextList.append('textPath').attr('xlink:href', function (d, i) {
             if (typeof(d.source) === "object") {
                 return '#edgePath' + d.source.id + "_" + d.target.id;
             } else {
                 return '#edgePath' + d.source + "_" + d.target;
             }
-        }).style("text-anchor", "middle").style("pointer-events", "none").attr("startOffset", "50%").attr('class', 'edge-text-path');
+        }).style("text-anchor", "middle").style("pointer-events", "all").attr("startOffset", "50%").attr('class', 'edge-text-path');
 
+        this.edgeTextPath.on("click", () => { console.log("[click] edgeTextPath " + this); console.log(this); });
         this.edgeTextPath.append("tspan").attr('class', 'tps-tspan').text(function (d) {
             let tps = numeral(d.count / d.period).format(that.props.config.numberFormat);
             return tps + "r/s ";
@@ -889,6 +894,9 @@ class Topology extends Component {
         }).style("webkit-animation", (d) => {
             return styleAnimateEdge(d, this);
         });
+
+        this.edgeFlowPath.style("pointer-events", "auto");
+        this.edgeFlowPath.on("click", that.edgeClicked);
 
         function styleAnimateEdge(d, edge) {
             const tps = (d.count / d.period);
@@ -973,6 +981,25 @@ class Topology extends Component {
                 this.simulation.tick();
             }
             this.simulation.restart();
+        }
+    };
+
+    edgeClicked = (d, x, y, z) => {
+        console.log("[click] edgeFlowPath ");
+        d.sweep = !d.sweep;
+        this.edgePathList.attr('d', this.makeEdge);
+        this.edgeFlowPath.attr('d', this.makeEdge);
+        this.edgeTextList.attr('dy', this.calcEdgeTextDy);
+    };
+
+    calcEdgeTextDy = (d) => {
+        if(d.sweep === undefined) {
+            d.sweep = true;
+        }
+        if(!d.sweep) {
+            return 15;
+        } else {
+            return -10;
         }
     };
 
