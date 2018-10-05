@@ -101,16 +101,20 @@ class Topology extends Component {
     serverCnt = 0;
     doneServerCnt = 0;
 
+    nodes= [];
+    topology=[];
+    links =[];
+    linked = {};
+
+    preNodeCount = 0;
+
     constructor(props) {
         super(props);
 
         this.state = {
+            tpsToLineSpeed : true,
+            speedLevel : "slow",
             list: [],
-            topology: [],
-            nodes : [],
-            links : [],
-            linked : {},
-
             zoom : false,
             pin : false,
             redLine : false,
@@ -183,14 +187,9 @@ class Topology extends Component {
     }
 
     componentDidUpdate(prevProps, prevState) {
-        if (!this.init && this.state.topology.length > 0) {
+        if (!this.init && this.topology.length > 0) {
             this.draw();
             this.init = true;
-        }
-
-
-        if (this.init && JSON.stringify(this.state.topology) !== JSON.stringify(prevState.topology)) {
-            this.update();
         }
     }
 
@@ -460,13 +459,16 @@ class Topology extends Component {
                         linked[`${d.source},${d.target}`] = true;
                     });
 
+                    this.nodes = this.mergeNode(this.nodes, nodes);
+                    this.topology = topology;
+                    this.links = this.mergeLink(this.links, links);
+                    this.linked = linked;
                     this.setState({
                         list: msg.result,
-                        topology: topology,
-                        nodes : this.mergeNode(this.state.nodes, nodes),
-                        links : this.mergeLink(this.state.links, links),
-                        linked : linked
+                        //changeTime : (new Date()).getTime()
                     });
+
+                    this.update();
                 }
 
             }).fail((xhr, textStatus, errorThrown) => {
@@ -537,8 +539,6 @@ class Topology extends Component {
             };
         });
 
-
-
         newNodes.forEach((node) => {
             if (nodeMap[node.id]) {
                 nodeMap[node.id].update = true;
@@ -570,7 +570,7 @@ class Topology extends Component {
     };
 
     isConnected = (a, b) => {
-        return this.state.linked[`${a},${b}`] || this.state.linked[`${b},${a}`];
+        return this.linked[`${a},${b}`] || this.linked[`${b},${a}`];
     }
 
     dragstarted = (d) => {
@@ -708,8 +708,8 @@ class Topology extends Component {
         this.width = wrapper.offsetWidth;
         this.height = wrapper.offsetHeight;
 
-        let nodes = this.state.nodes;
-        let links = this.state.links;
+        let nodes = this.nodes;
+        let links = this.links;
 
         d3.select(this.refs.topologyChart).selectAll("svg").remove();
         this.svg = d3.select(this.refs.topologyChart).append("svg").attr("width", this.width).attr("height", this.height).append("g");
@@ -767,9 +767,12 @@ class Topology extends Component {
 
         // 노드 아래에 표시되는 명칭
         this.nodeNameTextGroup = this.svg.append("g").attr("class", "node-name-text-group");
-        this.nodeNameText = this.nodeNameTextGroup.selectAll(".node-name").data(nodes).enter().append("text").attr("class", "node-name").style("font-size", this.option.fontSize + "px").style("fill", "white").text(function (d) {
+        this.nodeNameText = this.nodeNameTextGroup.selectAll(".node-name").data(nodes).enter().append("text").attr("class", "node-name").style("font-size", this.option.fontSize + "px").style("fill", "white");
+        this.nodeNameText.text(function (d) {
             return d.objName;
         });
+        this.nodeNameText.on("mouseover",that.hover);
+        this.nodeNameText.on("mouseout", that.leave);
 
         // 노드
         this.nodeGroup = this.svg.append("g").attr("class", "node-group");
@@ -821,11 +824,48 @@ class Topology extends Component {
 
     };
 
+
+    getStepCountByTps = (tps, tpsMode) => {
+        if (tpsMode === "medium") {
+            return Math.round(71 * (tps ** (-0.452)));
+
+        } else if (tpsMode === "slow") {
+            return Math.round(55 * (tps ** (-0.529)));
+
+        } else if (tpsMode === "fast") {
+            return Math.round(150 * (tps ** (-0.421)));
+
+        }
+
+        return Math.round(71 * (tps ** (-0.452)));
+    }
+
+    styleAnimateEdge = (d, edge) => {
+
+        if (this.state.tpsToLineSpeed) {
+            const tps = (d.count / d.period);
+            let step = this.getStepCountByTps(tps, "low");
+            if (step < 4) step = 4;
+            if (step > 250) step = 250;
+            let flow = step / 20;
+
+            if (edge.prevStepCount && step < edge.prevStepCount * 1.5 && step > edge.prevStepCount * 0.7) {
+                return edge.prevStyle;
+            } else {
+                edge.prevStepCount = step;
+                edge.prevStyle = `flow ${flow}s infinite steps(${step})`;
+                return edge.prevStyle;
+            }
+        } else {
+            return "flow 1s infinite steps(20)";
+        }
+    };
+
     update = () => {
         let that = this;
 
-        let nodes = this.state.nodes;
-        let links = this.state.links;
+        let nodes = this.nodes;
+        let links = this.links;
 
         // 노드에 표시되는 텍스트
         this.edgePathList = this.edgePathGroup.selectAll(".edge-path").data(links);
@@ -885,42 +925,11 @@ class Topology extends Component {
             return 'edgeFlowPath' + i
         }).style("pointer-events", "none")
         .style("animation", (d) => {
-            return styleAnimateEdge(d, this);
+            return that.styleAnimateEdge(d, this);
         }).style("webkit-animation", (d) => {
-            return styleAnimateEdge(d, this);
+            return that.styleAnimateEdge(d, this);
         });
 
-        function styleAnimateEdge(d, edge) {
-            const tps = (d.count / d.period);
-            let step = getStepCountByTps(tps, "low");
-            if (step < 4) step = 4;
-            if (step > 250) step = 250;
-            let flow = step / 20;
-
-            if (edge.prevStepCount && step < edge.prevStepCount * 1.5 && step > edge.prevStepCount * 0.7) {
-                return edge.prevStyle;
-            } else {
-                edge.prevStepCount = step;
-                edge.prevStyle = `flow ${flow}s infinite steps(${step})`;
-                return edge.prevStyle;
-            }
-        }
-
-        //TODO 어딘가에다 옵션으로...
-        function getStepCountByTps(tps, tpsMode) {
-            if (tpsMode === "normal") {
-                return Math.round(71 * (tps ** (-0.452)));
-
-            } else if (tpsMode === "low") {
-                return Math.round(55 * (tps ** (-0.529)));
-
-            } else if (tpsMode === "high") {
-                return Math.round(150 * (tps ** (-0.421)));
-
-            }
-
-            return Math.round(71 * (tps ** (-0.452)));
-        }
 
         // 노드 아래에 표시되는 명칭
         this.nodeNameText = this.nodeNameTextGroup.selectAll(".node-name").data(nodes);
@@ -967,13 +976,17 @@ class Topology extends Component {
         this.simulation.nodes(nodes).on("tick", this.ticked);
         this.simulation.force("link").links(links);
 
-        if (this.simulation) {
+        if (this.nodes && this.preNodeCount !== this.nodes.length) {
             this.simulation.stop();
             for (var i = 0, n = Math.ceil(Math.log(this.simulation.alphaMin()) / Math.log(1 - this.simulation.alphaDecay())); i < n; ++i) {
                 this.simulation.tick();
             }
+            this.simulation.alpha(1).restart();
+        } else {
             this.simulation.restart();
         }
+
+        this.preNodeCount = nodes.length;
     };
 
     ticked = () => {
@@ -994,6 +1007,7 @@ class Topology extends Component {
         // 노드 위치
         this.node.attr("cx", function (d) {
             return d.x;
+
         }).attr("cy", function (d) {
             return d.y;
         });
@@ -1027,11 +1041,21 @@ class Topology extends Component {
         this.edgeFlowPath.attr('d', that.makeEdge);
     };
 
+    changeSpeedLevel = (level) => {
+        if (this.state.tpsToLineSpeed) {
+            this.setState({
+                speedLevel : level
+            });
+        }
+
+        this.update();
+    };
+
     checkBtnClick = (property) => {
         let that = this;
         let state = Object.assign({}, this.state);
         state[property] = !state[property];
-        this.setState(state);
+
 
         if (property === "zoom") {
             if (state[property]) {
@@ -1073,6 +1097,17 @@ class Topology extends Component {
                 }
             });
         }
+
+        if (property === "tpsToLineSpeed") {
+            if (state[property]) {
+                state["speedLevel"] = "slow";
+            } else {
+                state["speedLevel"] = "none";
+            }
+
+        }
+
+        this.setState(state);
     };
 
     changeDistance = (dir) => {
@@ -1103,10 +1138,18 @@ class Topology extends Component {
                 <div>
                 <div className="controller noselect">
                     <div className="left">
-                        <div className="summary">{this.state.nodes.length} NODES</div>
-                        <div className="summary">{this.state.links.length} LINKS</div>
+                        <div className="summary">{this.nodes.length} NODES</div>
+                        <div className="summary">{this.links.length} LINKS</div>
                     </div>
                     <div className="right">
+                        <div className="group">
+                            <div className={"check-btn tps " + (this.state.tpsToLineSpeed ? "on" : "off")} onClick={this.checkBtnClick.bind(this, "tpsToLineSpeed")}>TPS TO LINE SPEED</div>
+                            <div className="radio-group">
+                                <div className={"radio-btn " + (!this.state.tpsToLineSpeed ? "disable " : " ") + (this.state.speedLevel === "slow" ? "on" : "off")} onClick={this.changeSpeedLevel.bind(this, "slow")}>SLOW</div>
+                                <div className={"radio-btn " + (!this.state.tpsToLineSpeed ? "disable " : " ") + (this.state.speedLevel === "medium" ? "on" : "off")} onClick={this.changeSpeedLevel.bind(this, "medium")}>MEDIUM</div>
+                                <div className={"radio-btn " + (!this.state.tpsToLineSpeed ? "disable " : " ") + (this.state.speedLevel === "fast" ? "on" : "off")} onClick={this.changeSpeedLevel.bind(this, "fast")}>FAST</div>
+                            </div>
+                        </div>
                         <div className="group">
                             <div className={"check-btn " + (this.state.highlight ? "on" : "off")} onClick={this.checkBtnClick.bind(this, "highlight")}>HIGHLIGHT</div>
                         </div>
@@ -1121,7 +1164,7 @@ class Topology extends Component {
                         </div>
                     </div>
                 </div>
-                {(!this.state.topology || this.state.topology.length < 1) &&
+                {(!this.topology || this.topology.length < 1) &&
                 <div className="no-topology-data">
                     <div>
                         <div className="logo-div"><img alt="scouter-logo" className="logo" src={this.props.config.theme === "theme-gray" ? logoBlack : logo}/></div>
