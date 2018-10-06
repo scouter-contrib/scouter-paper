@@ -113,7 +113,7 @@ class Topology extends Component {
 
         this.state = {
             tpsToLineSpeed : true,
-            speedLevel : "slow",
+            speedLevel : "fast",
             list: [],
             zoom : false,
             pin : false,
@@ -829,34 +829,37 @@ class Topology extends Component {
 
 
     getStepCountByTps = (tps, tpsMode) => {
-        if (tpsMode === "medium") {
-            return Math.round(71 * (tps ** (-0.452)));
 
-        } else if (tpsMode === "slow") {
-            return Math.round(55 * (tps ** (-0.529)));
-
-        } else if (tpsMode === "fast") {
+        if (tpsMode === "slow") {
             return Math.round(150 * (tps ** (-0.421)));
 
-        }
+        } else if (tpsMode === "medium") {
+            return Math.round(71 * (tps ** (-0.452)));
 
-        return Math.round(71 * (tps ** (-0.452)));
+        } else if (tpsMode === "fast") {
+            return Math.round(55 * (tps ** (-0.529)));
+
+        } else {
+            return Math.round(55 * (tps ** (-0.529)));
+        }
     };
 
-    styleAnimateEdge = (d, edge) => {
-
+    styleAnimateEdge = (d, edge, speedLevel) => {
         if (this.state.tpsToLineSpeed) {
             const tps = (d.count / d.period);
-            let step = this.getStepCountByTps(tps, "low");
+            let step = this.getStepCountByTps(tps, speedLevel || this.state.speedLevel);
             if (step < 4) step = 4;
             if (step > 250) step = 250;
             let flow = step / 20;
 
-            if (edge.prevStepCount && step < edge.prevStepCount * 1.5 && step > edge.prevStepCount * 0.7) {
+            if (!speedLevel && edge.prevTps && tps < edge.prevTps * 1.35 && tps > edge.prevTps * 0.8) {
                 return edge.prevStyle;
+
             } else {
                 edge.prevStepCount = step;
+                edge.prevTps = tps;
                 edge.prevStyle = `flow ${flow}s infinite steps(${step})`;
+
                 return edge.prevStyle;
             }
         } else {
@@ -864,7 +867,7 @@ class Topology extends Component {
         }
     };
 
-    update = () => {
+    update = (speedLevel) => {
         let that = this;
 
         let nodes = this.nodes;
@@ -929,11 +932,13 @@ class Topology extends Component {
         }).attr('id', function (d, i) {
             return 'edgeFlowPath' + i
         }).style("pointer-events", "none")
-        .style("animation", (d) => {
-            return that.styleAnimateEdge(d, this);
-        }).style("webkit-animation", (d) => {
-            return that.styleAnimateEdge(d, this);
+        .style("animation", function (d) {
+            return that.styleAnimateEdge(d, this, speedLevel);
         });
+
+        // .style("webkit-animation", function (d, i, objs) {
+        //     return that.styleAnimateEdge(d, this, speedLevelChanged);
+        // });
 
         this.edgeFlowPath.style("pointer-events", "auto");
         this.edgeFlowPath.on("click", that.edgeClicked);
@@ -1074,7 +1079,7 @@ class Topology extends Component {
             });
         }
 
-        this.update();
+        this.update(level);
     };
 
     checkBtnClick = (property) => {
