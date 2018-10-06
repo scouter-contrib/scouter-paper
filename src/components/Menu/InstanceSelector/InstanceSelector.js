@@ -162,6 +162,9 @@ class InstanceSelector extends Component {
 
                     // GET INSTANCES INFO FROM URL IF EXISTS
                     let objectsParam = new URLSearchParams(this.props.location.search).get('objects');
+                    if(!objectsParam) {
+                        objectsParam = new URLSearchParams(this.props.location.search).get('instances');
+                    }
                     let urlObjectHashes = null;
                     if (objectsParam) {
                         urlObjectHashes = objectsParam.split(",");
