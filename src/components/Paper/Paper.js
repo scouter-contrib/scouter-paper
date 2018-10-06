@@ -903,7 +903,8 @@ class Paper extends Component {
                 data.pastTimestamp = null;
                 data.clearTimestamp = clear ? (new Date()).getTime() : data.clearTimestamp;
                 this.setState({
-                    data: data
+                    data: data,
+                    xlogNotSupportedInRange: false
                 });
 
             }).fail((xhr, textStatus, errorThrown) => {

@@ -48,6 +48,7 @@
     padding: 2px 4px;
 }
 
+.topology-wrapper .controller .radio-btn,
 .topology-wrapper .controller .check-btn {
     display: inline-block;
     font-size: 9px;
@@ -61,10 +62,31 @@
     cursor: pointer;
 }
 
+.topology-wrapper .controller .radio-btn.disable {
+    background-color: #DDD;
+}
+
+.topology-wrapper .controller .check-btn.tps {
+    width: 120px;
+}
+
+.topology-wrapper .controller .radio-group {
+    display: inline-block;
+}
+.topology-wrapper .controller .radio-btn {
+    width: 50px;
+}
+
+.topology-wrapper .controller .radio-btn:hover,
 .topology-wrapper .controller .check-btn:hover {
     background-color: #EEE;
 }
 
+.topology-wrapper .controller .radio-btn.disable:hover {
+    background-color: #DDD;
+}
+
+.topology-wrapper .controller .radio-btn.on,
 .topology-wrapper .controller .check-btn.on {
     background-color: #FFCC11;
 }
