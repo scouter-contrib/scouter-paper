@@ -465,7 +465,12 @@ class Topology extends Component {
                         //changeTime : (new Date()).getTime()
                     });
 
-                    this.update();
+                    if (this.init) {
+                        this.update(this.state.speedLevel);
+                    } else {
+                        this.draw();
+                    }
+
                 }
 
             }).fail((xhr, textStatus, errorThrown) => {
@@ -787,8 +792,8 @@ class Topology extends Component {
         this.node.on("mouseover",that.hover);
         this.node.on("mouseout", that.leave);
 
-        this.nodeLabelGroup = this.svg.append("g").attr("class", "node-labels").selectAll("text").data(nodes).enter();
-        this.nodeLabel = this.nodeLabelGroup.append("text").attr("class", "node-label").style("font-size", this.option.fontSize + "px").text(function (d) {
+        this.nodeLabelGroup = this.svg.append("g").attr("class", "node-labels");
+        this.nodeLabel = this.nodeLabelGroup.selectAll("text").data(nodes).enter().append("text").attr("class", "node-label").style("font-size", this.option.fontSize + "px").text(function (d) {
             let name = d.objTypeFamily ? d.objTypeFamily : d.objCategory;
             if (name) {
                 return name.toUpperCase();
@@ -799,8 +804,8 @@ class Topology extends Component {
             return that.getCatgegoryInfo(d.objCategory).color;
         });
 
-        this.nodeIconGroup = this.svg.append("g").attr("class", "node-icon-group").selectAll("text").data(nodes).enter();
-        this.nodeIcon = this.nodeIconGroup.append("text").attr("class", "node-icon").style("font-family", function (d) {
+        this.nodeIconGroup = this.svg.append("g").attr("class", "node-icon-group");
+        this.nodeIcon = this.nodeIconGroup.selectAll("text").data(nodes).enter().append("text").attr("class", "node-icon").style("font-family", function (d) {
             return that.getCatgegoryInfo(d.objCategory).fontFamily;
         }).style("font-size", function (d) {
             return that.getCatgegoryInfo(d.objCategory).fontSize;
@@ -900,7 +905,6 @@ class Topology extends Component {
             }
         }).style("text-anchor", "middle").style("pointer-events", "all").attr("startOffset", "50%").attr('class', 'edge-text-path');
 
-        this.edgeTextPath.on("click", () => { console.log("[click] edgeTextPath " + this); console.log(this); });
         this.edgeTextPath.append("tspan").attr('class', 'tps-tspan').text(function (d) {
             let tps = numeral(d.count / d.period).format(that.props.config.numberFormat);
             return tps + "r/s ";
@@ -964,7 +968,8 @@ class Topology extends Component {
         // 노드 라벨
         this.nodeLabel = this.nodeLabelGroup.selectAll(".node-label").data(nodes);
         this.nodeLabel.exit().remove();
-        this.nodeLabel = this.nodeLabel.enter().append("text").merge(this.nodeLabel).attr("class", "node-label").style("font-size", this.option.fontSize + "px").text(function (d) {
+        this.nodeLabel = this.nodeLabel.enter().append("text").merge(this.nodeLabel).attr("class", "node-label").style("font-size", this.option.fontSize + "px");
+        this.nodeLabel.text(function (d) {
             return (d.objTypeFamily ? d.objTypeFamily : d.objCategory).toUpperCase();
         }).style("fill", function (d) {
             return that.getCatgegoryInfo(d.objCategory).color;
@@ -973,7 +978,8 @@ class Topology extends Component {
         // 노드 아이콘
         this.nodeIcon = this.nodeIconGroup.selectAll(".node-icon").data(nodes);
         this.nodeIcon.exit().remove();
-        this.nodeIcon = this.nodeIcon.enter().append("text").merge(this.nodeIcon).attr("class", "node-icon").style("font-family", function (d) {
+        this.nodeIcon = this.nodeIcon.enter().append("text").merge(this.nodeIcon);
+        this.nodeIcon.attr("class", "node-icon").style("font-family", function (d) {
             return that.getCatgegoryInfo(d.objCategory).fontFamily;
         }).style("font-size", function (d) {
             return that.getCatgegoryInfo(d.objCategory).fontSize;
@@ -1002,7 +1008,6 @@ class Topology extends Component {
     };
 
     edgeClicked = (d, x, y, z) => {
-        console.log("[click] edgeFlowPath ");
         d.sweep = !d.sweep;
         this.edgePathList.attr('d', this.makeEdge);
         this.edgeFlowPath.attr('d', this.makeEdge);
