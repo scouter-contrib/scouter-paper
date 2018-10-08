@@ -35,11 +35,19 @@ import {
 import Home from "./components/Home/Home";
 import Topology from "./components/Topology/Topology";
 import * as common from "./common/common";
+import Debug from "./components/Debug/Debug";
 
 const browser = detect();
 const support = (browser.name !== "ie" && browser.name !== "edge");
 
 class App extends Component {
+
+    constructor(props) {
+        super(props);
+        this.state = {
+            debug : false
+        };
+    }
 
     info = (user, config) => {
         this.props.setControlVisibility("Loading", true);
@@ -255,7 +263,37 @@ class App extends Component {
         // TODO Notice가 관리되면 화면에 보여준다.
         this.getNotice();
 
+        window.addEventListener("keydown", this.keyDown.bind(this));
+
     }
+
+    componentWillUnmount() {
+        window.removeEventListener("keydown", this.keyDown.bind(this));
+    }
+
+    keyDown = (event) => {
+
+        var key;
+        var isShift;
+        var isCtrl;
+        if (window.event) {
+            key = window.event.keyCode;
+            isShift = !!window.event.shiftKey;
+            isCtrl = !!window.event.ctrlKey;
+        } else {
+            key = event.which;
+            isShift = !!event.shiftKey;
+            isCtrl = !!event.ctrlKey;
+        }
+
+        if (isShift && isCtrl) {
+            if (key === 85) {//u
+                this.setState({
+                    debug : !this.state.debug
+                });
+            }
+        }
+    };
 
     getFontGeneric = (val) => {
         for (let i = 0; i < this.props.config.fonts.length; i++) {
@@ -289,6 +327,12 @@ class App extends Component {
         document.body.appendChild(css);
     };
 
+    closeDebug = () => {
+        this.setState({
+            debug : false
+        });
+    };
+
     render() {
         return (
             <div className="black">
@@ -309,6 +353,7 @@ class App extends Component {
                     </Overlay>
                     }
                     <Loading visible={this.props.control.Loading}></Loading>
+                    {this.state.debug && <Debug closeDebug={this.closeDebug}/>}
                 </ContentWrapper>
                 }
                 {!support && <Unsupport name={browser.name} version={browser.version}/>}
