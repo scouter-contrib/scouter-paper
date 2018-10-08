@@ -39,8 +39,6 @@ import OldVersion from "../OldVersion/OldVersion";
 class Topology extends Component {
 
     dragChanged = false;
-    lastTicked = 0;
-
     polling = null;
     interval = 5000;
     init = false;
@@ -49,7 +47,6 @@ class Topology extends Component {
     svg = null;
     width = 100;
     height = 100;
-    lineColor = "white";
     r = 16;
     simulation = null;
 
@@ -110,16 +107,20 @@ class Topology extends Component {
 
     constructor(props) {
         super(props);
-
-        this.state = {
-            tpsToLineSpeed : true,
-            speedLevel : "fast",
-            list: [],
-            zoom : false,
-            pin : false,
-            redLine : false,
-            highlight : false,
-            distance : 300
+        let options = this.getTopolopyOptions();
+        if (options) {
+            this.state = options;
+        } else {
+            this.state = {
+                tpsToLineSpeed : true,
+                speedLevel : "fast",
+                redLine : false,
+                highlight : false,
+                distance : 300,
+                zoom : false,
+                pin : false,
+                lastUpdateTime : null
+            }
         }
     }
 
@@ -138,6 +139,23 @@ class Topology extends Component {
             this.getTopology(nextProps.config, nextProps.objects, nextProps.user);
         }
     }
+
+    setTopolopyOptions = (state, key, value) => {
+        let options = Object.assign({}, state);
+        options[key] = value;
+        localStorage && localStorage.setItem("topologyOptions", JSON.stringify(options));
+    };
+
+    getTopolopyOptions = () => {
+        if (localStorage) {
+            let topologyOptions = localStorage.getItem("topologyOptions");
+            if (topologyOptions) {
+                return JSON.parse(topologyOptions);
+            }
+        }
+
+        return null;
+    };
 
     resizeTimer = null;
     resize = () => {
@@ -460,9 +478,12 @@ class Topology extends Component {
                     this.topology = topology;
                     this.links = this.mergeLink(this.links, links);
                     this.linked = linked;
+                    /*this.setState({
+                        list: msg.result
+                    });*/
+
                     this.setState({
-                        list: msg.result,
-                        //changeTime : (new Date()).getTime()
+                        lastUpdateTime: (new Date()).getTime()
                     });
 
                     if (this.init) {
@@ -1026,18 +1047,6 @@ class Topology extends Component {
     };
 
     ticked = () => {
-        /*const now = new Date().valueOf();
-        if(now - this.lastTicked < 100) {
-            return;
-        }
-        this.lastTicked = new Date().valueOf();
-
-        const posChanged = _.find(this.state.nodes, function(n) {
-            return n.vx !== 0 || n.vy !== 0 || n.x !== n.fx || n.y !== n.fy;
-        });
-        if (!posChanged && !this.dragChanged) {
-            return;
-        }*/
 
         let that = this;
         // 노드 위치
@@ -1082,6 +1091,7 @@ class Topology extends Component {
             this.setState({
                 speedLevel : level
             });
+            this.setTopolopyOptions(this.state, "speedLevel", level);
         }
 
         this.update(level);
@@ -1092,11 +1102,8 @@ class Topology extends Component {
         let state = Object.assign({}, this.state);
         state[property] = !state[property];
 
-
         if (property === "zoom") {
             if (state[property]) {
-                //this.svg.call(d3.zoom().on("zoom", this.zoomed));
-                //d3.select(this.refs.topologyChart).selectAll("svg").call(d3.zoom().on("zoom", this.zoomed));
                 d3.select(this.refs.topologyChart).selectAll("svg").call(this.zoom.scaleExtent([0.2, 5]).on("zoom", this.zoomed));
             } else {
                 d3.select(this.refs.topologyChart).selectAll("svg").call(this.zoom.scaleExtent([1, 1]).on("zoom", this.zoomed));
@@ -1140,10 +1147,14 @@ class Topology extends Component {
             } else {
                 state["speedLevel"] = "none";
             }
-
         }
 
         this.setState(state);
+        if (property === "tpsToLineSpeed") {
+            this.setTopolopyOptions(state, property, state[property]);
+        } else {
+            this.setTopolopyOptions(this.state, property, state[property]);
+        }
     };
 
     changeDistance = (dir) => {
@@ -1160,6 +1171,7 @@ class Topology extends Component {
         this.setState({
             distance : distance
         });
+        this.setTopolopyOptions(this.state, "distance", distance);
 
         this.simulation.force("link").distance([distance]);
         this.simulation.alpha(1).restart();

@@ -165,7 +165,6 @@ class App extends Component {
             if (statusText === "success") {
                 const noticeTokenReceived = request.getResponseHeader('X-Scouter-Notice-Token');
                 if(noticeTokenReceived && noticeTokenReceived.length > 5 && noticeTokenReceived !== noticeToken) {
-                    console.log("noticeTokenReceived = " + noticeTokenReceived);
                     localStorage.setItem(noticeTokenKey, noticeTokenReceived);
                 }
             }

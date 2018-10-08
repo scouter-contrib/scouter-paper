@@ -387,7 +387,6 @@ class InstanceSelector extends Component {
             AgentColor.setInstances(objects, this.props.config.colorType);
             this.props.setTarget(objects);
             this.props.setControlVisibility("TargetSelector", false);
-            //console.log(this.props.location.pathname);
             common.setRangePropsToUrl(this.props, undefined, objects);
             this.props.toggleSelectorVisible();
         }
