@@ -23,6 +23,26 @@ class Profiler extends Component {
         // URL로부터 TXID와 날짜를 세팅
         let txid = getParam(this.props, "txid");
         let txiddate = getParam(this.props, "txiddate");
+
+        let options = this.getProfilerOptions();
+        if (options) {
+            options.summary = options.summary === undefined ? true : options.summary;
+            options.indent = options.indent === undefined ? true : options.indent;
+            options.bind = options.bind === undefined ? true : options.bind;
+            options.wrap = options.wrap === undefined ? true : options.wrap;
+            options.gap = options.gap === undefined ? true : options.gap;
+            options.formatter = options.formatter === undefined ? true : options.formatter;
+        } else {
+            options = {
+                summary: true,
+                indent: true,
+                bind: true,
+                wrap: true,
+                gap: true,
+                formatter : true
+            }
+        }
+
         this.state = {
             show: false,
             xlogs: [],
@@ -30,12 +50,12 @@ class Profiler extends Component {
             txid: null,
             profile: null,
             steps: null,
-            summary: true,
-            indent: true,
-            bind: true,
-            wrap: false,
-            gap: true,
-            formatter: false,
+            summary: options.summary,
+            indent: options.indent,
+            bind: options.bind,
+            wrap: options.wrap,
+            gap: options.gap,
+            formatter: options.formatter,
             listWidth : 40,
             smallScreen : false,
             paramTxid : txid ? txid : null,
@@ -183,6 +203,26 @@ class Profiler extends Component {
             }
         }
     }*/
+
+    setProfilerOptions = (key, value) => {
+        let options = this.getProfilerOptions();
+        if (!options) {
+            options = {};
+        }
+        options[key] = value;
+        localStorage && localStorage.setItem("profilerOptions", JSON.stringify(options));
+    };
+
+    getProfilerOptions = () => {
+        if (localStorage) {
+            let topologyOptions = localStorage.getItem("profilerOptions");
+            if (topologyOptions) {
+                return JSON.parse(topologyOptions);
+            }
+        }
+
+        return null;
+    };
 
     getList = (x1, x2, y1, y2, filter) => {
         let days = getSearchDays(x1, x2);
@@ -416,37 +456,42 @@ class Profiler extends Component {
         this.setState({
             summary: !this.state.summary
         });
+        this.setProfilerOptions("summary", !this.state.summary);
     };
 
     toggleIndent = () => {
         this.setState({
             indent: !this.state.indent
         });
+        this.setProfilerOptions("indent", !this.state.indent);
     };
 
     toggleBind = () => {
         this.setState({
             bind: !this.state.bind
         });
+        this.setProfilerOptions("bind", !this.state.bind);
     };
-
 
     toggleWrap = () => {
         this.setState({
             wrap: !this.state.wrap
         });
+        this.setProfilerOptions("wrap", !this.state.wrap);
     };
 
     toggleGap = () => {
         this.setState({
             gap: !this.state.gap
         });
+        this.setProfilerOptions("gap", !this.state.gap);
     };
 
     toggleFormatter = () => {
         this.setState({
             formatter: !this.state.formatter
         });
+        this.setProfilerOptions("formatter", !this.state.formatter);
     };
 
     changeListWidth = (e) => {
