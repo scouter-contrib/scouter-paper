@@ -1,5 +1,6 @@
 // local storage access
 import moment from "moment";
+export const version = "2.1.308";
 
 export function getData(key) {
     let ls = null;

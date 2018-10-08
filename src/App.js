@@ -20,9 +20,21 @@ import {setSupported, setConfig, addRequest, clearAllMessage, setControlVisibili
 import {detect} from 'detect-browser';
 import Unsupport from "./components/Unsupport/Unsupport";
 import jQuery from "jquery";
-import {errorHandler, mergeDeep, getParam, setAuthHeader, getWithCredentials, getHttpProtocol, getDefaultServerConfig, getCurrentUser, getCurrentDefaultServer} from './common/common';
+import {
+    errorHandler,
+    mergeDeep,
+    getParam,
+    setAuthHeader,
+    getWithCredentials,
+    getHttpProtocol,
+    getDefaultServerConfig,
+    getCurrentUser,
+    getCurrentDefaultServer
+} from './common/common';
+
 import Home from "./components/Home/Home";
 import Topology from "./components/Topology/Topology";
+import * as common from "./common/common";
 
 const browser = detect();
 const support = (browser.name !== "ie" && browser.name !== "edge");
@@ -136,6 +148,32 @@ class App extends Component {
         });
     };
 
+    getNotice = () => {
+        let noticeTokenKey = "scouter-notice-token";
+        const noticeToken = localStorage.getItem(noticeTokenKey);
+
+        jQuery.ajax({
+            method: "GET",
+            async: true,
+            url: "http://notice.scouterapm.com:6181/scouter-paper/latest-notice",
+            // xhrFields: getWithCredentials(config),
+            beforeSend: function (xhr) {
+                xhr.setRequestHeader('X-SCCH', noticeToken || '');
+                xhr.setRequestHeader('X-SCV', "v" + common.version);
+            }
+        }).done((msg, statusText, request) => {
+            if (statusText === "success") {
+                const noticeTokenReceived = request.getResponseHeader('X-Scouter-Notice-Token');
+                if(noticeTokenReceived && noticeTokenReceived.length > 5 && noticeTokenReceived !== noticeToken) {
+                    console.log("noticeTokenReceived = " + noticeTokenReceived);
+                    localStorage.setItem(noticeTokenKey, noticeTokenReceived);
+                }
+            }
+        }).fail((xhr, textStatus, errorThrown) => {
+            // skip
+        });
+    };
+
     componentWillMount() {
         let config = null;
         let str = localStorage.getItem("config");
@@ -212,6 +250,11 @@ class App extends Component {
 
         // 처음 카운터 모델을 조회하는데, 에러 처리는 하지 않는다
         this.getCounterModel(this.props.config, this.props.user, false);
+
+        // Notice를 조회한다. 이미 조회한 Notice인지 확인하여 하루에 한번만 보여주던지..
+        // X-Scouter-Notice-Token 응답 헤더는 LocalStorage에 저장하여 다음 요청 헤더로 사용한다.
+        // TODO Notice가 관리되면 화면에 보여준다.
+        this.getNotice();
 
     }
 
