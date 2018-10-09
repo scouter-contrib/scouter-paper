@@ -14,9 +14,9 @@ import {withRouter} from 'react-router-dom';
 import {getHttpProtocol, errorHandler, getWithCredentials, setAuthHeader, getCurrentUser} from '../../../common/common';
 import 'url-search-params-polyfill';
 import * as common from '../../../common/common'
+import * as PaperIcons from '../../../common/PaperIcons'
 import AgentColor from "../../../common/InstanceColor";
 import InnerLoading from "../../InnerLoading/InnerLoading";
-import IconImage from "../../IconImage/IconImage";
 
 class InstanceSelector extends Component {
 
@@ -162,6 +162,9 @@ class InstanceSelector extends Component {
 
                     // GET INSTANCES INFO FROM URL IF EXISTS
                     let objectsParam = new URLSearchParams(this.props.location.search).get('objects');
+                    if(!objectsParam) {
+                        objectsParam = new URLSearchParams(this.props.location.search).get('instances');
+                    }
                     let urlObjectHashes = null;
                     if (objectsParam) {
                         urlObjectHashes = objectsParam.split(",");
@@ -384,7 +387,6 @@ class InstanceSelector extends Component {
             AgentColor.setInstances(objects, this.props.config.colorType);
             this.props.setTarget(objects);
             this.props.setControlVisibility("TargetSelector", false);
-            //console.log(this.props.location.pathname);
             common.setRangePropsToUrl(this.props, undefined, objects);
             this.props.toggleSelectorVisible();
         }
@@ -488,7 +490,6 @@ class InstanceSelector extends Component {
     };
 
     render() {
-
         return (
             <div className={"instance-selector-bg " + (this.props.visible ? "" : "hidden")} onClick={this.props.toggleSelectorVisible}>
                 <div className={"instance-selector-fixed-bg"}>
@@ -554,11 +555,16 @@ class InstanceSelector extends Component {
                                             icon = objType.icon;
                                             displayName = objType.displayName;
                                         }
+
+                                        let iconInfo = PaperIcons.getObjectIcon(icon);
                                         return (
                                             <div key={i} className={"instance " + (i === 0 ? 'first ' : ' ') + (!(!this.state.selectedObjects[instance.objHash]) ? "selected" : " ")} onClick={this.instanceClick.bind(this, instance)}>
                                                 <div className="type-icon">
-                                                    <div className="type-icon-wrapper">
+                                                    {/*<div className="type-icon-wrapper">
                                                         <IconImage icon={icon}/>
+                                                    </div>*/}
+                                                    <div className="type-icon-wrapper" style={{color : iconInfo.color, backgroundColor : iconInfo.bgColor}}>
+                                                        <div className={"object-icon " + iconInfo.fontFamily + " " + iconInfo.text}></div>
                                                     </div>
                                                 </div>
                                                 <div className="instance-text-info">

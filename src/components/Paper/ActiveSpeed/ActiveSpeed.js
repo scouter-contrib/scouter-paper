@@ -39,7 +39,6 @@ class ActiveSpeed extends Component {
         let maxValue = this.props.box.values["maxValue"];
         let singleLine = this.props.box.values["singleLine"];
 
-        console.log(this.props.objects);
         return (
             <div className="active-speed-wrapper">
                 <div className="active-speed-content">

@@ -236,7 +236,7 @@
     height: 40px;
     text-align: center;
     box-sizing: border-box;
-    padding: 8px;
+    padding: 5px;
 }
 
 .instance-selector .instance-list div.instance > div.instance-text-info {
@@ -244,10 +244,27 @@
 }
 
 .instance-selector .instance-list div.instance > div.type-icon .type-icon-wrapper {
-    background-color: rgba(255,255,255,0.7);
-    background-color: white;
     border-radius: 3px;
+    display: inline-block;
+    width: 30px;
+    height: 30px;
+    text-align: center;
 }
+
+.instance-selector .instance-list div.instance > div.type-icon .type-icon-wrapper .object-icon {
+    background-color: transparent;
+    font-size: 18px;
+    padding-top: 7px;
+}
+
+.instance-selector .instance-list div.instance > div.type-icon .type-icon-wrapper .object-icon.technology-icons {
+    font-family: "technology-icons";
+}
+
+.instance-selector .instance-list div.instance > div.type-icon .type-icon-wrapper .object-icon.FontAwesome {
+    font-family: "FontAwesome";
+}
+
 
 .instance-selector .instance-list div.instance .instance-name {
     font-size: 11px;
@@ -337,4 +354,3 @@
     width: 100%;
     outline: none;
 }
-

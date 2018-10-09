@@ -7,28 +7,14 @@ import logoBlack from '../../img/scouter_black.png';
 import {
     addRequest,
     pushMessage,
-    setControlVisibility,
-    setRealTime,
-    setRealTimeValue,
-    setRangeDate,
-    setRangeHours,
-    setRangeMinutes,
-    setRangeValue,
-    setRangeDateHoursMinutes,
-    setRangeDateHoursMinutesValue,
-    setRangeAll,
-    setTemplate
+    setControlVisibility
 } from "../../actions";
 import jQuery from "jquery";
 import {
     errorHandler,
-    getData,
     getHttpProtocol,
     getWithCredentials,
     setAuthHeader,
-    setData,
-    getSearchDays,
-    getDivideDays,
     getCurrentUser
 } from "../../common/common";
 import * as d3 from "d3";
@@ -38,18 +24,13 @@ import OldVersion from "../OldVersion/OldVersion";
 
 class Topology extends Component {
 
-    dragChanged = false;
-    lastTicked = 0;
-
     polling = null;
     interval = 5000;
-    init = false;
     completeInstanceList = false;
 
     svg = null;
     width = 100;
     height = 100;
-    lineColor = "white";
     r = 16;
     simulation = null;
 
@@ -101,21 +82,29 @@ class Topology extends Component {
     serverCnt = 0;
     doneServerCnt = 0;
 
+    nodes= [];
+    topology=[];
+    links =[];
+    linked = {};
+
+    preNodeCount = 0;
+
     constructor(props) {
         super(props);
-
-        this.state = {
-            list: [],
-            topology: [],
-            nodes : [],
-            links : [],
-            linked : {},
-
-            zoom : false,
-            pin : false,
-            redLine : false,
-            highlight : false,
-            distance : 300
+        let options = this.getTopolopyOptions();
+        if (options) {
+            this.state = options;
+        } else {
+            this.state = {
+                tpsToLineSpeed : true,
+                speedLevel : "fast",
+                redLine : false,
+                highlight : false,
+                distance : 300,
+                zoom : false,
+                pin : false,
+                lastUpdateTime : null
+            }
         }
     }
 
@@ -135,6 +124,23 @@ class Topology extends Component {
         }
     }
 
+    setTopolopyOptions = (state, key, value) => {
+        let options = Object.assign({}, state);
+        options[key] = value;
+        localStorage && localStorage.setItem("topologyOptions", JSON.stringify(options));
+    };
+
+    getTopolopyOptions = () => {
+        if (localStorage) {
+            let topologyOptions = localStorage.getItem("topologyOptions");
+            if (topologyOptions) {
+                return JSON.parse(topologyOptions);
+            }
+        }
+
+        return null;
+    };
+
     resizeTimer = null;
     resize = () => {
 
@@ -151,6 +157,8 @@ class Topology extends Component {
                 if (this.svg) {
                     d3.select(this.refs.topologyChart).selectAll("svg").attr("width", this.width).attr("height", this.height);
                     this.svg.attr("width", this.width).attr("height", this.height);
+                    this.simulation.force("center", d3.forceCenter(this.width / 2, this.height / 2));
+                    this.update();
                 }
             }
         }, 1000);
@@ -183,13 +191,7 @@ class Topology extends Component {
     }
 
     componentDidUpdate(prevProps, prevState) {
-        if (!this.init && this.state.topology.length > 0) {
-            this.draw();
-            this.init = true;
-        }
-
-
-        if (this.init && JSON.stringify(this.state.topology) !== JSON.stringify(prevState.topology)) {
+        if (this.topology && this.topology.length > 0) {
             this.update();
         }
     }
@@ -349,9 +351,6 @@ class Topology extends Component {
             }).done((msg) => {
 
                 let list = msg.result;
-
-
-
                 if (list) {
                     let objectTypeTopologyMap = {};
                     let cnt = 0;
@@ -460,13 +459,19 @@ class Topology extends Component {
                         linked[`${d.source},${d.target}`] = true;
                     });
 
+                    this.nodes = this.mergeNode(this.nodes, nodes);
+                    this.topology = topology;
+                    this.links = this.mergeLink(this.links, links);
+                    this.linked = linked;
+                    /*this.setState({
+                        list: msg.result
+                    });*/
+
                     this.setState({
-                        list: msg.result,
-                        topology: topology,
-                        nodes : this.mergeNode(this.state.nodes, nodes),
-                        links : this.mergeLink(this.state.links, links),
-                        linked : linked
+                        lastUpdateTime: (new Date()).getTime()
                     });
+
+                    this.update(this.state.speedLevel);
                 }
 
             }).fail((xhr, textStatus, errorThrown) => {
@@ -537,8 +542,6 @@ class Topology extends Component {
             };
         });
 
-
-
         newNodes.forEach((node) => {
             if (nodeMap[node.id]) {
                 nodeMap[node.id].update = true;
@@ -570,7 +573,7 @@ class Topology extends Component {
     };
 
     isConnected = (a, b) => {
-        return this.state.linked[`${a},${b}`] || this.state.linked[`${b},${a}`];
+        return this.linked[`${a},${b}`] || this.linked[`${b},${a}`];
     }
 
     dragstarted = (d) => {
@@ -578,22 +581,11 @@ class Topology extends Component {
         d3.event.sourceEvent.stopPropagation();
         d.fx = d.x;
         d.fy = d.y;
-        this.dragChanged = true;
     };
 
     dragged = (d) => {
         d.fx = d3.event.x;
         d.fy = d3.event.y;
-    };
-
-    dblclick = (d) => {
-        if (d.fixed) {
-            d.fixed = false;
-            d.fx = null;
-            d.fy = null;
-        } else {
-            d.fixed = true;
-        }
     };
 
     dragended = (d) => {
@@ -604,7 +596,6 @@ class Topology extends Component {
                 d.fy = null;
             }
         }
-        this.dragChanged = false;
     };
 
     getCatgegoryInfo = (category) => {
@@ -627,8 +618,10 @@ class Topology extends Component {
         let dry = dr;
         let xRotation = 0;
         let largeArc = 0;
-        let sweep = 1;
-
+        if(d.sweep == undefined) {
+            d.sweep = true;
+        }
+        let sweep = d.sweep ? 1 : 0;
         if (x1 === x2 && y1 === y2) {
             xRotation = -45;
             largeArc = 1;
@@ -701,131 +694,83 @@ class Topology extends Component {
         }
     };
 
-    draw = () => {
+    getStepCountByTps = (tps, tpsMode) => {
+
+        if (tpsMode === "slow") {
+            return Math.round(150 * (tps ** (-0.421)));
+
+        } else if (tpsMode === "medium") {
+            return Math.round(71 * (tps ** (-0.452)));
+
+        } else if (tpsMode === "fast") {
+            return Math.round(55 * (tps ** (-0.529)));
+
+        } else {
+            return Math.round(55 * (tps ** (-0.529)));
+        }
+    };
+
+    styleAnimateEdge = (d, edge, speedLevel) => {
+        if (this.state.tpsToLineSpeed) {
+            const tps = (d.count / d.period);
+            let step = this.getStepCountByTps(tps, speedLevel || this.state.speedLevel);
+            if (step < 4) step = 4;
+            if (step > 250) step = 250;
+            let flow = step / 20;
+
+            if (!speedLevel && edge.prevTps && tps < edge.prevTps * 1.35 && tps > edge.prevTps * 0.8) {
+                return edge.prevStyle;
+
+            } else {
+                edge.prevStepCount = step;
+                edge.prevTps = tps;
+                edge.prevStyle = `flow ${flow}s infinite steps(${step})`;
+
+                return edge.prevStyle;
+            }
+        } else {
+            return "flow 1s infinite steps(20)";
+        }
+    };
+
+    update = (speedLevel) => {
         let that = this;
 
         let wrapper = this.refs.topologyChart;
         this.width = wrapper.offsetWidth;
         this.height = wrapper.offsetHeight;
 
-        let nodes = this.state.nodes;
-        let links = this.state.links;
+        let nodes = this.nodes;
+        let links = this.links;
 
-        d3.select(this.refs.topologyChart).selectAll("svg").remove();
-        this.svg = d3.select(this.refs.topologyChart).append("svg").attr("width", this.width).attr("height", this.height).append("g");
+        if (!this.svg) {
+            this.svg = d3.select(this.refs.topologyChart).append("svg").attr("width", this.width).attr("height", this.height).append("g");;
 
-        this.zoom = d3.zoom().on("zoom", this.zoomed);
+            this.edgePathGroup = this.svg.append("g").attr("class", "edge-path-group");
+            this.edgeTextGroup = this.svg.append("g").attr("class", "edge-text-group");
+            this.edgeFlowPathGroup = this.svg.append("g").attr("class", "edge-flow-path-group");
+            this.nodeNameTextGroup = this.svg.append("g").attr("class", "node-name-text-group");
+            this.nodeGroup = this.svg.append("g").attr("class", "node-group");
+            this.nodeLabelGroup = this.svg.append("g").attr("class", "node-labels");
+            this.nodeIconGroup = this.svg.append("g").attr("class", "node-icon-group");
 
-        if (this.state.zoom) {
-            d3.select(this.refs.topologyChart).selectAll("svg").call(this.zoom.scaleExtent([0.2, 5]));
-        } else {
-            d3.select(this.refs.topologyChart).selectAll("svg").call(this.zoom.scaleExtent([1, 1]));
-        }
-
-        this.simulation = d3.forceSimulation();
-        this.simulation.force("link", d3.forceLink().id(function (d) {
-            return d.id;
-        }));
-        this.simulation.force('charge', d3.forceManyBody().strength([-10]));
-        this.simulation.force("center", d3.forceCenter(this.width / 2, this.height / 2));
-        this.simulation.force("collide", d3.forceCollide(30));
-        this.simulation.nodes(nodes).on("tick", this.ticked);
-
-        // 노드에 표시되는 텍스트
-        this.edgePathGroup = this.svg.append("g").attr("class", "edge-path-group");
-        this.edgePathList = this.edgePathGroup.selectAll(".edge-path").data(links).enter().append('path').attr('class', 'edge-path').attr('id', function (d, i) {
-            return 'edgePath' + d.source + "_" + d.target;
-        }).style("pointer-events", "none");
-        this.edgeTextGroup = this.svg.append("g").attr("class", "edge-text-group");
-        this.edgeTextList = this.edgeTextGroup.selectAll(".edge-text").data(links).enter().append('text').style("pointer-events", "none").attr('class', 'edge-text').attr('dy', -10).attr('id', function (d, i) {
-            return 'edgeLabel' + i
-        });
-        this.edgeTextPath = this.edgeTextList.append('textPath').attr('xlink:href', function (d, i) {
-            return '#edgePath' + d.source + "_" + d.target;
-        }).style("text-anchor", "middle").style("pointer-events", "none").attr("startOffset", "50%").attr('class', 'edge-text-path');
-
-        this.edgeTextPath.append("tspan").attr('class', 'tps-tspan').text(function (d) {
-            let tps = numeral(d.count / d.period).format(that.props.config.numberFormat);
-            return tps + "r/s ";
-        });
-
-        this.edgeTextPath.append("tspan").attr('class', 'error-rate-tspan').text(function (d) {
-            let errorRate = numeral((d.errorCount / d.count) * 100).format(that.props.config.numberFormat);
-            return errorRate + "% ";
-        });
-
-        this.edgeTextPath.append("tspan").attr('class', 'avg-elapsed-tspan').text(function (d) {
-            let avgElapsedTime = numeral(d.totalElapsed / d.count).format(that.props.config.numberFormat);
-            return avgElapsedTime + "ms";
-        });
-
-        // 노드간의 연결 선
-        this.edgeFlowPathGroup = this.svg.append("g").attr("class", "edge-flow-path-group");
-        this.edgeFlowPath = this.edgeFlowPathGroup.selectAll(".edge-flow-path").data(links).enter().append('path').attr('class', 'edge-flow-path').attr('id', function (d, i) {
-            return 'edgeFlowPath' + i
-        }).style("pointer-events", "none");
-
-        // 노드 아래에 표시되는 명칭
-        this.nodeNameTextGroup = this.svg.append("g").attr("class", "node-name-text-group");
-        this.nodeNameText = this.nodeNameTextGroup.selectAll(".node-name").data(nodes).enter().append("text").attr("class", "node-name").style("font-size", this.option.fontSize + "px").style("fill", "white").text(function (d) {
-            return d.objName;
-        });
-
-        // 노드
-        this.nodeGroup = this.svg.append("g").attr("class", "node-group");
-        this.node = this.nodeGroup.selectAll("circle").data(nodes).enter().append("circle").attr("class", "node").attr("r", this.r).style("stroke-width", "4px").style("fill", "white").style("stroke", function (d) {
-            return that.getCatgegoryInfo(d.objCategory).color;
-        });
-        //this.node.on("dblclick", this.dblclick)
-        this.node.call(d3.drag().on("start", this.dragstarted).on("drag", this.dragged).on("end", this.dragended));
-        this.node.on("mouseover",that.hover);
-        this.node.on("mouseout", that.leave);
-
-        this.nodeLabelGroup = this.svg.append("g").attr("class", "node-labels").selectAll("text").data(nodes).enter();
-        this.nodeLabel = this.nodeLabelGroup.append("text").attr("class", "node-label").style("font-size", this.option.fontSize + "px").text(function (d) {
-            let name = d.objTypeFamily ? d.objTypeFamily : d.objCategory;
-            if (name) {
-                return name.toUpperCase();
+            this.zoom = d3.zoom().on("zoom", this.zoomed);
+            if (this.state.zoom) {
+                d3.select(this.refs.topologyChart).selectAll("svg").call(this.zoom.scaleExtent([0.2, 5]));
             } else {
-                return "";
+                d3.select(this.refs.topologyChart).selectAll("svg").call(this.zoom.scaleExtent([1, 1]));
             }
-        }).style("fill", function (d) {
-            return that.getCatgegoryInfo(d.objCategory).color;
-        });
 
-        this.nodeIconGroup = this.svg.append("g").attr("class", "node-icon-group").selectAll("text").data(nodes).enter();
-        this.nodeIcon = this.nodeIconGroup.append("text").attr("class", "node-icon").style("font-family", function (d) {
-            return that.getCatgegoryInfo(d.objCategory).fontFamily;
-        }).style("font-size", function (d) {
-            return that.getCatgegoryInfo(d.objCategory).fontSize;
-        }).style("fill", function (d) {
-            return that.getCatgegoryInfo(d.objCategory).color;
-        }).text(function (d) {
-            return that.getCatgegoryInfo(d.objCategory).text;
-        });
-        //this.nodeIcon.on("dblclick", this.dblclick);
-        this.nodeIcon.call(d3.drag().on("start", this.dragstarted).on("drag", this.dragged).on("end", this.dragended));
-        this.nodeIcon.on("mouseover",that.hover);
-        this.nodeIcon.on("mouseout", that.leave);
-
-
-        this.simulation.force("link").links(links).distance([this.state.distance]);
-        this.simulation.stop();
-
-        for (var i = 0, n = Math.ceil(Math.log(this.simulation.alphaMin()) / Math.log(1 - this.simulation.alphaDecay())); i < n; ++i) {
-            this.simulation.tick();
+            this.simulation = d3.forceSimulation();
+            this.simulation.force("link", d3.forceLink().id(function (d) {
+                return d.id;
+            }));
+            this.simulation.force('charge', d3.forceManyBody().strength([-10]));
+            this.simulation.force("center", d3.forceCenter(this.width / 2, this.height / 2));
+            this.simulation.force("collide", d3.forceCollide(30));
+            this.simulation.nodes(nodes).on("tick", this.ticked);
+            this.simulation.force("link").links(links).distance([this.state.distance]);
         }
-
-        this.simulation.restart();
-        this.init = true;
-
-    };
-
-    update = () => {
-        let that = this;
-
-        let nodes = this.state.nodes;
-        let links = this.state.links;
 
         // 노드에 표시되는 텍스트
         this.edgePathList = this.edgePathGroup.selectAll(".edge-path").data(links);
@@ -840,18 +785,19 @@ class Topology extends Component {
 
         this.edgeTextList = this.edgeTextGroup.selectAll(".edge-text").data(links);
         this.edgeTextList.exit().remove();
-        this.edgeTextList = this.edgeTextList.enter().append('text').merge(this.edgeTextList).style("pointer-events", "none").attr('class', 'edge-text').attr('dy', -10).attr('id', function (d, i) {
-            return 'edgeLabel' + i
-        });
+        this.edgeTextList = this.edgeTextList.enter().append('text').merge(this.edgeTextList).style("pointer-events", "none").attr('class', 'edge-text')
+            .attr('dy', this.calcEdgeTextDy)
+            .attr('id', (d, i) => 'edgeLabel' + i);
 
         this.edgeTextList.selectAll("textPath").remove();
+
         this.edgeTextPath = this.edgeTextList.append('textPath').attr('xlink:href', function (d, i) {
             if (typeof(d.source) === "object") {
                 return '#edgePath' + d.source.id + "_" + d.target.id;
             } else {
                 return '#edgePath' + d.source + "_" + d.target;
             }
-        }).style("text-anchor", "middle").style("pointer-events", "none").attr("startOffset", "50%").attr('class', 'edge-text-path');
+        }).style("text-anchor", "middle").style("pointer-events", "all").attr("startOffset", "50%").attr('class', 'edge-text-path');
 
         this.edgeTextPath.append("tspan").attr('class', 'tps-tspan').text(function (d) {
             let tps = numeral(d.count / d.period).format(that.props.config.numberFormat);
@@ -883,8 +829,12 @@ class Topology extends Component {
             }
         }).attr('id', function (d, i) {
             return 'edgeFlowPath' + i
-        }).style("pointer-events", "none");
+        }).style("pointer-events", "none").style("animation", function (d) {
+            return that.styleAnimateEdge(d, this, speedLevel);
+        });
 
+        this.edgeFlowPath.style("pointer-events", "auto");
+        this.edgeFlowPath.on("click", that.edgeClicked);
 
         // 노드 아래에 표시되는 명칭
         this.nodeNameText = this.nodeNameTextGroup.selectAll(".node-name").data(nodes);
@@ -899,7 +849,7 @@ class Topology extends Component {
         this.node = this.node.enter().append("circle").merge(this.node).attr("class", "node").attr("r", this.r).style("stroke-width", "4px").style("fill", "white").style("stroke", function (d) {
             return that.getCatgegoryInfo(d.objCategory).color;
         });
-        //this.node.on("dblclick", this.dblclick)
+
         this.node.call(d3.drag().on("start", this.dragstarted).on("drag", this.dragged).on("end", this.dragended));
         this.node.on("mouseover",that.hover);
         this.node.on("mouseout", that.leave);
@@ -907,7 +857,8 @@ class Topology extends Component {
         // 노드 라벨
         this.nodeLabel = this.nodeLabelGroup.selectAll(".node-label").data(nodes);
         this.nodeLabel.exit().remove();
-        this.nodeLabel = this.nodeLabel.enter().append("text").merge(this.nodeLabel).attr("class", "node-label").style("font-size", this.option.fontSize + "px").text(function (d) {
+        this.nodeLabel = this.nodeLabel.enter().append("text").merge(this.nodeLabel).attr("class", "node-label").style("font-size", this.option.fontSize + "px");
+        this.nodeLabel.text(function (d) {
             return (d.objTypeFamily ? d.objTypeFamily : d.objCategory).toUpperCase();
         }).style("fill", function (d) {
             return that.getCatgegoryInfo(d.objCategory).color;
@@ -916,7 +867,8 @@ class Topology extends Component {
         // 노드 아이콘
         this.nodeIcon = this.nodeIconGroup.selectAll(".node-icon").data(nodes);
         this.nodeIcon.exit().remove();
-        this.nodeIcon = this.nodeIcon.enter().append("text").merge(this.nodeIcon).attr("class", "node-icon").style("font-family", function (d) {
+        this.nodeIcon = this.nodeIcon.enter().append("text").merge(this.nodeIcon);
+        this.nodeIcon.attr("class", "node-icon").style("font-family", function (d) {
             return that.getCatgegoryInfo(d.objCategory).fontFamily;
         }).style("font-size", function (d) {
             return that.getCatgegoryInfo(d.objCategory).fontSize;
@@ -924,42 +876,59 @@ class Topology extends Component {
             return that.getCatgegoryInfo(d.objCategory).color;
         }).text(function (d) {
             return that.getCatgegoryInfo(d.objCategory).text;
-        })/*.on("dblclick", this.dblclick)*/.call(d3.drag().on("start", this.dragstarted).on("drag", this.dragged).on("end", this.dragended));
+        }).call(d3.drag().on("start", this.dragstarted).on("drag", this.dragged).on("end", this.dragended));
         this.nodeIcon.on("mouseover",that.hover);
         this.nodeIcon.on("mouseout", that.leave);
 
         this.simulation.nodes(nodes).on("tick", this.ticked);
         this.simulation.force("link").links(links);
 
-        if (this.simulation) {
+        if (this.nodes && this.preNodeCount !== this.nodes.length) {
             this.simulation.stop();
             for (var i = 0, n = Math.ceil(Math.log(this.simulation.alphaMin()) / Math.log(1 - this.simulation.alphaDecay())); i < n; ++i) {
                 this.simulation.tick();
             }
+            this.simulation.alpha(1).restart();
+        } else {
             this.simulation.restart();
+        }
+
+        if (this.state.pin) {
+            this.node.each((d) => {
+                d.fixed = true;
+                d.fx = d.x;
+                d.fy = d.y;
+            });
+        }
+
+        this.preNodeCount = nodes.length;
+    };
+
+    edgeClicked = (d, x, y, z) => {
+        d.sweep = !d.sweep;
+        this.edgePathList.attr('d', this.makeEdge);
+        this.edgeFlowPath.attr('d', this.makeEdge);
+        this.edgeTextList.attr('dy', this.calcEdgeTextDy);
+    };
+
+    calcEdgeTextDy = (d) => {
+        if(d.sweep === undefined) {
+            d.sweep = true;
+        }
+        if(!d.sweep) {
+            return 15;
+        } else {
+            return -10;
         }
     };
 
     ticked = () => {
 
-
-        /*const now = new Date().valueOf();
-        if(now - this.lastTicked < 100) {
-            return;
-        }
-        this.lastTicked = new Date().valueOf();
-
-        const posChanged = _.find(this.state.nodes, function(n) {
-            return n.vx !== 0 || n.vy !== 0 || n.x !== n.fx || n.y !== n.fy;
-        });
-        if (!posChanged && !this.dragChanged) {
-            return;
-        }*/
-
         let that = this;
         // 노드 위치
         this.node.attr("cx", function (d) {
             return d.x;
+
         }).attr("cy", function (d) {
             return d.y;
         });
@@ -993,16 +962,24 @@ class Topology extends Component {
         this.edgeFlowPath.attr('d', that.makeEdge);
     };
 
+    changeSpeedLevel = (level) => {
+        if (this.state.tpsToLineSpeed) {
+            this.setState({
+                speedLevel : level
+            });
+            this.setTopolopyOptions(this.state, "speedLevel", level);
+        }
+
+        this.update(level);
+    };
+
     checkBtnClick = (property) => {
         let that = this;
         let state = Object.assign({}, this.state);
         state[property] = !state[property];
-        this.setState(state);
 
         if (property === "zoom") {
             if (state[property]) {
-                //this.svg.call(d3.zoom().on("zoom", this.zoomed));
-                //d3.select(this.refs.topologyChart).selectAll("svg").call(d3.zoom().on("zoom", this.zoomed));
                 d3.select(this.refs.topologyChart).selectAll("svg").call(this.zoom.scaleExtent([0.2, 5]).on("zoom", this.zoomed));
             } else {
                 d3.select(this.refs.topologyChart).selectAll("svg").call(this.zoom.scaleExtent([1, 1]).on("zoom", this.zoomed));
@@ -1039,6 +1016,21 @@ class Topology extends Component {
                 }
             });
         }
+
+        if (property === "tpsToLineSpeed") {
+            if (state[property]) {
+                state["speedLevel"] = "slow";
+            } else {
+                state["speedLevel"] = "none";
+            }
+        }
+
+        this.setState(state);
+        if (property === "tpsToLineSpeed") {
+            this.setTopolopyOptions(state, property, state[property]);
+        } else {
+            this.setTopolopyOptions(this.state, property, state[property]);
+        }
     };
 
     changeDistance = (dir) => {
@@ -1055,6 +1047,7 @@ class Topology extends Component {
         this.setState({
             distance : distance
         });
+        this.setTopolopyOptions(this.state, "distance", distance);
 
         this.simulation.force("link").distance([distance]);
         this.simulation.alpha(1).restart();
@@ -1069,25 +1062,53 @@ class Topology extends Component {
                 <div>
                 <div className="controller noselect">
                     <div className="left">
-                        <div className="summary">{this.state.nodes.length} NODES</div>
-                        <div className="summary">{this.state.links.length} LINKS</div>
+                        <div className="summary">{this.nodes.length} NODES</div>
+                        <div className="summary">{this.links.length} LINKS</div>
                     </div>
                     <div className="right">
                         <div className="group">
-                            <div className={"check-btn " + (this.state.highlight ? "on" : "off")} onClick={this.checkBtnClick.bind(this, "highlight")}>HIGHLIGHT</div>
+                            <div className={"check-btn tps " + (this.state.tpsToLineSpeed ? "on" : "off")} onClick={this.checkBtnClick.bind(this, "tpsToLineSpeed")}>
+                                <span className="text">TPS TO LINE SPEED</span><span className="icon">LINE SPEED</span>
+                            </div>
+                            <div className="radio-group">
+                                <div className={"radio-btn " + (!this.state.tpsToLineSpeed ? "disable " : " ") + (this.state.speedLevel === "slow" ? "on" : "off")} onClick={this.changeSpeedLevel.bind(this, "slow")}>
+                                    <span className="text">SLOW</span><span className="icon">S</span>
+                                </div>
+                                <div className={"radio-btn " + (!this.state.tpsToLineSpeed ? "disable " : " ") + (this.state.speedLevel === "medium" ? "on" : "off")} onClick={this.changeSpeedLevel.bind(this, "medium")}>
+                                    <span className="text">MEDIUM</span><span className="icon">M</span>
+                                </div>
+                                <div className={"radio-btn " + (!this.state.tpsToLineSpeed ? "disable " : " ") + (this.state.speedLevel === "fast" ? "on" : "off")} onClick={this.changeSpeedLevel.bind(this, "fast")}>
+                                    <span className="text">FAST</span><span className="icon">F</span>
+                                </div>
+                            </div>
                         </div>
                         <div className="group">
-                            <div className="check-btn" onClick={this.changeDistance.bind(this, "plus")} >DISTANCE+</div>
-                            <div className="check-btn" onClick={this.changeDistance.bind(this, "minus")}>DISTANCE-</div>
+                            <div className={"check-btn " + (this.state.highlight ? "on" : "off")} onClick={this.checkBtnClick.bind(this, "highlight")}>
+                                <span className="text">HIGHLIGHT</span><span className="icon"><i className="fa fa-lightbulb-o" aria-hidden="true"></i></span>
+                            </div>
                         </div>
                         <div className="group">
-                            <div className={"check-btn " + (this.state.zoom ? "on" : "off")} onClick={this.checkBtnClick.bind(this, "zoom")}>ZOOM</div>
-                            <div className={"check-btn " + (this.state.pin ? "on" : "pin")} onClick={this.checkBtnClick.bind(this, "pin")}>PIN</div>
-                            <div className={"check-btn " + (this.state.redLine ? "on" : "redLine")} onClick={this.checkBtnClick.bind(this, "redLine")}>RED LINE</div>
+                            <div className="check-btn" onClick={this.changeDistance.bind(this, "plus")} >
+                                <span className="text">DISTANCE+</span><span className="icon">D+</span>
+                            </div>
+                            <div className="check-btn" onClick={this.changeDistance.bind(this, "minus")}>
+                                <span className="text">DISTANCE-</span><span className="icon">D-</span>
+                            </div>
+                        </div>
+                        <div className="group">
+                            <div className={"check-btn " + (this.state.zoom ? "on" : "off")} onClick={this.checkBtnClick.bind(this, "zoom")}>
+                                <span className="text">ZOOM</span><span className="icon"><i className="fa fa-search" aria-hidden="true"></i></span>
+                            </div>
+                            <div className={"check-btn " + (this.state.pin ? "on" : "pin")} onClick={this.checkBtnClick.bind(this, "pin")}>
+                                <span className="text">PIN</span><span className="icon"><i className="fa fa-map-pin" aria-hidden="true"></i></span>
+                            </div>
+                            <div className={"check-btn " + (this.state.redLine ? "on" : "redLine")} onClick={this.checkBtnClick.bind(this, "redLine")}>
+                                <span className="text">RED LINE</span><span className="icon"><i className="fa fa-exclamation-triangle" aria-hidden="true"></i></span>
+                            </div>
                         </div>
                     </div>
                 </div>
-                {(!this.state.topology || this.state.topology.length < 1) &&
+                {(!this.topology || this.topology.length < 1) &&
                 <div className="no-topology-data">
                     <div>
                         <div className="logo-div"><img alt="scouter-logo" className="logo" src={this.props.config.theme === "theme-gray" ? logoBlack : logo}/></div>
@@ -1119,20 +1140,7 @@ let mapDispatchToProps = (dispatch) => {
     return {
         addRequest: () => dispatch(addRequest()),
         pushMessage: (category, title, content) => dispatch(pushMessage(category, title, content)),
-        setControlVisibility: (name, value) => dispatch(setControlVisibility(name, value)),
-
-        setRealTime: (realTime, longTerm) => dispatch(setRealTime(realTime, longTerm)),
-        setRealTimeValue: (realTime, longTerm, value) => dispatch(setRealTimeValue(realTime, longTerm, value)),
-        setRangeDate: (date) => dispatch(setRangeDate(date)),
-        setRangeHours: (hours) => dispatch(setRangeHours(hours)),
-        setRangeMinutes: (minutes) => dispatch(setRangeMinutes(minutes)),
-        setRangeValue: (value) => dispatch(setRangeValue(value)),
-        setRangeDateHoursMinutes: (date, hours, minutes) => dispatch(setRangeDateHoursMinutes(date, hours, minutes)),
-        setRangeDateHoursMinutesValue: (date, hours, minutes, value) => dispatch(setRangeDateHoursMinutesValue(date, hours, minutes, value)),
-        setRangeAll: (date, hours, minutes, value, realTime, longTerm, range, step) => dispatch(setRangeAll(date, hours, minutes, value, realTime, longTerm, range, step)),
-
-        setTemplate: (boxes, layouts) => dispatch(setTemplate(boxes, layouts))
-
+        setControlVisibility: (name, value) => dispatch(setControlVisibility(name, value))
     };
 };
 

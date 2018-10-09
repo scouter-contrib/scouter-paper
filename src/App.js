@@ -20,14 +20,34 @@ import {setSupported, setConfig, addRequest, clearAllMessage, setControlVisibili
 import {detect} from 'detect-browser';
 import Unsupport from "./components/Unsupport/Unsupport";
 import jQuery from "jquery";
-import {errorHandler, mergeDeep, getParam, setAuthHeader, getWithCredentials, getHttpProtocol, getDefaultServerConfig, getCurrentUser, getCurrentDefaultServer} from './common/common';
+import {
+    errorHandler,
+    mergeDeep,
+    getParam,
+    setAuthHeader,
+    getWithCredentials,
+    getHttpProtocol,
+    getDefaultServerConfig,
+    getCurrentUser,
+    getCurrentDefaultServer
+} from './common/common';
+
 import Home from "./components/Home/Home";
 import Topology from "./components/Topology/Topology";
+import * as common from "./common/common";
+import Debug from "./components/Debug/Debug";
 
 const browser = detect();
 const support = (browser.name !== "ie" && browser.name !== "edge");
 
 class App extends Component {
+
+    constructor(props) {
+        super(props);
+        this.state = {
+            debug : false
+        };
+    }
 
     info = (user, config) => {
         this.props.setControlVisibility("Loading", true);
@@ -136,6 +156,31 @@ class App extends Component {
         });
     };
 
+    getNotice = () => {
+        let noticeTokenKey = "scouter-notice-token";
+        const noticeToken = localStorage.getItem(noticeTokenKey);
+
+        jQuery.ajax({
+            method: "GET",
+            async: true,
+            url: "http://notice.scouterapm.com:6181/scouter-paper/latest-notice",
+            // xhrFields: getWithCredentials(config),
+            beforeSend: function (xhr) {
+                xhr.setRequestHeader('X-SCCH', noticeToken || '');
+                xhr.setRequestHeader('X-SCV', "v" + common.version);
+            }
+        }).done((msg, statusText, request) => {
+            if (statusText === "success") {
+                const noticeTokenReceived = request.getResponseHeader('X-Scouter-Notice-Token');
+                if(noticeTokenReceived && noticeTokenReceived.length > 5 && noticeTokenReceived !== noticeToken) {
+                    localStorage.setItem(noticeTokenKey, noticeTokenReceived);
+                }
+            }
+        }).fail((xhr, textStatus, errorThrown) => {
+            // skip
+        });
+    };
+
     componentWillMount() {
         let config = null;
         let str = localStorage.getItem("config");
@@ -213,7 +258,42 @@ class App extends Component {
         // 처음 카운터 모델을 조회하는데, 에러 처리는 하지 않는다
         this.getCounterModel(this.props.config, this.props.user, false);
 
+        // Notice를 조회한다. 이미 조회한 Notice인지 확인하여 하루에 한번만 보여주던지..
+        // X-Scouter-Notice-Token 응답 헤더는 LocalStorage에 저장하여 다음 요청 헤더로 사용한다.
+        // TODO Notice가 관리되면 화면에 보여준다.
+        this.getNotice();
+
+        window.addEventListener("keydown", this.keyDown.bind(this));
+
     }
+
+    componentWillUnmount() {
+        window.removeEventListener("keydown", this.keyDown.bind(this));
+    }
+
+    keyDown = (event) => {
+
+        var key;
+        var isShift;
+        var isCtrl;
+        if (window.event) {
+            key = window.event.keyCode;
+            isShift = !!window.event.shiftKey;
+            isCtrl = !!window.event.ctrlKey;
+        } else {
+            key = event.which;
+            isShift = !!event.shiftKey;
+            isCtrl = !!event.ctrlKey;
+        }
+
+        if (isShift && isCtrl) {
+            if (key === 85) {//u
+                this.setState({
+                    debug : !this.state.debug
+                });
+            }
+        }
+    };
 
     getFontGeneric = (val) => {
         for (let i = 0; i < this.props.config.fonts.length; i++) {
@@ -247,6 +327,12 @@ class App extends Component {
         document.body.appendChild(css);
     };
 
+    closeDebug = () => {
+        this.setState({
+            debug : false
+        });
+    };
+
     render() {
         return (
             <div className="black">
@@ -267,6 +353,7 @@ class App extends Component {
                     </Overlay>
                     }
                     <Loading visible={this.props.control.Loading}></Loading>
+                    {this.state.debug && <Debug closeDebug={this.closeDebug}/>}
                 </ContentWrapper>
                 }
                 {!support && <Unsupport name={browser.name} version={browser.version}/>}

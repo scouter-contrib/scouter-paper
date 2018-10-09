@@ -107,6 +107,12 @@ class Paper extends Component {
             }
 
             let value = Math.floor((to.valueOf() - from.valueOf()) / (1000 * 60));
+            // 전달된 범위가 최소 범위보다 작을 경우, 최소 범위로 조회
+            if (value < this.props.config.range.shortHistoryStep) {
+                value = this.props.config.range.shortHistoryStep;
+                to = from.clone().add(value, "minutes");
+            }
+
             if (!isNaN(value)) {
                 this.props.setRangeDateHoursMinutesValue(from, from.hours(), from.minutes(), value);
                 this.needSearch = true;
@@ -244,7 +250,7 @@ class Paper extends Component {
                 this.getCounterHistory(this.props.objects, now - ten, now, false);
                 this.getLatestData(true, this.props.objects);
             } else {
-                if (this.needSearch) {
+                if (this.needSearch && this.props.objects && this.props.objects.length > 0) {
                     this.needSearch = false;
                     this.search(this.needSearchFrom, this.needSearchTo, this.props.objects);
                 } else {
@@ -903,7 +909,8 @@ class Paper extends Component {
                 data.pastTimestamp = null;
                 data.clearTimestamp = clear ? (new Date()).getTime() : data.clearTimestamp;
                 this.setState({
-                    data: data
+                    data: data,
+                    xlogNotSupportedInRange: false
                 });
 
             }).fail((xhr, textStatus, errorThrown) => {
