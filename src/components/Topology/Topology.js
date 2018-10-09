@@ -38,7 +38,6 @@ import OldVersion from "../OldVersion/OldVersion";
 
 class Topology extends Component {
 
-    dragChanged = false;
     polling = null;
     interval = 5000;
     init = false;
@@ -601,7 +600,6 @@ class Topology extends Component {
         d3.event.sourceEvent.stopPropagation();
         d.fx = d.x;
         d.fy = d.y;
-        this.dragChanged = true;
     };
 
     dragged = (d) => {
@@ -627,7 +625,6 @@ class Topology extends Component {
                 d.fy = null;
             }
         }
-        this.dragChanged = false;
     };
 
     getCatgegoryInfo = (category) => {
@@ -808,6 +805,7 @@ class Topology extends Component {
         this.node = this.nodeGroup.selectAll("circle").data(nodes).enter().append("circle").attr("class", "node").attr("r", this.r).style("stroke-width", "4px").style("fill", "white").style("stroke", function (d) {
             return that.getCatgegoryInfo(d.objCategory).color;
         });
+
         //this.node.on("dblclick", this.dblclick)
         this.node.call(d3.drag().on("start", this.dragstarted).on("drag", this.dragged).on("end", this.dragended));
         this.node.on("mouseover",that.hover);
@@ -850,6 +848,14 @@ class Topology extends Component {
 
         this.simulation.restart();
         this.init = true;
+
+        if (this.state.pin) {
+            this.node.each((d) => {
+                d.fixed = true;
+                d.fx = d.x;
+                d.fy = d.y;
+            });
+        }
 
     };
 

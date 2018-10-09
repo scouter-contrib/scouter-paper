@@ -21,10 +21,9 @@ class Menu extends Component {
     }
 
     componentDidMount() {
-        /*let menu = "";
-        if (this.props.location.pathname === "/paper") {
-            menu = "paper";
-        }*/
+        this.setState({
+            menu : this.props.location.pathname
+        });
     }
 
     toggleSelectorVisible = () => {
