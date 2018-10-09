@@ -96,7 +96,10 @@ class Menu extends Component {
                     <NavLink className={"menu-item " + (this.state.menu === "/settings" ? "active" : "")} to={"/settings" + instanceParam}   activeClassName="active" onClick={this.menuClick.bind(this, "/settings")}>
                         <div>
                             <div className="icon"><i className="fa fa-cog" aria-hidden="true"></i></div>
-                            <div className="text">SETTINGS</div>
+                            <div className="text">
+                                <span className="menu-text">SETTINGS</span>
+                                <span className="menu-icon"><i className="fa fa-cog" aria-hidden="true"></i></span>
+                            </div>
                         </div>
                     </NavLink>
                     {(getDefaultServerConfig(this.props.config).authentification !== "none") &&

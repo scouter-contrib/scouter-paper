@@ -1,9 +1,17 @@
 .topology-wrapper {
     height: calc(100% - 71px);
-    margin: 10px  auto;
+    margin: 10px auto;
     box-sizing: border-box;
     position: relative;
     max-width: 1600px;
+}
+
+@media only screen and (max-width: 600px) {
+    .topology-wrapper {
+        height: calc(100% - 61px);
+
+
+    }
 }
 
 .topology-wrapper > div {
@@ -28,6 +36,18 @@
 .topology-wrapper .controller .right {
     right: 6px;
     padding-top: 6px;
+}
+
+@media only screen and (max-width: 500px) {
+    .topology-wrapper .controller .left {
+        display: none;
+    }
+
+    .topology-wrapper .controller .right {
+        left: 0;
+        right: 0;
+        text-align: center;
+    }
 }
 
 .topology-wrapper .controller .right .group {
@@ -62,19 +82,48 @@
     cursor: pointer;
 }
 
-.topology-wrapper .controller .radio-btn.disable {
-    background-color: #DDD;
+.topology-wrapper .controller .radio-btn {
+    width: 50px;
+}
+
+.topology-wrapper .controller .radio-btn .icon,
+.topology-wrapper .controller .check-btn .icon {
+    display: none;
 }
 
 .topology-wrapper .controller .check-btn.tps {
     width: 120px;
 }
 
+@media only screen and (max-width: 1000px) {
+    .topology-wrapper .controller .radio-btn .text,
+    .topology-wrapper .controller .check-btn .text {
+        display: none;
+    }
+
+    .topology-wrapper .controller .radio-btn .icon,
+    .topology-wrapper .controller .check-btn .icon {
+        display: inline-block;
+    }
+
+    .topology-wrapper .controller .radio-btn,
+    .topology-wrapper .controller .check-btn {
+        width: 30px;
+    }
+
+    .topology-wrapper .controller .check-btn.tps {
+        width: 70px;
+    }
+}
+
+
+
+.topology-wrapper .controller .radio-btn.disable {
+    background-color: #DDD;
+}
+
 .topology-wrapper .controller .radio-group {
     display: inline-block;
-}
-.topology-wrapper .controller .radio-btn {
-    width: 50px;
 }
 
 .topology-wrapper .controller .radio-btn:hover,
@@ -216,3 +265,4 @@
 .topology-wrapper .no-topology-data > div .logo-div img {
     width: 60px;
 }
+

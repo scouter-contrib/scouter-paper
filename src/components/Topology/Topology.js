@@ -7,28 +7,14 @@ import logoBlack from '../../img/scouter_black.png';
 import {
     addRequest,
     pushMessage,
-    setControlVisibility,
-    setRealTime,
-    setRealTimeValue,
-    setRangeDate,
-    setRangeHours,
-    setRangeMinutes,
-    setRangeValue,
-    setRangeDateHoursMinutes,
-    setRangeDateHoursMinutesValue,
-    setRangeAll,
-    setTemplate
+    setControlVisibility
 } from "../../actions";
 import jQuery from "jquery";
 import {
     errorHandler,
-    getData,
     getHttpProtocol,
     getWithCredentials,
     setAuthHeader,
-    setData,
-    getSearchDays,
-    getDivideDays,
     getCurrentUser
 } from "../../common/common";
 import * as d3 from "d3";
@@ -40,7 +26,6 @@ class Topology extends Component {
 
     polling = null;
     interval = 5000;
-    init = false;
     completeInstanceList = false;
 
     svg = null;
@@ -172,6 +157,8 @@ class Topology extends Component {
                 if (this.svg) {
                     d3.select(this.refs.topologyChart).selectAll("svg").attr("width", this.width).attr("height", this.height);
                     this.svg.attr("width", this.width).attr("height", this.height);
+                    this.simulation.force("center", d3.forceCenter(this.width / 2, this.height / 2));
+                    this.update();
                 }
             }
         }, 1000);
@@ -204,9 +191,8 @@ class Topology extends Component {
     }
 
     componentDidUpdate(prevProps, prevState) {
-        if (!this.init && this.topology.length > 0) {
-            this.draw();
-            this.init = true;
+        if (this.topology && this.topology.length > 0) {
+            this.update();
         }
     }
 
@@ -485,12 +471,7 @@ class Topology extends Component {
                         lastUpdateTime: (new Date()).getTime()
                     });
 
-                    if (this.init) {
-                        this.update(this.state.speedLevel);
-                    } else {
-                        this.draw();
-                    }
-
+                    this.update(this.state.speedLevel);
                 }
 
             }).fail((xhr, textStatus, errorThrown) => {
@@ -607,16 +588,6 @@ class Topology extends Component {
         d.fy = d3.event.y;
     };
 
-    dblclick = (d) => {
-        if (d.fixed) {
-            d.fixed = false;
-            d.fx = null;
-            d.fy = null;
-        } else {
-            d.fixed = true;
-        }
-    };
-
     dragended = (d) => {
         if (!d3.event.active) this.simulation.alphaTarget(0);
         if (!d.fixed) {
@@ -723,143 +694,6 @@ class Topology extends Component {
         }
     };
 
-    draw = () => {
-        let that = this;
-
-        let wrapper = this.refs.topologyChart;
-        this.width = wrapper.offsetWidth;
-        this.height = wrapper.offsetHeight;
-
-        let nodes = this.nodes;
-        let links = this.links;
-
-        d3.select(this.refs.topologyChart).selectAll("svg").remove();
-        this.svg = d3.select(this.refs.topologyChart).append("svg").attr("width", this.width).attr("height", this.height).append("g");
-
-        this.zoom = d3.zoom().on("zoom", this.zoomed);
-
-        if (this.state.zoom) {
-            d3.select(this.refs.topologyChart).selectAll("svg").call(this.zoom.scaleExtent([0.2, 5]));
-        } else {
-            d3.select(this.refs.topologyChart).selectAll("svg").call(this.zoom.scaleExtent([1, 1]));
-        }
-
-        this.simulation = d3.forceSimulation();
-        this.simulation.force("link", d3.forceLink().id(function (d) {
-            return d.id;
-        }));
-        this.simulation.force('charge', d3.forceManyBody().strength([-10]));
-        this.simulation.force("center", d3.forceCenter(this.width / 2, this.height / 2));
-        this.simulation.force("collide", d3.forceCollide(30));
-        this.simulation.nodes(nodes).on("tick", this.ticked);
-
-        // 노드에 표시되는 텍스트
-        this.edgePathGroup = this.svg.append("g").attr("class", "edge-path-group");
-        this.edgePathList = this.edgePathGroup.selectAll(".edge-path").data(links).enter().append('path').attr('class', 'edge-path').attr('id', function (d, i) {
-            return 'edgePath' + d.source + "_" + d.target;
-        }).style("pointer-events", "none");
-
-        this.edgeTextGroup = this.svg.append("g").attr("class", "edge-text-group");
-        this.edgeTextList = this.edgeTextGroup.selectAll(".edge-text").data(links).enter().append('text').style("pointer-events", "none").attr('class', 'edge-text').attr('dy', -10).attr('id', function (d, i) {
-            return 'edgeLabel' + i
-        });
-
-        this.edgeTextPath = this.edgeTextList.append('textPath').attr('xlink:href', function (d, i) {
-            return '#edgePath' + d.source + "_" + d.target;
-        }).style("text-anchor", "middle").style("pointer-events", "all").attr("startOffset", "50%").attr('class', 'edge-text-path');
-
-        this.edgeTextPath.append("tspan").attr('class', 'tps-tspan').text(function (d) {
-            let tps = numeral(d.count / d.period).format(that.props.config.numberFormat);
-            return tps + "r/s ";
-        });
-
-        this.edgeTextPath.append("tspan").attr('class', 'error-rate-tspan').text(function (d) {
-            let errorRate = numeral((d.errorCount / d.count) * 100).format(that.props.config.numberFormat);
-            return errorRate + "% ";
-        });
-
-        this.edgeTextPath.append("tspan").attr('class', 'avg-elapsed-tspan').text(function (d) {
-            let avgElapsedTime = numeral(d.totalElapsed / d.count).format(that.props.config.numberFormat);
-            return avgElapsedTime + "ms";
-        });
-
-        // 노드간의 연결 선
-        this.edgeFlowPathGroup = this.svg.append("g").attr("class", "edge-flow-path-group");
-        this.edgeFlowPath = this.edgeFlowPathGroup.selectAll(".edge-flow-path").data(links).enter().append('path').attr('class', 'edge-flow-path').attr('id', function (d, i) {
-            return 'edgeFlowPath' + i
-        }).style("pointer-events", "stroke");
-
-        this.edgeFlowPath.on("click", this.edgeClicked);
-
-        // 노드 아래에 표시되는 명칭
-        this.nodeNameTextGroup = this.svg.append("g").attr("class", "node-name-text-group");
-        this.nodeNameText = this.nodeNameTextGroup.selectAll(".node-name").data(nodes).enter().append("text").attr("class", "node-name").style("font-size", this.option.fontSize + "px").style("fill", "white");
-        this.nodeNameText.text(function (d) {
-            return d.objName;
-        });
-        this.nodeNameText.on("mouseover",that.hover);
-        this.nodeNameText.on("mouseout", that.leave);
-
-        // 노드
-        this.nodeGroup = this.svg.append("g").attr("class", "node-group");
-        this.node = this.nodeGroup.selectAll("circle").data(nodes).enter().append("circle").attr("class", "node").attr("r", this.r).style("stroke-width", "4px").style("fill", "white").style("stroke", function (d) {
-            return that.getCatgegoryInfo(d.objCategory).color;
-        });
-
-        //this.node.on("dblclick", this.dblclick)
-        this.node.call(d3.drag().on("start", this.dragstarted).on("drag", this.dragged).on("end", this.dragended));
-        this.node.on("mouseover",that.hover);
-        this.node.on("mouseout", that.leave);
-
-        this.nodeLabelGroup = this.svg.append("g").attr("class", "node-labels");
-        this.nodeLabel = this.nodeLabelGroup.selectAll("text").data(nodes).enter().append("text").attr("class", "node-label").style("font-size", this.option.fontSize + "px").text(function (d) {
-            let name = d.objTypeFamily ? d.objTypeFamily : d.objCategory;
-            if (name) {
-                return name.toUpperCase();
-            } else {
-                return "";
-            }
-        }).style("fill", function (d) {
-            return that.getCatgegoryInfo(d.objCategory).color;
-        });
-
-        this.nodeIconGroup = this.svg.append("g").attr("class", "node-icon-group");
-        this.nodeIcon = this.nodeIconGroup.selectAll("text").data(nodes).enter().append("text").attr("class", "node-icon").style("font-family", function (d) {
-            return that.getCatgegoryInfo(d.objCategory).fontFamily;
-        }).style("font-size", function (d) {
-            return that.getCatgegoryInfo(d.objCategory).fontSize;
-        }).style("fill", function (d) {
-            return that.getCatgegoryInfo(d.objCategory).color;
-        }).text(function (d) {
-            return that.getCatgegoryInfo(d.objCategory).text;
-        });
-        //this.nodeIcon.on("dblclick", this.dblclick);
-        this.nodeIcon.call(d3.drag().on("start", this.dragstarted).on("drag", this.dragged).on("end", this.dragended));
-        this.nodeIcon.on("mouseover",that.hover);
-        this.nodeIcon.on("mouseout", that.leave);
-
-
-        this.simulation.force("link").links(links).distance([this.state.distance]);
-        this.simulation.stop();
-
-        for (var i = 0, n = Math.ceil(Math.log(this.simulation.alphaMin()) / Math.log(1 - this.simulation.alphaDecay())); i < n; ++i) {
-            this.simulation.tick();
-        }
-
-        this.simulation.restart();
-        this.init = true;
-
-        if (this.state.pin) {
-            this.node.each((d) => {
-                d.fixed = true;
-                d.fx = d.x;
-                d.fy = d.y;
-            });
-        }
-
-    };
-
-
     getStepCountByTps = (tps, tpsMode) => {
 
         if (tpsMode === "slow") {
@@ -902,8 +736,41 @@ class Topology extends Component {
     update = (speedLevel) => {
         let that = this;
 
+        let wrapper = this.refs.topologyChart;
+        this.width = wrapper.offsetWidth;
+        this.height = wrapper.offsetHeight;
+
         let nodes = this.nodes;
         let links = this.links;
+
+        if (!this.svg) {
+            this.svg = d3.select(this.refs.topologyChart).append("svg").attr("width", this.width).attr("height", this.height).append("g");;
+
+            this.edgePathGroup = this.svg.append("g").attr("class", "edge-path-group");
+            this.edgeTextGroup = this.svg.append("g").attr("class", "edge-text-group");
+            this.edgeFlowPathGroup = this.svg.append("g").attr("class", "edge-flow-path-group");
+            this.nodeNameTextGroup = this.svg.append("g").attr("class", "node-name-text-group");
+            this.nodeGroup = this.svg.append("g").attr("class", "node-group");
+            this.nodeLabelGroup = this.svg.append("g").attr("class", "node-labels");
+            this.nodeIconGroup = this.svg.append("g").attr("class", "node-icon-group");
+
+            this.zoom = d3.zoom().on("zoom", this.zoomed);
+            if (this.state.zoom) {
+                d3.select(this.refs.topologyChart).selectAll("svg").call(this.zoom.scaleExtent([0.2, 5]));
+            } else {
+                d3.select(this.refs.topologyChart).selectAll("svg").call(this.zoom.scaleExtent([1, 1]));
+            }
+
+            this.simulation = d3.forceSimulation();
+            this.simulation.force("link", d3.forceLink().id(function (d) {
+                return d.id;
+            }));
+            this.simulation.force('charge', d3.forceManyBody().strength([-10]));
+            this.simulation.force("center", d3.forceCenter(this.width / 2, this.height / 2));
+            this.simulation.force("collide", d3.forceCollide(30));
+            this.simulation.nodes(nodes).on("tick", this.ticked);
+            this.simulation.force("link").links(links).distance([this.state.distance]);
+        }
 
         // 노드에 표시되는 텍스트
         this.edgePathList = this.edgePathGroup.selectAll(".edge-path").data(links);
@@ -962,14 +829,9 @@ class Topology extends Component {
             }
         }).attr('id', function (d, i) {
             return 'edgeFlowPath' + i
-        }).style("pointer-events", "none")
-        .style("animation", function (d) {
+        }).style("pointer-events", "none").style("animation", function (d) {
             return that.styleAnimateEdge(d, this, speedLevel);
         });
-
-        // .style("webkit-animation", function (d, i, objs) {
-        //     return that.styleAnimateEdge(d, this, speedLevelChanged);
-        // });
 
         this.edgeFlowPath.style("pointer-events", "auto");
         this.edgeFlowPath.on("click", that.edgeClicked);
@@ -987,7 +849,7 @@ class Topology extends Component {
         this.node = this.node.enter().append("circle").merge(this.node).attr("class", "node").attr("r", this.r).style("stroke-width", "4px").style("fill", "white").style("stroke", function (d) {
             return that.getCatgegoryInfo(d.objCategory).color;
         });
-        //this.node.on("dblclick", this.dblclick)
+
         this.node.call(d3.drag().on("start", this.dragstarted).on("drag", this.dragged).on("end", this.dragended));
         this.node.on("mouseover",that.hover);
         this.node.on("mouseout", that.leave);
@@ -1014,7 +876,7 @@ class Topology extends Component {
             return that.getCatgegoryInfo(d.objCategory).color;
         }).text(function (d) {
             return that.getCatgegoryInfo(d.objCategory).text;
-        })/*.on("dblclick", this.dblclick)*/.call(d3.drag().on("start", this.dragstarted).on("drag", this.dragged).on("end", this.dragended));
+        }).call(d3.drag().on("start", this.dragstarted).on("drag", this.dragged).on("end", this.dragended));
         this.nodeIcon.on("mouseover",that.hover);
         this.nodeIcon.on("mouseout", that.leave);
 
@@ -1029,6 +891,14 @@ class Topology extends Component {
             this.simulation.alpha(1).restart();
         } else {
             this.simulation.restart();
+        }
+
+        if (this.state.pin) {
+            this.node.each((d) => {
+                d.fixed = true;
+                d.fx = d.x;
+                d.fy = d.y;
+            });
         }
 
         this.preNodeCount = nodes.length;
@@ -1197,24 +1067,44 @@ class Topology extends Component {
                     </div>
                     <div className="right">
                         <div className="group">
-                            <div className={"check-btn tps " + (this.state.tpsToLineSpeed ? "on" : "off")} onClick={this.checkBtnClick.bind(this, "tpsToLineSpeed")}>TPS TO LINE SPEED</div>
+                            <div className={"check-btn tps " + (this.state.tpsToLineSpeed ? "on" : "off")} onClick={this.checkBtnClick.bind(this, "tpsToLineSpeed")}>
+                                <span className="text">TPS TO LINE SPEED</span><span className="icon">LINE SPEED</span>
+                            </div>
                             <div className="radio-group">
-                                <div className={"radio-btn " + (!this.state.tpsToLineSpeed ? "disable " : " ") + (this.state.speedLevel === "slow" ? "on" : "off")} onClick={this.changeSpeedLevel.bind(this, "slow")}>SLOW</div>
-                                <div className={"radio-btn " + (!this.state.tpsToLineSpeed ? "disable " : " ") + (this.state.speedLevel === "medium" ? "on" : "off")} onClick={this.changeSpeedLevel.bind(this, "medium")}>MEDIUM</div>
-                                <div className={"radio-btn " + (!this.state.tpsToLineSpeed ? "disable " : " ") + (this.state.speedLevel === "fast" ? "on" : "off")} onClick={this.changeSpeedLevel.bind(this, "fast")}>FAST</div>
+                                <div className={"radio-btn " + (!this.state.tpsToLineSpeed ? "disable " : " ") + (this.state.speedLevel === "slow" ? "on" : "off")} onClick={this.changeSpeedLevel.bind(this, "slow")}>
+                                    <span className="text">SLOW</span><span className="icon">S</span>
+                                </div>
+                                <div className={"radio-btn " + (!this.state.tpsToLineSpeed ? "disable " : " ") + (this.state.speedLevel === "medium" ? "on" : "off")} onClick={this.changeSpeedLevel.bind(this, "medium")}>
+                                    <span className="text">MEDIUM</span><span className="icon">M</span>
+                                </div>
+                                <div className={"radio-btn " + (!this.state.tpsToLineSpeed ? "disable " : " ") + (this.state.speedLevel === "fast" ? "on" : "off")} onClick={this.changeSpeedLevel.bind(this, "fast")}>
+                                    <span className="text">FAST</span><span className="icon">F</span>
+                                </div>
                             </div>
                         </div>
                         <div className="group">
-                            <div className={"check-btn " + (this.state.highlight ? "on" : "off")} onClick={this.checkBtnClick.bind(this, "highlight")}>HIGHLIGHT</div>
+                            <div className={"check-btn " + (this.state.highlight ? "on" : "off")} onClick={this.checkBtnClick.bind(this, "highlight")}>
+                                <span className="text">HIGHLIGHT</span><span className="icon"><i className="fa fa-lightbulb-o" aria-hidden="true"></i></span>
+                            </div>
                         </div>
                         <div className="group">
-                            <div className="check-btn" onClick={this.changeDistance.bind(this, "plus")} >DISTANCE+</div>
-                            <div className="check-btn" onClick={this.changeDistance.bind(this, "minus")}>DISTANCE-</div>
+                            <div className="check-btn" onClick={this.changeDistance.bind(this, "plus")} >
+                                <span className="text">DISTANCE+</span><span className="icon">D+</span>
+                            </div>
+                            <div className="check-btn" onClick={this.changeDistance.bind(this, "minus")}>
+                                <span className="text">DISTANCE-</span><span className="icon">D-</span>
+                            </div>
                         </div>
                         <div className="group">
-                            <div className={"check-btn " + (this.state.zoom ? "on" : "off")} onClick={this.checkBtnClick.bind(this, "zoom")}>ZOOM</div>
-                            <div className={"check-btn " + (this.state.pin ? "on" : "pin")} onClick={this.checkBtnClick.bind(this, "pin")}>PIN</div>
-                            <div className={"check-btn " + (this.state.redLine ? "on" : "redLine")} onClick={this.checkBtnClick.bind(this, "redLine")}>RED LINE</div>
+                            <div className={"check-btn " + (this.state.zoom ? "on" : "off")} onClick={this.checkBtnClick.bind(this, "zoom")}>
+                                <span className="text">ZOOM</span><span className="icon"><i className="fa fa-search" aria-hidden="true"></i></span>
+                            </div>
+                            <div className={"check-btn " + (this.state.pin ? "on" : "pin")} onClick={this.checkBtnClick.bind(this, "pin")}>
+                                <span className="text">PIN</span><span className="icon"><i className="fa fa-map-pin" aria-hidden="true"></i></span>
+                            </div>
+                            <div className={"check-btn " + (this.state.redLine ? "on" : "redLine")} onClick={this.checkBtnClick.bind(this, "redLine")}>
+                                <span className="text">RED LINE</span><span className="icon"><i className="fa fa-exclamation-triangle" aria-hidden="true"></i></span>
+                            </div>
                         </div>
                     </div>
                 </div>
@@ -1250,20 +1140,7 @@ let mapDispatchToProps = (dispatch) => {
     return {
         addRequest: () => dispatch(addRequest()),
         pushMessage: (category, title, content) => dispatch(pushMessage(category, title, content)),
-        setControlVisibility: (name, value) => dispatch(setControlVisibility(name, value)),
-
-        setRealTime: (realTime, longTerm) => dispatch(setRealTime(realTime, longTerm)),
-        setRealTimeValue: (realTime, longTerm, value) => dispatch(setRealTimeValue(realTime, longTerm, value)),
-        setRangeDate: (date) => dispatch(setRangeDate(date)),
-        setRangeHours: (hours) => dispatch(setRangeHours(hours)),
-        setRangeMinutes: (minutes) => dispatch(setRangeMinutes(minutes)),
-        setRangeValue: (value) => dispatch(setRangeValue(value)),
-        setRangeDateHoursMinutes: (date, hours, minutes) => dispatch(setRangeDateHoursMinutes(date, hours, minutes)),
-        setRangeDateHoursMinutesValue: (date, hours, minutes, value) => dispatch(setRangeDateHoursMinutesValue(date, hours, minutes, value)),
-        setRangeAll: (date, hours, minutes, value, realTime, longTerm, range, step) => dispatch(setRangeAll(date, hours, minutes, value, realTime, longTerm, range, step)),
-
-        setTemplate: (boxes, layouts) => dispatch(setTemplate(boxes, layouts))
-
+        setControlVisibility: (name, value) => dispatch(setControlVisibility(name, value))
     };
 };
 
