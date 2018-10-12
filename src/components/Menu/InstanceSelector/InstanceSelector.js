@@ -490,6 +490,7 @@ class InstanceSelector extends Component {
     };
 
     render() {
+
         return (
             <div className={"instance-selector-bg " + (this.props.visible ? "" : "hidden")} onClick={this.props.toggleSelectorVisible}>
                 <div className={"instance-selector-fixed-bg"}>
@@ -552,7 +553,7 @@ class InstanceSelector extends Component {
                                         let icon = "";
                                         let displayName = "";
                                         if (objType) {
-                                            icon = objType.icon;
+                                            icon = objType.icon ? objType.icon : instance.objType;
                                             displayName = objType.displayName;
                                         }
 
@@ -560,11 +561,9 @@ class InstanceSelector extends Component {
                                         return (
                                             <div key={i} className={"instance " + (i === 0 ? 'first ' : ' ') + (!(!this.state.selectedObjects[instance.objHash]) ? "selected" : " ")} onClick={this.instanceClick.bind(this, instance)}>
                                                 <div className="type-icon">
-                                                    {/*<div className="type-icon-wrapper">
-                                                        <IconImage icon={icon}/>
-                                                    </div>*/}
                                                     <div className="type-icon-wrapper" style={{color : iconInfo.color, backgroundColor : iconInfo.bgColor}}>
-                                                        <div className={"object-icon " + iconInfo.fontFamily + " " + iconInfo.text}></div>
+                                                        {iconInfo.fontFamily === "text" && <div className={"object-icon " + iconInfo.fontFamily}>{iconInfo.text}</div>}
+                                                        {iconInfo.fontFamily !== "text" && <div className={"object-icon " + iconInfo.fontFamily + " " + iconInfo.text}></div>}
                                                     </div>
                                                 </div>
                                                 <div className="instance-text-info">

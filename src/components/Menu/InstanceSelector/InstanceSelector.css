@@ -265,6 +265,13 @@
     font-family: "FontAwesome";
 }
 
+.instance-selector .instance-list div.instance > div.type-icon .type-icon-wrapper .object-icon.text {
+    font-size: 9px;
+    padding-top: 10px;
+    letter-spacing: -0.5px;
+    text-transform: uppercase;
+}
+
 
 .instance-selector .instance-list div.instance .instance-name {
     font-size: 11px;

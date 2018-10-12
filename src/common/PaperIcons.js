@@ -27,6 +27,16 @@ export const ObjectIcons = {
         text: "icon-database",
         color: "rgb(67,139,198)",
         bgColor: "white"
+    }, datasource: {
+        fontFamily: "technology-icons",
+        text: "icon-database",
+        color: "rgb(67,139,198)",
+        bgColor: "white"
+    }, reqproc: {
+        fontFamily: "text",
+        text: "REQP",
+        color: "#333",
+        bgColor: "white"
     }, hadoop: {
         fontFamily: "technology-icons",
         text: "icon-hadoop",
@@ -297,9 +307,34 @@ export const ObjectIcons = {
         text: "icon-git-squared",
         color: "#333",
         bgColor: "white"
-    }, linux: {
+    }, jboss: {
+        fontFamily: "text",
+        text: "jboss",
+        color: "rgb(198,0,0)",
+        bgColor: "white"
+    }, resin: {
+        fontFamily: "text",
+        text: "resin",
+        color: "rgb(0,44,95)",
+        bgColor: "white"
+    }, batch: {
+        fontFamily: "text",
+        text: "batch",
+        color: "#333",
+        bgColor: "white"
+    }, aws: {
+        fontFamily: "FontAwesome",
+        text: "fa fa-amazon",
+        color: "#333",
+        bgColor: "white"
+    } , linux: {
         fontFamily: "FontAwesome",
         text: "fa fa-linux",
+        color: "#333",
+        bgColor: "white"
+    }, windows: {
+        fontFamily: "FontAwesome",
+        text: "fa fa-windows",
         color: "#333",
         bgColor: "white"
     }, ___default: {
