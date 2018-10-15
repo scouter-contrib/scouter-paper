@@ -26,6 +26,7 @@ import {connect} from 'react-redux';
 import {withRouter} from 'react-router-dom';
 import * as d3 from "d3";
 import numeral from "numeral";
+import moment from "moment";
 
 const profileMetas = [
     {
@@ -254,6 +255,54 @@ class SingleProfile extends Component {
         this.fullTimeFormat = this.props.config.dateFormat + " " + this.props.config.timeFormat;
     }
 
+    getNavData = (endtime, gxid, caller, txid, steps) => {
+
+        let flow = {
+            main : [],
+            sub : []
+        };
+
+        if (gxid) {
+            flow.main.push({
+                id : gxid,
+                type : gxid === txid ? "current" : "global",
+                endtime : endtime
+            });
+        }
+
+        if (caller && Number(caller) !== 0 && gxid !== caller) {
+            flow.main.push({
+                id : caller,
+                type : gxid === txid ? "self" : "caller",
+                endtime : endtime
+            });
+        }
+
+        if (txid !== gxid) {
+            flow.main.push({
+                id : txid,
+                type : "current",
+                endtime : endtime
+            });
+        }
+
+        steps && steps.forEach((d, i) => {
+            if (d.step.txid) {
+                flow.sub.push({
+                    id : d.step.txid,
+                    type : "callee",
+                    endtime : endtime
+                });
+            }
+        });
+
+        return flow;
+    };
+
+    txNavClick = (xlog, endtime) => {
+        this.props.rowClick({txid:xlog}, moment(new Date(Number(endtime))).format("YYYYMMDD"));
+    };
+
     render() {
         let startTime;
         if (this.props.profile) {
@@ -261,8 +310,41 @@ class SingleProfile extends Component {
         }
 
         let beforeStepStartTime;
+
+        let nav = null;
+        if (this.props.profile) {
+            nav = this.getNavData(this.props.profile.endTime, this.props.profile.gxid, this.props.profile.caller, this.props.profile.txid, this.props.steps);
+        }
         return (
             <div className='single-profile'>
+                <div className="tx-nav">
+                    <div className="main">
+                        {(nav && nav.main.length > 0) && nav.main.map((d, i) => {
+                            return (
+                                <div className="tx-link-wrapper" key={i}>
+                                    {i !== 0 && <div className="arrow"><i className="fa fa-long-arrow-right" aria-hidden="true"></i></div>}
+                                    <div className="tx-link">
+                                        <span className="type">{d.type}</span>
+                                        <span className="txid" onClick={this.txNavClick.bind(this, d.id, d.endtime)}>{d.id}</span>
+                                    </div>
+                                </div>
+                            )
+                        })}
+                    </div>
+                    <div className="sub">
+                        {(nav && nav.sub.length > 0) && nav.sub.map((d, i) => {
+                            return (
+                                <div className="tx-link-wrapper" key={i}>
+                                    <div className="arrow"><i className="fa fa-long-arrow-right" aria-hidden="true"></i></div>
+                                    <div className="tx-link">
+                                        <span className="type">{d.type}</span>
+                                        <span className="txid" onClick={this.txNavClick.bind(this, d.id, d.endtime)}>{d.id}</span>
+                                    </div>
+                                </div>
+                            )
+                        })}
+                    </div>
+                </div>
                 <div className="sub-title">GENERAL INFO</div>
                 <div className={"xlog-data " + (this.props.wrap ? 'wrap' : '')}>
                     {this.props.profile && profileMetas && profileMetas.filter((d) => {return this.props.summary ? d.show : true}).map((meta, i) => {
