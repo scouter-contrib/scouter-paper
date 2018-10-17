@@ -378,6 +378,10 @@ class Profiler extends Component {
                     txid: xlog.txid
                 });
             }
+        } else {
+            this.setState({
+                txid: xlog.txid
+            });
         }
 
         let tdate = (txiddate ? txiddate : moment(new Date(Number(xlog.endTime))).format("YYYYMMDD"));
@@ -419,7 +423,7 @@ class Profiler extends Component {
                     step: {
                         parent: "-1",
                         index: orderedSteps.length + 1,
-                        start_time: this.state.profile.elapsed,
+                        start_time: this.state.profile &&this.state.profile.elapsed,
                         start_cpu: "0",
                         message: "end of service",
                         stepType: "3",
@@ -590,8 +594,9 @@ class Profiler extends Component {
                     <div className="profiler-layout right" style={rightStyle}>
                         <div className="summary">
                             {(!this.state.paramTxid && this.state.smallScreen) && <div onClick={this.clearTxId.bind(this)} className="profile-list-btn"><i className="fa fa-chevron-circle-left"></i></div>}
+                            {!this.state.txid  && <div className="title">NO PROFILE SELECTED</div>}
                             {this.state.txid  && <div className="title">DETAIL <span className="selected-info">({this.state.txid ? 'TXID : ' + this.state.txid : 'NO PROFILE SELECTED'})</span>{this.state.txid ? <span className="copy-url-btn" onClick={this.copyUrl}>{this.state.copyBtnText}</span> : null}</div>}
-                            {this.state.paramTxid  && <div className="title">DETAIL <span className="selected-info">({this.state.paramTxid ? 'TXID : ' + this.state.paramTxid : 'NO PROFILE SELECTED'})</span>{this.state.paramTxid ? <span className="copy-url-btn" onClick={this.copyUrl}>{this.state.copyBtnText}</span> : null}</div>}
+                            {!this.state.txid && this.state.paramTxid  && <div className="title">DETAIL <span className="selected-info">({this.state.paramTxid ? 'TXID : ' + this.state.paramTxid : 'NO PROFILE SELECTED'})</span>{this.state.paramTxid ? <span className="copy-url-btn" onClick={this.copyUrl}>{this.state.copyBtnText}</span> : null}</div>}
                             <div className="profile-steps-control noselect">
                                 <div className={"profile-control-btn " + (this.state.summary ? 'active' : '')} onClick={this.toggleSummary}>{this.state.summary ? <i className="fa fa-check-circle"></i> : <i className="fa fa-circle-o"></i>} SUMMARY</div>
                                 <div className={"profile-control-btn " + (this.state.indent ? 'active' : '')} onClick={this.toggleIndent}>{this.state.indent ? <i className="fa fa-check-circle"></i> : <i className="fa fa-circle-o"></i>} INDENT</div>
@@ -604,7 +609,7 @@ class Profiler extends Component {
                         </div>
                         <div className={"profile-steps"}>
                             <div className="profile-steps-content scrollbar">
-                                {(this.state.paramTxid || this.state.txid) && <SingleProfile txid={this.state.txid} profile={this.state.profile} steps={this.state.steps} summary={this.state.summary} indent={this.state.indent} bind={this.state.bind} wrap={this.state.wrap} gap={this.state.gap} formatter={this.state.formatter}/>}
+                                {(this.state.paramTxid || this.state.txid) && <SingleProfile rowClick={this.rowClick} txid={this.state.txid} profile={this.state.profile} steps={this.state.steps} summary={this.state.summary} indent={this.state.indent} bind={this.state.bind} wrap={this.state.wrap} gap={this.state.gap} formatter={this.state.formatter}/>}
                                 {(!this.state.paramTxid && !this.state.txid) && <div className="no-profile"><div>NO PROFILE SELECTED</div></div>}
                                 </div>
                         </div>
