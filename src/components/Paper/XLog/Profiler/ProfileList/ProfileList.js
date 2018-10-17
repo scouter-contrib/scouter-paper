@@ -8,9 +8,6 @@ import numeral from "numeral";
 const layout = [
 
     {
-        key: "caller",
-        name: "CALLER"
-    },{
         key: "objName",
         name: "INSTANCE"
     },
