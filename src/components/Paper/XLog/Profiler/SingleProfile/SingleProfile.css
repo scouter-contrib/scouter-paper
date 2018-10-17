@@ -109,6 +109,12 @@
     display: inline-block;
     border: 1px solid rgba(0,0,0,0.3);
     border-radius: 3px;
+    /*background-color: #007FFF;
+    color: white;*/
+}
+
+.single-profile .tx-nav .tx-link.current {
+    font-weight: bold;
 }
 
 .single-profile .tx-nav .tx-link-wrapper .arrow {

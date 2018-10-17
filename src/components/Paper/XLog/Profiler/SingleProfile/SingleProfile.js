@@ -262,10 +262,10 @@ class SingleProfile extends Component {
             sub : []
         };
 
-        if (gxid) {
+        if (0 !== Number(gxid) && gxid) {
             flow.main.push({
                 id : gxid,
-                type : gxid === txid ? "current" : "global",
+                type : gxid === txid ? "current" : "start",
                 endtime : endtime
             });
         }
@@ -287,6 +287,7 @@ class SingleProfile extends Component {
         }
 
         steps && steps.forEach((d, i) => {
+
             if (d.step.txid) {
                 flow.sub.push({
                     id : d.step.txid,
@@ -301,6 +302,10 @@ class SingleProfile extends Component {
 
     txNavClick = (xlog, endtime) => {
         this.props.rowClick({txid:xlog}, moment(new Date(Number(endtime))).format("YYYYMMDD"));
+    };
+
+    txLinkClick = (xlog) => {
+        this.props.rowClick({txid:xlog}, moment(new Date(Number(this.props.profile.endTime))).format("YYYYMMDD"));
     };
 
     render() {
@@ -323,7 +328,7 @@ class SingleProfile extends Component {
                             return (
                                 <div className="tx-link-wrapper" key={i}>
                                     {i !== 0 && <div className="arrow"><i className="fa fa-long-arrow-right" aria-hidden="true"></i></div>}
-                                    <div className="tx-link">
+                                    <div className={"tx-link " + d.type}>
                                         <span className="type">{d.type}</span>
                                         <span className="txid" onClick={this.txNavClick.bind(this, d.id, d.endtime)}>{d.id}</span>
                                     </div>
@@ -372,27 +377,27 @@ class SingleProfile extends Component {
 
                         return (
                             <Step gap={gap} showGap={this.props.gap} indent={row.step.indent} applyIndent={this.props.indent} key={i}>
-                                {row.step.stepType === "9" && <HashedMessageStep startTime={startTime} row={row}/>}
-                                {row.step.stepType === "16" && <Sql3Step formatter={this.props.formatter} bind={this.props.bind} startTime={startTime} row={row}/>}
-                                {row.step.stepType === "2" && <SqlStep startTime={startTime} row={row}/>}
-                                {row.step.stepType === "8" && <Sql2Step startTime={startTime} row={row}/>}
-                                {row.step.stepType === "1" && <MethodStep startTime={startTime} row={row}/>}
-                                {row.step.stepType === "10" && <Method2Step startTime={startTime} row={row}/>}
-                                {row.step.stepType === "3" && <MessageStep startTime={startTime} row={row}/>}
-                                {row.step.stepType === "5" && <SocketStep startTime={startTime} row={row}/>}
-                                {row.step.stepType === "6" && <ApiCallStep startTime={startTime} row={row}/>}
-                                {row.step.stepType === "15" && <ApiCall2Step startTime={startTime} row={row}/>}
-                                {row.step.stepType === "7" && <ThreadSubmitStep startTime={startTime} row={row}/>}
-                                {row.step.stepType === "17" && <ParameterizedMessageStep startTime={startTime} row={row}/>}
-                                {row.step.stepType === "12" && <DumpStep  formatter={this.props.formatter} startTime={startTime} row={row}/>}
-                                {row.step.stepType === "13" && <DispatchStep startTime={startTime} row={row}/>}
-                                {row.step.stepType === "14" && <ThreadCallPossibleStep startTime={startTime} row={row}/>}
-                                {row.step.stepType === "11" && <MethodSumStep startTime={startTime} row={row}/>}
-                                {row.step.stepType === "21" && <SqlSumStep startTime={startTime} row={row}/>}
-                                {row.step.stepType === "31" && <MessageSumStep startTime={startTime} row={row}/>}
-                                {row.step.stepType === "42" && <SocketSumStep startTime={startTime} row={row}/>}
-                                {row.step.stepType === "43" && <ApiCallSumStep startTime={startTime} row={row}/>}
-                                {row.step.stepType === "99" && <ControlStep startTime={startTime} row={row}/>}
+                                {row.step.stepType === "9" && <HashedMessageStep txLinkClick={this.txLinkClick} startTime={startTime} row={row}/>}
+                                {row.step.stepType === "16" && <Sql3Step txLinkClick={this.txLinkClick} formatter={this.props.formatter} bind={this.props.bind} startTime={startTime} row={row}/>}
+                                {row.step.stepType === "2" && <SqlStep txLinkClick={this.txLinkClick} startTime={startTime} row={row}/>}
+                                {row.step.stepType === "8" && <Sql2Step txLinkClick={this.txLinkClick} startTime={startTime} row={row}/>}
+                                {row.step.stepType === "1" && <MethodStep txLinkClick={this.txLinkClick} startTime={startTime} row={row}/>}
+                                {row.step.stepType === "10" && <Method2Step txLinkClick={this.txLinkClick} startTime={startTime} row={row}/>}
+                                {row.step.stepType === "3" && <MessageStep txLinkClick={this.txLinkClick} startTime={startTime} row={row}/>}
+                                {row.step.stepType === "5" && <SocketStep txLinkClick={this.txLinkClick} startTime={startTime} row={row}/>}
+                                {row.step.stepType === "6" && <ApiCallStep txLinkClick={this.txLinkClick} startTime={startTime} row={row}/>}
+                                {row.step.stepType === "15" && <ApiCall2Step txLinkClick={this.txLinkClick} startTime={startTime} row={row}/>}
+                                {row.step.stepType === "7" && <ThreadSubmitStep txLinkClick={this.txLinkClick} startTime={startTime} row={row}/>}
+                                {row.step.stepType === "17" && <ParameterizedMessageStep txLinkClick={this.txLinkClick} startTime={startTime} row={row}/>}
+                                {row.step.stepType === "12" && <DumpStep txLinkClick={this.txLinkClick} formatter={this.props.formatter} startTime={startTime} row={row}/>}
+                                {row.step.stepType === "13" && <DispatchStep txLinkClick={this.txLinkClick} startTime={startTime} row={row}/>}
+                                {(row.step.stepType === "14" && row.step.threaded === "1") && <ThreadCallPossibleStep txLinkClick={this.txLinkClick} startTime={startTime} row={row}/>}
+                                {row.step.stepType === "11" && <MethodSumStep txLinkClick={this.txLinkClick} startTime={startTime} row={row}/>}
+                                {row.step.stepType === "21" && <SqlSumStep txLinkClick={this.txLinkClick} startTime={startTime} row={row}/>}
+                                {row.step.stepType === "31" && <MessageSumStep txLinkClick={this.txLinkClick} startTime={startTime} row={row}/>}
+                                {row.step.stepType === "42" && <SocketSumStep txLinkClick={this.txLinkClick} startTime={startTime} row={row}/>}
+                                {row.step.stepType === "43" && <ApiCallSumStep txLinkClick={this.txLinkClick} startTime={startTime} row={row}/>}
+                                {row.step.stepType === "99" && <ControlStep txLinkClick={this.txLinkClick} startTime={startTime} row={row}/>}
                             </Step>)
                     })}
                 </div>

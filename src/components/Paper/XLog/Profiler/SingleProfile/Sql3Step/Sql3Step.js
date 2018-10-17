@@ -3,6 +3,7 @@ import './Sql3Step.css';
 import StepGeneral from "../StepGeneral/StepGeneral";
 import sqlFormatter from "sql-formatter";
 import Error from "../Error/Error";
+import TxNavLink from "../TxNavLink/TxNavLink";
 //scouter.lang.step.SqlStep2
 /*
     //scouter.lang.step.SqlStep
@@ -47,6 +48,7 @@ class Sql3Step extends Component {
         return (
             <div className="step sql3-step">
                 <StepGeneral startTime={this.props.startTime} row={this.props.row} elapsed={this.props.row.step.elapsed} type="SQL"/>
+                <TxNavLink txLinkClick={this.props.txLinkClick} row={this.props.row}></TxNavLink>
                 {(isNaN(this.props.row.step.error) || Number(this.props.row.step.error) > 0) && <Error row={this.props.row}></Error>}
                 <div className={"sql-statement " + (this.props.formatter ? 'formatter' : '')} dangerouslySetInnerHTML={{__html: sql}}></div>
                 <div className="sql-param">[{this.props.row.step.param}]</div>

@@ -1,6 +1,7 @@
 import React, {Component} from 'react';
 import './Method2Step.css';
 import StepGeneral from "../StepGeneral/StepGeneral";
+import TxNavLink from "../TxNavLink/TxNavLink";
 import Error from "../Error/Error";
 
 // scouter.lang.step.Method2Step
@@ -29,6 +30,7 @@ class Method2Step extends Component {
         return (
             <div className="step method2-step">
                 <StepGeneral startTime={this.props.startTime} row={this.props.row} elapsed={this.props.row.step.elapsed} type="METHOD"/>
+                <TxNavLink txLinkClick={this.props.txLinkClick} row={this.props.row}></TxNavLink>
                 {(isNaN(this.props.row.step.error) || Number(this.props.row.step.error) > 0) && <Error row={this.props.row}></Error>}
                 <div className="message-content">{methodNameSimple} <span className="gray">[{fullMethod}]</span></div>
             </div>
