@@ -107,12 +107,17 @@ class XLogFilter extends Component {
         this.props.closeFilter(this.props.box.key);        
     };
 
+    openHelp = () => {
+        window.open("https://github.com/scouter-project/scouter/blob/master/scouter.document/views/XLog-Filter.md", "_blank");
+    };
+
     render() {
         return (
             <div className={"xlog-filter-wrapper " + (this.state.small ? "small" : "")} onMouseDown={(e) => {e.stopPropagation();}} onMouseUp={(e) => {e.stopPropagation();}} ref="XLogFilter">
                 <div className="xlog-filter-wrapper-cell">
                     <div className="xlog-filter scrollbar">
                         <div className="xlog-filter-title">XLOG FILTER</div>
+                        <button className="xlog-filter-help-btn" onClick={this.openHelp}><i className="fa fa-question-circle-o" aria-hidden="true"></i></button>
                         <button className="xlog-filter-close-btn" onClick={this.onClose}><i className="fa fa-times-circle-o" aria-hidden="true"></i></button>
                         <div className="xlog-filter-content">
                             <div className="xlog-filter-content-row half">
