@@ -93,6 +93,9 @@ class Topology extends Component {
         super(props);
         let options = this.getTopolopyOptions();
         if (options) {
+            if (options.grouping === undefined) {
+                options.grouping = false;
+            }
             this.state = options;
         } else {
             this.state = {
@@ -103,7 +106,8 @@ class Topology extends Component {
                 distance : 300,
                 zoom : false,
                 pin : false,
-                lastUpdateTime : null
+                lastUpdateTime : null,
+                grouping : false
             }
         }
     }
@@ -353,48 +357,84 @@ class Topology extends Component {
                 let list = msg.result;
                 if (list) {
                     let objectTypeTopologyMap = {};
-                    let cnt = 0;
-                    list.forEach((d) => {
-                        if (that.instances[Number(d.fromObjHash)] && that.instances[Number(d.fromObjHash)].objType) {
-                            d.fromObjType = that.instances[d.fromObjHash].objType;
-                            d.fromObjTypeName = that.instances[d.fromObjHash].objType;
-                            d.fromObjTypeFamily = that.instances[d.fromObjHash].objFamily;
-                            d.fromObjCategory = that.instances[d.fromObjHash].objFamily;
-                        } else {
-                            let typeInfo = that.getUnknownObjectType(d, "from");
-                            d.fromObjType = typeInfo["objType"];
-                            d.fromObjTypeName = typeInfo["objTypeName"];
-                            d.fromObjTypeFamily = null;
-                            d.fromObjCategory = typeInfo["category"];
-                        }
+                    if (that.state.grouping) {
+                        list.forEach((d) => {
+                            if (that.instances[Number(d.fromObjHash)] && that.instances[Number(d.fromObjHash)].objType) {
+                                d.fromObjType = that.instances[d.fromObjHash].objType;
+                                d.fromObjTypeName = that.instances[d.fromObjHash].objType;
+                                d.fromObjTypeFamily = that.instances[d.fromObjHash].objFamily;
+                                d.fromObjCategory = that.instances[d.fromObjHash].objFamily;
+                            } else {
+                                let typeInfo = that.getUnknownObjectType(d, "from");
+                                d.fromObjType = typeInfo["objType"];
+                                d.fromObjTypeName = typeInfo["objTypeName"];
+                                d.fromObjTypeFamily = null;
+                                d.fromObjCategory = typeInfo["category"];
+                            }
 
-                        if (that.instances[Number(d.toObjHash)] && that.instances[Number(d.toObjHash)].objType) {
-                            d.toObjType = that.instances[d.toObjHash].objType;
-                            d.toObjTypeName = that.instances[d.toObjHash].objType;
-                            d.toObjTypeFamily = that.instances[d.toObjHash].objFamily;
-                            d.toObjCategory = that.instances[d.toObjHash].objFamily;
-                        } else {
-                            let typeInfo = that.getUnknownObjectType(d, "to");
-                            d.toObjType = typeInfo["objType"];
-                            d.toObjTypeName = typeInfo["objTypeName"];
-                            d.toObjTypeFamily = null;
-                            d.toObjCategory = typeInfo["category"];
-                        }
+                            if (that.instances[Number(d.toObjHash)] && that.instances[Number(d.toObjHash)].objType) {
+                                d.toObjType = that.instances[d.toObjHash].objType;
+                                d.toObjTypeName = that.instances[d.toObjHash].objType;
+                                d.toObjTypeFamily = that.instances[d.toObjHash].objFamily;
+                                d.toObjCategory = that.instances[d.toObjHash].objFamily;
+                            } else {
+                                let typeInfo = that.getUnknownObjectType(d, "to");
+                                d.toObjType = typeInfo["objType"];
+                                d.toObjTypeName = typeInfo["objTypeName"];
+                                d.toObjTypeFamily = null;
+                                d.toObjCategory = typeInfo["category"];
+                            }
 
-                        if (objectTypeTopologyMap[d.fromObjType + "_" + d.toObjType]) {
-                            cnt++;
-                            objectTypeTopologyMap[d.fromObjType + "_" + d.toObjType].count += Number(d.count);
-                            objectTypeTopologyMap[d.fromObjType + "_" + d.toObjType].errorCount += Number(d.errorCount);
-                            objectTypeTopologyMap[d.fromObjType + "_" + d.toObjType].totalElapsed += Number(d.totalElapsed);
-                        } else {
-                            cnt++;
-                            objectTypeTopologyMap[d.fromObjType + "_" + d.toObjType] = {
-                                fromObjHash: d.fromObjType,
-                                fromObjName: d.fromObjTypeName,
+                            if (objectTypeTopologyMap[d.fromObjType + "_" + d.toObjType]) {
+                                objectTypeTopologyMap[d.fromObjType + "_" + d.toObjType].count += Number(d.count);
+                                objectTypeTopologyMap[d.fromObjType + "_" + d.toObjType].errorCount += Number(d.errorCount);
+                                objectTypeTopologyMap[d.fromObjType + "_" + d.toObjType].totalElapsed += Number(d.totalElapsed);
+                            } else {
+                                objectTypeTopologyMap[d.fromObjType + "_" + d.toObjType] = {
+                                    fromObjHash: d.fromObjType,
+                                    fromObjName: d.fromObjTypeName,
+                                    fromObjTypeFamily: d.fromObjTypeFamily,
+                                    fromObjCategory: d.fromObjCategory,
+                                    toObjHash: d.toObjType,
+                                    toObjName: d.toObjTypeName,
+                                    toObjTypeFamily: d.toObjTypeFamily,
+                                    toObjCategory: d.toObjCategory,
+                                    count: Number(d.count),
+                                    errorCount: Number(d.errorCount),
+                                    period: Number(d.period),
+                                    totalElapsed: Number(d.totalElapsed)
+                                };
+                            }
+                        });
+                    } else {
+                        list.forEach((d) => {
+                            if (that.instances[Number(d.fromObjHash)] && that.instances[Number(d.fromObjHash)].objType) {
+                                d.fromObjCategory = that.instances[d.fromObjHash].objFamily;
+                            } else {
+                                let typeInfo = that.getUnknownObjectType(d, "from");
+                                d.fromObjType = typeInfo["objType"];
+                                d.fromObjTypeName = typeInfo["objTypeName"];
+                                d.fromObjTypeFamily = null;
+                                d.fromObjCategory = typeInfo["category"];
+                            }
+
+                            if (that.instances[Number(d.toObjHash)] && that.instances[Number(d.toObjHash)].objType) {
+                                d.toObjCategory = that.instances[d.toObjHash].objFamily;
+                            } else {
+                                let typeInfo = that.getUnknownObjectType(d, "to");
+                                d.toObjType = typeInfo["objType"];
+                                d.toObjTypeName = typeInfo["objTypeName"];
+                                d.toObjTypeFamily = null;
+                                d.toObjCategory = typeInfo["category"];
+                            }
+
+                            objectTypeTopologyMap[d.fromObjHash + "_" + d.toObjHash] = {
+                                fromObjHash: d.fromObjHash,
+                                fromObjName: d.fromObjName,
                                 fromObjTypeFamily: d.fromObjTypeFamily,
                                 fromObjCategory: d.fromObjCategory,
-                                toObjHash: d.toObjType,
-                                toObjName: d.toObjTypeName,
+                                toObjHash: d.toObjHash,
+                                toObjName: d.toObjName,
                                 toObjTypeFamily: d.toObjTypeFamily,
                                 toObjCategory: d.toObjCategory,
                                 count: Number(d.count),
@@ -402,8 +442,8 @@ class Topology extends Component {
                                 period: Number(d.period),
                                 totalElapsed: Number(d.totalElapsed)
                             };
-                        }
-                    });
+                        });
+                    }
 
                     let topology = [];
                     let outCount = 0;
@@ -1025,6 +1065,10 @@ class Topology extends Component {
             }
         }
 
+        if (property === "grouping") {
+            this.getTopology(this.props.config, this.props.objects, this.props.user);
+        }
+
         this.setState(state);
         if (property === "tpsToLineSpeed") {
             this.setTopolopyOptions(state, property, state[property]);
@@ -1066,6 +1110,11 @@ class Topology extends Component {
                         <div className="summary">{this.links.length} LINKS</div>
                     </div>
                     <div className="right">
+                        <div className="group">
+                            <div className={"check-btn " + (this.state.grouping ? "on" : "off")} onClick={this.checkBtnClick.bind(this, "grouping")}>
+                                <span className="text">GROUPING</span><span className="icon"><i className="fa fa-lightbulb-o" aria-hidden="true"></i></span>
+                            </div>
+                        </div>
                         <div className="group">
                             <div className={"check-btn tps " + (this.state.tpsToLineSpeed ? "on" : "off")} onClick={this.checkBtnClick.bind(this, "tpsToLineSpeed")}>
                                 <span className="text">TPS TO LINE SPEED</span><span className="icon">LINE SPEED</span>

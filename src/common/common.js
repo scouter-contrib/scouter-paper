@@ -2,7 +2,7 @@
 import moment from "moment";
 import jQuery from "jquery";
 import {Dictionary, DictType} from "./dictionary";
-export const version = "2.1.320";
+export const version = "2.2.326";
 
 export function getData(key) {
     let ls = null;

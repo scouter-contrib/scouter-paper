@@ -1,6 +1,7 @@
 import React, {Component} from 'react';
 import './MethodStep.css';
 import StepGeneral from "../StepGeneral/StepGeneral";
+import TxNavLink from "../TxNavLink/TxNavLink";
 
 // scouter.lang.step.MethodStep
 /*
@@ -24,6 +25,7 @@ class MethodStep extends Component {
         return (
             <div className="step method-step">
                 <StepGeneral startTime={this.props.startTime} row={this.props.row} elapsed={this.props.row.step.elapsed} type="METHOD"/>
+                <TxNavLink txLinkClick={this.props.txLinkClick} row={this.props.row}></TxNavLink>
                 <div className="message-content">{methodNameSimple} <span className="gray">[{fullMethod}]</span></div>
             </div>
         )

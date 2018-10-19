@@ -1,6 +1,7 @@
 import React, {Component} from 'react';
 import './ThreadCallPossibleStep.css';
 import StepGeneral from "../StepGeneral/StepGeneral";
+import TxNavLink from "../TxNavLink/TxNavLink";
 
 //scouter.lang.step.ThreadCallPossibleStep
 /*
@@ -27,6 +28,7 @@ class ThreadCallPossibleStep extends Component {
             return (
                 <div className="step thread-call-possible-step">
                     <StepGeneral startTime={this.props.startTime} row={this.props.row} elapsed={this.props.row.step.elapsed} type="THREAD CALL"/>
+                    <TxNavLink txLinkClick={this.props.txLinkClick} row={this.props.row}></TxNavLink>
                     <div className="message-content">{status} {this.props.row.mainValue}</div>
                 </div>)
         } else {

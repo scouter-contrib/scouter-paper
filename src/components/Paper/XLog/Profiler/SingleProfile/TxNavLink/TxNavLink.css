@@ -1,0 +1,27 @@
+.tx-nav-link-wrapper {
+    padding: 10px 5px 0;
+}
+
+.tx-nav-link-wrapper span {
+    padding: 2px 4px;
+    display: inline-block;
+}
+
+
+.tx-nav-link-wrapper > div {
+    margin-right: 5px;
+    display: inline-block;
+    border: 1px solid rgba(0,0,0,0.3);
+    border-radius: 3px;
+}
+
+.tx-nav-link-wrapper .type {
+    border-right: 1px solid rgba(0,0,0,0.3);
+    display: inline-block;
+    text-transform: uppercase;
+}
+
+.tx-nav-link-wrapper .txid {
+    text-decoration: underline;
+    cursor: pointer
+}
