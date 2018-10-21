@@ -17,6 +17,10 @@
     display: inline-block;
 }
 
+.narrow .xlog-steps .message-step .message-content span {
+    padding: 2px 5px;
+}
+
 .xlog-steps .message-step .message-content .type-tag {
     background-color: #28AE7B;
     color: white;
@@ -26,3 +30,4 @@
     width: 40px;
     box-sizing: border-box;
 }
+
