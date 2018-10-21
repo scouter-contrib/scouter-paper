@@ -1,6 +1,17 @@
 .api-call-step .message-content {
-    padding: 9px 5px;
-    color: #FCB514;
+    padding: 9px 15px;
+    color: #1a237e;
+    font-weight: bold;
+    font-size: 11px;
+}
+
+.api-call-step .message-content:before {
+    content:"[CALL] ";
+}
+
+.narrow .api-call-step .message-content {
+    padding: 2px 15px;
+    background-color: #fff9c4;
 }
 
 .api-call-step .message-content > span {

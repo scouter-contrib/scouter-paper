@@ -4,6 +4,11 @@
     color: #0000C3;
 }
 
+.narrow .sql3-step .sql-statement {
+    padding: 3px 10px;
+    line-height: 100%;
+}
+
 .sql3-step .sql-statement .prefix {
     color: darkgreen;
 }
@@ -31,6 +36,11 @@
 }
 
 .sql3-step .sql-param {
+    /*padding: 0 10px 10px;*/
+    padding: 0 10px 2px;
+}
+
+.sql3-step .sql-param .narrow {
     padding: 0 10px 10px;
 }
 

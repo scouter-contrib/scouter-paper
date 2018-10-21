@@ -25,6 +25,10 @@
     display: inline-block;
 }
 
+.narrow .xlog-steps .hashed-message .message-content span {
+    padding: 2px 5px;
+}
+
 .xlog-steps .hashed-message .message-content .type-tag {
     background-color: #28AE7B;
     color: white;

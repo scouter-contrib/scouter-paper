@@ -3,6 +3,9 @@
     color: #FCD116;
 }
 
+.narrow .socket-step .message-content {
+    padding: 2px 5px;
+}
 .socket-step .message-content > span {
 
 }

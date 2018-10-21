@@ -27,17 +27,19 @@ class Profiler extends Component {
         let options = this.getProfilerOptions();
         if (options) {
             options.summary = options.summary === undefined ? true : options.summary;
+            options.narrow = options.narrow === undefined ? false : options.narrow;
             options.indent = options.indent === undefined ? true : options.indent;
             options.bind = options.bind === undefined ? true : options.bind;
-            options.wrap = options.wrap === undefined ? true : options.wrap;
+            options.wrap = options.wrap === undefined ? false : options.wrap;
             options.gap = options.gap === undefined ? true : options.gap;
             options.formatter = options.formatter === undefined ? true : options.formatter;
         } else {
             options = {
                 summary: true,
+                narrow: false,
                 indent: true,
                 bind: true,
-                wrap: true,
+                wrap: false,
                 gap: true,
                 formatter : true
             }
@@ -51,6 +53,7 @@ class Profiler extends Component {
             profile: null,
             steps: null,
             summary: options.summary,
+            narrow: options.narrow,
             indent: options.indent,
             bind: options.bind,
             wrap: options.wrap,
@@ -115,6 +118,10 @@ class Profiler extends Component {
         }
 
         if (nextState.summary !== this.state.summary) {
+            return true;
+        }
+
+        if (nextState.narrow !== this.state.narrow) {
             return true;
         }
 
@@ -463,6 +470,13 @@ class Profiler extends Component {
         this.setProfilerOptions("summary", !this.state.summary);
     };
 
+    toggleNarrow = () => {
+        this.setState({
+            narrow: !this.state.narrow
+        });
+        this.setProfilerOptions("narrow", !this.state.narrow);
+    };
+
     toggleIndent = () => {
         this.setState({
             indent: !this.state.indent
@@ -599,6 +613,7 @@ class Profiler extends Component {
                             {!this.state.txid && this.state.paramTxid  && <div className="title">DETAIL <span className="selected-info">({this.state.paramTxid ? 'TXID : ' + this.state.paramTxid : 'NO PROFILE SELECTED'})</span>{this.state.paramTxid ? <span className="copy-url-btn" onClick={this.copyUrl}>{this.state.copyBtnText}</span> : null}</div>}
                             <div className="profile-steps-control noselect">
                                 <div className={"profile-control-btn " + (this.state.summary ? 'active' : '')} onClick={this.toggleSummary}>{this.state.summary ? <i className="fa fa-check-circle"></i> : <i className="fa fa-circle-o"></i>} SUMMARY</div>
+                                <div className={"profile-control-btn " + (this.state.narrow ? 'active' : '')} onClick={this.toggleNarrow}>{this.state.narrow ? <i className="fa fa-check-circle"></i> : <i className="fa fa-circle-o"></i>} NARROW</div>
                                 <div className={"profile-control-btn " + (this.state.indent ? 'active' : '')} onClick={this.toggleIndent}>{this.state.indent ? <i className="fa fa-check-circle"></i> : <i className="fa fa-circle-o"></i>} INDENT</div>
                                 <div className={"profile-control-btn " + (this.state.bind ? 'active' : '')} onClick={this.toggleBind}>{this.state.bind ? <i className="fa fa-check-circle"></i> : <i className="fa fa-circle-o"></i>} BIND</div>
                                 <div className={"profile-control-btn " + (this.state.wrap ? 'active' : '')} onClick={this.toggleWrap}>{this.state.wrap ? <i className="fa fa-check-circle"></i> : <i className="fa fa-circle-o"></i>} WRAP</div>
@@ -607,9 +622,9 @@ class Profiler extends Component {
                             </div>
                             <div className="close-btn" onClick={this.close}></div>
                         </div>
-                        <div className={"profile-steps"}>
+                        <div className={"profile-steps " + (this.state.narrow ? 'narrow' : '')}>
                             <div className="profile-steps-content scrollbar">
-                                {(this.state.paramTxid || this.state.txid) && <SingleProfile rowClick={this.rowClick} txid={this.state.txid} profile={this.state.profile} steps={this.state.steps} summary={this.state.summary} indent={this.state.indent} bind={this.state.bind} wrap={this.state.wrap} gap={this.state.gap} formatter={this.state.formatter}/>}
+                                {(this.state.paramTxid || this.state.txid) && <SingleProfile rowClick={this.rowClick} txid={this.state.txid} profile={this.state.profile} steps={this.state.steps} summary={this.state.summary} narrow={this.state.narrow} indent={this.state.indent} bind={this.state.bind} wrap={this.state.wrap} gap={this.state.gap} formatter={this.state.formatter}/>}
                                 {(!this.state.paramTxid && !this.state.txid) && <div className="no-profile"><div>NO PROFILE SELECTED</div></div>}
                                 </div>
                         </div>
