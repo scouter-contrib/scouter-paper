@@ -907,7 +907,7 @@ class Topology extends Component {
         // 노드의 인스턴수 수
         this.nodeInstanceCountText = this.nodeInstanceCountTextGroup.selectAll(".node-inst-count").data(nodes);
         this.nodeInstanceCountText.exit().remove();
-        this.nodeInstanceCountText = this.nodeInstanceCountText.enter().append("text").merge(this.nodeInstanceCountText).attr("class", ".node-inst-count")
+        this.nodeInstanceCountText = this.nodeInstanceCountText.enter().append("text").merge(this.nodeInstanceCountText).attr("class", "node-inst-count")
             .style("font-size", this.option.fontSize + "px")
             .style("fill", "#81f33b")
             .text((d) => d.grouping && d.instanceCount > 0 ? d.instanceCount + " instances" : "");
