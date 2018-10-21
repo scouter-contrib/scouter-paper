@@ -1,6 +1,13 @@
 .thread-call-possible-step .message-content {
-    padding: 9px 5px;
-    color: #FCB514;
+    padding: 9px 15px;
+    color: #01579b;
+    font-weight: bold;
+    font-size: 11px;
+}
+
+.narrow .thread-call-possible-step .message-content {
+    padding: 2px 15px;
+    background-color: #ffe0b2;
 }
 
 .thread-call-possible-step .message-content > span {

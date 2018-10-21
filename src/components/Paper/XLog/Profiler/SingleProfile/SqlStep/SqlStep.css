@@ -4,6 +4,11 @@
     color: #0000C3;
 }
 
+.narrow .sql-step .sql-statement {
+    padding: 3px 10px;
+    line-height: 100%;
+}
+
 .sql-step .sql-statement .prefix {
     color: darkgreen;
 }

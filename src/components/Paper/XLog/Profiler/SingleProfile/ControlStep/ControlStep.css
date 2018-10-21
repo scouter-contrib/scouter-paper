@@ -2,3 +2,7 @@
     color: #28AE7B;
     padding: 9px 5px;
 }
+
+.narrow .step-control-step .message-content {
+    padding: 2px 5px;
+}

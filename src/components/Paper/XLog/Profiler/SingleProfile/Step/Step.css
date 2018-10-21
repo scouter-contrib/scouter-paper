@@ -3,6 +3,10 @@
     width: 100%;
 }
 
+.narrow .step-div {
+    margin-top: 2px;
+}
+
 .step-div.has-gab.show-gab {
     margin-top: 0;
 }
@@ -17,6 +21,13 @@
     background-color: #DDD;
     border-radius: 5px;
     margin: 10px 0;
+}
+
+.narrow .step-div .gap-time > div {
+    padding: 0 10px;
+    margin: 3px 0;
+    line-height: 50%;
+    font-weight: bold;
 }
 
 .step-div .gap-time .arrow {

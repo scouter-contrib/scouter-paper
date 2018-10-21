@@ -101,11 +101,11 @@
     background-color: #EEE;
     margin-right: 2px;
     box-sizing: border-box;
-    transition: background-color 0.4s;
+    transition: background-color 5s;
     border-radius: 2px;
 }
 
-.active-speed-wrapper .active-speed-content .row > div.instance-info-div .bar-info .separtor {
+.active-speed-wrapper .active-speed-content .row > div.instance-info-div .bar-info .separator {
     color: #777;
 }
 
