@@ -357,6 +357,8 @@ class Topology extends Component {
                 let list = msg.result;
                 if (list) {
                     let objectTypeTopologyMap = {};
+                    let objToTypeMap = {};
+
                     if (that.state.grouping) {
                         list.forEach((d) => {
                             if (that.instances[Number(d.fromObjHash)] && that.instances[Number(d.fromObjHash)].objType) {
@@ -384,6 +386,11 @@ class Topology extends Component {
                                 d.toObjTypeFamily = null;
                                 d.toObjCategory = typeInfo["category"];
                             }
+
+                            if (!objToTypeMap[d.fromObjHash]) objToTypeMap[d.fromObjHash] = {};
+                            if (!objToTypeMap[d.toObjHash]) objToTypeMap[d.fromObjHash] = {};
+                            objToTypeMap[d.fromObjHash] = d.fromObjType;
+                            objToTypeMap[d.toObjHash] = d.toObjType;
 
                             if (objectTypeTopologyMap[d.fromObjType + "_" + d.toObjType]) {
                                 objectTypeTopologyMap[d.fromObjType + "_" + d.toObjType].count += Number(d.count);
@@ -429,6 +436,7 @@ class Topology extends Component {
                             }
 
                             objectTypeTopologyMap[d.fromObjHash + "_" + d.toObjHash] = {
+                                group: false,
                                 fromObjHash: d.fromObjHash,
                                 fromObjName: d.fromObjName,
                                 fromObjTypeFamily: d.fromObjTypeFamily,
@@ -491,6 +499,11 @@ class Topology extends Component {
                         }
                     })), (d) => {
                         return d.id;
+                    });
+
+                    nodes.forEach((node) => {
+                        node.grouping = that.state.grouping;
+                        node.instanceCount = Object.values(objToTypeMap).filter((d) => d === node.objName).length;
                     });
 
                     let linked = {};
@@ -709,6 +722,10 @@ class Topology extends Component {
                 return this.nodeTypeHover(d, o);
             });
 
+            this.nodeInstanceCountText.transition(500).style('opacity', o => {
+                return this.nodeTypeHover(d, o);
+            });
+
             this.nodeLabel.transition(500).style('opacity', o => {
                 return this.nodeTypeHover(d, o);
             });
@@ -728,6 +745,7 @@ class Topology extends Component {
         if (this.state.highlight) {
             this.node.transition(500).style('opacity', 1.0);
             this.nodeNameText.transition(500).style('opacity', 1.0);
+            this.nodeInstanceCountText.transition(500).style('opacity', 1.0);
             this.nodeLabel.transition(500).style('opacity', 1.0);
             this.edgeTextList.transition(500).style('opacity', 1);
             this.edgeFlowPath.transition(500).style('stroke-opacity', 0.5);
@@ -790,6 +808,7 @@ class Topology extends Component {
             this.edgeTextGroup = this.svg.append("g").attr("class", "edge-text-group");
             this.edgeFlowPathGroup = this.svg.append("g").attr("class", "edge-flow-path-group");
             this.nodeNameTextGroup = this.svg.append("g").attr("class", "node-name-text-group");
+            this.nodeInstanceCountTextGroup = this.svg.append("g").attr("class", "node-instance-count-text-group");
             this.nodeGroup = this.svg.append("g").attr("class", "node-group");
             this.nodeLabelGroup = this.svg.append("g").attr("class", "node-labels");
             this.nodeIconGroup = this.svg.append("g").attr("class", "node-icon-group");
@@ -879,9 +898,19 @@ class Topology extends Component {
         // 노드 아래에 표시되는 명칭
         this.nodeNameText = this.nodeNameTextGroup.selectAll(".node-name").data(nodes);
         this.nodeNameText.exit().remove();
-        this.nodeNameText = this.nodeNameText.enter().append("text").merge(this.nodeNameText).attr("class", "node-name").style("font-size", this.option.fontSize + "px").style("fill", "white").text(function (d) {
-            return d.objName;
-        });
+        this.nodeNameText = this.nodeNameText.enter().append("text").merge(this.nodeNameText).attr("class", "node-name")
+            .style("font-size", (this.option.fontSize + 1) + "px")
+            .style("font-weight", (d) => d.objTypeFamily === "javaee" ? "bold" : "normal")
+            .style("fill", (d) => d.objTypeFamily === "javaee" ? "#ffd600" : "white")
+            .text((d) => d.objName);
+
+        // 노드의 인스턴수 수
+        this.nodeInstanceCountText = this.nodeInstanceCountTextGroup.selectAll(".node-inst-count").data(nodes);
+        this.nodeInstanceCountText.exit().remove();
+        this.nodeInstanceCountText = this.nodeInstanceCountText.enter().append("text").merge(this.nodeInstanceCountText).attr("class", "node-inst-count")
+            .style("font-size", this.option.fontSize + "px")
+            .style("fill", "#81f33b")
+            .text((d) => d.grouping && d.instanceCount > 0 ? d.instanceCount + " instances" : "");
 
         // 노드
         this.node = this.nodeGroup.selectAll(".node").data(nodes);
@@ -978,7 +1007,14 @@ class Topology extends Component {
             const width = this.getComputedTextLength();
             return d.x - (width / 2);
         }).attr("y", function (d) {
-            return d.y + that.r + (that.option.fontSize / 2) + 5;
+            return d.y + that.r + (that.option.fontSize / 2) + 6;
+        });
+
+        this.nodeInstanceCountText.attr("x", function (d) {
+            const width = this.getComputedTextLength();
+            return d.x - (width / 2);
+        }).attr("y", function (d) {
+            return d.y + that.r + (that.option.fontSize / 2) + 17;
         });
 
         // 노드 타입 명칭 상단 가운데 위치 하도록
