@@ -11,10 +11,18 @@
     line-height: 100%;
 }
 
+.narrow .xlog-steps .general > span {
+    padding: 1px 4px;
+}
+
 .xlog-steps .general .index {
     width: 60px;
     padding: 2px 0;
     text-align: center;
+}
+
+.narrow .xlog-steps .general .index {
+    padding: 1px 0;
 }
 
 .xlog-steps .general .type {
@@ -24,15 +32,25 @@
 
 }
 
+/*.xlog-steps .general .start-time {*/
+    /*text-align: center;*/
+    /*!*width: 165px;*!*/
+/*}*/
+
+/*.xlog-steps .general .elapsed {*/
+    /*width: 80px;*/
+    /*text-align: right;*/
+    /*background-color: #EEE;*/
+/*}*/
+
 .xlog-steps .general .start-time {
     text-align: center;
-    width: 165px;
+    background-color: #EEE;
 }
 
 .xlog-steps .general .elapsed {
-    width: 80px;
+    width: 90px;
     text-align: right;
-    background-color: #EEE;
 }
 
 .xlog-steps .general .value {

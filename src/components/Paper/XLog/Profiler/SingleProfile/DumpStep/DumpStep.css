@@ -3,6 +3,10 @@
     padding: 9px 5px;
 }
 
+.narrow .dump-step .message-content {
+    padding: 2px 5px;
+}
+
 .dump-step .message-content.formatter {
     white-space: pre;
 }

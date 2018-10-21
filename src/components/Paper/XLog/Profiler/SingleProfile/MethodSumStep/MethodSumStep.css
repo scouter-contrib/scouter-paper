@@ -3,6 +3,10 @@
     color: #603311;
 }
 
+.narrow .method-sum-step .message-content {
+    padding: 2px 5px;
+}
+
 .method-sum-step .message-content > span {
 
 }

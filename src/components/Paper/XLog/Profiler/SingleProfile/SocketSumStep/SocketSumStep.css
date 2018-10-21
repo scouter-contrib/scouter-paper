@@ -3,6 +3,10 @@
     color: #FCD116;
 }
 
+.narrow .socket-sum-step .message-content {
+    padding: 2px 5px;
+}
+
 .socket-sum-step .message-content > span {
 
 }
