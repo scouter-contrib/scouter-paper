@@ -46,6 +46,14 @@ class Home extends Component {
                         current = text.category[text.category.length - 1];
                         continue;
                     } else {
+                        if (!current) {
+                            text.category.push({
+                                title : "MISC",
+                                lines : []
+                            });
+                            current = text.category[text.category.length - 1];
+                        }
+
                         if (line[0] === "-") {
                             current.lines.push(line.substring(1, line.length - 1));
                         } else {

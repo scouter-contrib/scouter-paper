@@ -1,5 +1,7 @@
 // local storage access
 import moment from "moment";
+import jQuery from "jquery";
+import {Dictionary, DictType} from "./dictionary";
 export const version = "2.2.326";
 
 export function getData(key) {
@@ -90,6 +92,9 @@ export function errorHandler(xhr, textStatus, errorThrown, props) {
                 props.pushMessage("error", "ERROR - " + xhr.responseJSON.resultCode, xhr.responseJSON.message);
                 props.setControlVisibility("Message", true);
             }
+        } else if (xhr.responseText) {
+            props.pushMessage("error", "ERROR - " + xhr.statusText, xhr.responseText);
+            props.setControlVisibility("Message", true);
         }
     }
     else if (xhr.readyState === 0) {
@@ -97,8 +102,13 @@ export function errorHandler(xhr, textStatus, errorThrown, props) {
         props.setControlVisibility("Message", true);
     }
     else {
-        props.pushMessage("error", "ERROR - " + xhr.responseJSON.resultCode, xhr.responseJSON.message);
-        props.setControlVisibility("Message", true);
+        if (xhr.responseJSON) {
+            props.pushMessage("error", "ERROR - " + xhr.responseJSON.resultCode, xhr.responseJSON.message);
+            props.setControlVisibility("Message", true);
+        } else if (xhr.responseText) {
+            props.pushMessage("error", "ERROR - " + xhr.responseJSON.resultCode, xhr.responseJSON.message);
+            props.setControlVisibility("Message", true);
+        }
     }
 }
 
@@ -371,6 +381,57 @@ export function hash(str) {
 	return crc;
 }
 
+export async function getFilteredData0(xlogs, filter, props) {
+    if (!xlogs || xlogs.length < 1) {
+        return xlogs;
+    }
+
+    if (!filter.filtering) {
+        return xlogs;
+    }
+
+    let dicts = new Set();
+    let data = [];
+    let temp = [];
+
+    xlogs.forEach(async xlog => {
+        if(dicts.size > Dictionary.bulkSize) {
+            await Dictionary.record(dicts, props, moment(new Date(Number(data[data.length].endTime))).format("YYYYMMDD"));
+            dicts = new Set();
+            const filtered = getFilteredData(temp);
+            temp = [];
+            data = data.concat(filtered);
+        }
+
+        if (filter.service && filter.service.includes("*") && !Dictionary.contains("service", xlog.service)) {
+            dicts.add(`${DictType.service}:${xlog.service}`);
+        }
+        if (filter.login && filter.login.includes("*") && !Dictionary.contains("login", xlog.login)) {
+            dicts.add( `${DictType.login}:${xlog.login}`);
+        }
+        if (filter.desc && filter.desc.includes("*") && !Dictionary.contains("desc", xlog.desc)) {
+            dicts.add( `${DictType.desc}:${xlog.desc}`);
+        }
+        if (filter.referrer && filter.referrer.includes("*") && !Dictionary.contains("referrer", xlog.referrer)) {
+            dicts.add( `${DictType.referrer}:${xlog.referrer}`);
+        }
+        if (filter.userAgent && filter.userAgent.includes("*") && !Dictionary.contains("userAgent", xlog.userAgent)) {
+            dicts.add( `${DictType.userAgent}:${xlog.userAgent}`);
+        }
+
+        temp.push(xlog);
+    });
+
+    if (dicts.size > 0) {
+        await Dictionary.record(dicts, props, moment(new Date(Number(temp[temp.length - 1].endTime))).format("YYYYMMDD"));
+    }
+    const filtered = getFilteredData(temp, filter);
+    temp = [];
+    data = data.concat(filtered);
+
+    return data;
+}
+
 export function getFilteredData (xlogs, filter) {
     let datas = xlogs;
 
@@ -384,7 +445,11 @@ export function getFilteredData (xlogs, filter) {
         }
 
         if (filter.service) {
-            datas = datas.filter((d) => d.service === String(hash(filter.service)));
+            datas = datas.filter((d) => {
+                return filter.service.includes("*")
+                    ? filter.serviceMatcher.include(Dictionary.find(DictType.service, d.service))
+                    : d.service === String(hash(filter.service));
+            });
         }
 
         if (filter.minElapsedTime) {
@@ -400,15 +465,35 @@ export function getFilteredData (xlogs, filter) {
         }
 
         if (filter.referrer) {
-            datas = datas.filter((d) => d.referrer === String(hash(filter.referrer)));
+            datas = datas.filter((d) => {
+                return filter.referrer.includes("*")
+                    ? filter.referrerMatcher.include(Dictionary.find(DictType.referrer, d.referrer))
+                    : d.referrer === String(hash(filter.referrer));
+            });
         }
 
         if (filter.login) {
-            datas = datas.filter((d) => d.login === String(hash(filter.login)));
+            datas = datas.filter((d) => {
+                return filter.login.includes("*")
+                    ? filter.loginMatcher.include(Dictionary.find(DictType.login, d.login))
+                    : d.login === String(hash(filter.login));
+            });
+        }
+
+        if (filter.desc) {
+            datas = datas.filter((d) => {
+                return filter.desc.includes("*")
+                    ? filter.descMatcher.include(Dictionary.find(DictType.desc, d.desc))
+                    : d.desc === String(hash(filter.desc));
+            });
         }
 
         if (filter.userAgent) {
-            datas = datas.filter((d) => d.userAgent === String(hash(filter.userAgent)));
+            datas = datas.filter((d) => {
+                return filter.userAgent.includes("*")
+                    ? filter.userAgentMatcher.include(Dictionary.find(DictType.userAgent, d.userAgent))
+                    : d.userAgent === String(hash(filter.userAgent));
+            });
         }
         
         switch (filter.type) {

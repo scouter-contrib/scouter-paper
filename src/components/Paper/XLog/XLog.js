@@ -160,11 +160,12 @@ class XLog extends Component {
 
     
 
-    draw = (xlogs, filter) => {
+    draw = async (xlogs, filter) => {
         if (this.refs.xlogViewer && xlogs) {
             let context = d3.select(this.refs.xlogViewer).select("canvas").node().getContext("2d");
             
-            let datas = common.getFilteredData(xlogs, filter);
+            //let datas = common.getFilteredData(xlogs, filter);
+            let datas = await common.getFilteredData0(xlogs, filter, this.props);
             datas.forEach((d, i) => {
                 let x = this.graph.x(d.endTime);
                 let y = this.graph.y(d.elapsed);

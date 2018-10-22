@@ -4,7 +4,19 @@ import {addRequest, setControlVisibility, pushMessage} from '../../../../actions
 import {withRouter} from 'react-router-dom';
 import {connect} from 'react-redux';
 import jQuery from "jquery";
-import {setTxidPropsToUrl, getFilteredData, getHttpProtocol, errorHandler, getWithCredentials, setAuthHeader, getSearchDays, getDivideDays, getParam, getCurrentUser} from '../../../../common/common';
+import {
+    setTxidPropsToUrl,
+    getFilteredData,
+    getHttpProtocol,
+    errorHandler,
+    getWithCredentials,
+    setAuthHeader,
+    getSearchDays,
+    getDivideDays,
+    getParam,
+    getCurrentUser,
+    getFilteredData0
+} from '../../../../common/common';
 import SingleProfile from "./SingleProfile/SingleProfile";
 import ProfileList from "./ProfileList/ProfileList";
 import _ from "lodash";
@@ -253,7 +265,7 @@ class Profiler extends Component {
 
 
     // search의 경우, 마지막 newXLogs가 allXLogs에 들어 있는 문제 있음
-    getListData = (x1, x2, y1, y2, append, filter) => {
+    getListData = async (x1, x2, y1, y2, append, filter) => {
         let that = this;
         let allXLogs = that.props.xlogs;
         let newXLogs = that.props.newXLogs;
@@ -292,7 +304,7 @@ class Profiler extends Component {
 
         }
 
-        filtered = getFilteredData(filtered, filter);
+        filtered = await getFilteredData0(filtered, filter);
 
         let date = moment(new Date(x1)).format("YYYYMMDD");
 
