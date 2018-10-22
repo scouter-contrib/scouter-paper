@@ -149,3 +149,7 @@
     cursor: pointer
 }
 
+.single-profile .tx-nav .tx-link .elapsed {
+    border-left: 1px solid rgba(0,0,0,0.3);
+}
+

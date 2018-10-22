@@ -10,6 +10,7 @@ import ProfileList from "./ProfileList/ProfileList";
 import _ from "lodash";
 import moment from "moment";
 import copy from 'copy-to-clipboard';
+import {IdAbbr} from "../../../../common/idAbbr";
 //import {disableBodyScroll, enableBodyScroll} from 'body-scroll-lock';
 
 const xlogMaxSelectionCount = 200;
@@ -17,6 +18,7 @@ const xlogMaxSelectionCount = 200;
 class Profiler extends Component {
 
     txidInit = false;
+
     constructor(props) {
         super(props);
 
@@ -41,7 +43,7 @@ class Profiler extends Component {
                 bind: true,
                 wrap: false,
                 gap: true,
-                formatter : true
+                formatter: true
             }
         }
 
@@ -59,11 +61,11 @@ class Profiler extends Component {
             wrap: options.wrap,
             gap: options.gap,
             formatter: options.formatter,
-            listWidth : 40,
-            smallScreen : false,
-            paramTxid : txid ? txid : null,
-            paramTxidDate : txiddate ? txiddate : null,
-            copyBtnText : "COPY URL"
+            listWidth: 40,
+            smallScreen: false,
+            paramTxid: txid ? txid : null,
+            paramTxidDate: txiddate ? txiddate : null,
+            copyBtnText: "COPY URL"
         };
     }
 
@@ -162,7 +164,7 @@ class Profiler extends Component {
 
         if (this.state.smallScreen !== smallScreen) {
             this.setState({
-                smallScreen : smallScreen
+                smallScreen: smallScreen
             })
         }
     };
@@ -192,7 +194,7 @@ class Profiler extends Component {
                     });
 
                     this.rowClick({
-                        txid : this.state.paramTxid
+                        txid: this.state.paramTxid
                     }, this.state.paramTxidDate);
                 }
 
@@ -241,7 +243,7 @@ class Profiler extends Component {
             });
 
             for (let i = 0; i < fromTos.length; i++) {
-                this.getListData(fromTos[i].from, fromTos[i].to , y1, y2, true, filter);
+                this.getListData(fromTos[i].from, fromTos[i].to, y1, y2, true, filter);
             }
 
         } else {
@@ -263,7 +265,7 @@ class Profiler extends Component {
                 .filter(x => x1 <= x.endTime * 1 && x.endTime * 1 <= x2 && y1 <= x.elapsed * 1 && x.elapsed * 1 <= y2)
                 .take(xlogMaxSelectionCount).value();
 
-            let last =  xlogMaxSelectionCount - filtered1.length;
+            let last = xlogMaxSelectionCount - filtered1.length;
             let filtered2 = [];
             if (last > 0) {
                 filtered2 = _(newXLogs)
@@ -354,7 +356,7 @@ class Profiler extends Component {
             txid: null,
             profile: null,
             steps: null,
-            paramTxid : null,
+            paramTxid: null,
             paramTxidDate: null
         });
 
@@ -391,8 +393,7 @@ class Profiler extends Component {
             });
         }
 
-        let tdate = (txiddate ? txiddate : moment(new Date(Number(xlog.endTime))).format("YYYYMMDD"));
-        setTxidPropsToUrl(this.props, tdate, xlog.txid);
+        const tdate = (txiddate ? txiddate : moment(new Date(Number(xlog.endTime))).format("YYYYMMDD"));
 
         // XLOG DATA
         this.props.setControlVisibility("Loading", true);
@@ -406,50 +407,59 @@ class Profiler extends Component {
                 setAuthHeader(xhr, that.props.config, getCurrentUser(that.props.config, that.props.user));
             }
         }).done((msg) => {
-            this.setState({
-                profile: msg.result
-            });
+            if (msg.result) {
+                setTxidPropsToUrl(this.props, tdate, xlog.txid);
+                msg.result.txidAbbr = IdAbbr.abbr(msg.result.txid);
 
-            // Profile Data
-            this.props.addRequest();
-            jQuery.ajax({
-                method: "GET",
-                async: true,
-                url: getHttpProtocol(this.props.config) + '/scouter/v1/profile-data/' + (txiddate ? txiddate : moment(new Date(Number(xlog.endTime))).format("YYYYMMDD")) + "/" + xlog.txid,
-                xhrFields: getWithCredentials(that.props.config),
-                beforeSend: function (xhr) {
-                    setAuthHeader(xhr, that.props.config, getCurrentUser(that.props.config, that.props.user));
-                }
-            }).done((msg) => {
-                const orderedSteps = _.orderBy(msg.result, (e) => Number(e.step.order), ['asc']);
-                this.addIndentPropertyTo(orderedSteps);
-
-                const eos = {
-                    mainValue: "end of service",
-                    additionalValueList: [],
-                    step: {
-                        parent: "-1",
-                        index: orderedSteps.length + 1,
-                        start_time: this.state.profile &&this.state.profile.elapsed,
-                        start_cpu: "0",
-                        message: "end of service",
-                        stepType: "3",
-                        order: orderedSteps.length + 1,
-                        stepTypeName: "MESSAGE"
-                    }
-                };
-                orderedSteps.push(eos);
                 this.setState({
-                    steps: orderedSteps
+                    profile: msg.result
                 });
 
-            }).fail((xhr, textStatus, errorThrown) => {
-                errorHandler(xhr, textStatus, errorThrown, this.props);
-            }).always(() => {
-                this.props.setControlVisibility("Loading", false);
-            });
+                // Profile Data
+                this.props.addRequest();
+                jQuery.ajax({
+                    method: "GET",
+                    async: true,
+                    url: getHttpProtocol(this.props.config) + '/scouter/v1/profile-data/' + (txiddate ? txiddate : moment(new Date(Number(xlog.endTime))).format("YYYYMMDD")) + "/" + xlog.txid,
+                    xhrFields: getWithCredentials(that.props.config),
+                    beforeSend: function (xhr) {
+                        setAuthHeader(xhr, that.props.config, getCurrentUser(that.props.config, that.props.user));
+                    }
+                }).done((msg) => {
+                    const orderedSteps = _.orderBy(msg.result, (e) => Number(e.step.order), ['asc']);
+                    this.addIndentPropertyTo(orderedSteps);
+                    this.addTxidAbbrPropertyTo(orderedSteps)
+
+                    const eos = {
+                        mainValue: "end of service",
+                        additionalValueList: [],
+                        step: {
+                            parent: "-1",
+                            index: orderedSteps.length + 1,
+                            start_time: this.state.profile && this.state.profile.elapsed,
+                            start_cpu: "0",
+                            message: "end of service",
+                            stepType: "3",
+                            order: orderedSteps.length + 1,
+                            stepTypeName: "MESSAGE"
+                        }
+                    };
+                    orderedSteps.push(eos);
+                    this.setState({
+                        steps: orderedSteps
+                    });
+
+                }).fail((xhr, textStatus, errorThrown) => {
+                    errorHandler(xhr, textStatus, errorThrown, this.props);
+                }).always(() => {
+                    this.props.setControlVisibility("Loading", false);
+                });
+            }
+
         }).fail((xhr, textStatus, errorThrown) => {
             errorHandler(xhr, textStatus, errorThrown, this.props);
+            this.props.setControlVisibility("Loading", false);
+        }).always(() => {
             this.props.setControlVisibility("Loading", false);
         });
     };
@@ -460,6 +470,14 @@ class Profiler extends Component {
             const indent = indentMap.hasOwnProperty(v.step.parent) ? indentMap[v.step.parent] + 1 : 0;
             indentMap[v.step.index] = indent;
             v.step.indent = indent;
+        });
+    }
+
+    addTxidAbbrPropertyTo(steps) {
+        steps.forEach((v) => {
+            if (v.step.txid) {
+                v.step.txidAbbr = IdAbbr.abbr(v.step.txid);
+            }
         });
     }
 
@@ -540,7 +558,7 @@ class Profiler extends Component {
         }
 
         this.setState({
-            listWidth : listWidth
+            listWidth: listWidth
         });
     };
 
@@ -554,12 +572,12 @@ class Profiler extends Component {
         copy(window.location.href);
 
         this.setState({
-            copyBtnText : "COPIED!"
+            copyBtnText: "COPIED!"
         });
 
         setTimeout(() => {
             this.setState({
-                copyBtnText : "COPY URL"
+                copyBtnText: "COPY URL"
             });
         }, 2000);
     };
@@ -571,26 +589,39 @@ class Profiler extends Component {
         if (!this.state.paramTxid) {
             if (this.state.smallScreen) {
                 if (this.state.txid) {
-                    leftStyle = {width : "100%", display : "none"};
-                    rightStyle= {width : "100%", display : "inline-block"};
+                    leftStyle = {width: "100%", display: "none"};
+                    rightStyle = {width: "100%", display: "inline-block"};
                 } else {
-                    leftStyle = {width : "100%", display : "inline-block"};
-                    rightStyle= {width : "100%", display : "none"};
+                    leftStyle = {width: "100%", display: "inline-block"};
+                    rightStyle = {width: "100%", display: "none"};
                 }
             } else {
-                leftStyle = {width : this.state.listWidth + "%", display : this.state.listWidth === 0 ? "none" : "inline-block"};
-                rightStyle = {width : (100 - this.state.listWidth) + "%", display : this.state.listWidth === 100 ? "none" : "inline-block"}
+                leftStyle = {
+                    width: this.state.listWidth + "%",
+                    display: this.state.listWidth === 0 ? "none" : "inline-block"
+                };
+                rightStyle = {
+                    width: (100 - this.state.listWidth) + "%",
+                    display: this.state.listWidth === 100 ? "none" : "inline-block"
+                }
             }
         }
 
         return (
-            <div className={"xlog-profiler " + (this.state.paramTxid ? 'param-mode ' : ' ') + (this.state.show ? ' ' : 'hidden')}>
+            <div
+                className={"xlog-profiler " + (this.state.paramTxid ? 'param-mode ' : ' ') + (this.state.show ? ' ' : 'hidden')}>
                 <div>
                     <div className="size-control-btns">
-                        {!this.state.paramTxid && <button onClick={this.changeListWidth.bind(this, "min")}><i className="fa fa-angle-double-left"></i></button>}
-                        {!this.state.paramTxid && <button onClick={this.changeListWidth.bind(this, "small")}><i className="fa fa-angle-left"></i></button>}
-                        {!this.state.paramTxid && <button onClick={this.changeListWidth.bind(this, "big")}><i className="fa fa-angle-right"></i></button>}
-                        {!this.state.paramTxid && <button onClick={this.changeListWidth.bind(this, "max")}><i className="fa fa-angle-double-right"></i></button>}
+                        {!this.state.paramTxid && <button onClick={this.changeListWidth.bind(this, "min")}><i
+                            className="fa fa-angle-double-left"></i></button>}
+                        {!this.state.paramTxid &&
+                        <button onClick={this.changeListWidth.bind(this, "small")}><i className="fa fa-angle-left"></i>
+                        </button>}
+                        {!this.state.paramTxid &&
+                        <button onClick={this.changeListWidth.bind(this, "big")}><i className="fa fa-angle-right"></i>
+                        </button>}
+                        {!this.state.paramTxid && <button onClick={this.changeListWidth.bind(this, "max")}><i
+                            className="fa fa-angle-double-right"></i></button>}
                         <div className="close-btn" onClick={this.close}></div>
                     </div>
                     {!this.state.paramTxid &&
@@ -607,10 +638,18 @@ class Profiler extends Component {
                     }
                     <div className="profiler-layout right" style={rightStyle}>
                         <div className="summary">
-                            {(!this.state.paramTxid && this.state.smallScreen) && <div onClick={this.clearTxId.bind(this)} className="profile-list-btn"><i className="fa fa-chevron-circle-left"></i></div>}
-                            {!this.state.txid  && <div className="title">NO PROFILE SELECTED</div>}
-                            {this.state.txid  && <div className="title">DETAIL <span className="selected-info">({this.state.txid ? 'TXID : ' + this.state.txid : 'NO PROFILE SELECTED'})</span>{this.state.txid ? <span className="copy-url-btn" onClick={this.copyUrl}>{this.state.copyBtnText}</span> : null}</div>}
-                            {!this.state.txid && this.state.paramTxid  && <div className="title">DETAIL <span className="selected-info">({this.state.paramTxid ? 'TXID : ' + this.state.paramTxid : 'NO PROFILE SELECTED'})</span>{this.state.paramTxid ? <span className="copy-url-btn" onClick={this.copyUrl}>{this.state.copyBtnText}</span> : null}</div>}
+                            {(!this.state.paramTxid && this.state.smallScreen) &&
+                            <div onClick={this.clearTxId.bind(this)} className="profile-list-btn"><i
+                                className="fa fa-chevron-circle-left"></i></div>}
+                            {!this.state.txid && <div className="title">NO PROFILE SELECTED</div>}
+                            {this.state.txid && <div className="title">DETAIL <span
+                                className="selected-info">({this.state.txid ? 'TXID : ' + this.state.txid : 'NO PROFILE SELECTED'})</span>{this.state.txid ?
+                                <span className="copy-url-btn"
+                                      onClick={this.copyUrl}>{this.state.copyBtnText}</span> : null}</div>}
+                            {!this.state.txid && this.state.paramTxid && <div className="title">DETAIL <span
+                                className="selected-info">({this.state.paramTxid ? 'TXID : ' + this.state.paramTxid : 'NO PROFILE SELECTED'})</span>{this.state.paramTxid ?
+                                <span className="copy-url-btn"
+                                      onClick={this.copyUrl}>{this.state.copyBtnText}</span> : null}</div>}
                             <div className="profile-steps-control noselect">
                                 <div className={"profile-control-btn " + (this.state.summary ? 'active' : '')} onClick={this.toggleSummary}>{this.state.summary ? <i className="fa fa-check-circle"></i> : <i className="fa fa-circle-o"></i>} SUMMARY</div>
                                 <div className={"profile-control-btn " + (this.state.narrow ? 'active' : '')} onClick={this.toggleNarrow}>{this.state.narrow ? <i className="fa fa-check-circle"></i> : <i className="fa fa-circle-o"></i>} NARROW</div>
@@ -624,9 +663,16 @@ class Profiler extends Component {
                         </div>
                         <div className={"profile-steps " + (this.state.narrow ? 'narrow' : '')}>
                             <div className="profile-steps-content scrollbar">
-                                {(this.state.paramTxid || this.state.txid) && <SingleProfile rowClick={this.rowClick} txid={this.state.txid} profile={this.state.profile} steps={this.state.steps} summary={this.state.summary} narrow={this.state.narrow} indent={this.state.indent} bind={this.state.bind} wrap={this.state.wrap} gap={this.state.gap} formatter={this.state.formatter}/>}
-                                {(!this.state.paramTxid && !this.state.txid) && <div className="no-profile"><div>NO PROFILE SELECTED</div></div>}
-                                </div>
+                                {(this.state.paramTxid || this.state.txid) &&
+                                <SingleProfile rowClick={this.rowClick} txid={this.state.txid}
+                                               profile={this.state.profile} steps={this.state.steps}
+                                               summary={this.state.summary} narrow={this.state.narrow} indent={this.state.indent}
+                                               bind={this.state.bind} wrap={this.state.wrap} gap={this.state.gap}
+                                               formatter={this.state.formatter}/>}
+                                {(!this.state.paramTxid && !this.state.txid) && <div className="no-profile">
+                                    <div>NO PROFILE SELECTED</div>
+                                </div>}
+                            </div>
                         </div>
                     </div>
                 </div>

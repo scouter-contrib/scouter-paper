@@ -27,13 +27,20 @@ import {withRouter} from 'react-router-dom';
 import * as d3 from "d3";
 import numeral from "numeral";
 import moment from "moment";
+import {IdAbbr} from "../../../../../common/idAbbr";
 
 const profileMetas = [
+    {
+        key: "txidAbbr",
+        name: "TXID(Abbr)",
+        type: "string",
+        show: true
+    },
     {
         key: "txid",
         name: "TXID",
         type: "string",
-        show: true
+        show: false
     },
     {
         key: "service",
@@ -245,6 +252,42 @@ const profileMetas = [
     }
 ];
 
+const stepMeta = {
+    6: {
+        name: "apicall",
+        getNavName: (step) => "CALL API"
+    },
+    15: {
+        name: "apicall2",
+        getNavName: (step) => "CALL API"
+    },
+    7: {
+        name: "threadSubmit",
+        getNavName: (step) => "CALL THREAD"
+    },
+    13: {
+        name: "dispatch",
+        getNavName: (step) => "CALL THREAD"
+    },
+    14: {
+        name: "threadCallPossible",
+        getNavName: (step) => {
+            if(step.threaded === "1") {
+                return "CALL THREAD";
+            } else {
+                return undefined;
+            }
+        }
+    }
+};
+
+// public final static byte APICALL = 6;
+// public final static byte APICALL2 = 15;
+//
+// public final static byte THREAD_SUBMIT = 7;
+// public final static byte DISPATCH = 13;
+// public final static byte THREAD_CALL_POSSIBLE = 14;
+
 class SingleProfile extends Component {
 
     dateFormat = null;
@@ -265,6 +308,7 @@ class SingleProfile extends Component {
         if (0 !== Number(gxid) && gxid) {
             flow.main.push({
                 id : gxid,
+                idx : IdAbbr.abbr(gxid),
                 type : gxid === txid ? "current" : "start",
                 endtime : endtime
             });
@@ -273,6 +317,7 @@ class SingleProfile extends Component {
         if (caller && Number(caller) !== 0 && gxid !== caller) {
             flow.main.push({
                 id : caller,
+                idx : IdAbbr.abbr(caller),
                 type : gxid === txid ? "self" : "caller",
                 endtime : endtime
             });
@@ -281,18 +326,21 @@ class SingleProfile extends Component {
         if (txid !== gxid) {
             flow.main.push({
                 id : txid,
+                idx : IdAbbr.abbr(txid),
                 type : "current",
                 endtime : endtime
             });
         }
 
         steps && steps.forEach((d, i) => {
-
-            if (d.step.txid) {
+            const meta = stepMeta[d.step.stepType];
+            if (d.step.txid && meta && meta.getNavName(d.step)) {
                 flow.sub.push({
                     id : d.step.txid,
-                    type : "callee",
-                    endtime : endtime
+                    idx : IdAbbr.abbr(d.step.txid),
+                    type : meta.getNavName(d.step),
+                    endtime : endtime,
+                    elapsed : d.step.elapsed
                 });
             }
         });
@@ -330,7 +378,7 @@ class SingleProfile extends Component {
                                     {i !== 0 && <div className="arrow"><i className="fa fa-long-arrow-right" aria-hidden="true"></i></div>}
                                     <div className={"tx-link " + d.type}>
                                         <span className="type">{d.type}</span>
-                                        <span className="txid" onClick={this.txNavClick.bind(this, d.id, d.endtime)}>{d.id}</span>
+                                        <span className="txid" onClick={this.txNavClick.bind(this, d.id, d.endtime)}>{d.idx}</span>
                                     </div>
                                 </div>
                             )
@@ -343,7 +391,8 @@ class SingleProfile extends Component {
                                     <div className="arrow"><i className="fa fa-long-arrow-right" aria-hidden="true"></i></div>
                                     <div className="tx-link">
                                         <span className="type">{d.type}</span>
-                                        <span className="txid" onClick={this.txNavClick.bind(this, d.id, d.endtime)}>{d.id}</span>
+                                        <span className="txid" onClick={this.txNavClick.bind(this, d.id, d.endtime)}>{d.idx}</span>
+                                        {d.elapsed >= 0 && <span className="elapsed">{d.elapsed} ms</span>}
                                     </div>
                                 </div>
                             )
