@@ -1,0 +1,21 @@
+.span-step .message-content {
+    color: #5B59BA;
+    padding: 9px 5px;
+}
+
+.narrow .span-step .message-content {
+    padding: 2px 5px;
+}
+
+.span-step .message-content .gray {
+    color: #AAAAAA;
+}
+
+.span-step .message-content.tag:before {
+    content:"   -> ";
+}
+
+.span-step .message-content.tag {
+    font-weight: normal;
+    color: #AAAAAA;
+}

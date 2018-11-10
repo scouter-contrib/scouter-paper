@@ -1,0 +1,28 @@
+.spancall-step .message-content {
+    padding: 9px 15px;
+    color: #1a237e;
+    font-weight: bold;
+    font-size: 11px;
+}
+
+.spancall-step .message-content.url:before {
+    content:"[CALL] ";
+}
+
+.spancall-step .message-content.tag:before {
+    content:"   -> ";
+}
+
+.narrow .spancall-step .message-content {
+    padding: 2px 15px;
+}
+
+.spancall-step .message-content.url {
+    background-color: #fff9c4;
+}
+
+.spancall-step .message-content.tag {
+    font-weight: normal;
+    color: #AAAAAA;
+}
+
