@@ -263,6 +263,10 @@ const stepMeta = {
         name: "apicall2",
         getNavName: (step) => "CALL API"
     },
+    52: {
+        name: "spancall",
+        getNavName: (step) => "CALL SPAN"
+    },
     7: {
         name: "threadSubmit",
         getNavName: (step) => "CALL THREAD"
