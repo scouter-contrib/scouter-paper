@@ -2,6 +2,8 @@ import React, {Component} from 'react';
 import './SingleProfile.css';
 import HashedMessageStep from "./HashedMessageStep/HashedMessageStep";
 import MethodStep from "./MethodStep/MethodStep";
+import SpanStep from "./SpanStep/SpanStep";
+import SpanCallStep from "./SpanCallStep/SpanCallStep";
 import SqlStep from "./SqlStep/SqlStep";
 import MessageStep from "./MessageStep/MessageStep";
 import SocketStep from "./SocketStep/SocketStep";
@@ -261,6 +263,10 @@ const stepMeta = {
         name: "apicall2",
         getNavName: (step) => "CALL API"
     },
+    52: {
+        name: "spancall",
+        getNavName: (step) => "CALL SPAN"
+    },
     7: {
         name: "threadSubmit",
         getNavName: (step) => "CALL THREAD"
@@ -434,6 +440,8 @@ class SingleProfile extends Component {
                                 {row.step.stepType === "2" && <SqlStep txLinkClick={this.txLinkClick} narrow={this.props.narrow} startTime={startTime} row={row}/>}
                                 {row.step.stepType === "8" && <Sql2Step txLinkClick={this.txLinkClick} narrow={this.props.narrow} startTime={startTime} row={row}/>}
                                 {row.step.stepType === "1" && <MethodStep txLinkClick={this.txLinkClick} narrow={this.props.narrow} startTime={startTime} row={row}/>}
+                                {row.step.stepType === "51" && <SpanStep txLinkClick={this.txLinkClick} narrow={this.props.narrow} startTime={startTime} row={row}/>}
+                                {row.step.stepType === "52" && <SpanCallStep txLinkClick={this.txLinkClick} narrow={this.props.narrow} startTime={startTime} row={row}/>}
                                 {row.step.stepType === "10" && <Method2Step txLinkClick={this.txLinkClick} narrow={this.props.narrow} startTime={startTime} row={row}/>}
                                 {row.step.stepType === "3" && <MessageStep txLinkClick={this.txLinkClick} narrow={this.props.narrow} startTime={startTime} row={row}/>}
                                 {row.step.stepType === "5" && <SocketStep txLinkClick={this.txLinkClick} narrow={this.props.narrow} startTime={startTime} row={row}/>}
