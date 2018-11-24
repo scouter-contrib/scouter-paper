@@ -440,8 +440,8 @@ class SingleProfile extends Component {
                                 {row.step.stepType === "2" && <SqlStep txLinkClick={this.txLinkClick} narrow={this.props.narrow} startTime={startTime} row={row}/>}
                                 {row.step.stepType === "8" && <Sql2Step txLinkClick={this.txLinkClick} narrow={this.props.narrow} startTime={startTime} row={row}/>}
                                 {row.step.stepType === "1" && <MethodStep txLinkClick={this.txLinkClick} narrow={this.props.narrow} startTime={startTime} row={row}/>}
-                                {row.step.stepType === "51" && <SpanStep txLinkClick={this.txLinkClick} narrow={this.props.narrow} startTime={startTime} row={row}/>}
-                                {row.step.stepType === "52" && <SpanCallStep txLinkClick={this.txLinkClick} narrow={this.props.narrow} startTime={startTime} row={row}/>}
+                                {row.step.stepType === "51" && <SpanStep txLinkClick={this.txLinkClick} formatter={this.props.formatter} narrow={this.props.narrow} startTime={startTime} row={row}/>}
+                                {row.step.stepType === "52" && <SpanCallStep txLinkClick={this.txLinkClick} formatter={this.props.formatter} narrow={this.props.narrow} startTime={startTime} row={row}/>}
                                 {row.step.stepType === "10" && <Method2Step txLinkClick={this.txLinkClick} narrow={this.props.narrow} startTime={startTime} row={row}/>}
                                 {row.step.stepType === "3" && <MessageStep txLinkClick={this.txLinkClick} narrow={this.props.narrow} startTime={startTime} row={row}/>}
                                 {row.step.stepType === "5" && <SocketStep txLinkClick={this.txLinkClick} narrow={this.props.narrow} startTime={startTime} row={row}/>}

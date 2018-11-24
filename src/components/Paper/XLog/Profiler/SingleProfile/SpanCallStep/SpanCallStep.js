@@ -3,6 +3,7 @@ import './SpanCallStep.css';
 import StepGeneral from "../StepGeneral/StepGeneral";
 import TxNavLink from "../TxNavLink/TxNavLink";
 import Error from "../Error/Error";
+import JSONPretty from 'react-json-pretty';
 /*
     public int hash;
     public int elapsed;
@@ -34,7 +35,6 @@ import Error from "../Error/Error";
  */
 class SpanCallStep extends Component {
     render() {
-        console.log(this.props.row);
         const step = this.props.row.step;
 
         let localEndpoint = step.localEndpoint.serviceName ? JSON.stringify(step.localEndpoint) : null;
@@ -47,15 +47,31 @@ class SpanCallStep extends Component {
                 <StepGeneral startTime={this.props.startTime} row={this.props.row} elapsed={this.props.row.step.elapsed} type="SPANCALL"/>
                 <TxNavLink txLinkClick={this.props.txLinkClick} row={this.props.row}></TxNavLink>
                 {(isNaN(this.props.row.step.error) || Number(this.props.row.step.error) > 0) && <Error row={this.props.row}></Error>}
-                <div className="message-content url">{this.props.row.mainValue} {'[addr] ' + this.props.row.step.address}</div>
+                <div className="main-value url">{this.props.row.mainValue} {'[addr] ' + this.props.row.step.address}</div>
                 {(localEndpoint) &&
-                <div className="message-content tag">localEndPoint: {localEndpoint}</div>}
+                <div className="span-content">
+                    <div className="span-title">localEndPoint</div>
+                    {this.props.formatter && <div className="span-value"><JSONPretty json={localEndpoint}></JSONPretty></div>}
+                    {!this.props.formatter && <div className="span-value">{localEndpoint}</div>}
+                </div>}
                 {(remoteEndpoint) &&
-                <div className="message-content tag">remoteEndPoint: {localEndpoint}</div>}
+                <div className="span-content">
+                    <div className="span-title">remoteEndPoint</div>
+                    {this.props.formatter && <div className="span-value"><JSONPretty json={remoteEndpoint}></JSONPretty></div>}
+                    {!this.props.formatter && <div className="span-value">{remoteEndpoint}</div>}
+                </div>}
                 {(tags) &&
-                <div className="message-content tag">tags: {tags}</div>}
+                <div className="span-content">
+                    <div className="span-title">tags</div>
+                    {this.props.formatter && <div className="span-value"><JSONPretty json={tags}></JSONPretty></div>}
+                    {!this.props.formatter && <div className="span-value">{tags}</div>}
+                </div>}
                 {(annotations) &&
-                <div className="message-content tag">annotations: {annotations}</div>}
+                <div className="span-content">
+                    <div className="span-title">annotations</div>
+                    {this.props.formatter && <div className="span-value"><JSONPretty json={annotations}></JSONPretty></div>}
+                    {!this.props.formatter && <div className="span-value">{annotations}</div>}
+                </div>}
             </div>
         )
     }

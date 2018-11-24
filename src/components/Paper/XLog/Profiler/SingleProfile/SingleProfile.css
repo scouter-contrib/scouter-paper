@@ -146,10 +146,15 @@
 
 .single-profile .tx-nav .tx-link .txid {
     text-decoration: underline;
-    cursor: pointer
+    cursor: pointer;
+    min-width: 50px;
+    display: inline-block;
+    box-sizing: border-box;
 }
 
 .single-profile .tx-nav .tx-link .elapsed {
     border-left: 1px solid rgba(0,0,0,0.3);
+    min-width: 50px;
+    display: inline-block;
+    box-sizing: border-box;
 }
-

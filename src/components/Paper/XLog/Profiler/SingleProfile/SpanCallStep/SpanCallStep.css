@@ -1,28 +1,46 @@
-.spancall-step .message-content {
-    padding: 9px 15px;
+.spancall-step .main-value {
     color: #1a237e;
+    padding: 9px 5px 0;
     font-weight: bold;
-    font-size: 11px;
 }
 
-.spancall-step .message-content.url:before {
-    content:"[CALL] ";
+.narrow .spancall-step .main-value {
+    padding: 2px 10px;
 }
 
-.spancall-step .message-content.tag:before {
-    content:"   -> ";
+.spancall-step .main-value .gray {
+    color: #AAAAAA;
 }
 
-.narrow .spancall-step .message-content {
-    padding: 2px 15px;
-}
-
-.spancall-step .message-content.url {
-    background-color: #fff9c4;
-}
-
-.spancall-step .message-content.tag {
+.spancall-step .main-value.tag {
     font-weight: normal;
     color: #AAAAAA;
 }
 
+.spancall-step .span-content pre {
+    font-family: inherit !important;
+    margin: 0;
+}
+
+.spancall-step .span-content {
+    margin-top: 10px;
+}
+
+.spancall-step .span-content:last-child {
+    margin-bottom: 10px;
+}
+
+.spancall-step .span-content .span-title {
+    padding: 0 5px 0;
+    background-color: #EEE;
+    display: inline-block;
+    margin-left: 5px;
+}
+
+.spancall-step .span-content .span-value {
+    padding: 2px 5px 0;
+}
+
+.spancall-step .main-value.url:before {
+    content: "[CALL] ";
+}
