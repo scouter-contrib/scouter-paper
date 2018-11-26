@@ -21,6 +21,7 @@ export const SET_REAL_TIME_RANGE_STEP_VALUE = 'SET_REAL_TIME_RANGE_STEP_VALUE';
 export const SET_RANGE_DATE_HOURS_MINUTES_VALUE = 'SET_RANGE_DATE_HOURS_MINUTES_VALUE';
 export const SET_RANGE_ALL = 'SET_RANGE_ALL';
 export const SET_COUNTER_INFO = 'SET_COUNTER_INFO';
+export const SET_CONTROLLER_STATE = 'SET_CONTROLLER_STATE';
 
 export function setConfig(config) {
     return {
@@ -205,6 +206,13 @@ export function setSupported(value) {
     return {
         type: SET_SUPPORTED,
         supported: value
+    };
+}
+
+export function setControllerState(state) {
+    return {
+        type: SET_CONTROLLER_STATE,
+        state: state
     };
 }
 

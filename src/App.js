@@ -11,7 +11,9 @@ import {
     Login,
     Overlay,
     Message,
-    ContentWrapper
+    ContentWrapper,
+    Logo,
+    Navigator
 } from './components';
 import {Route, Switch} from 'react-router-dom';
 import {connect} from 'react-redux';
@@ -36,6 +38,7 @@ import Home from "./components/Home/Home";
 import Topology from "./components/Topology/Topology";
 import * as common from "./common/common";
 import Debug from "./components/Debug/Debug";
+import Controller from "./components/Controller/Controller";
 
 const browser = detect();
 const support = (browser.name !== "ie" && browser.name !== "edge");
@@ -355,6 +358,11 @@ class App extends Component {
                     <Loading visible={this.props.control.Loading}></Loading>
                     {this.state.debug && <Debug closeDebug={this.closeDebug}/>}
                 </ContentWrapper>
+                }
+                {support && <Controller>
+                    <Logo></Logo>
+                    <Navigator></Navigator>
+                </Controller>
                 }
                 {!support && <Unsupport name={browser.name} version={browser.version}/>}
             </div>

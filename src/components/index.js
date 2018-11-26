@@ -16,6 +16,8 @@ import Settings from './Settings/Settings';
 import InstanceInfo from './Menu/InstanceInfo/InstanceInfo';
 import InstanceSelector from './Menu/InstanceSelector/InstanceSelector';
 import XLogFilter from './Paper/XLogFilter/XLogFilter';
+import Logo from './Logo/Logo';
+import Navigator from './Navigator/Navigator';
 
 export {
     ContentWrapper,
@@ -35,5 +37,7 @@ export {
     Settings,
     InstanceInfo,
     InstanceSelector,
-    XLogFilter
+    XLogFilter,
+    Logo,
+    Navigator
 };

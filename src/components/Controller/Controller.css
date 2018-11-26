@@ -1,0 +1,16 @@
+.controller-wrapper {
+    position: fixed;
+    top : 0;
+    left : 0;
+    bottom : 0;
+    width: 400px;
+    background-color: rgba(0,0,0,0.3);
+    background-color: #282828;
+    z-index: 30;
+    transition: width 0.3s;
+}
+
+.controller-wrapper.min {
+    width: 40px;
+    transition: width 0.3s;
+}

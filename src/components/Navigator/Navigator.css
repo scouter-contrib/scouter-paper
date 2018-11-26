@@ -1,0 +1,97 @@
+.navigator-wrapper {
+    padding: 0;
+    position: relative;
+    font-family: 'Bungee', sans-serif;
+    background-color: rgba(255, 255, 255, 0.2);
+    background-color: #191919;
+    height: 50px;
+    box-sizing: border-box;
+}
+
+.min .navigator-wrapper {
+    height: auto;
+}
+
+.navigator-wrapper .navigator {
+    color: white;
+    margin: 0 auto;
+    font-weight: normal;
+    box-sizing: border-box;
+    text-align: center;
+    display: table;
+    height: 100%;
+}
+
+.min .navigator-wrapper .navigator {
+    display: block;
+    height: auto;
+}
+
+.navigator-wrapper .navigator > div {
+    display: table-cell;
+    vertical-align: middle;
+}
+
+.min .navigator-wrapper .navigator > div {
+    display: block;
+}
+
+.navigator-wrapper .navigator a.menu-item {
+    display: inline-block;
+    color: #AAA;
+    padding: 0 10px;
+    cursor: pointer;
+    box-sizing: border-box;
+    position: relative;
+    text-decoration: none;
+    -webkit-touch-callout: none;
+    -webkit-user-select: none;
+    -moz-user-select: none;
+    -ms-user-select: none;
+    user-select: none;
+    font-size: 10px;
+}
+
+.min .navigator-wrapper .navigator a.menu-item {
+    padding: 10px 0;
+}
+
+.min .navigator-wrapper .navigator a.menu-item .text {
+    display: none;
+}
+
+.navigator-wrapper .navigator .menu-item:hover {
+    color: #DDD;
+}
+
+.navigator-wrapper .navigator .menu-item.active {
+    color: white;
+    color: #FFCC11;
+}
+
+navigator-wrapper .navigator .menu-item.active:hover {
+    color: white;
+    color: #FFCC11;
+}
+
+.navigator-wrapper .navigator .menu-item .icon {
+    text-align: center;
+    box-sizing: border-box;
+    font-size: 16px;
+}
+
+.navigator-wrapper .menu-instance-selector {
+    display: inline-block;
+    padding-top: 10px;
+    font-size: 10px;
+    float: right;
+    margin-right: 10px;
+}
+
+.navigator-wrapper .layout-manager-selector {
+    display: inline-block;
+    padding-top: 10px;
+    font-size: 10px;
+    float: right;
+    margin-right: 10px;
+}
