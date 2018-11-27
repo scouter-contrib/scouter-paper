@@ -13,7 +13,8 @@ import {
     Message,
     ContentWrapper,
     Logo,
-    Navigator
+    Navigator,
+    ObjectSelector
 } from './components';
 import {Route, Switch} from 'react-router-dom';
 import {connect} from 'react-redux';
@@ -362,6 +363,8 @@ class App extends Component {
                 {support && <Controller>
                     <Logo></Logo>
                     <Navigator></Navigator>
+                    <ObjectSelector></ObjectSelector>
+
                 </Controller>
                 }
                 {!support && <Unsupport name={browser.name} version={browser.version}/>}

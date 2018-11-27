@@ -104,10 +104,19 @@ class Navigator extends Component {
                     {(getDefaultServerConfig(this.props.config).authentification !== "none") &&
                     <div>
                         <NavLink className={"menu-item " + (this.state.menu === "login" ? "active" : "")} to={"/login" + instanceParam} activeClassName="active" onClick={this.menuClick.bind(this, "/login")}>
+                            {(user && user.id) &&
                             <div>
-                                {(user && user.id) ? <div className="text"></div> : <div className="icon"><i className="fa fa-handshake-o" aria-hidden="true"></i></div>}
-                                {(user && user.id) ? <div className="text"><i className="fa fa-child login-icon" aria-hidden="true"></i></div> : <div>LOGIN</div>}
+                                <div className="icon"><i className="fa fa-child" aria-hidden="true"></i></div>
+                                <div className="text">USER</div>
                             </div>
+                            }
+                            {!(user && user.id) &&
+                            <div>
+                                <div className="icon"><i className="fa fa-handshake-o" aria-hidden="true"></i></div>
+                                <div className="text">LOGIN</div>
+                            </div>
+                            }
+
                         </NavLink>
                     </div>
                     }

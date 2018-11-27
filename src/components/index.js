@@ -18,6 +18,8 @@ import InstanceSelector from './Menu/InstanceSelector/InstanceSelector';
 import XLogFilter from './Paper/XLogFilter/XLogFilter';
 import Logo from './Logo/Logo';
 import Navigator from './Navigator/Navigator';
+import ObjectSelector from './ObjectSelector/ObjectSelector';
+import ApiServerSelector from './ObjectSelector/ApiServerSelector/ApiServerSelector';
 
 export {
     ContentWrapper,
@@ -39,5 +41,7 @@ export {
     InstanceSelector,
     XLogFilter,
     Logo,
-    Navigator
+    Navigator,
+    ObjectSelector,
+    ApiServerSelector
 };
