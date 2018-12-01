@@ -47,6 +47,18 @@ class Topology extends Component {
             text: "\uf15c",
             color: "#a42122"
         },
+        KAFKA: {
+            fontFamily: "Glyphter",
+            fontSize: "18px",
+            text: "\u004a",
+            color: "#000000"
+        },
+        RABBITMQ: {
+            fontFamily: "Glyphter",
+            fontSize: "18px",
+            text: "\u0049",
+            color: "#F55708"
+        },
         DB: {
             fontFamily: "technology-icons",
             fontSize: "18px",
@@ -316,7 +328,26 @@ class Topology extends Component {
                 }
                 break;
             }
+            case "INTR_KAFKA_CALL" : {
+                result["objType"] = "KAFKA" + data[position + "ObjHash"];
+                result["objTypeName"] = "KAFKA";
+                if (position === "from") {
 
+                } else {
+                    result["category"] = "KAFKA";
+                }
+                break;
+            }
+            case "INTR_RABBITMQ_CALL" : {
+                result["objType"] = "RABBITMQ" + data[position + "ObjHash"];
+                result["objTypeName"] = "RABBITMQ";
+                if (position === "from") {
+
+                } else {
+                    result["category"] = "RABBITMQ";
+                }
+                break;
+            }
             case "INTR_DB_CALL" : {
                 result["objType"] = "DB" + data[position + "ObjHash"];
                 result["objTypeName"] = data[position + "ObjName"];
