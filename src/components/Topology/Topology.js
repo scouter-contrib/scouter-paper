@@ -320,7 +320,8 @@ class Topology extends Component {
             }
             case "INTR_REDIS_CALL" : {
                 result["objType"] = "REDIS" + data[position + "ObjHash"];
-                result["objTypeName"] = "REDIS";
+                const redisName = data[position + "ObjName"] || "-";
+                result["objTypeName"] = redisName.length > 1 ? redisName : "REDIS";
                 if (position === "from") {
 
                 } else {
@@ -330,7 +331,8 @@ class Topology extends Component {
             }
             case "INTR_KAFKA_CALL" : {
                 result["objType"] = "KAFKA" + data[position + "ObjHash"];
-                result["objTypeName"] = "KAFKA";
+                const kafkaName = data[position + "ObjName"] || "-";
+                result["objTypeName"] = kafkaName.length > 1 ? kafkaName : "KFAKA";
                 if (position === "from") {
 
                 } else {
@@ -340,7 +342,8 @@ class Topology extends Component {
             }
             case "INTR_RABBITMQ_CALL" : {
                 result["objType"] = "RABBITMQ" + data[position + "ObjHash"];
-                result["objTypeName"] = "RABBITMQ";
+                const rabbitName = data[position + "ObjName"] || "-";
+                result["objTypeName"] = rabbitName.length > 1 ? rabbitName : "RABBITMQ";
                 if (position === "from") {
 
                 } else {
