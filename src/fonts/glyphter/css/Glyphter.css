@@ -9,7 +9,7 @@
     font-weight: normal;
     font-style: normal;
 }
-[class*='icon-']:before{
+[class*='gcon-']:before{
 	display: inline-block;
    font-family: 'Glyphter';
    font-style: normal;
@@ -18,5 +18,5 @@
    -webkit-font-smoothing: antialiased;
    -moz-osx-font-smoothing: grayscale
 }
-.icon-rabbitmq:before{content:'\0049';}
-.icon-apache_kafka:before{content:'\004a';}
+.gcon-rabbitmq:before{content:'\0049';}
+.gcon-apache_kafka:before{content:'\004a';}
