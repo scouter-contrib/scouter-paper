@@ -1,5 +1,5 @@
 .menu-div {
-    padding: 5px 0 0;
+    padding: 4px 0 0;
     position: relative;
     background-color: #207ce5;
     font-family: 'Bungee', sans-serif;
@@ -16,7 +16,6 @@
 
 .menu {
     color: white;
-    max-width: 1600px;
     margin: 0 auto;
     font-weight: normal;
     box-sizing: border-box;
@@ -91,7 +90,7 @@
 .menu a.menu-item {
     display: inline-block;
     color: #CCC;
-    padding: 15px 10px;
+    padding: 10px 10px;
     cursor: pointer;
     border-bottom: 4px solid transparent;
     transition: border-bottom-colo, colorr 0.3s;

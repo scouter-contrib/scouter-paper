@@ -3,12 +3,526 @@ import './Controller.css';
 import {setControllerState} from '../../actions';
 import {connect} from 'react-redux';
 import {withRouter} from 'react-router-dom';
+import Logo from "../Logo/Logo";
+import SimpleSelector from "../SimpleSelector/SimpleSelector";
+import InstanceSelector from "../Menu/InstanceSelector/InstanceSelector";
+import AgentColor from "../../common/InstanceColor";
+import {getDefaultServerConfig, getDefaultServerConfigIndex, setServerTimeGap, setRangePropsToUrl, getHttpProtocol, errorHandler, getWithCredentials, setAuthHeader, getCurrentUser} from '../../common/common';
+import {
+    addRequest,
+    pushMessage,
+    setTarget,
+    clearAllMessage,
+    setControlVisibility,
+    setConfig
+} from '../../actions';
+import jQuery from "jquery";
+
 
 class Controller extends Component {
+
+    constructor(props) {
+        super(props);
+        this.state = {
+            servers: [],
+            activeServerId: null,
+            objects: [],
+            selectedObjects: {},
+            filter: "",
+            loading : false,
+            selector: false
+        };
+    }
+
+    componentDidMount() {
+        if (getDefaultServerConfig(this.props.config).authentification !== "bearer") {
+            this.setTargetFromUrl(this.props);
+        } else {
+            let defaultServerconfig = getDefaultServerConfig(this.props.config);
+            let origin = defaultServerconfig.protocol + "://" + defaultServerconfig.address + ":" + defaultServerconfig.port;
+            if (this.props.config || (this.props.user[origin] && this.props.user[origin].id)) {
+                this.setTargetFromUrl(this.props);
+            }
+        }
+    }
+
+    componentWillReceiveProps(nextProps) {
+        if (nextProps.user.id) {
+            this.setTargetFromUrl(nextProps);
+        }
+
+        if (JSON.stringify(this.props.user) !== JSON.stringify(nextProps.user)) {
+            this.getServers(nextProps.config);
+        }
+
+    }
+
+    componentDidUpdate(prevProps, prevState) {
+        if (this.state.selector && prevState.selector !== this.state.selector) {
+            if (!this.state.servers || this.state.servers.length < 1) {
+                this.getServers(this.props.config);
+            }
+        }
+    }
+
+    toggleSelectorVisible = () => {
+        this.setState({
+            selector: !this.state.selector
+        });
+    };
+
+    onChangeScouterServer = (inx) => {
+        let config = JSON.parse(JSON.stringify(this.props.config));
+
+        for (let i = 0; i < config.servers.length; i++) {
+            if (i === inx) {
+                config.servers[i].default = true;
+            } else {
+                config.servers[i].default = false;
+            }
+        }
+
+        this.props.setConfig(config);
+        this.getServers(config);
+        if (localStorage) {
+            localStorage.setItem("config", JSON.stringify(config));
+        }
+
+        this.props.setTarget([], []);
+        this.setState({
+            servers: [],
+            objects: [],
+            activeServerId: null,
+            selectedObjects: {},
+            filter: ""
+        });
+
+    };
+
+    setObjects = () => {
+        let objects = [];
+        for (let hash in this.state.selectedObjects) {
+            objects.push(this.state.selectedObjects[hash]);
+        }
+
+        if (objects.length < 1) {
+            this.props.pushMessage("info", "NO MONITORING TARGET", "At least one object must be selected");
+            this.props.setControlVisibility("Message", true);
+        } else {
+            objects.sort((a, b) => a.objName < b.objName ? -1 : 1);
+            AgentColor.setInstances(objects, this.props.config.colorType);
+            this.props.setTarget(objects);
+            this.props.setControlVisibility("TargetSelector", false);
+            setRangePropsToUrl(this.props, undefined, objects);
+            this.toggleSelectorVisible();
+        }
+    };
+
+    instanceClick = (instance) => {
+
+        let selectedObjects = Object.assign({}, this.state.selectedObjects);
+        if (selectedObjects[instance.objHash]) {
+            delete selectedObjects[instance.objHash];
+        } else {
+            selectedObjects[instance.objHash] = instance;
+        }
+
+        let selectedObjectCount = 0;
+        for (let attr in selectedObjects) {
+            for (let i = 0; i < this.state.objects.length; i++) {
+                if (this.state.objects[i].objHash === attr) {
+                    selectedObjectCount++;
+                }
+            }
+        }
+
+        let servers = this.state.servers;
+        for (let i = 0; i < servers.length; i++) {
+            if (servers[i].id === this.state.activeServerId) {
+                servers[i].selectedObjectCount = selectedObjectCount;
+            }
+        }
+
+        this.setState({
+            servers: servers,
+            selectedObjects: selectedObjects
+        });
+    };
+
+
+    onServerClick = (serverId) => {
+        let that = this;
+        this.props.addRequest();
+        jQuery.ajax({
+            method: "GET",
+            async: true,
+            url: getHttpProtocol(this.props.config) + '/scouter/v1/object?serverId=' + serverId,
+            xhrFields: getWithCredentials(that.props.config),
+            beforeSend: function (xhr) {
+                setAuthHeader(xhr, that.props.config, getCurrentUser(that.props.config, that.props.user));
+            },
+        }).done((msg) => {
+            if (msg.result) {
+                that.setState({
+                    activeServerId: serverId
+                });
+
+                const objects = msg.result;
+                console.log(objects)
+                if (objects) {
+                    objects.sort((a, b) => a.objName < b.objName ? -1 : 1);
+                    this.setState({
+                        objects: msg.result
+                    });
+                }
+            }
+        }).fail((xhr, textStatus, errorThrown) => {
+            errorHandler(xhr, textStatus, errorThrown, that.props);
+        });
+    };
+
+
+
+
+
+
+    setTargetFromUrl = (props) => {
+
+        let that = this;
+
+        if (!this.init) {
+            this.props.addRequest();
+            jQuery.ajax({
+                method: "GET",
+                async: true,
+                url: getHttpProtocol(props.config) + '/scouter/v1/info/server',
+                xhrFields: getWithCredentials(props.config),
+                beforeSend: function (xhr) {
+                    setAuthHeader(xhr, props.config, getCurrentUser(props.config, props.user));
+                }
+            }).done((msg) => {
+
+                if (msg && msg.result) {
+                    that.init = true;
+                    let servers = msg.result;
+
+                    if (servers.length > 0) {
+                        if (!servers[0].version) {
+                            props.pushMessage("error", "Not Supported", "Paper 2.0 is available only on Scout Server 2.0 and later.");
+                            props.setControlVisibility("Message", true);
+                            return;
+                        }
+                    }
+
+                    //현재 멀티서버와 연결된 scouter webapp은 지원하지 않으므로 일단 단일 서버로 가정하고 마지막 서버 시간과 맞춘다.
+                    servers.forEach((server) => {
+                        setServerTimeGap(Number(server.serverTime) - new Date().valueOf());
+                    });
+
+                    // GET INSTANCES INFO FROM URL IF EXISTS
+                    let objectsParam = new URLSearchParams(this.props.location.search).get('objects');
+                    if(!objectsParam) {
+                        objectsParam = new URLSearchParams(this.props.location.search).get('instances');
+                    }
+                    let urlObjectHashes = null;
+                    if (objectsParam) {
+                        urlObjectHashes = objectsParam.split(",");
+                        if (urlObjectHashes) {
+                            urlObjectHashes = urlObjectHashes.map((d) => {
+                                return Number(d)
+                            });
+                        }
+                    }
+
+                    if (urlObjectHashes) {
+                        let selectedObjects = [];
+                        let objects = [];
+                        let activeServerId = null;
+                        servers.forEach((server) => {
+                            //일단 단일 서버로 가정하고 서버 시간과 맞춘다.
+                            setServerTimeGap(Number(server.serverTime) - new Date().valueOf());
+
+                            jQuery.ajax({
+                                method: "GET",
+                                async: false,
+                                url: getHttpProtocol(this.props.config) + '/scouter/v1/object?serverId=' + server.id,
+                                xhrFields: getWithCredentials(props.config),
+                                beforeSend: function (xhr) {
+                                    setAuthHeader(xhr, props.config, getCurrentUser(props.config, props.user));
+                                }
+                            }).done(function (msg) {
+                                objects = msg.result;
+
+                                if (objects && objects.length > 0) {
+                                    objects = objects
+                                        .filter(instance => {
+                                            return (instance.objName.match(new RegExp("/", "g")) || []).length < 3;
+                                        });
+
+                                    objects.forEach((instance) => {
+                                        urlObjectHashes.forEach((objHash) => {
+                                            if (objHash === Number(instance.objHash)) {
+                                                selectedObjects.push(instance);
+                                                if (!server.selectedObjectCount) {
+                                                    server.selectedObjectCount = 0;
+                                                }
+                                                server.selectedObjectCount++;
+                                                // 마지막으로 찾은 서버 ID로 세팅
+                                                activeServerId = server.id;
+                                            }
+                                        });
+                                    })
+                                }
+                            }).fail(function (xhr, textStatus, errorThrown) {
+                                errorHandler(xhr, textStatus, errorThrown, that.props);
+                            });
+                        });
+
+                        if (selectedObjects.length > 0) {
+                            selectedObjects.sort((a, b) => a.objName < b.objName ? -1 : 1);
+
+                            let selectedObjectMap = {};
+                            for (let i = 0; i < selectedObjects.length; i++) {
+                                selectedObjectMap[selectedObjects[i].objHash] = selectedObjects[i];
+                            }
+
+                            this.setState({
+                                servers: servers,
+                                objects: objects,
+                                activeServerId: activeServerId,
+                                selectedObjects: selectedObjectMap
+                            });
+
+                            AgentColor.setInstances(selectedObjects, this.props.config.colorType);
+                            this.props.setTarget(selectedObjects);
+
+                        } else {
+                            this.setState({
+                                servers: servers
+                            });
+                        }
+
+                    } else {
+                        this.setState({
+                            servers: servers
+                        });
+                    }
+                }
+
+            }).fail((xhr, textStatus, errorThrown) => {
+                errorHandler(xhr, textStatus, errorThrown, that.props);
+            });
+        }
+    };
+
+    getServers = (config) => {
+
+        let that = this;
+        this.props.addRequest();
+
+        this.setState({
+            loading : true
+        });
+
+        jQuery.ajax({
+            method: "GET",
+            async: true,
+            url: getHttpProtocol(config) + '/scouter/v1/info/server'
+        }).done((msg) => {
+
+            console.log("get");
+            let servers = msg.result;
+            let activeServerId = null;
+            if (servers.length > 0) {
+                if (!servers[0].version) {
+                    activeServerId = 0;
+                    this.props.pushMessage("error", "Not Supported", "Paper 2.0 is available only on Scout Server 2.0 and later.");
+                    this.props.setControlVisibility("Message", true);
+                }
+            }
+
+            this.setState({
+                servers: servers,
+                objects: [],
+                activeServerId: activeServerId,
+                selectedObjects: {},
+                filter: ""
+            });
+        }).fail((xhr, textStatus, errorThrown) => {
+            this.setState({
+                servers: [],
+                objects: [],
+                activeServerId: null,
+                selectedObjects: {},
+                filter: ""
+            });
+            errorHandler(xhr, textStatus, errorThrown, that.props);
+        }).always(() => {
+            this.setState({
+                loading : false
+            });
+        });
+
+    };
+
+    quickSelect = (filteredObjects) => {
+        let isAllSelected = true;
+        for (let i = 0; i < filteredObjects.length; i++) {
+            if (!this.state.selectedObjects[filteredObjects[i].objHash]) {
+                isAllSelected = false;
+                break;
+            }
+        }
+
+        let selectedObjects = Object.assign({}, this.state.selectedObjects);
+        if (isAllSelected) {
+            for (let i = 0; i < filteredObjects.length; i++) {
+                if (this.state.selectedObjects[filteredObjects[i].objHash]) {
+                    delete selectedObjects[filteredObjects[i].objHash];
+                }
+            }
+        } else {
+            for (let i = 0; i < filteredObjects.length; i++) {
+                if (!this.state.selectedObjects[filteredObjects.objHash]) {
+                    selectedObjects[filteredObjects[i].objHash] = filteredObjects[i];
+                }
+            }
+        }
+
+        let selectedObjectCount = 0;
+        for (let attr in selectedObjects) {
+            for (let i = 0; i < this.state.objects.length; i++) {
+                if (this.state.objects[i].objHash === attr) {
+                    selectedObjectCount++;
+                }
+            }
+        }
+
+        let servers = this.state.servers.slice(0);
+        for (let i = 0; i < servers.length; i++) {
+            if (servers[i].id === this.state.activeServerId) {
+                servers[i].selectedObjectCount = selectedObjectCount;
+            }
+        }
+
+        this.setState({
+            servers: servers,
+            selectedObjects: selectedObjects
+        });
+    }
+
+    quickSelectByTypeClick = (type) => {
+        let filteredObjects;
+        if (type === "all") {
+            filteredObjects = this.state.objects.filter((object) => {
+                return true;
+            });
+        } else {
+            filteredObjects = this.state.objects.filter((object) => {
+                return type === this.getIconOrObjectType(object);
+            });
+        }
+        this.quickSelect(filteredObjects);
+    };
+
+    getIconOrObjectType = (instance) => {
+        let objType = this.props.counterInfo.objTypesMap[instance.objType];
+        let icon;
+        if (objType) {
+            icon = objType.icon ? objType.icon : instance.objType;
+        }
+
+        return icon;
+    };
+
+    selectAll = () => {
+        let filteredObjects = this.state.objects.filter((object) => {
+            if (this.state.filter && this.state.filter.length > 1) {
+                if ((object.objType && object.objType.toLowerCase().indexOf(this.state.filter.toLowerCase()) > -1) || (object.objName && object.objName.toLowerCase().indexOf(this.state.filter.toLowerCase()) > -1) || (object.address && object.address.toLowerCase().indexOf(this.state.filter.toLowerCase()) > -1)) {
+                    return true;
+                } else {
+                    return false;
+                }
+            } else {
+                return true;
+            }
+        });
+
+        this.quickSelect(filteredObjects);
+    };
+
+    onFilterChange = (filter) => {
+        this.setState({
+            filter: filter
+        });
+    };
+
+    clearFilter = () => {
+        this.setState({
+            filter: ""
+        });
+    };
+
     render() {
+
+        console.log(this.state.selectedObjects);
         return (
             <article className={"controller-wrapper " + this.props.control.Controller}>
-                <div>{this.props.children}</div>
+                <Logo></Logo>
+
+                <div className="control-item first">
+                    <div className="row desc">
+                        <div className="step"><span>1</span></div>
+                        <div className="row-message">SELECT API SERVER</div>
+                    </div>
+                    <div className="row control">
+                        <div>
+                            <SimpleSelector selected={getDefaultServerConfigIndex(this.props.config)} list={this.props.config.servers} onChange={this.onChangeScouterServer}></SimpleSelector>
+                        </div>
+                    </div>
+                </div>
+
+                <div className="control-item">
+                    <div className="row desc">
+                        <div className="step"><span>2</span></div>
+                        <div className="row-message">SELECT TARGET OBJECTS</div>
+                    </div>
+                    <div className="row control">
+                        <div>
+                            <div className="object-navigator-btn">
+                                <span>NO SELECTED</span>
+                                <span className="popup-icon" onClick={this.toggleSelectorVisible}><i className="fa fa-crosshairs" aria-hidden="true"></i></span>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <div className="control-item">
+                    <div className="row desc">
+                        <div className="step"><span>3</span></div>
+                        <div className="row-message">APPLY FILTER</div>
+                    </div>
+                </div>
+
+                <div className="control-item">
+                    <div className="row desc">
+                        <div className="step"><span>4</span></div>
+                        <div className="row-message">CHANGE LAYOUT</div>
+                    </div>
+                </div>
+
+                <InstanceSelector onFilterChange={this.onFilterChange} clearFilter={this.clearFilter} quickSelectByTypeClick={this.quickSelectByTypeClick} selectAll={this.selectAll} servers={this.state.servers}
+                                  activeServerId={this.state.activeServerId}
+                objects={this.state.objects}
+                selectedObjects={this.state.selectedObjects}
+                filter={this.state.filter}
+                loading={this.state.loading}
+                                  onServerClick={this.onServerClick}
+                                  instanceClick={this.instanceClick}
+                                  setObjects={this.setObjects}
+
+                visible={this.state.selector} toggleSelectorVisible={this.toggleSelectorVisible}/>
+
             </article>
         );
     }
@@ -16,13 +530,24 @@ class Controller extends Component {
 
 let mapStateToProps = (state) => {
     return {
-        control: state.control
+        control: state.control,
+        objects: state.target.objects,
+        counterInfo: state.counterInfo,
+        config: state.config,
+        user: state.user,
+        range: state.range
     };
 };
 
 let mapDispatchToProps = (dispatch) => {
     return {
-        setControllerState: (state) => dispatch(setControllerState(state))
+        setControllerState: (state) => dispatch(setControllerState(state)),
+        setTarget: (objects) => dispatch(setTarget(objects)),
+        setControlVisibility: (name, value) => dispatch(setControlVisibility(name, value)),
+        clearAllMessage: () => dispatch(clearAllMessage()),
+        pushMessage: (category, title, content) => dispatch(pushMessage(category, title, content)),
+        addRequest: () => dispatch(addRequest()),
+        setConfig: (config) => dispatch(setConfig(config)),
     };
 };
 

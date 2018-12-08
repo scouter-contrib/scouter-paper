@@ -15,7 +15,7 @@ import {getHttpProtocol, errorHandler, getWithCredentials, setAuthHeader, getCur
 import 'url-search-params-polyfill';
 import * as common from '../../../common/common'
 import * as PaperIcons from '../../../common/PaperIcons'
-import AgentColor from "../../../common/InstanceColor";
+
 import InnerLoading from "../../InnerLoading/InnerLoading";
 
 class InstanceSelector extends Component {
@@ -24,381 +24,31 @@ class InstanceSelector extends Component {
 
     constructor(props) {
         super(props);
-        this.state = {
-            servers: [],
-            activeServerId: null,
-            objects: [],
-            selectedObjects: {},
-            filter: "",
-            loading : false
-        };
-    }
-
-    componentDidMount() {
-        if (common.getDefaultServerConfig(this.props.config).authentification !== "bearer") {
-            this.setTargetFromUrl(this.props);
-        } else {
-            let defaultServerconfig = common.getDefaultServerConfig(this.props.config);
-            let origin = defaultServerconfig.protocol + "://" + defaultServerconfig.address + ":" + defaultServerconfig.port;
-            if (this.props.config || (this.props.user[origin] && this.props.user[origin].id)) {
-                this.setTargetFromUrl(this.props);
-            }
-        }
-    }
-
-    componentWillReceiveProps(nextProps) {
-        if (nextProps.user.id) {
-            this.setTargetFromUrl(nextProps);
-        }
-
-        if (JSON.stringify(this.props.user) !== JSON.stringify(nextProps.user)) {
-            this.getServers(nextProps.config);
-        }
 
     }
 
-    onFilterChange = (event) => {
-        this.setState({
-            filter: event.target.value
-        });
-    };
-
-    clearFilter = () => {
-        this.setState({
-            filter: ""
-        });
-    };
-
-    selectAll = () => {
-        let filteredObjects = this.state.objects.filter((object) => {
-            if (this.state.filter && this.state.filter.length > 1) {
-                if ((object.objType && object.objType.toLowerCase().indexOf(this.state.filter.toLowerCase()) > -1) || (object.objName && object.objName.toLowerCase().indexOf(this.state.filter.toLowerCase()) > -1) || (object.address && object.address.toLowerCase().indexOf(this.state.filter.toLowerCase()) > -1)) {
-                    return true;
-                } else {
-                    return false;
-                }
-            } else {
-                return true;
-            }
-        });
-
-        let isAllSelected = true;
-        for (let i = 0; i < filteredObjects.length; i++) {
-            if (!this.state.selectedObjects[filteredObjects[i].objHash]) {
-                isAllSelected = false;
-                break;
-            }
-        }
-
-        let selectedObjects = Object.assign({}, this.state.selectedObjects);
-        if (isAllSelected) {
-            for (let i = 0; i < filteredObjects.length; i++) {
-                if (this.state.selectedObjects[filteredObjects[i].objHash]) {
-                    delete selectedObjects[filteredObjects[i].objHash];
-                }
-            }
-        } else {
-            for (let i = 0; i < filteredObjects.length; i++) {
-                if (!this.state.selectedObjects[filteredObjects.objHash]) {
-                    selectedObjects[filteredObjects[i].objHash] = filteredObjects[i];
-                }
-            }
-        }
-
-        let selectedObjectCount = 0;
-        for (let attr in selectedObjects) {
-            for (let i = 0; i < this.state.objects.length; i++) {
-                if (this.state.objects[i].objHash === attr) {
-                    selectedObjectCount++;
-                }
-            }
-        }
-
-        let servers = this.state.servers.slice(0);
-        for (let i = 0; i < servers.length; i++) {
-            if (servers[i].id === this.state.activeServerId) {
-                servers[i].selectedObjectCount = selectedObjectCount;
-            }
-        }
-
-        this.setState({
-            servers: servers,
-            selectedObjects: selectedObjects
-        });
-    };
-
-    setTargetFromUrl = (props) => {
-
-        let that = this;
-
-        if (!this.init) {
-            this.props.addRequest();
-            jQuery.ajax({
-                method: "GET",
-                async: true,
-                url: getHttpProtocol(props.config) + '/scouter/v1/info/server',
-                xhrFields: getWithCredentials(props.config),
-                beforeSend: function (xhr) {
-                    setAuthHeader(xhr, props.config, getCurrentUser(props.config, props.user));
-                }
-            }).done((msg) => {
-
-                if (msg && msg.result) {
-                    that.init = true;
-                    let servers = msg.result;
-
-                    if (servers.length > 0) {
-                        if (!servers[0].version) {
-                            props.pushMessage("error", "Not Supported", "Paper 2.0 is available only on Scout Server 2.0 and later.");
-                            props.setControlVisibility("Message", true);
-                            return;
-                        }
-                    }
-
-                    //현재 멀티서버와 연결된 scouter webapp은 지원하지 않으므로 일단 단일 서버로 가정하고 마지막 서버 시간과 맞춘다.
-                    servers.forEach((server) => {
-                        common.setServerTimeGap(Number(server.serverTime) - new Date().valueOf());
-                    });
-
-                    // GET INSTANCES INFO FROM URL IF EXISTS
-                    let objectsParam = new URLSearchParams(this.props.location.search).get('objects');
-                    if(!objectsParam) {
-                        objectsParam = new URLSearchParams(this.props.location.search).get('instances');
-                    }
-                    let urlObjectHashes = null;
-                    if (objectsParam) {
-                        urlObjectHashes = objectsParam.split(",");
-                        if (urlObjectHashes) {
-                            urlObjectHashes = urlObjectHashes.map((d) => {
-                                return Number(d)
-                            });
-                        }
-                    }
-
-                    if (urlObjectHashes) {
-                        let selectedObjects = [];
-                        let objects = [];
-                        let activeServerId = null;
-                        servers.forEach((server) => {
-                            //일단 단일 서버로 가정하고 서버 시간과 맞춘다.
-                            common.setServerTimeGap(Number(server.serverTime) - new Date().valueOf());
-
-                            jQuery.ajax({
-                                method: "GET",
-                                async: false,
-                                url: getHttpProtocol(this.props.config) + '/scouter/v1/object?serverId=' + server.id,
-                                xhrFields: getWithCredentials(props.config),
-                                beforeSend: function (xhr) {
-                                    setAuthHeader(xhr, props.config, getCurrentUser(props.config, props.user));
-                                }
-                            }).done(function (msg) {
-                                objects = msg.result;
-
-                                if (objects && objects.length > 0) {
-                                    objects = objects
-                                        .filter(instance => {
-                                            return (instance.objName.match(new RegExp("/", "g")) || []).length < 3;
-                                        });
-
-                                    objects.forEach((instance) => {
-                                        urlObjectHashes.forEach((objHash) => {
-                                            if (objHash === Number(instance.objHash)) {
-                                                selectedObjects.push(instance);
-                                                if (!server.selectedObjectCount) {
-                                                    server.selectedObjectCount = 0;
-                                                }
-                                                server.selectedObjectCount++;
-                                                // 마지막으로 찾은 서버 ID로 세팅
-                                                activeServerId = server.id;
-                                            }
-                                        });
-                                    })
-                                }
-                            }).fail(function (xhr, textStatus, errorThrown) {
-                                errorHandler(xhr, textStatus, errorThrown, that.props);
-                            });
-                        });
-
-                        if (selectedObjects.length > 0) {
-                            selectedObjects.sort((a, b) => a.objName < b.objName ? -1 : 1);
-
-                            let selectedObjectMap = {};
-                            for (let i = 0; i < selectedObjects.length; i++) {
-                                selectedObjectMap[selectedObjects[i].objHash] = selectedObjects[i];
-                            }
-
-                            this.setState({
-                                servers: servers,
-                                objects: objects,
-                                activeServerId: activeServerId,
-                                selectedObjects: selectedObjectMap
-                            });
-
-                            AgentColor.setInstances(selectedObjects, this.props.config.colorType);
-                            this.props.setTarget(selectedObjects);
-
-                        } else {
-                            this.setState({
-                                servers: servers
-                            });
-                        }
-
-                    } else {
-                        this.setState({
-                            servers: servers
-                        });
-                    }
-                }
-
-            }).fail((xhr, textStatus, errorThrown) => {
-                errorHandler(xhr, textStatus, errorThrown, that.props);
-            });
-        }
-    };
 
 
-    getServers = (config) => {
 
-        let that = this;
-        this.props.addRequest();
 
-        this.setState({
-            loading : true
-        });
 
-        jQuery.ajax({
-            method: "GET",
-            async: true,
-            url: getHttpProtocol(config) + '/scouter/v1/info/server'
-        }).done((msg) => {
 
-            let servers = msg.result;
-            if (servers.length > 0) {
-                if (!servers[0].version) {
-                    this.props.pushMessage("error", "Not Supported", "Paper 2.0 is available only on Scout Server 2.0 and later.");
-                    this.props.setControlVisibility("Message", true);
-                }
-            }
 
-            this.setState({
-                servers: servers,
-                objects: [],
-                activeServerId: null,
-                selectedObjects: {},
-                filter: ""
-            });
-        }).fail((xhr, textStatus, errorThrown) => {
-            this.setState({
-                servers: [],
-                objects: [],
-                activeServerId: null,
-                selectedObjects: {},
-                filter: ""
-            });
-            errorHandler(xhr, textStatus, errorThrown, that.props);
-        }).always(() => {
-            this.setState({
-                loading : false
-            });
-        });
 
-    };
 
-    componentDidUpdate(prevProps, prevState) {
-        if (this.props.visible && prevProps.visible !== this.props.visible) {
-            if (!this.state.servers || this.state.servers.length < 1) {
-                this.getServers(this.props.config);
-            }
-        }
-    }
 
-    onServerClick = (serverId) => {
-        let that = this;
-        this.props.addRequest();
-        jQuery.ajax({
-            method: "GET",
-            async: true,
-            url: getHttpProtocol(this.props.config) + '/scouter/v1/object?serverId=' + serverId,
-            xhrFields: getWithCredentials(that.props.config),
-            beforeSend: function (xhr) {
-                setAuthHeader(xhr, that.props.config, getCurrentUser(that.props.config, that.props.user));
-            },
-        }).done((msg) => {
-            if (msg.result) {
-                that.setState({
-                    activeServerId: serverId
-                });
 
-                const objects = msg.result;
-                if (objects) {
-                    objects.sort((a, b) => a.objName < b.objName ? -1 : 1);
-                    this.setState({
-                        objects: msg.result
-                    });
-                }
-            }
-        }).fail((xhr, textStatus, errorThrown) => {
-            errorHandler(xhr, textStatus, errorThrown, that.props);
-        });
-    };
 
-    instanceClick = (instance) => {
 
-        let selectedObjects = Object.assign({}, this.state.selectedObjects);
-        if (selectedObjects[instance.objHash]) {
-            delete selectedObjects[instance.objHash];
-        } else {
-            selectedObjects[instance.objHash] = instance;
-        }
 
-        let selectedObjectCount = 0;
-        for (let attr in selectedObjects) {
-            for (let i = 0; i < this.state.objects.length; i++) {
-                if (this.state.objects[i].objHash === attr) {
-                    selectedObjectCount++;
-                }
-            }
-        }
-
-        let servers = this.state.servers;
-        for (let i = 0; i < servers.length; i++) {
-            if (servers[i].id === this.state.activeServerId) {
-                servers[i].selectedObjectCount = selectedObjectCount;
-            }
-        }
-
-        this.setState({
-            servers: servers,
-            selectedObjects: selectedObjects
-        });
-    };
-
-    setObjects = () => {
-        let objects = [];
-        for (let hash in this.state.selectedObjects) {
-            objects.push(this.state.selectedObjects[hash]);
-        }
-
-        if (objects.length < 1) {
-            this.props.pushMessage("info", "NO MONITORING TARGET", "At least one object must be selected");
-            this.props.setControlVisibility("Message", true);
-        } else {
-            objects.sort((a, b) => a.objName < b.objName ? -1 : 1);
-            AgentColor.setInstances(objects, this.props.config.colorType);
-            this.props.setTarget(objects);
-            this.props.setControlVisibility("TargetSelector", false);
-            common.setRangePropsToUrl(this.props, undefined, objects);
-            this.props.toggleSelectorVisible();
-        }
-    };
 
     savePreset = () => {
         let that = this;
         let objects = [];
         let iconMap = {};
-        for (let hash in this.state.selectedObjects) {
-            objects.push(this.state.selectedObjects[hash]);
-            iconMap[this.props.counterInfo.objTypesMap[this.state.selectedObjects[hash].objType].icon] = true;
+        for (let hash in this.props.selectedObjects) {
+            objects.push(this.props.selectedObjects[hash]);
+            iconMap[this.props.counterInfo.objTypesMap[this.props.selectedObjects[hash].objType].icon] = true;
         }
 
         jQuery.ajax({
@@ -460,134 +110,153 @@ class InstanceSelector extends Component {
         this.props.toggleSelectorVisible();
     };
 
-    onChangeScouterServer = (event) => {
-        let inx = Number(event.target.value);
-        let config = JSON.parse(JSON.stringify(this.props.config));
 
-        for (let i = 0; i < config.servers.length; i++) {
-            if (i === inx) {
-                config.servers[i].default = true;
-            } else {
-                config.servers[i].default = false;
-            }
+    instanceClick = (instance) => {
+        this.props.instanceClick(instance);
+    };
+
+
+
+    getIconOrObjectType = (instance) => {
+        let objType = this.props.counterInfo.objTypesMap[instance.objType];
+        let icon;
+        if (objType) {
+            icon = objType.icon ? objType.icon : instance.objType;
         }
 
-        this.props.setConfig(config);
-        this.getServers(config);
-        if (localStorage) {
-            localStorage.setItem("config", JSON.stringify(config));
-        }
+        return icon;
+    };
 
-        this.props.setTarget([], []);
-        this.setState({
-            servers: [],
-            objects: [],
-            activeServerId: null,
-            selectedObjects: {},
-            filter: ""
-        });
+    onFilterChange = (event) => {
+        this.props.onFilterChange(event.target.value);
+    };
 
+    onServerClick = (serverId) => {
+        this.props.onServerClick(serverId);
+    };
+
+    quickSelectByTypeClick = (type) => {
+        this.props.quickSelectByTypeClick(type);
     };
 
     render() {
 
+        let iconMap = {"all" : 0};
+        let selectedIconMap = {"all" : 0};
+
+        let all = 0;
+        this.props.selectedObjects && this.props.objects && this.props.objects.forEach((instance) => {
+            let icon = this.getIconOrObjectType(instance);
+            if (iconMap[icon] === undefined) {
+                iconMap[icon] = 1;
+                selectedIconMap[icon] = 0;
+            } else {
+                iconMap[icon]++;
+            }
+
+            let selected = !(!this.props.selectedObjects[instance.objHash]);
+            if (selected) {
+                selectedIconMap[icon] ++;
+                selectedIconMap["all"] ++;
+            }
+            all++;
+        });
+
+        iconMap["all"] = all;
+
+        console.log(this.props.objects);
+
         return (
             <div className={"instance-selector-bg " + (this.props.visible ? "" : "hidden")} onClick={this.props.toggleSelectorVisible}>
-                <div className={"instance-selector-fixed-bg"}>
-                </div>
-                <div className="instance-selector popup-div" onClick={(e) => e.stopPropagation()}>
-                    <div className="scouter-servers">
-                        <div className="scouter-server-label">SCOUTER WEB API SERVER</div>
-                        <div className="scouter-server-select">
-                            <select value={common.getDefaultServerConfigIndex(this.props.config)} onChange={this.onChangeScouterServer.bind(this)}>
-                                {this.props.config.servers.map((server, inx) => {
-                                    return (
-                                        <option key={inx} value={inx}>{server.protocol + "://" + server.address + ":" + server.port}</option>
-                                    )
-                                })}
-                            </select>
-                        </div>
-                    </div>
-                    <div className="instance-selector-content">
-                        <div className="host-list">
-                            <div>
-                                <div className="title">
-                                    <div>SERVERS</div>
-                                </div>
-                                <div className="list-content scrollbar">
-                                    {this.state.servers && this.state.servers.map((host, i) => {
-                                            return (<div className={'host ' + (i === 0 ? 'first ' : ' ') + (host.id === this.state.activeServerId ? 'active ' : ' ')} key={i} onClick={this.onServerClick.bind(this, host.id)}>{host.name}{host.selectedObjectCount > 0 && <span className="host-selected-count">{host.selectedObjectCount}</span>}</div>)
-                                        }
-                                    )}
-                                </div>
-                            </div>
-                        </div>
-                        <div className="instance-list">
-                            <div>
-                                <div
-                                    className={"filter " + (this.state.filter && this.state.filter.length > 1 ? 'filtered' : '')}>
-                                    <span className="filter-icon" onClick={this.clearFilter}><i className="fa fa-filter" aria-hidden="true"></i></span><span className="filter-tag">OBJECT</span><input type="search" onChange={this.onFilterChange.bind(this)} value={this.state.filter}/><span className="check-btn" onClick={this.selectAll}><i className="fa fa-check-circle-o" aria-hidden="true"></i> ALL</span>
-                                </div>
-                                <div className="list-content scrollbar">
-                                    {(this.state.objects && this.state.objects.length > 0) && this.state.objects.filter((instance) => {
-
-                                        if (this.state.filter && this.state.filter.length > 1) {
-                                            if ((instance.objType && instance.objType.toLowerCase().indexOf(this.state.filter.toLowerCase()) > -1) || (instance.objName && instance.objName.toLowerCase().indexOf(this.state.filter.toLowerCase()) > -1) || (instance.address && instance.address.toLowerCase().indexOf(this.state.filter.toLowerCase()) > -1)) {
-                                                return true;
-                                            } else {
-                                                return false;
+                <div>
+                    <div className="instance-selector popup-div" onClick={(e) => e.stopPropagation()}>
+                        <div className="instance-selector-content">
+                            <div className="host-list">
+                                <div>
+                                    <div className="title">
+                                        <div>SERVERS</div>
+                                    </div>
+                                    <div className="list-content scrollbar">
+                                        {this.props.servers && this.props.servers.map((host, i) => {
+                                                return (<div className={'host ' + (i === 0 ? 'first ' : ' ') + (host.id === this.props.activeServerId ? 'active ' : ' ')} key={i} onClick={this.onServerClick.bind(this, host.id)}>{host.name}{host.selectedObjectCount > 0 && <span className="host-selected-count">{host.selectedObjectCount}</span>}</div>)
                                             }
-                                        } else {
-                                            return true;
-                                        }
+                                        )}
+                                    </div>
+                                </div>
+                            </div>
+                            <div className="instance-list">
+                                <div>
+                                    <div className={"filter " + (this.props.filter && this.props.filter.length > 1 ? 'filtered' : '')}>
+                                        <span className="filter-tag">OBJECT</span><span className="filter-separator"></span><span className="filter-icon" onClick={this.props.clearFilter}><i className="fa fa-filter" aria-hidden="true"></i></span><input type="search" onChange={this.onFilterChange.bind(this)} value={this.props.filter}/><span className="check-btn" onClick={this.props.selectAll}>ALL</span>
+                                    </div>
+                                    <div className="icon-type-map">
+                                        {(this.props.objects && this.props.objects.length > 0) && (Object.keys(iconMap).map((icon, i) => {
+                                            return <span className={iconMap[icon] === selectedIconMap[icon] ? "selected" : ""} key={i} onClick={this.quickSelectByTypeClick.bind(this, icon)}>{icon} {iconMap[icon]}</span>
+                                        }))}
+                                    </div>
+                                    <div className="list-content scrollbar">
+                                        {(this.props.objects && this.props.objects.length > 0) && this.props.objects.filter((instance) => {
 
-                                    }).sort((a, b) => {
-                                        let compare = a.objType.localeCompare(b.objType);
-                                        if (compare === 0) {
-                                            return a.objName.localeCompare(b.objName);
-                                        } else {
-                                            return compare;
-                                        }
-                                    }).map((instance, i) => {
-                                        let objType = this.props.counterInfo.objTypesMap[instance.objType];
-                                        let icon = "";
-                                        let displayName = "";
-                                        if (objType) {
-                                            icon = objType.icon ? objType.icon : instance.objType;
-                                            displayName = objType.displayName;
-                                        }
+                                            if (this.props.filter && this.props.filter.length > 1) {
+                                                if ((instance.objType && instance.objType.toLowerCase().indexOf(this.props.filter.toLowerCase()) > -1) || (instance.objName && instance.objName.toLowerCase().indexOf(this.props.filter.toLowerCase()) > -1) || (instance.address && instance.address.toLowerCase().indexOf(this.props.filter.toLowerCase()) > -1)) {
+                                                    return true;
+                                                } else {
+                                                    return false;
+                                                }
+                                            } else {
+                                                return true;
+                                            }
 
-                                        let iconInfo = PaperIcons.getObjectIcon(icon);
-                                        return (
-                                            <div key={i} className={"instance " + (i === 0 ? 'first ' : ' ') + (!(!this.state.selectedObjects[instance.objHash]) ? "selected" : " ")} onClick={this.instanceClick.bind(this, instance)}>
-                                                <div className="type-icon">
-                                                    <div className="type-icon-wrapper" style={{color : iconInfo.color, backgroundColor : iconInfo.bgColor}}>
-                                                        {iconInfo.fontFamily === "text" && <div className={"object-icon " + iconInfo.fontFamily}>{iconInfo.text}</div>}
-                                                        {iconInfo.fontFamily !== "text" && <div className={"object-icon " + iconInfo.fontFamily + " " + iconInfo.text}></div>}
+                                        }).sort((a, b) => {
+                                            let compare = a.objType.localeCompare(b.objType);
+                                            if (compare === 0) {
+                                                return a.objName.localeCompare(b.objName);
+                                            } else {
+                                                return compare;
+                                            }
+                                        }).map((instance, i) => {
+                                            let objType = this.props.counterInfo.objTypesMap[instance.objType];
+                                            let icon = "";
+                                            let displayName = "";
+                                            if (objType) {
+                                                icon = objType.icon ? objType.icon : instance.objType;
+                                                displayName = objType.displayName;
+                                            }
+
+                                            let iconInfo = PaperIcons.getObjectIcon(icon);
+                                            return (
+                                                <div key={i} className={"instance " + (i === 0 ? 'first ' : ' ') + (!(!(this.props.selectedObjects && this.props.selectedObjects[instance.objHash])) ? "selected" : " ")} onClick={this.instanceClick.bind(this, instance)}>
+                                                    <div>
+                                                        <div className="type-icon">
+                                                            <div className="type-icon-wrapper" style={{color : iconInfo.color, backgroundColor : iconInfo.bgColor}}>
+                                                                {iconInfo.fontFamily === "text" && <div className={"object-icon " + iconInfo.fontFamily}>{iconInfo.text}</div>}
+                                                                {iconInfo.fontFamily !== "text" && <div className={"object-icon " + iconInfo.fontFamily + " " + iconInfo.text}></div>}
+                                                            </div>
+                                                        </div>
+                                                        <div className="instance-text-info">
+                                                            <div className="instance-name">{instance.objName}</div>
+                                                            <div className="instance-other"><span>{instance.address}</span><span className="instance-objtype">{displayName}</span></div>
+                                                        </div>
                                                     </div>
-                                                </div>
-                                                <div className="instance-text-info">
-                                                    <div className="instance-name">{instance.objName}</div>
-                                                    <div className="instance-other"><span>{instance.address}</span><span className="instance-objtype">{displayName}</span></div>
-                                                </div>
-                                            </div>)
-                                    })}
-                                    {(!this.state.objects || this.state.objects.length < 1) &&
-                                    <div className="no-instance">
-                                        <div>
-                                            <div>NO OBJECT</div>
-                                        </div>
-                                    </div>}
+                                                </div>)
+                                        })}
+                                        {(!this.props.objects || this.props.objects.length < 1) &&
+                                        <div className="no-instance">
+                                            <div>
+                                                <div>NO OBJECT</div>
+                                            </div>
+                                        </div>}
+                                    </div>
                                 </div>
                             </div>
                         </div>
+                        <div className="buttons">
+                            <button className="save-preset-btn" onClick={this.savePreset}>SAVE AS PRESET</button>
+                            <button onClick={this.cancelClick}>CANCEL</button>
+                            <button onClick={this.props.setObjects}>APPLY</button>
+                        </div>
+                        <InnerLoading visible={this.props.loading}></InnerLoading>
                     </div>
-                    <div className="buttons">
-                        <button className="save-preset-btn" onClick={this.savePreset}>SAVE AS PRESET</button>
-                        <button onClick={this.cancelClick}>CANCEL</button>
-                        <button onClick={this.setObjects}>APPLY</button>
-                    </div>
-                    <InnerLoading visible={this.state.loading}></InnerLoading>
                 </div>
             </div>
         );
@@ -596,7 +265,6 @@ class InstanceSelector extends Component {
 
 let mapStateToProps = (state) => {
     return {
-        objects: state.target.objects,
         counterInfo: state.counterInfo,
         config: state.config,
         user: state.user,

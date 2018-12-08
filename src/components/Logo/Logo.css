@@ -2,13 +2,17 @@
     text-align: center;
     padding: 20px 0;
     background-color: #282828;
+    background-color: #104E8B;
+    background-color: #26466D;
     position: relative;
-    height: 50px;
+    height: 40px;
     box-sizing: border-box;
+    background-color: rgba(0,0,0,0.2);
 }
 
 .min .paper-logo-wrapper {
     padding: 0;
+    height: 60px;
 }
 
 .paper-logo-wrapper div.paper-logo {
@@ -27,6 +31,7 @@
     user-select: none;
     width: 40px;
     font-family: 'Bungee', sans-serif;
+    top : -6px;
 }
 
 .paper-logo-wrapper div.paper-logo a {
@@ -50,7 +55,7 @@
 }
 
 .min .paper-logo-wrapper div.paper-logo .logo-icon {
-    top: 7px;
+    top: 16px;
 }
 
 
@@ -135,17 +140,6 @@
     background-color: #FFCC11;;
     cursor: pointer;
 }
-
-.min .paper-logo-wrapper .side-icon > div > div.fixed-wrapper {
-    display: none;
-}
-
-.paper-logo-wrapper .side-icon > div > div.fixed-wrapper:hover {
-    color: orange;
-    color: #FFCC11;
-    cursor: pointer;
-}
-
 
 .paper-logo-wrapper .side-icon > span {
     display: inline-block;

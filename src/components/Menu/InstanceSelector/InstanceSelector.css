@@ -1,41 +1,44 @@
 .instance-selector-bg {
-    position: absolute;
-    top: 0;
-    left: 0;
-    right: 0;
-    bottom: 0;
-    z-index: 30;
-    max-width: 1600px;
-    margin: 0 auto;
-}
-
-.instance-selector-bg .instance-selector-fixed-bg {
     position: fixed;
     top: 0;
     left: 0;
     right: 0;
     bottom: 0;
-    background-color: rgba(0, 0, 0, 0.3);
-    z-index: 30;
+    _z-index: 30;
+    margin: 0 auto;
+    background-color: rgba(0, 0, 0, 0.6);
+    width: 100%;
+    display: table;
+    height: 100%;
+    box-sizing: border-box;
+}
+
+.instance-selector-bg.hidden {
+    display: none;
 }
 
 
+
+.instance-selector-bg > div {
+    display: table-cell;
+    width: 100%;
+    height: 100%;
+    box-sizing: border-box;
+    vertical-align: middle;
+}
+
 .instance-selector {
+    margin: 0 auto;
     border: 1px solid rgba(0, 0, 0, 0.6);
     color: white;
-    width: 600px;
-    height: 350px;
-    position: absolute;
-    top: 47px;
-    right: 0px;
-    z-index: 5;
+    width: 800px;
+    height: 400px;
     padding: 0;
     -webkit-touch-callout: none;
     -webkit-user-select: none;
     -moz-user-select: none;
     -ms-user-select: none;
     user-select: none;
-    z-index: 31;
 }
 
 .instance-selector > div {
@@ -49,7 +52,7 @@
 .instance-selector .instance-selector-content {
     display: table;
     width: 100%;
-    height: calc(100% - 74px);
+    height: calc(100% - 40px);
     table-layout: fixed;
 }
 
@@ -66,40 +69,74 @@
 }
 
 .instance-selector .instance-selector-content .title {
-    position: absolute;
-    top: 0;
-    text-align: center;
+    text-align: left;
     width: 100%;
     height: 30px;
     padding-top: 5px;
     box-sizing: border-box;
 }
 
+.instance-selector .instance-selector-content .title > div {
+    display: inline-block;
+    padding: 5px 10px;
+    margin: 0;
+    font-size: 10px;
+    height: 20px;
+    box-sizing: border-box;
+    border-radius: 3px;
+}
+
+
+
+
 .instance-selector .instance-selector-content .filter {
-    position: absolute;
+    position: relative;
     top: 0;
     width: 100%;
-    padding: 4px 0;
+    padding: 5px 0;
     height: 30px;
     box-sizing: border-box;
-    border-bottom: 1px solid rgba(0, 0, 0, 0.2);
-    
+}
+
+.instance-selector .instance-selector-content .icon-type-map {
+    height: 20px;
+    padding-left: 5px;
+    font-size: 8px;
+    border-bottom: 1px solid rgba(0,0,0,0.3);
+    box-sizing: border-box;
+}
+
+.instance-selector .instance-selector-content .icon-type-map > span {
+    display: inline-block;
+    padding: 2px 4px;
+    border: 1px solid rgba(0,0,0,0.3);
+    margin-right: 2px;
+    text-transform: uppercase;
+    cursor: pointer;
+}
+
+.instance-selector .instance-selector-content .icon-type-map > span:hover {
+    background-color: rgba(0,0,0,0.2);
+}
+
+.instance-selector .instance-selector-content .icon-type-map > span.selected {
+    background-color: #EEC900;
+    color: #333;
 }
 
 .instance-selector .instance-selector-content .filter .check-btn {
     display: inline-block;
-    width: 45px;
-    padding: 4px 0;
+    width: 30px;
+    padding: 3px 0;
     margin-left: 4px;
     text-align: center;
-    background-color: white;
-    color: #333;
+    color: white;
     cursor: pointer;
     border-radius: 3px;
 }
 
 .instance-selector .instance-selector-content .filter .check-btn:hover {
-    background-color: #DDD;
+    color: #EEC900;
 }
 
 .instance-selector .instance-selector-content .filter .filter-icon {
@@ -115,37 +152,48 @@
 }
 
 .instance-selector .instance-selector-content .filter .filter-tag {
-    width: 70px;
     display: inline-block;
     text-align: center;
-    padding: 5px 0;
-    background-color: rgba(0, 0, 0, 0.2);
+    padding: 5px 6px 5px 10px;
     border-radius: 3px 0 0 3px;
     height: 20px;
     box-sizing: border-box;
+    width: 52px;
+}
+
+.instance-selector .instance-selector-content .filter .filter-separator {
+    display: inline-block;
+    background-color: rgba(255,255,255,0.5);
+    width: 1px;
+    height: 7px;
 }
 
 .instance-selector .instance-selector-content .filter input {
-    width: calc(100% - 94px - 50px);
+    width: calc(100% - 53px - 60px);
     font-size: 10px;
     padding: 3px 5px;
-    border-radius: 0 3px 3px 0;
+    border-radius: 2px;
     border: none;
     outline: none;
     box-sizing: border-box;
-    border: 1px solid rgba(0, 0, 0, 0.3);
+    _border: 1px solid rgba(0, 0, 0, 0.3);
     transition: background-color 0.3s;
-    height: 20px;
+    _height: 20px;
 
 }
 
 .instance-selector .instance-selector-content .list-content {
     height: calc(100% - 30px);
     position: absolute;
-    top: 29px;
+    top: 30px;
     overflow-y: auto;
     width: 100%;
     line-height: 0;
+}
+
+.instance-selector .instance-selector-content .instance-list .list-content {
+    top : 49px;
+    height: calc(100% - 49px);
 }
 
 .instance-selector .instance-selector-content .list-content .no-instance {
@@ -170,29 +218,19 @@
     line-height: 100%;
 }
 
-.instance-selector .instance-selector-content .title > div {
-    display: inline-block;
-    padding: 5px 0 5px;
-    background-color: rgba(0, 0, 0, 0.2);
-    margin: 0;
-    font-size: 10px;
-    width: 70px;
-    height: 20px;
-    box-sizing: border-box;
-    border-radius: 3px;
-}
-
 .instance-selector .host-list {
     display: table-cell;
-    width: 40%;
+    width: 30%;
     border-right: 1px solid rgba(0, 0, 0, 0.3);
     font-size: 10px;
 }
 
 .instance-selector .host-list div.host {
-    padding: 17px 8px 16px;
     cursor: pointer;
-    border-bottom: 1px solid rgba(0, 0, 0, 0.2);
+    border-bottom: 1px solid rgba(0, 0, 0, 0.3);
+    height: 40px;
+    box-sizing: border-box;
+    padding : 13px 10px 0 10px;
 }
 
 .instance-selector .host-list div.host .host-selected-count {
@@ -208,8 +246,7 @@
 }
 
 .instance-selector .host-list div.host.first {
-    border-top: 1px solid rgba(0, 0, 0, 0.2);
-
+    border-top: 1px solid rgba(0, 0, 0, 0.3);
 }
 
 .instance-selector .instance-list {
@@ -219,19 +256,26 @@
 .instance-selector .instance-list div.instance {
     padding: 0;
     cursor: pointer;
-    border-bottom: 1px solid rgba(0, 0, 0, 0.2);
+    border-bottom: 1px solid rgba(0, 0, 0, 0.3);
+    display: block;
+    width: 100%;
+    box-sizing: border-box;
+    height: 40px;
+    box-sizing: border-box;
+}
+.instance-selector .instance-list div.instance > div {
     display: table;
     table-layout: fixed;
     width: 100%;
-    box-sizing: border-box;
 }
 
-.instance-selector .instance-list div.instance > div {
+
+.instance-selector .instance-list div.instance > div > div {
     display: table-cell;
     vertical-align: middle;
 }
 
-.instance-selector .instance-list div.instance > div.type-icon {
+.instance-selector .instance-list div.instance div.type-icon {
     width: 40px;
     height: 40px;
     text-align: center;
@@ -239,11 +283,11 @@
     padding: 5px;
 }
 
-.instance-selector .instance-list div.instance > div.instance-text-info {
+.instance-selector .instance-list div.instance div.instance-text-info {
 
 }
 
-.instance-selector .instance-list div.instance > div.type-icon .type-icon-wrapper {
+.instance-selector .instance-list div.instance div.type-icon .type-icon-wrapper {
     border-radius: 3px;
     display: inline-block;
     width: 30px;
@@ -251,21 +295,21 @@
     text-align: center;
 }
 
-.instance-selector .instance-list div.instance > div.type-icon .type-icon-wrapper .object-icon {
+.instance-selector .instance-list div.instance div.type-icon .type-icon-wrapper .object-icon {
     background-color: transparent;
     font-size: 18px;
     padding-top: 7px;
 }
 
-.instance-selector .instance-list div.instance > div.type-icon .type-icon-wrapper .object-icon.technology-icons {
+.instance-selector .instance-list div.instance div.type-icon .type-icon-wrapper .object-icon.technology-icons {
     font-family: "technology-icons";
 }
 
-.instance-selector .instance-list div.instance > div.type-icon .type-icon-wrapper .object-icon.FontAwesome {
+.instance-selector .instance-list div.instance div.type-icon .type-icon-wrapper .object-icon.FontAwesome {
     font-family: "FontAwesome";
 }
 
-.instance-selector .instance-list div.instance > div.type-icon .type-icon-wrapper .object-icon.text {
+.instance-selector .instance-list div.instance div.type-icon .type-icon-wrapper .object-icon.text {
     font-size: 9px;
     padding-top: 10px;
     letter-spacing: -0.5px;
@@ -294,7 +338,7 @@
 }
 
 .instance-selector .instance-list div.instance.first {
-    border-top: 1px solid rgba(0, 0, 0, 0.2);
+    border-top: 1px solid rgba(0, 0, 0, 0.3);
 }
 
 .instance-selector .instance-list div.instance:hover {

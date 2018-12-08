@@ -1,14 +1,14 @@
-.api-server-selector-wrapper {
+.simple-selector-wrapper {
     text-transform: uppercase;
     position: relative;
-    padding: 10px 0 10px 10px;
+    padding: 5px 0px 5px 5px;
 }
 
-.api-server-selector-wrapper .selected-server {
+.simple-selector-wrapper .selected-server {
     margin-right: 40px;
 }
 
-.api-server-selector-wrapper .drop-icon {
+.simple-selector-wrapper .drop-icon {
     position: absolute;
     top : 0;
     right : 0;
@@ -16,17 +16,17 @@
     font-size: 16px;
     width: 20px;
     text-align: center;
-    padding-top: 7px;
+    padding-top: 3px;
     box-sizing: border-box;
     cursor: pointer;
 }
 
-.api-server-selector-wrapper .drop-icon:hover {
+.simple-selector-wrapper .drop-icon:hover {
     background-color: #FFCC11;
     color: #333;
 }
 
-.api-server-selector-wrapper .server-list {
+.simple-selector-wrapper .server-list {
     position: absolute;
     top : 100%;
     width: 100%;
@@ -39,26 +39,26 @@
     overflow-y: auto;
 }
 
-.api-server-selector-wrapper .server-list ul {
+.simple-selector-wrapper .server-list ul {
     list-style: none;
     margin: 0;
     padding: 0;
 }
 
-.api-server-selector-wrapper .server-list ul li {
+.simple-selector-wrapper .server-list ul li {
     padding: 5px 10px;
     position: relative;
     border-bottom: 1px solid rgba(0,0,0,0.2);
     cursor: pointer;
 }
 
-.api-server-selector-wrapper .server-list ul li:hover {
+.simple-selector-wrapper .server-list ul li:hover {
     background-color: #FFCC11;
     background-color: #FFEA9F;
     color: #333;
 }
 
-.api-server-selector-wrapper .server-list ul li .selected-span {
+.simple-selector-wrapper .server-list ul li .selected-span {
     display: inline-block;
     width: 5px;
     position: absolute;
@@ -67,10 +67,10 @@
     bottom : 0;
 }
 
-.api-server-selector-wrapper .server-list ul li .selected-span.selected {
+.simple-selector-wrapper .server-list ul li .selected-span.selected {
     background-color: #FFCC11;
 }
 
-.api-server-selector-wrapper .server-list ul li:nth-child(2n) {
+.simple-selector-wrapper .server-list ul li:nth-child(2n) {
     _background-color: rgba(0,0,0,0.1);
 }

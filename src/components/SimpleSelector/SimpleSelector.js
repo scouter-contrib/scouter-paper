@@ -1,7 +1,7 @@
 import React, {Component} from 'react';
-import './ApiServerSelector.css';
+import './SimpleSelector.css';
 
-class ApiServerSelector extends Component {
+class SimpleSelector extends Component {
 
     constructor(props) {
         super(props);
@@ -16,7 +16,7 @@ class ApiServerSelector extends Component {
         })
     };
 
-    serverClick = (inx) => {
+    onChange = (inx) => {
         this.props.onChange(inx);
         this.setState({
             open : false
@@ -24,17 +24,18 @@ class ApiServerSelector extends Component {
     };
 
     render() {
-        let selectedServer = this.props.servers[this.props.selected];
+        console.log(this.props.selected);
+        let selectedItem = this.props.list[this.props.selected];
         return (
-            <div className="api-server-selector-wrapper" onClick={this.props.toggleSelectorVisible}>
-                <div className="selected-server">{selectedServer.protocol + "://" + selectedServer.address + ":" + selectedServer.port}</div>
+            <div className="simple-selector-wrapper" onClick={this.props.toggleSelectorVisible}>
+                <div className="selected-server">{selectedItem ? selectedItem.name : this.props.emptyMessage}</div>
                 <div onClick={this.toggleOpen} className="drop-icon"><span><i className="fa fa-angle-down" aria-hidden="true"></i></span></div>
                 {this.state.open &&
                 <div className="server-list scrollbar">
                     <ul>
-                        {this.props.servers.map((server, inx) => {
+                        {this.props.list.map((item, inx) => {
                             return (
-                                <li onClick={this.serverClick.bind(this, inx)} key={inx}><span className={"selected-span " + (this.props.selected === inx ? "selected" : "")}></span>{server.protocol + "://" + server.address + ":" + server.port}</li>
+                                <li onClick={this.onChange.bind(this, inx)} key={inx}><span className={"selected-span " + (this.props.selected === inx ? "selected" : "")}></span>{item.name}</li>
                             )
                         })}
                     </ul>
@@ -44,4 +45,4 @@ class ApiServerSelector extends Component {
     }
 }
 
-export default ApiServerSelector;
+export default SimpleSelector;

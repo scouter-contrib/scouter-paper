@@ -1589,7 +1589,7 @@ class Paper extends Component {
         });
     };
 
-
+C
 
     render() {
         let objectSelected = this.props.objects.length > 0;

@@ -363,9 +363,9 @@
 
 
 .object-selector-wrapper .object-selector-content {
-    display: none;
+    _display: none;
 }
 
 .object-selector-wrapper .buttons {
-    display: none;
+    _display: none;
 }

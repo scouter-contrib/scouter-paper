@@ -13,8 +13,7 @@ import {
     Message,
     ContentWrapper,
     Logo,
-    Navigator,
-    ObjectSelector
+    Navigator
 } from './components';
 import {Route, Switch} from 'react-router-dom';
 import {connect} from 'react-redux';
@@ -226,6 +225,12 @@ class App extends Component {
             }
         }
 
+        if (config && config.servers) {
+            config.servers.forEach((server) => {
+                server.name = server.protocol + "://" + server.address + ":" + server.port
+            });
+        }
+
         this.props.setConfig(config);
         if (localStorage) {
             localStorage.setItem("config", JSON.stringify(config));
@@ -337,6 +342,8 @@ class App extends Component {
         });
     };
 
+
+
     render() {
         return (
             <div className="black">
@@ -361,13 +368,14 @@ class App extends Component {
                 </ContentWrapper>
                 }
                 {support && <Controller>
-                    <Logo></Logo>
-                    <Navigator></Navigator>
-                    <ObjectSelector></ObjectSelector>
+
+                    {/*<Navigator></Navigator>*/}
+                    {/*<ObjectSelector></ObjectSelector>*/}
 
                 </Controller>
                 }
                 {!support && <Unsupport name={browser.name} version={browser.version}/>}
+
             </div>
         );
     }

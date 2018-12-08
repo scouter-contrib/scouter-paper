@@ -11,13 +11,15 @@ div#root > div {
 article.content-wrapper {
     height: calc(100% - 50px);
     height: 100%;
-    margin-left: 40px;
     width: calc(100% - 40px);
+    margin-left: 40px;
+    transition: all 0.3s;
 }
 
-article.content-wrapper.fixed {
+article.content-wrapper.max {
     margin-left: 400px;
     width: calc(100% - 400px);
+    transition: all 0.3s;
 }
 
 .content-wrapper > div {

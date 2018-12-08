@@ -17,7 +17,7 @@ import * as common from '../../common/common'
 import * as PaperIcons from '../../common/PaperIcons'
 import AgentColor from "../../common/InstanceColor";
 import InnerLoading from "../InnerLoading/InnerLoading";
-import ApiServerSelector from "./ApiServerSelector/ApiServerSelector";
+import SimpleSelector from "../SimpleSelector/SimpleSelector";
 
 
 
@@ -183,6 +183,7 @@ class ObjectSelector extends Component {
                         let objects = [];
                         let activeServerId = null;
                         servers.forEach((server) => {
+
                             //일단 단일 서버로 가정하고 서버 시간과 맞춘다.
                             common.setServerTimeGap(Number(server.serverTime) - new Date().valueOf());
 
@@ -275,9 +276,12 @@ class ObjectSelector extends Component {
             url: getHttpProtocol(config) + '/scouter/v1/info/server'
         }).done((msg) => {
 
+            console.log("get");
             let servers = msg.result;
+            let activeServerId = null;
             if (servers.length > 0) {
                 if (!servers[0].version) {
+                    activeServerId = 0;
                     this.props.pushMessage("error", "Not Supported", "Paper 2.0 is available only on Scout Server 2.0 and later.");
                     this.props.setControlVisibility("Message", true);
                 }
@@ -286,7 +290,7 @@ class ObjectSelector extends Component {
             this.setState({
                 servers: servers,
                 objects: [],
-                activeServerId: null,
+                activeServerId: activeServerId,
                 selectedObjects: {},
                 filter: ""
             });
@@ -315,7 +319,14 @@ class ObjectSelector extends Component {
         }
     }
 
-    onServerClick = (serverId) => {
+    onServerClick = (index) => {
+
+        if (!this.state.servers || !this.state.servers[index]) {
+            return;
+        }
+
+        let serverId = this.state.servers[index].id;
+
         let that = this;
         this.props.addRequest();
         jQuery.ajax({
@@ -329,7 +340,7 @@ class ObjectSelector extends Component {
         }).done((msg) => {
             if (msg.result) {
                 that.setState({
-                    activeServerId: serverId
+                    activeServerId: index
                 });
 
                 const objects = msg.result;
@@ -500,7 +511,14 @@ class ObjectSelector extends Component {
                         <div className="api-server-select-control">
                             <div className="control-label"><span>API SERVER</span></div>
                             <div className="control-separator"><span></span></div>
-                            <div className="control-component"><ApiServerSelector selected={common.getDefaultServerConfigIndex(this.props.config)} servers={this.props.config.servers} onChange={this.onChangeScouterServer}></ApiServerSelector></div>
+                            <div className="control-component"><SimpleSelector selected={common.getDefaultServerConfigIndex(this.props.config)} list={this.props.config.servers} onChange={this.onChangeScouterServer}></SimpleSelector></div>
+                        </div>
+                    </div>
+                    <div className="api-server-select-control-wrapper">
+                        <div className="api-server-select-control">
+                            <div className="control-label"><span>COLLECTOR</span></div>
+                            <div className="control-separator"><span></span></div>
+                            <div className="control-component"><SimpleSelector selected={this.state.activeServerId} list={this.state.servers} onChange={this.onServerClick} emptyMessage="NO COLLECT SERVER"></SimpleSelector></div>
                         </div>
                     </div>
                     <div className="object-selector-content">

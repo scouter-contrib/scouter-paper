@@ -1,16 +1,109 @@
 .controller-wrapper {
     position: fixed;
-    top : 0;
-    left : 0;
-    bottom : 0;
+    top: 0px;
+    left: 0;
+    bottom: 0;
     width: 400px;
-    background-color: rgba(0,0,0,0.3);
+    background-color: rgba(0, 0, 0, 0.3);
     background-color: #282828;
+    background-color: #104E8B;
+    background-color: #26466D;
     z-index: 30;
     transition: width 0.3s;
+    color: white;
 }
 
 .controller-wrapper.min {
     width: 40px;
     transition: width 0.3s;
+}
+
+.controller-wrapper .control-item {
+    margin-top: 10px;
+    border-bottom: 1px dashed rgba(0,0,0,0.2);
+    padding-bottom: 10px;
+}
+
+.min.controller-wrapper .control-item {
+    border-bottom: none;
+}
+
+.controller-wrapper .control-item .row {
+    display: table;
+    width: 100%;
+    table-layout: fixed;
+    font-size: 10px;
+}
+
+.controller-wrapper .control-item .row > div {
+    padding: 5px;
+    display: table-cell;
+    box-sizing: border-box;
+}
+
+.controller-wrapper .row .step {
+    color: white;
+    width: 26px;
+    text-align: center;
+}
+
+.controller-wrapper .control-item .row > div.row-message {
+    padding: 5px 0;
+}
+
+.controller-wrapper .row .step span {
+    width: 16px;
+    height: 16px;
+    background-color: rgba(0,0,0,0.4);
+    border-radius: 50%;
+    padding-top: 2px;
+    display: inline-block;
+    box-sizing: border-box;
+    text-align: center;
+}
+
+.controller-wrapper .row .step span {
+
+}
+
+.min.controller-wrapper .row.desc {
+    display: none;
+}
+
+.min.controller-wrapper .control-item .row.control {
+    display: none;
+}
+
+.controller-wrapper .control-item .row.control {
+    margin: 2px 10px 0;
+    width: calc(100% - 20px);
+    box-sizing: border-box;
+    font-size: 11px;
+    background-color: rgba(0,0,0,0.2);
+    border-radius: 2px;
+}
+
+.controller-wrapper .row .object-navigator-btn {
+    padding: 5px;
+    position: relative;
+}
+
+.controller-wrapper .row .object-navigator-btn .popup-icon {
+    position: absolute;
+    top : 0;
+    right : 0;
+    font-size: 14px;
+    width: 20px;
+    height: 100%;
+    padding-top: 4px;
+    box-sizing: border-box;
+    display: inline-block;
+    text-align: center;
+}
+
+.controller-wrapper .row .object-navigator-btn .popup-icon:hover {
+    background-color: rgba(0,0,0,0.3);
+    color: #333;
+    background-color: #FFCC11;;
+    cursor: pointer;
 }

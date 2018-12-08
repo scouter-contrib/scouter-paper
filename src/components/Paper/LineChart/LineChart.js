@@ -710,9 +710,14 @@ class LineChart extends Component {
                     break;
                 }
 
+                console.log(that.props.objects);
+
                 for (let i = 0; i < that.props.objects.length; i++) {
                     const obj = that.props.objects[i];
+                    console.log(thisOption);
+                    console.log(obj);
                     if (thisOption.familyName === obj.objFamily) {
+
                         if (!instanceMetricCount[obj.objHash]) {
                             instanceMetricCount[obj.objHash] = 0;
                         }
@@ -752,6 +757,7 @@ class LineChart extends Component {
             }
 
             that.graph.currentTooltipTime = tooltip.timeValue;
+            console.log(tooltip);
             that.props.showTooltip(xPos, yPos, that.graph.margin.left, that.graph.margin.top, tooltip);
         });
 

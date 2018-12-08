@@ -19,7 +19,7 @@ import XLogFilter from './Paper/XLogFilter/XLogFilter';
 import Logo from './Logo/Logo';
 import Navigator from './Navigator/Navigator';
 import ObjectSelector from './ObjectSelector/ObjectSelector';
-import ApiServerSelector from './ObjectSelector/ApiServerSelector/ApiServerSelector';
+import SimpleSelector from './SimpleSelector/SimpleSelector';
 
 export {
     ContentWrapper,
@@ -43,5 +43,5 @@ export {
     Logo,
     Navigator,
     ObjectSelector,
-    ApiServerSelector
+    SimpleSelector
 };
