@@ -208,12 +208,7 @@ class InstanceSelector extends Component {
                                             }
 
                                         }).sort((a, b) => {
-                                            let compare = a.objType.localeCompare(b.objType);
-                                            if (compare === 0) {
-                                                return a.objName.localeCompare(b.objName);
-                                            } else {
-                                                return compare;
-                                            }
+                                            return (a.objType + a.objName).localeCompare(b.objType + b.objName);
                                         }).map((instance, i) => {
                                             let objType = this.props.counterInfo.objTypesMap[instance.objType];
                                             let icon = "";

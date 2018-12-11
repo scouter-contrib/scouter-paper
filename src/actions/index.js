@@ -22,6 +22,9 @@ export const SET_RANGE_DATE_HOURS_MINUTES_VALUE = 'SET_RANGE_DATE_HOURS_MINUTES_
 export const SET_RANGE_ALL = 'SET_RANGE_ALL';
 export const SET_COUNTER_INFO = 'SET_COUNTER_INFO';
 export const SET_CONTROLLER_STATE = 'SET_CONTROLLER_STATE';
+export const SET_FILTER_MAP = 'SET_FILTER_MAP';
+export const ADD_FILTERED_OBJECT = 'ADD_FILTERED_OBJECT';
+export const REMOVE_FILTERED_OBJECT = 'REMOVE_FILTERED_OBJECT';
 
 export function setConfig(config) {
     return {
@@ -59,6 +62,27 @@ export function setTarget(objects) {
     return {
         type: SET_TARGET,
         objects : objects
+    };
+}
+
+export function setFilterMap(filterMap) {
+    return {
+        type: SET_FILTER_MAP,
+        filterMap : filterMap
+    };
+}
+
+export function addFilteredObject(objHash) {
+    return {
+        type: ADD_FILTERED_OBJECT,
+        objHash : objHash
+    };
+}
+
+export function removeFilteredObject(objHash) {
+    return {
+        type: REMOVE_FILTERED_OBJECT,
+        objHash : objHash
     };
 }
 

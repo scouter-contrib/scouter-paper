@@ -14,7 +14,10 @@ import {
     setTarget,
     clearAllMessage,
     setControlVisibility,
-    setConfig
+    setConfig,
+    setFilterMap,
+    addFilteredObject,
+    removeFilteredObject
 } from '../../actions';
 import jQuery from "jquery";
 
@@ -30,7 +33,8 @@ class Controller extends Component {
             selectedObjects: {},
             filter: "",
             loading : false,
-            selector: false
+            selector: false,
+            filterOpened : false
         };
     }
 
@@ -463,9 +467,23 @@ class Controller extends Component {
         });
     };
 
-    render() {
+    toggleFilterControl = () => {
+        this.setState({
+            filterOpened: !this.state.filterOpened
+        });
+    };
 
-        console.log(this.state.selectedObjects);
+    toggleFilteredObject = (objHash) => {
+        console.log(this.props.filterMap[objHash]);
+        if (this.props.filterMap[objHash]) {
+            this.props.removeFilteredObject(objHash);
+        } else {
+            this.props.addFilteredObject(objHash);
+        }
+    };
+
+    render() {
+        console.log(this.props.filterMap);
         return (
             <article className={"controller-wrapper " + this.props.control.Controller}>
                 <Logo></Logo>
@@ -481,7 +499,6 @@ class Controller extends Component {
                         </div>
                     </div>
                 </div>
-
                 <div className="control-item">
                     <div className="row desc">
                         <div className="step"><span>2</span></div>
@@ -490,13 +507,25 @@ class Controller extends Component {
                     <div className="row control">
                         <div>
                             <div className="object-navigator-btn">
-                                <span>NO SELECTED</span>
+                                {this.props.objects.length > 0 && <span>{Object.keys(this.props.filterMap).length} / {this.props.objects.length} OBJECTS</span>}
+                                {this.props.objects.length <= 0 && <span>NO SELECTED</span>}
+                                <span className="toggle-filter-icon" onClick={this.toggleFilterControl}><i className="fa fa-angle-down" aria-hidden="true"></i></span>
                                 <span className="popup-icon" onClick={this.toggleSelectorVisible}><i className="fa fa-crosshairs" aria-hidden="true"></i></span>
                             </div>
+                            {this.state.filterOpened &&
+                            <div className="object-filter-list scrollbar">
+                                <ul>
+                                    {this.props.objects.sort((a,b) => {
+                                        return a.objName.localeCompare(b.objName);
+                                    }).map((object, i) => {
+                                        return <li key={i} className={this.props.filterMap[object.objHash] ? "filtered" : ""} onClick={this.toggleFilteredObject.bind(this, object.objHash)}>{object.objName}</li>;
+                                    })}
+                                </ul>
+                            </div>
+                            }
                         </div>
                     </div>
                 </div>
-
                 <div className="control-item">
                     <div className="row desc">
                         <div className="step"><span>3</span></div>
@@ -532,6 +561,7 @@ let mapStateToProps = (state) => {
     return {
         control: state.control,
         objects: state.target.objects,
+        filterMap: state.target.filterMap,
         counterInfo: state.counterInfo,
         config: state.config,
         user: state.user,
@@ -548,6 +578,9 @@ let mapDispatchToProps = (dispatch) => {
         pushMessage: (category, title, content) => dispatch(pushMessage(category, title, content)),
         addRequest: () => dispatch(addRequest()),
         setConfig: (config) => dispatch(setConfig(config)),
+        setFilterMap: (filterMap) => dispatch(setFilterMap(filterMap)),
+        addFilteredObject: (objHash) => dispatch(addFilteredObject(objHash)),
+        removeFilteredObject: (objHash) => dispatch(removeFilteredObject(objHash))
     };
 };
 

@@ -1,4 +1,4 @@
-import {SET_SUPPORTED, ADD_REQUEST, SET_CONFIG, SET_USER_ID, SET_USER_DATA, SET_TARGET, PUSH_MESSAGE, SET_CONTROL_VISIBILITY, CLEAR_ALL_MESSAGE, SET_BG_COLOR, SET_SELECTION, SET_TEMPLATE, SET_REAL_TIME, SET_RANGE_DATE, SET_RANGE_HOURS, SET_RANGE_MINUTES, SET_RANGE_VALUE, SET_REAL_TIME_VALUE, SET_RANGE_DATE_HOURS_MINUTES, SET_REAL_TIME_RANGE_STEP_VALUE, SET_RANGE_DATE_HOURS_MINUTES_VALUE, SET_RANGE_ALL, SET_COUNTER_INFO, SET_CONTROLLER_STATE} from '../actions';
+import {SET_SUPPORTED, ADD_REQUEST, SET_CONFIG, SET_USER_ID, SET_USER_DATA, SET_TARGET, PUSH_MESSAGE, SET_CONTROL_VISIBILITY, CLEAR_ALL_MESSAGE, SET_BG_COLOR, SET_SELECTION, SET_TEMPLATE, SET_REAL_TIME, SET_RANGE_DATE, SET_RANGE_HOURS, SET_RANGE_MINUTES, SET_RANGE_VALUE, SET_REAL_TIME_VALUE, SET_RANGE_DATE_HOURS_MINUTES, SET_REAL_TIME_RANGE_STEP_VALUE, SET_RANGE_DATE_HOURS_MINUTES_VALUE, SET_RANGE_ALL, SET_COUNTER_INFO, SET_CONTROLLER_STATE, SET_FILTER_MAP, ADD_FILTERED_OBJECT, REMOVE_FILTERED_OBJECT} from '../actions';
 import {combineReducers} from 'redux';
 import moment from 'moment';
 
@@ -227,6 +227,7 @@ const user = (state = userState, action) => {
 
 const targetState = {
     objects: [],
+    filterMap : {},
     selection : {
         x1: null,
         x2: null,
@@ -238,13 +239,39 @@ const targetState = {
 const target = (state = targetState, action) => {
     switch (action.type) {
         case SET_TARGET:
+            let filterMap = {};
+            action.objects.forEach((object) => {
+                filterMap[object.objHash] = true;
+            });
+
             return Object.assign({}, state, {
-                objects: action.objects
+                objects: action.objects,
+                filterMap : filterMap
             });
         case SET_SELECTION:
             return Object.assign({}, state, {
                 selection: action.selection
             });
+        case SET_FILTER_MAP:
+            return Object.assign({}, state, {
+                filterMap: action.filterMap
+            });
+        case ADD_FILTERED_OBJECT: {
+            let currentFilterMap = Object.assign({}, state.filterMap);
+            currentFilterMap[action.objHash] = true;
+            return Object.assign({}, state, {
+                filterMap: currentFilterMap
+            });
+        }
+
+        case REMOVE_FILTERED_OBJECT: {
+            let currentFilterMap = Object.assign({}, state.filterMap);
+            console.log(currentFilterMap);
+            delete currentFilterMap[action.objHash];
+            return Object.assign({}, state, {
+                filterMap: currentFilterMap
+            });
+        }
         default:
             return state;
     }

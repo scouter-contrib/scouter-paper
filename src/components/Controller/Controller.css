@@ -88,10 +88,9 @@
     position: relative;
 }
 
+.controller-wrapper .row .object-navigator-btn .toggle-filter-icon,
 .controller-wrapper .row .object-navigator-btn .popup-icon {
     position: absolute;
-    top : 0;
-    right : 0;
     font-size: 14px;
     width: 20px;
     height: 100%;
@@ -101,9 +100,51 @@
     text-align: center;
 }
 
+.controller-wrapper .row .object-navigator-btn .popup-icon {
+    top : 0;
+    right : 0;
+}
+
+.controller-wrapper .row .object-navigator-btn .toggle-filter-icon {
+    top : 0;
+    right : 20px;
+}
+
+.controller-wrapper .row .object-navigator-btn .toggle-filter-icon:hover,
 .controller-wrapper .row .object-navigator-btn .popup-icon:hover {
     background-color: rgba(0,0,0,0.3);
     color: #333;
-    background-color: #FFCC11;;
+    background-color: #FFCC11;
     cursor: pointer;
+}
+
+.controller-wrapper .object-filter-list {
+    max-height: 200px;
+    overflow-y: auto;
+    margin-top: 5px;
+}
+
+.controller-wrapper .object-filter-list ul {
+    list-style: none;
+    margin: 0;
+    padding: 0;
+}
+
+.controller-wrapper .object-filter-list ul li {
+    padding: 5px;
+    cursor: pointer;
+    border-bottom: 1px solid rgba(0,0,0,0.2);
+}
+
+.controller-wrapper .object-filter-list ul li:first-child {
+    border-top: 1px solid rgba(0,0,0,0.2);
+}
+
+.controller-wrapper .object-filter-list ul li:hover {
+    background-color: rgba(0,0,0,0.2);
+}
+
+.controller-wrapper .object-filter-list ul li.filtered {
+    background-color: #FFCC11;
+    color: #333;
 }
