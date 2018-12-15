@@ -293,6 +293,10 @@ class Paper extends Component {
             }
         }
 
+        if (JSON.stringify(this.props.filterMap) !== JSON.stringify(nextProps.filterMap)) {
+            this.getVisitor(nextProps);
+        }
+
         if (JSON.stringify(this.props.objects) !== JSON.stringify(nextProps.objects) || JSON.stringify(this.props.user) !== JSON.stringify(nextProps.user) || JSON.stringify(this.props.config) !== JSON.stringify(nextProps.config)) {
             this.checkRealtimeAlert();
         }
@@ -401,7 +405,7 @@ class Paper extends Component {
             this.getXLog(false, objects);
         }
 
-        this.getVisitor();
+        this.getVisitor(this.props);
         this.getRealTimeCounter();
 
         clearInterval(this.dataRefreshTimer);
@@ -1090,34 +1094,50 @@ class Paper extends Component {
         }
     };
 
-    getVisitor = () => {
+    getVisitor = (props) => {
         let that = this;
-        if (this.props.objects && this.props.objects.length > 0) {
-            this.props.addRequest();
-            let time = (new ServerDate()).getTime();
-            jQuery.ajax({
-                method: "GET",
-                async: true,
-                url: getHttpProtocol(this.props.config) + '/scouter/v1/visitor/realTime?objHashes=' + JSON.stringify(this.props.objects.map((instance) => {
-                    return Number(instance.objHash);
-                })),
-                xhrFields: getWithCredentials(that.props.config),
-                beforeSend: function (xhr) {
-                    setAuthHeader(xhr, that.props.config, getCurrentUser(that.props.config, that.props.user));
-                }
-            }).done((msg) => {
-                if (!that.mounted) {
-                    return;
-                }
+        if (props.objects && props.objects.length > 0) {
+            let filterdObjects = props.objects.filter((instance) => {
+                return props.filterMap[instance.objHash]
+            });
+
+            if (filterdObjects.length > 0) {
+                props.addRequest();
+                let time = (new ServerDate()).getTime();
+                jQuery.ajax({
+                    method: "GET",
+                    async: true,
+                    url: getHttpProtocol(props.config) + '/scouter/v1/visitor/realTime?objHashes=' + JSON.stringify(filterdObjects.map((instance) => {
+                        return Number(instance.objHash);
+                    })),
+                    xhrFields: getWithCredentials(props.config),
+                    beforeSend: function (xhr) {
+                        setAuthHeader(xhr, props.config, getCurrentUser(props.config, props.user));
+                    }
+                }).done((msg) => {
+                    if (!that.mounted) {
+                        return;
+                    }
+                    this.setState({
+                        visitor: {
+                            time: time,
+                            visitor: msg.result
+                        }
+                    });
+                }).fail((xhr, textStatus, errorThrown) => {
+                    errorHandler(xhr, textStatus, errorThrown, props);
+                });
+            } else {
+                let time = (new ServerDate()).getTime();
                 this.setState({
                     visitor: {
                         time: time,
-                        visitor: msg.result
+                        visitor: 0
                     }
                 });
-            }).fail((xhr, textStatus, errorThrown) => {
-                errorHandler(xhr, textStatus, errorThrown, this.props);
-            });
+            }
+
+
         }
     };
 
@@ -1667,6 +1687,7 @@ C
 let mapStateToProps = (state) => {
         return {
             objects: state.target.objects,
+            filterMap: state.target.filterMap,
             selection: state.target.selection,
             config: state.config,
             user: state.user,

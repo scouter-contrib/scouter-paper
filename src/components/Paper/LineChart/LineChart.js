@@ -452,7 +452,12 @@ class LineChart extends Component {
                 })
             }
 
-            area.data([that.state.counters[counterKey]]).attr("d", valueArea).style("fill", color).style("opacity", this.props.config.graph.fillOpacity);
+
+            if (!this.props.filterMap[obj.objHash]) {
+                area.data([that.state.counters[counterKey]]).attr("d", valueArea).style("fill", color).style("opacity", 0);
+            } else {
+                area.data([that.state.counters[counterKey]]).attr("d", valueArea).style("fill", color).style("opacity", this.props.config.graph.fillOpacity);
+            }
         }
 
 
@@ -506,7 +511,11 @@ class LineChart extends Component {
             }
         });
 
-        path.data([that.state.counters[counterKey]]).attr("d", valueLine).style("stroke-width", this.props.config.graph.width).style("opacity", this.props.config.graph.opacity);
+        if (!this.props.filterMap[obj.objHash]) {
+            path.data([that.state.counters[counterKey]]).attr("d", valueLine).style("stroke-width", this.props.config.graph.width).style("opacity", 0);
+        } else {
+            path.data([that.state.counters[counterKey]]).attr("d", valueLine).style("stroke-width", this.props.config.graph.width).style("opacity", this.props.config.graph.opacity);
+        }
     };
 
 
@@ -564,8 +573,15 @@ class LineChart extends Component {
         let circleKey = "circle-" + obj.objHash + "_" + this.replaceName(thisOption.counterKey);
         let circle = that.graph.focus.select("circle." + circleKey);
         if (circle.size() < 1) {
-            that.graph.focus.append("circle").attr("class", circleKey).attr("r", r).attr("stroke", color);
+            circle = that.graph.focus.append("circle").attr("class", circleKey).attr("r", r).attr("stroke", color);
         }
+
+        if (this.props.filterMap[obj.objHash]) {
+            circle.style("opacity", 1);
+        } else {
+            circle.style("opacity", 0);
+        }
+
     };
 
     mouseMoveObject = (obj, thisOption, counterKey, dataIndex, color, tooltip) => {
@@ -575,14 +591,16 @@ class LineChart extends Component {
         let unit = that.state.counters[counterKey][dataIndex].data[obj.objHash] ? that.state.counters[counterKey][dataIndex].data[obj.objHash].unit : "";
 
         if (that.state.counters[counterKey][dataIndex].time) {
-            tooltip.lines.push({
-                instanceName: obj.objName,
-                circleKey: circleKey,
-                metricName: thisOption.title,
-                value: obj.objHash && that.state.counters[counterKey][dataIndex].data[obj.objHash] ? that.state.counters[counterKey][dataIndex].data[obj.objHash].value : null,
-                displayValue: obj.objHash && that.state.counters[counterKey][dataIndex].data[obj.objHash] ? numeral(that.state.counters[counterKey][dataIndex].data[obj.objHash].value).format(this.props.config.numberFormat) + " " + unit : null,
-                color: color
-            });
+            if (this.props.filterMap[obj.objHash]) {
+                tooltip.lines.push({
+                    instanceName: obj.objName,
+                    circleKey: circleKey,
+                    metricName: thisOption.title,
+                    value: obj.objHash && that.state.counters[counterKey][dataIndex].data[obj.objHash] ? that.state.counters[counterKey][dataIndex].data[obj.objHash].value : null,
+                    displayValue: obj.objHash && that.state.counters[counterKey][dataIndex].data[obj.objHash] ? numeral(that.state.counters[counterKey][dataIndex].data[obj.objHash].value).format(this.props.config.numberFormat) + " " + unit : null,
+                    color: color
+                });
+            }
         } else {
             that.graph.focus.select("circle." + circleKey).style("display", "none");
         }
@@ -710,12 +728,8 @@ class LineChart extends Component {
                     break;
                 }
 
-                console.log(that.props.objects);
-
                 for (let i = 0; i < that.props.objects.length; i++) {
                     const obj = that.props.objects[i];
-                    console.log(thisOption);
-                    console.log(obj);
                     if (thisOption.familyName === obj.objFamily) {
 
                         if (!instanceMetricCount[obj.objHash]) {
@@ -757,7 +771,6 @@ class LineChart extends Component {
             }
 
             that.graph.currentTooltipTime = tooltip.timeValue;
-            console.log(tooltip);
             that.props.showTooltip(xPos, yPos, that.graph.margin.left, that.graph.margin.top, tooltip);
         });
 
@@ -805,7 +818,8 @@ class LineChart extends Component {
 let mapStateToProps = (state) => {
     return {
         objects: state.target.objects,
-        config: state.config
+        config: state.config,
+        filterMap: state.target.filterMap
     };
 };
 

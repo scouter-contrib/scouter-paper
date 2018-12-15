@@ -195,7 +195,7 @@ class Profiler extends Component {
                     let y1 = nextProps.selection.y1;
                     let y2 = nextProps.selection.y2;
                     let filter = nextProps.selection.filter;
-                    this.getList(x1, x2, y1, y2, filter);
+                    this.getList(x1, x2, y1, y2, filter, nextProps.filterMap);
                 }
             } else {
                 if (!this.txidInit) {
@@ -245,7 +245,7 @@ class Profiler extends Component {
         return null;
     };
 
-    getList = (x1, x2, y1, y2, filter) => {
+    getList = (x1, x2, y1, y2, filter, filterMap) => {
         let days = getSearchDays(x1, x2);
         let fromTos = getDivideDays(x1, x2);
 
@@ -255,17 +255,17 @@ class Profiler extends Component {
             });
 
             for (let i = 0; i < fromTos.length; i++) {
-                this.getListData(fromTos[i].from, fromTos[i].to, y1, y2, true, filter);
+                this.getListData(fromTos[i].from, fromTos[i].to, y1, y2, true, filter, filterMap);
             }
 
         } else {
-            this.getListData(x1, x2, y1, y2, false, filter);
+            this.getListData(x1, x2, y1, y2, false, filter, filterMap);
         }
     };
 
 
     // search의 경우, 마지막 newXLogs가 allXLogs에 들어 있는 문제 있음
-    getListData = async (x1, x2, y1, y2, append, filter) => {
+    getListData = async (x1, x2, y1, y2, append, filter, filterMap) => {
         let that = this;
         let allXLogs = that.props.xlogs;
         let newXLogs = that.props.newXLogs;
@@ -305,6 +305,10 @@ class Profiler extends Component {
         }
 
         filtered = await getFilteredData0(filtered, filter);
+
+        filtered = filtered.filter((d) => {
+            return filterMap[d.objHash];
+        });
 
         let date = moment(new Date(x1)).format("YYYYMMDD");
 
@@ -697,7 +701,8 @@ let mapStateToProps = (state) => {
     return {
         objects: state.target.objects,
         config: state.config,
-        user: state.user
+        user: state.user,
+        filterMap: state.target.filterMap
     };
 };
 

@@ -24,7 +24,6 @@ class SimpleSelector extends Component {
     };
 
     render() {
-        console.log(this.props.selected);
         let selectedItem = this.props.list[this.props.selected];
         return (
             <div className="simple-selector-wrapper" onClick={this.props.toggleSelectorVisible}>

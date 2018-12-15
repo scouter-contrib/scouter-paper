@@ -89,6 +89,10 @@ class XLogBar extends Component {
 
 
             this.props.data.firstStepXlogs.forEach((xlog) => {
+                if (!this.props.filterMap[xlog.objHash]) {
+                    return;
+                }
+
                 let exist = base.querySelector("[data-txid='" + xlog.txid + "']");
                 if (!exist) {
                     let div = document.createElement("div");

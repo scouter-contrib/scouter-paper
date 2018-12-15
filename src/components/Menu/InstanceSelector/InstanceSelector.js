@@ -164,8 +164,6 @@ class InstanceSelector extends Component {
 
         iconMap["all"] = all;
 
-        console.log(this.props.objects);
-
         return (
             <div className={"instance-selector-bg " + (this.props.visible ? "" : "hidden")} onClick={this.props.toggleSelectorVisible}>
                 <div>

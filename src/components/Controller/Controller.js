@@ -172,7 +172,6 @@ class Controller extends Component {
                 });
 
                 const objects = msg.result;
-                console.log(objects)
                 if (objects) {
                     objects.sort((a, b) => a.objName < b.objName ? -1 : 1);
                     this.setState({
@@ -334,7 +333,6 @@ class Controller extends Component {
             url: getHttpProtocol(config) + '/scouter/v1/info/server'
         }).done((msg) => {
 
-            console.log("get");
             let servers = msg.result;
             let activeServerId = null;
             if (servers.length > 0) {
@@ -474,7 +472,6 @@ class Controller extends Component {
     };
 
     toggleFilteredObject = (objHash) => {
-        console.log(this.props.filterMap[objHash]);
         if (this.props.filterMap[objHash]) {
             this.props.removeFilteredObject(objHash);
         } else {
@@ -483,7 +480,6 @@ class Controller extends Component {
     };
 
     render() {
-        console.log(this.props.filterMap);
         return (
             <article className={"controller-wrapper " + this.props.control.Controller}>
                 <Logo></Logo>
