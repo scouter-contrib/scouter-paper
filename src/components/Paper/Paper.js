@@ -265,6 +265,12 @@ class Paper extends Component {
 
     componentWillReceiveProps(nextProps) {
 
+        console.log(nextProps.searchCondition);
+
+        if (this.props.searchCondition.time !== nextProps.searchCondition.time) {
+            this.search(nextProps.searchCondition.from, nextProps.searchCondition.to);
+        }
+
         if (JSON.stringify(nextProps.template) !== JSON.stringify(this.props.template)) {
             if (JSON.stringify(nextProps.template.boxes) !== JSON.stringify(this.state.boxes) || JSON.stringify(nextProps.template.layouts) !== JSON.stringify(this.state.layouts)) {
                 this.setState({
@@ -756,6 +762,8 @@ class Paper extends Component {
     };
 
     search = (from, to, objects) => {
+
+        console.log(from, to);
 
         this.lastFrom = from;
         this.lastTo = to;
@@ -1627,7 +1635,6 @@ C
                 <div>
                 <div className={"fixed-alter-object " + (this.state.fixedControl ? 'show' : '')}></div>
                 <PaperControl addPaper={this.addPaper} addPaperAndAddMetric={this.addPaperAndAddMetric} clearLayout={this.clearLayout} fixedControl={this.state.fixedControl} toggleRangeControl={this.toggleRangeControl} realtime={this.props.range.realTime} alert={this.state.alert} clearAllAlert={this.clearAllAlert} clearOneAlert={this.clearOneAlert} setRewind={this.setRewind} showAlert={this.state.showAlert} toggleShowAlert={this.toggleShowAlert} />
-                <RangeControl visible={this.state.rangeControl} search={this.search} fixedControl={this.state.fixedControl} toggleRangeControl={this.toggleRangeControl} changeLongTerm={this.changeLongTerm}/>
                 {(objectSelected && (!this.state.boxes || this.state.boxes.length === 0)) &&
                 <div className="quick-usage">
                     <div>
@@ -1693,7 +1700,8 @@ let mapStateToProps = (state) => {
             user: state.user,
             template: state.template,
             range: state.range,
-            supported : state.supported
+            supported : state.supported,
+            searchCondition: state.searchCondition,
         };
     };
 

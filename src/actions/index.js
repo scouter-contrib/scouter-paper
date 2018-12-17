@@ -25,6 +25,7 @@ export const SET_CONTROLLER_STATE = 'SET_CONTROLLER_STATE';
 export const SET_FILTER_MAP = 'SET_FILTER_MAP';
 export const ADD_FILTERED_OBJECT = 'ADD_FILTERED_OBJECT';
 export const REMOVE_FILTERED_OBJECT = 'REMOVE_FILTERED_OBJECT';
+export const SET_SEARCH_CONDITION = 'SET_SEARCH_CONDITION';
 
 export function setConfig(config) {
     return {
@@ -237,6 +238,15 @@ export function setControllerState(state) {
     return {
         type: SET_CONTROLLER_STATE,
         state: state
+    };
+}
+
+export function setSearchCondition(from, to, time) {
+    return {
+        type: SET_SEARCH_CONDITION,
+        from: from,
+        to : to,
+        time : time
     };
 }
 

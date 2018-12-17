@@ -7,6 +7,7 @@ import Logo from "../Logo/Logo";
 import SimpleSelector from "../SimpleSelector/SimpleSelector";
 import InstanceSelector from "../Menu/InstanceSelector/InstanceSelector";
 import AgentColor from "../../common/InstanceColor";
+import RangeControl from "../Paper/RangeControl/RangeControl";
 import {getDefaultServerConfig, getDefaultServerConfigIndex, setServerTimeGap, setRangePropsToUrl, getHttpProtocol, errorHandler, getWithCredentials, setAuthHeader, getCurrentUser} from '../../common/common';
 import {
     addRequest,
@@ -479,6 +480,10 @@ class Controller extends Component {
         }
     };
 
+    search = (from, to, objects) => {
+        this.props.search(from, to, objects);
+    };
+
     render() {
         return (
             <article className={"controller-wrapper " + this.props.control.Controller}>
@@ -525,7 +530,12 @@ class Controller extends Component {
                 <div className="control-item">
                     <div className="row desc">
                         <div className="step"><span>3</span></div>
-                        <div className="row-message">APPLY FILTER</div>
+                        <div className="row-message">SEARCH</div>
+                    </div>
+                    <div className="row control">
+                        <div>
+                            <RangeControl visible={this.state.rangeControl} search={this.search} fixedControl={this.state.fixedControl} changeLongTerm={this.changeLongTerm}/>
+                        </div>
                     </div>
                 </div>
 

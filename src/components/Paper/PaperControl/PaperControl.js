@@ -25,10 +25,6 @@ class PaperControl extends Component {
 
         return (
             <div className={"papers-controls noselect " + (this.props.fixedControl ? 'fixed-control ' : ' ') + (this.touch ? 'touch' : '')}>
-                <div className={"paper-control live " + (this.props.realtime ? "realtime" : "")} onClick={this.props.toggleRangeControl} data-tip="CLICK TO CHANGE TIME RANGE">
-                    <span className="live">R</span>
-                </div>
-                <div className="paper-control-separator"></div>
                 {!this.touch &&
                 <div className="paper-control" onClick={this.props.addPaper} data-tip="CLICK TO ADD EMPTY PAPER">
                     <i className="fa fa-plus-circle" aria-hidden="true"></i>
