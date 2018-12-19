@@ -763,8 +763,6 @@ class Paper extends Component {
 
     search = (from, to, objects) => {
 
-        console.log(from, to);
-
         this.lastFrom = from;
         this.lastTo = to;
 

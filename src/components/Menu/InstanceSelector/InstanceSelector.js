@@ -107,7 +107,7 @@ class InstanceSelector extends Component {
     };
 
     cancelClick = () => {
-        this.props.toggleSelectorVisible();
+        this.props.closeSelectorPopup();
     };
 
 
@@ -139,6 +139,10 @@ class InstanceSelector extends Component {
         this.props.quickSelectByTypeClick(type);
     };
 
+    showPresetManager = () => {
+        this.props.togglePresetManager();
+    };
+
     render() {
 
         let iconMap = {"all" : 0};
@@ -165,8 +169,12 @@ class InstanceSelector extends Component {
         iconMap["all"] = all;
 
         return (
-            <div className={"instance-selector-bg " + (this.props.visible ? "" : "hidden")} onClick={this.props.toggleSelectorVisible}>
+            <div className="instance-selector-bg" onClick={this.cancelClick}>
                 <div>
+                    <div className="selector-type-btns" onClick={(e) => e.stopPropagation()}>
+                        <div className="selected">SERVER NAVIGATOR</div>
+                        <div onClick={this.showPresetManager}>PRESET MANAGER</div>
+                    </div>
                     <div className="instance-selector popup-div" onClick={(e) => e.stopPropagation()}>
                         <div className="instance-selector-content">
                             <div className="host-list">

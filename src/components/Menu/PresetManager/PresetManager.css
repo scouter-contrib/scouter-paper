@@ -1,41 +1,66 @@
 .preset-manager-bg {
-    position: absolute;
-    top: 0;
-    left: 0;
-    right: 0;
-    bottom: 0;
-    z-index: 30;
-    max-width: 1600px;
-    margin: 0 auto;
-}
-
-.preset-manager-bg .preset-manager-fixed-bg {
     position: fixed;
     top: 0;
     left: 0;
     right: 0;
     bottom: 0;
-    background-color: rgba(0, 0, 0, 0.3);
     z-index: 30;
+    margin: 0 auto;
+    background-color: rgba(0, 0, 0, 0.6);
+    width: 100%;
+    display: table;
+    height: 100%;
+    box-sizing: border-box;
+}
+
+.preset-manager-bg > div {
+    display: table-cell;
+    width: 100%;
+    height: 100%;
+    box-sizing: border-box;
+    vertical-align: middle;
+}
+
+.preset-manager-bg .selector-type-btns {
+    width: 100%;
+    max-width: 800px;
+    margin: 0 auto 5px;
+}
+
+.preset-manager-bg .selector-type-btns > div {
+    display: inline-block;
+    padding: 6px 8px;
+    background-color: #282828;
+    border-radius: 5px;
+    margin-right: 5px;
+    font-size: 11px;
+    cursor: pointer;
+}
+
+.preset-manager-bg .selector-type-btns > div:hover {
+    background-color: #FFCC11;
+    color: #333;
+}
+
+.preset-manager-bg .selector-type-btns > div.selected {
+    background-color: #FFCC11;
+    color: #333;
 }
 
 .preset-manager {
+    margin: 0 auto;
     border: 1px solid rgba(0, 0, 0, 0.6);
     color: white;
-    width: 500px;
-    height: 300px;
-    position: absolute;
-    top: 47px;
-    right: 0;
-    z-index: 5;
+    width: 100%;
+    max-width: 800px;
+    height: 360px;
     padding: 0;
+    position: relative;
     -webkit-touch-callout: none;
     -webkit-user-select: none;
     -moz-user-select: none;
     -ms-user-select: none;
     user-select: none;
-    font-size: 10px;
-    z-index: 31;
 }
 
 .preset-manager > div {
@@ -50,6 +75,7 @@
     height: calc(100% - 70px);
     overflow-y: auto;
     margin-top: 30px;
+    font-size: 10px;
 }
 
 .preset-manager .title {

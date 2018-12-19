@@ -13,7 +13,6 @@ import XLogBar from './Paper/XLogBar/XLogBar';
 import EmptyBox from './Paper/EmptyBox/EmptyBox';
 import PaperControl from './Paper/PaperControl/PaperControl';
 import Settings from './Settings/Settings';
-import InstanceInfo from './Menu/InstanceInfo/InstanceInfo';
 import InstanceSelector from './Menu/InstanceSelector/InstanceSelector';
 import XLogFilter from './Paper/XLogFilter/XLogFilter';
 import Logo from './Logo/Logo';
@@ -37,7 +36,6 @@ export {
     EmptyBox,
     PaperControl,
     Settings,
-    InstanceInfo,
     InstanceSelector,
     XLogFilter,
     Logo,

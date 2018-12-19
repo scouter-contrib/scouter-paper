@@ -294,8 +294,6 @@ class LayoutManager extends Component {
     };
 
     render() {
-
-        console.log(this.state.savedNo);
         return (
             <div className="layout-manager-bg">
                 <div className="layout-summary">

@@ -9,6 +9,7 @@ import InstanceSelector from "../Menu/InstanceSelector/InstanceSelector";
 import AgentColor from "../../common/InstanceColor";
 import RangeControl from "../Paper/RangeControl/RangeControl";
 import LayoutManager from "../Menu/LayoutManager/LayoutManager";
+import PresetManager from "../Menu/PresetManager/PresetManager";
 import {getDefaultServerConfig, getDefaultServerConfigIndex, setServerTimeGap, setRangePropsToUrl, getHttpProtocol, errorHandler, getWithCredentials, setAuthHeader, getCurrentUser} from '../../common/common';
 import {
     addRequest,
@@ -36,6 +37,7 @@ class Controller extends Component {
             filter: "",
             loading : false,
             selector: false,
+            preset : false,
             filterOpened : false
         };
     }
@@ -73,7 +75,22 @@ class Controller extends Component {
 
     toggleSelectorVisible = () => {
         this.setState({
-            selector: !this.state.selector
+            selector: !this.state.selector,
+            preset : !this.state.selector ? false : this.state.selector
+        });
+    };
+
+    closeSelectorPopup = () => {
+        this.setState({
+            selector: false,
+            preset : false
+        });
+    };
+
+    togglePresetManager = () => {
+        this.setState({
+            preset: !this.state.preset,
+            selector : !this.state.preset ? false : this.state.preset
         });
     };
 
@@ -107,6 +124,7 @@ class Controller extends Component {
 
     setObjects = () => {
         let objects = [];
+        console.log(this.state.selectedObjects);
         for (let hash in this.state.selectedObjects) {
             objects.push(this.state.selectedObjects[hash]);
         }
@@ -187,9 +205,126 @@ class Controller extends Component {
     };
 
 
+    applyPreset = (preset) => {
+        let that = this;
+        let props = this.props;
+
+        this.props.addRequest();
+        jQuery.ajax({
+            method: "GET",
+            async: true,
+            url: getHttpProtocol(props.config) + '/scouter/v1/info/server',
+            xhrFields: getWithCredentials(props.config),
+            beforeSend: function (xhr) {
+                setAuthHeader(xhr, props.config, getCurrentUser(props.config, props.user));
+            }
+        }).done((msg) => {
+
+            if (msg && msg.result) {
+
+                let servers = msg.result;
+
+                if (servers.length > 0) {
+                    if (!servers[0].version) {
+                        props.pushMessage("error", "Not Supported", "Paper 2.0 is available only on Scout Server 2.0 and later.");
+                        props.setControlVisibility("Message", true);
+                        return;
+                    }
+                }
+
+                //현재 멀티서버와 연결된 scouter webapp은 지원하지 않으므로 일단 단일 서버로 가정하고 마지막 서버 시간과 맞춘다.
+                servers.forEach((server) => {
+                    setServerTimeGap(Number(server.serverTime) - new Date().valueOf());
+                });
 
 
+                // GET INSTANCES INFO FROM URL IF EXISTS
 
+                let urlObjectHashes = preset.objects.map((d) => {
+                    return Number(d)
+                });
+
+                if (urlObjectHashes) {
+                    let selectedObjects = [];
+                    let objects = [];
+                    let activeServerId = null;
+                    servers.forEach((server) => {
+                        //일단 단일 서버로 가정하고 서버 시간과 맞춘다.
+                        setServerTimeGap(Number(server.serverTime) - new Date().valueOf());
+
+                        jQuery.ajax({
+                            method: "GET",
+                            async: false,
+                            url: getHttpProtocol(this.props.config) + '/scouter/v1/object?serverId=' + server.id,
+                            xhrFields: getWithCredentials(props.config),
+                            beforeSend: function (xhr) {
+                                setAuthHeader(xhr, props.config, getCurrentUser(props.config, props.user));
+                            }
+                        }).done(function (msg) {
+                            objects = msg.result;
+
+                            if (objects && objects.length > 0) {
+                                objects = objects
+                                    .filter(instance => {
+                                        return (instance.objName.match(new RegExp("/", "g")) || []).length < 3;
+                                    });
+
+                                objects.forEach((instance) => {
+                                    urlObjectHashes.forEach((objHash) => {
+                                        if (objHash === Number(instance.objHash)) {
+                                            selectedObjects.push(instance);
+                                            if (!server.selectedObjectCount) {
+                                                server.selectedObjectCount = 0;
+                                            }
+                                            server.selectedObjectCount++;
+                                            // 마지막으로 찾은 서버 ID로 세팅
+                                            activeServerId = server.id;
+                                        }
+                                    });
+                                })
+                            }
+                        }).fail(function (xhr, textStatus, errorThrown) {
+                            errorHandler(xhr, textStatus, errorThrown, that.props);
+                        });
+                    });
+
+                    if (selectedObjects.length > 0) {
+                        selectedObjects.sort((a, b) => a.objName < b.objName ? -1 : 1);
+
+                        let selectedObjectMap = {};
+                        for (let i = 0; i < selectedObjects.length; i++) {
+                            selectedObjectMap[selectedObjects[i].objHash] = selectedObjects[i];
+                        }
+
+                        this.setState({
+                            servers: servers,
+                            objects: objects,
+                            activeServerId: activeServerId,
+                            selectedObjects: selectedObjectMap
+                        });
+
+                        AgentColor.setInstances(selectedObjects, this.props.config.colorType);
+                        this.props.setTarget(selectedObjects);
+
+                    } else {
+                        this.setState({
+                            servers: servers
+                        });
+                    }
+
+                } else {
+                    this.setState({
+                        servers: servers
+                    });
+                }
+            }
+
+        }).fail((xhr, textStatus, errorThrown) => {
+            errorHandler(xhr, textStatus, errorThrown, that.props);
+        });
+
+
+    };
 
     setTargetFromUrl = (props) => {
 
@@ -413,7 +548,7 @@ class Controller extends Component {
             servers: servers,
             selectedObjects: selectedObjects
         });
-    }
+    };
 
     quickSelectByTypeClick = (type) => {
         let filteredObjects;
@@ -552,17 +687,34 @@ class Controller extends Component {
                     </div>
                 </div>
 
-                <InstanceSelector onFilterChange={this.onFilterChange} clearFilter={this.clearFilter} quickSelectByTypeClick={this.quickSelectByTypeClick} selectAll={this.selectAll} servers={this.state.servers}
+                {this.state.selector &&
+                <InstanceSelector onFilterChange={this.onFilterChange}
+                                  clearFilter={this.clearFilter}
+                                  quickSelectByTypeClick={this.quickSelectByTypeClick}
+                                  selectAll={this.selectAll}
+                                  servers={this.state.servers}
                                   activeServerId={this.state.activeServerId}
-                objects={this.state.objects}
-                selectedObjects={this.state.selectedObjects}
-                filter={this.state.filter}
-                loading={this.state.loading}
+                                  objects={this.state.objects}
+                                  selectedObjects={this.state.selectedObjects}
+                                  filter={this.state.filter}
+                                  loading={this.state.loading}
                                   onServerClick={this.onServerClick}
                                   instanceClick={this.instanceClick}
                                   setObjects={this.setObjects}
+                                  visible={this.state.selector}
+                                  toggleSelectorVisible={this.toggleSelectorVisible}
+                                  togglePresetManager={this.togglePresetManager}
+                                  closeSelectorPopup={this.closeSelectorPopup} />
+                }
 
-                visible={this.state.selector} toggleSelectorVisible={this.toggleSelectorVisible}/>
+                {this.state.preset &&
+                <PresetManager visible={this.state.preset}
+                               togglePresetManager={this.togglePresetManager}
+                               closeSelectorPopup={this.closeSelectorPopup}
+                               toggleSelectorVisible={this.toggleSelectorVisible}
+                               setObjects={this.setObjects}
+                               applyPreset={this.applyPreset}/>
+                }
 
             </article>
         );
