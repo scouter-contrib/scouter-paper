@@ -8,6 +8,7 @@ import SimpleSelector from "../SimpleSelector/SimpleSelector";
 import InstanceSelector from "../Menu/InstanceSelector/InstanceSelector";
 import AgentColor from "../../common/InstanceColor";
 import RangeControl from "../Paper/RangeControl/RangeControl";
+import LayoutManager from "../Menu/LayoutManager/LayoutManager";
 import {getDefaultServerConfig, getDefaultServerConfigIndex, setServerTimeGap, setRangePropsToUrl, getHttpProtocol, errorHandler, getWithCredentials, setAuthHeader, getCurrentUser} from '../../common/common';
 import {
     addRequest,
@@ -486,7 +487,7 @@ class Controller extends Component {
 
     render() {
         return (
-            <article className={"controller-wrapper " + this.props.control.Controller}>
+            <article className={"controller-wrapper noselect " + this.props.control.Controller}>
                 <Logo></Logo>
 
                 <div className="control-item first">
@@ -543,6 +544,11 @@ class Controller extends Component {
                     <div className="row desc">
                         <div className="step"><span>4</span></div>
                         <div className="row-message">CHANGE LAYOUT</div>
+                    </div>
+                    <div className="row control">
+                        <div>
+                            <LayoutManager visible={true}></LayoutManager>
+                        </div>
                     </div>
                 </div>
 
