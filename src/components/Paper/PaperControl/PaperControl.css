@@ -1,206 +1,155 @@
 .papers-controls {
-    padding: 6px;
-    margin: 10px 10px 0;
     font-size: 14px;
     color: white;
-    background-color: rgba(0, 0, 0, 0.1);
-    border-radius: 5px;
-    height: 32px;
     box-sizing: border-box;
     position: relative;
-    z-index: 21;
 }
 
-.papers-controls.fixed-control {
-    position: fixed;
-    top: 0;
-    width: calc(100% + 7px);
-    z-index: 10;
-    background-color: #207ce5;
-    margin: 0;
-    border-radius: 0;
-    border-bottom: 1px solid rgba(0, 0, 0, 0.4);
-}
 
-.papers-controls .paper-control-separator {
-    width: 2px;
-    height: 14px;
-    background-color: rgba(0, 0, 0, 0.2);
-    display: inline-block;
-    margin: 0 10px 0;
-    border-radius: 1px;
-    position: relative;
-    top: 3px;
-}
-
-.papers-controls .paper-control {
-    display: inline-block;
-    margin: 0 2px;
-    padding: 3px 5px;
-    background-color: rgba(0, 0, 0, 0.1);
-    border-radius: 3px;
-    line-height: 100%;
+.papers-controls .paper-control-btn {
+    display: block;
+    padding: 8px 5px;
     cursor: pointer;
-    height: 20px;
-    box-sizing: border-box;
+    text-align: center;
+}
+
+.papers-controls .paper-control-btn:hover {
+    background-color: #FFCC11;
+    color: #333;
+    border-radius : 2px;
+}
+
+.papers-controls .paper-control .paper-control-text {
+    margin-left: 5px;
 }
 
 .papers-controls .paper-control.multi-control {
-    position: relative;
-    top: -2px;
+    display: block;
+    padding: 0;
 }
 
 .papers-controls .paper-control .draggable {
     cursor: move;
 }
 
-.papers-controls .paper-right {
-    float: right;
-}
+.papers-controls .paper-control-metrics {
 
-.papers-controls .paper-control:hover {
-    background-color: rgba(0, 0, 0, 0.4);
-}
-
-.papers-controls .label {
-    font-size: 8px;
-    padding: 5px 4px;
-    display: inline-block;
-    position: relative;
-    top: -2px;
-    margin-right: 5px;
 }
 
 .papers-controls .paper-control .text-icon {
-    font-size: 8px;
+    font-size: 11px;
     line-height: 0;
     position: relative;
-    top: -3px;
+    margin-left: 5px;
 }
 
 .papers-controls .multi-metrics {
-    font-size: 8px;
+
     position: relative;
     cursor: auto;
 }
 
-.papers-controls .multi-metrics ul {
+.papers-controls .group-name {
+    padding: 7px 12px;
+    text-transform: uppercase;
+    position: relative;
+}
+
+.papers-controls .group-name .toggle-filter-icon {
     position: absolute;
+    font-size: 14px;
+    width: 20px;
+    height: 20px;
+    padding-top: 4px;
+    box-sizing: border-box;
+    display: inline-block;
+    text-align: center;
+    right: 5px;
+    top : 3px;
+}
+
+.papers-controls .group-name .toggle-filter-icon:hover {
+    background-color: rgba(0,0,0,0.3);
+    color: #333;
+    background-color: #FFCC11;
+    cursor: pointer;
+}
+
+.papers-controls ul {
     line-height: 100%;
-    left: -5px;
-    top: 17px;
     list-style: none;
     margin: 0;
     padding: 0;
-    background-color: #26466D;
     border-radius: 2px;
-    display: none;
-    z-index: 21;
+    height: 0;
+    overflow: hidden;
 }
 
-.papers-controls .multi-control:hover ul {
+.papers-controls .paper-control.opened {
+    background-color: rgba(0,0,0,0.2);
+}
+
+.papers-controls .paper-control.opened ul {
+    height: auto;
+    padding: 5px 10px;
+}
+
+.papers-controls ul li {
+    display: inline-block;
+    width: calc((100% - 5px)/2);
+    overflow-x: hidden;
+    text-overflow: ellipsis;
+    box-sizing: border-box;
+    margin-bottom: 5px;
+    position: relative;
+}
+
+.papers-controls ul li .draggable-icon {
+    position: absolute;
+    font-size: 8px;
+    top : 6px;
+    right : 4px;
+    text-transform: uppercase;
+    padding: 2px 4px;
+    background-color: orange;
+    border-radius: 3px;
+    display: none;
+    cursor: move;
+}
+
+.papers-controls ul li:hover .draggable-icon {
     display: inline-block;
 }
 
-.papers-controls .multi-metrics ul li .control-item {
-    line-height: 10px;
+
+.papers-controls ul li:nth-child(2n-1) {
+    margin-right: 5px;
+}
+
+.papers-controls ul li .paper-control-item {
     display: block;
-    padding: 5px;
+    padding: 8px 5px;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    _border: 1px solid rgba(0,0,0,0.4);
+    background-color: rgba(0,0,0,0.3);
+    border-radius: 2px;
 }
 
-.papers-controls .multi-metrics ul li .draggable:hover {
-    background-color: rgba(0, 0, 0, 0.3);
+.papers-controls ul li:hover .draggable,
+.papers-controls ul li:hover .paper-control-item {
+    color: #333;
+    background-color: #FFCC11;
+
 }
 
-.papers-controls .multi-metrics ul li span {
+.papers-controls ul li span {
     white-space: nowrap;
     position: static !important;
 }
 
-@media screen and (max-width: 660px) {
 
-    .papers-controls {
-        height: 58px;
-        padding-right: 60px;
-        text-align: justify;
-        line-height: 24px;
-    }
 
-    .papers-controls .label {
-        display: none;
-    }
-
-    .papers-controls .paper-right {
-        float: none;
-        position: absolute;
-        top: 19px;
-        right: 5px;
-    }
-
-    .papers-controls .paper-alert.paper-right {
-        float: none;
-        position: absolute;
-        top: 19px;
-        right: 30px;
-    }
-
-    .papers-controls.fixed-control {
-        padding-right: 40px;
-    }
-
-    .papers-controls.fixed-control .paper-right {
-        right: 3px;
-    }
-
-    .papers-controls.fixed-control .paper-alert.paper-right {
-        right: 28px;
-    }
-
-    .papers-controls.touch .multi-metrics ul {
-        top: 22px;
-    }
-
-    .papers-controls .multi-metrics ul li .control-item {
-        padding: 7px 5px;
-    }
-
-    .papers-controls .multi-metrics ul li .control-item:active {
-        background-color: rgba(0, 0, 0, 0.3);
-    }
-}
-
-@media screen and (max-width: 360px) {
-    .papers-controls {
-        height: 84px;
-    }
-
-    .papers-controls .paper-right {
-        float: none;
-        position: absolute;
-        top: 19px;
-        right: 5px;
-    }
-
-    .papers-controls .paper-alert.paper-right {
-        float: none;
-        position: absolute;
-        top: 19px;
-        right: 30px;
-    }
-
-    .papers-controls.fixed-control .paper-right {
-        right: 10px;
-    }
-
-    .papers-controls.fixed-control .paper-alert.paper-right {
-        right: 36px;
-    }
-}
-
-.papers-controls .__react_component_tooltip {
-    font-size: 8px !important;
-    padding: 4px 8px !important;
-}
 
 .papers-controls .paper-alert {
     position: relative;

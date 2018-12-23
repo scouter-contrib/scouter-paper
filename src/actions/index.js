@@ -26,6 +26,31 @@ export const SET_FILTER_MAP = 'SET_FILTER_MAP';
 export const ADD_FILTERED_OBJECT = 'ADD_FILTERED_OBJECT';
 export const REMOVE_FILTERED_OBJECT = 'REMOVE_FILTERED_OBJECT';
 export const SET_SEARCH_CONDITION = 'SET_SEARCH_CONDITION';
+export const SET_BOXES = 'SET_BOXES';
+export const SET_LAYOUTS = 'SET_LAYOUTS';
+export const SET_BOXES_LAYOUTS = 'SET_BOXES_LAYOUTS';
+
+export function setBoxes(boxes) {
+    return {
+        type: SET_BOXES,
+        boxes : boxes
+    };
+}
+
+export function setLayouts(layouts) {
+    return {
+        type: SET_LAYOUTS,
+        layouts : layouts
+    };
+}
+
+export function setBoxesLayouts(boxes, layouts) {
+    return {
+        type: SET_BOXES_LAYOUTS,
+        boxes : boxes,
+        layouts : layouts
+    };
+}
 
 export function setConfig(config) {
     return {

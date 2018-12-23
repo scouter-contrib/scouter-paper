@@ -3,7 +3,7 @@ import "./Paper.css";
 import "./Resizable.css";
 import {connect} from "react-redux";
 import {withRouter} from 'react-router-dom';
-import {addRequest, pushMessage, setControlVisibility, setRealTime, setRealTimeValue, setRangeDate, setRangeHours, setRangeMinutes, setRangeValue, setRangeDateHoursMinutes, setRangeDateHoursMinutesValue, setRangeAll, setTemplate} from "../../actions";
+import {addRequest, pushMessage, setControlVisibility, setRealTime, setRealTimeValue, setRangeDate, setRangeHours, setRangeMinutes, setRangeValue, setRangeDateHoursMinutes, setRangeDateHoursMinutesValue, setRangeAll, setTemplate, setBoxes, setLayouts, setBoxesLayouts} from "../../actions";
 import {Responsive, WidthProvider} from "react-grid-layout";
 import {Box, BoxConfig, PaperControl, XLogFilter} from "../../components";
 import jQuery from "jquery";
@@ -53,7 +53,9 @@ class Paper extends Component {
 
         if (!boxes) {
             boxes = [];
-        }        
+        }
+
+        console.log(boxes);
 
         let range = 1000 * 60 * 10;
         let endTime = (new ServerDate()).getTime();
@@ -151,10 +153,11 @@ class Paper extends Component {
             }
         }
 
+
         this.state = {
-            layouts: layouts,
+            //layouts: layouts,
             layoutChangeTime: null,
-            boxes: boxes,
+            //boxes: boxes,
             filters : [],
 
             data: {
@@ -209,13 +212,15 @@ class Paper extends Component {
             },
             showAlert: false
         };
+
+        this.props.setBoxesLayouts(boxes, layouts);
     }
 
     componentDidUpdate = (prevProps, prevState) => {
 
         let counterKeyMap = {};
-        for (let i = 0; i < this.state.boxes.length; i++) {
-            let option = this.state.boxes[i].option;
+        for (let i = 0; i < this.props.boxes.length; i++) {
+            let option = this.props.boxes[i].option;
 
             if (option && option.length > 0) {
                 for (let j = 0; j < option.length; j++) {
@@ -228,8 +233,8 @@ class Paper extends Component {
         }
 
         let prevCounterKeyMap = {};
-        for (let i = 0; i < prevState.boxes.length; i++) {
-            let option = prevState.boxes[i].option;
+        for (let i = 0; i < prevProps.boxes.length; i++) {
+            let option = prevProps.boxes[i].option;
 
             if (option && option.length > 0) {
                 for (let j = 0; j < option.length; j++) {
@@ -270,11 +275,14 @@ class Paper extends Component {
 
         if (JSON.stringify(nextProps.template) !== JSON.stringify(this.props.template)) {
             if (JSON.stringify(nextProps.template.boxes) !== JSON.stringify(this.state.boxes) || JSON.stringify(nextProps.template.layouts) !== JSON.stringify(this.state.layouts)) {
+                this.props.setBoxesLayouts(nextProps.template.boxes, nextProps.template.layouts);
+                /*
                 this.setState({
                     layouts: nextProps.template.layouts,
                     layoutChangeTime: (new Date()).getTime(),
                     boxes: nextProps.template.boxes,
                 });
+                */
             }
         }
 
@@ -426,8 +434,8 @@ class Paper extends Component {
 
         if (this.props.objects && this.props.objects.length > 0) {
             let counterKeyMap = {};
-            for (let i = 0; i < this.state.boxes.length; i++) {
-                let option = this.state.boxes[i].option;
+            for (let i = 0; i < this.props.boxes.length; i++) {
+                let option = this.props.boxes[i].option;
 
                 if (option && option.length > 0) {
                     for (let j = 0; j < option.length; j++) {
@@ -679,8 +687,8 @@ class Paper extends Component {
             let counterKeyMap = {};
             let counterHistoryKeyMap = {};
 
-            for (let i = 0; i < this.state.boxes.length; i++) {
-                let option = this.state.boxes[i].option;
+            for (let i = 0; i < this.props.boxes.length; i++) {
+                let option = this.props.boxes[i].option;
 
                 if (option && option.length > 0) {
                     for (let j = 0; j < option.length; j++) {
@@ -1266,7 +1274,7 @@ class Paper extends Component {
 
     onLayoutChange(layout, layouts) {
 
-        let boxes = this.state.boxes;
+        let boxes = this.props.boxes;
         boxes.forEach((box) => {
             layout.forEach((l) => {
                 if (box.key === l.i) {
@@ -1275,12 +1283,15 @@ class Paper extends Component {
                 }
             });
         });
+
+        console.log(boxes);
         setData("layouts", layouts);
-        setData("boxes", this.state.boxes);
-        this.setState({
+        setData("boxes", boxes);
+        this.props.setLayouts(layouts);
+        /*this.setState({
             layouts: layouts,
             layoutChangeTime: (new Date()).getTime()
-        });
+        });*/
 
         setTimeout(() => {
             window.dispatchEvent(new Event('resize'));
@@ -1288,15 +1299,16 @@ class Paper extends Component {
 
     }
 
+    //d
     getUniqueKey() {
         let dup = false;
         let key = null;
         let i = 1;
         do {
             dup = false;
-            key = String(this.state.boxes.length + i);
-            for (let i = 0; i < this.state.boxes.length; i++) {
-                if (this.state.boxes[i].key === key) {
+            key = String(this.props.boxes.length + i);
+            for (let i = 0; i < this.props.boxes.length; i++) {
+                if (this.props.boxes[i].key === key) {
                     dup = true;
                     break;
                 }
@@ -1313,8 +1325,9 @@ class Paper extends Component {
         });
     };
 
+    //d
     addPaper = () => {
-        let boxes = this.state.boxes;
+        let boxes = this.props.boxes;
         let key = this.getUniqueKey();
 
         let maxY = 0;
@@ -1333,9 +1346,12 @@ class Paper extends Component {
         });
 
 
+        this.props.setBoxes(boxes);
+        /*
         this.setState({
             boxes: boxes
         });
+        */
 
         setData("boxes", boxes);
 
@@ -1351,9 +1367,10 @@ class Paper extends Component {
         }
     };
 
+    //d
     removePaper = (key) => {
 
-        let boxes = this.state.boxes;
+        let boxes = this.props.boxes;
         boxes.forEach((box, i) => {
             if (box.key === key) {
                 boxes.splice(i, 1);
@@ -1361,7 +1378,7 @@ class Paper extends Component {
             }
         });
 
-        let layouts = this.state.layouts;
+        let layouts = this.props.layouts;
 
         for (let unit in layouts) {
             if (layouts[unit] && layouts[unit].length > 0) {
@@ -1374,27 +1391,34 @@ class Paper extends Component {
             }
         }
 
-        this.setState({
+        this.props.setBoxesLayouts(boxes, layouts);
+        /*this.setState({
             boxes: boxes,
             layouts: layouts,
             layoutChangeTime: (new Date()).getTime()
         });
+        */
 
         setData("layouts", layouts);
         setData("boxes", boxes);
     };
 
+    //d
     clearLayout = () => {
+        this.props.setBoxesLayouts([], {});
+        /*
         this.setState({
             boxes: [],
             layouts: {},
             layoutChangeTime: (new Date()).getTime()
         });
+        */
     };
 
+    //d
     setOption = (key, option) => {
 
-        let boxes = this.state.boxes.slice(0);
+        let boxes = this.props.boxes.slice(0);
 
         boxes.forEach((box) => {
             if (box.key === key) {
@@ -1461,15 +1485,18 @@ class Paper extends Component {
             }
         });
 
+        /*
         this.setState({
             boxes: boxes
         });
+        */
+        this.props.setBoxes(boxes);
 
         setData("boxes", boxes);
     };
 
     setOptionValues = (key, values) => {
-        let boxes = this.state.boxes;
+        let boxes = this.props.boxes;
         boxes.forEach((box) => {
             if (box.key === key) {
                 for (let attr in values) {
@@ -1480,12 +1507,16 @@ class Paper extends Component {
             }
         });
 
+        this.props.setBoxes(boxes);
+        /*
         this.setState({
             boxes: boxes
         });
+        */
 
         setData("boxes", boxes);
     };
+
 
     removeMetrics = (boxKey, counterKeys) => {
 
@@ -1493,7 +1524,7 @@ class Paper extends Component {
             this.boxesRef[boxKey].removeTitle(counterKeys);
         }
 
-        let boxes = this.state.boxes.slice(0);
+        let boxes = this.props.boxes.slice(0);
         boxes.forEach((box) => {
             if (box.key === boxKey) {
                 box.config = false;
@@ -1523,31 +1554,38 @@ class Paper extends Component {
             }
         });
 
+        /*
         this.setState({
             boxes: boxes
         });
+        */
+        this.props.setBoxes(boxes);
 
         setData("boxes", boxes);
     };
 
     setOptionClose = (key) => {
-        let boxes = this.state.boxes;
+        let boxes = this.props.boxes;
         boxes.forEach((box) => {
             if (box.key === key) {
                 box.config = false;
             }
         });
 
+        /*
         this.setState({
             boxes: boxes
         });
+        */
+
+        this.props.setBoxes(boxes);
 
         setData("boxes", boxes);
     };
 
 
     toggleConfig = (key) => {
-        let boxes = this.state.boxes;
+        let boxes = this.props.boxes;
         boxes.forEach((box) => {
             if (box.key === key) {
                 box.config = !box.config;
@@ -1555,9 +1593,13 @@ class Paper extends Component {
             }
         });
 
+        /*
         this.setState({
             boxes: boxes
         });
+        */
+
+        this.props.setBoxes(boxes);
 
     };
 
@@ -1612,8 +1654,6 @@ class Paper extends Component {
         });
     };
 
-C
-
     render() {
         let objectSelected = this.props.objects.length > 0;
 
@@ -1629,8 +1669,8 @@ C
                 {this.props.supported.supported &&
                 <div>
                 <div className={"fixed-alter-object " + (this.state.fixedControl ? 'show' : '')}></div>
-                <PaperControl addPaper={this.addPaper} addPaperAndAddMetric={this.addPaperAndAddMetric} clearLayout={this.clearLayout} fixedControl={this.state.fixedControl} toggleRangeControl={this.toggleRangeControl} realtime={this.props.range.realTime} alert={this.state.alert} clearAllAlert={this.clearAllAlert} clearOneAlert={this.clearOneAlert} setRewind={this.setRewind} showAlert={this.state.showAlert} toggleShowAlert={this.toggleShowAlert} />
-                {(objectSelected && (!this.state.boxes || this.state.boxes.length === 0)) &&
+                {/*<PaperControl addPaper={this.addPaper} addPaperAndAddMetric={this.addPaperAndAddMetric} clearLayout={this.clearLayout} fixedControl={this.state.fixedControl} toggleRangeControl={this.toggleRangeControl} realtime={this.props.range.realTime} alert={this.state.alert} clearAllAlert={this.clearAllAlert} clearOneAlert={this.clearOneAlert} setRewind={this.setRewind} showAlert={this.state.showAlert} toggleShowAlert={this.toggleShowAlert} />*/}
+                {(objectSelected && (!this.props.boxes || this.props.boxes.length === 0)) &&
                 <div className="quick-usage">
                     <div>
                         <div>
@@ -1644,8 +1684,8 @@ C
                         </div>
                     </div>
                 </div>}
-                <ResponsiveReactGridLayout className="layout" cols={{lg: 12, md: 10, sm: 6, xs: 4, xxs: 2}} layouts={this.state.layouts} rowHeight={30} onLayoutChange={(layout, layouts) => this.onLayoutChange(layout, layouts)}>
-                    {this.state.boxes.map((box, i) => {
+                <ResponsiveReactGridLayout className="layout" cols={{lg: 12, md: 10, sm: 6, xs: 4, xxs: 2}} layouts={this.props.layouts} rowHeight={30} onLayoutChange={(layout, layouts) => this.onLayoutChange(layout, layouts)}>
+                    {this.props.boxes.map((box, i) => {
                         let filterInfo = this.state.filters.filter((d) => d.key === box.key)[0];
                         return (
                             <div className="box-layout" key={box.key} data-grid={box.layout}>
@@ -1696,6 +1736,9 @@ let mapStateToProps = (state) => {
             template: state.template,
             range: state.range,
             supported : state.supported,
+            boxes : state.paper.boxes,
+            layouts : state.paper.layouts,
+            layoutChangeTime : state.paper.layoutChangeTime,
             searchCondition: state.searchCondition,
         };
     };
@@ -1716,7 +1759,11 @@ let mapDispatchToProps = (dispatch) => {
             setRangeDateHoursMinutesValue: (date, hours, minutes, value) => dispatch(setRangeDateHoursMinutesValue(date, hours, minutes, value)),
             setRangeAll: (date, hours, minutes, value, realTime, longTerm, range, step) => dispatch(setRangeAll(date, hours, minutes, value, realTime, longTerm, range, step)),
 
-            setTemplate: (boxes, layouts) => dispatch(setTemplate(boxes, layouts))
+            setTemplate: (boxes, layouts) => dispatch(setTemplate(boxes, layouts)),
+
+            setBoxes: (boxes) => dispatch(setBoxes(boxes)),
+            setLayouts: (layouts) => dispatch(setLayouts(layouts)),
+            setBoxesLayouts: (boxes, layouts) => dispatch(setBoxesLayouts(boxes, layouts))
 
         };
     };

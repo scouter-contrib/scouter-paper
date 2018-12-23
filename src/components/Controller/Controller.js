@@ -10,7 +10,7 @@ import AgentColor from "../../common/InstanceColor";
 import RangeControl from "../Paper/RangeControl/RangeControl";
 import LayoutManager from "../Menu/LayoutManager/LayoutManager";
 import PresetManager from "../Menu/PresetManager/PresetManager";
-import {getDefaultServerConfig, getDefaultServerConfigIndex, setServerTimeGap, setRangePropsToUrl, getHttpProtocol, errorHandler, getWithCredentials, setAuthHeader, getCurrentUser} from '../../common/common';
+import {getDefaultServerConfig, getDefaultServerConfigIndex, setServerTimeGap, setRangePropsToUrl, getHttpProtocol, errorHandler, getWithCredentials, setAuthHeader, getCurrentUser, setData} from '../../common/common';
 import {
     addRequest,
     pushMessage,
@@ -20,9 +20,13 @@ import {
     setConfig,
     setFilterMap,
     addFilteredObject,
-    removeFilteredObject
+    removeFilteredObject,
+    setBoxes,
+    setLayouts,
+    setBoxesLayouts
 } from '../../actions';
 import jQuery from "jquery";
+import PaperControl from "../Paper/PaperControl/PaperControl";
 
 
 class Controller extends Component {
@@ -38,7 +42,8 @@ class Controller extends Component {
             loading : false,
             selector: false,
             preset : false,
-            filterOpened : false
+            filterOpened : false,
+            currentTab : "CONFIGURATION"
         };
     }
 
@@ -619,72 +624,250 @@ class Controller extends Component {
         this.props.search(from, to, objects);
     };
 
+    changeCurrentTab = (tab) => {
+        this.setState({
+            currentTab : tab
+        });
+    };
+
+    setOption = (key, option) => {
+
+        let boxes = this.props.boxes.slice(0);
+
+        boxes.forEach((box) => {
+            if (box.key === key) {
+
+                if (option.mode === "exclusive") {
+                    box.option = {
+                        mode: option.mode,
+                        type: option.type,
+                        config: option.config,
+                        counterKey: option.counterKey,
+                        title: option.title
+                    };
+                } else {
+
+                    if (!box.option) {
+                        box.option = [];
+                    }
+
+                    if (box.option && !Array.isArray(box.option)) {
+                        box.option = [];
+                    }
+
+                    let duplicated = false;
+                    for (let i = 0; i < box.option.length; i++) {
+                        if (box.option[i].counterKey === option.name && box.option[i].familyName === option.familyName) {
+                            duplicated = true;
+                            break;
+                        }
+                    }
+
+                    if (!duplicated) {
+                        box.option.push({
+                            mode: "nonexclusive",
+                            type: "counter",
+                            config: option.config,
+                            counterKey: option.name,
+                            title: option.displayName,
+                            familyName : option.familyName
+                        });
+                    }
+                }
+
+                box.values = {};
+                for (let attr in option.config) {
+                    box.values[attr] = option.config[attr].value;
+                }
+
+                if (Array.isArray(box.option)) {
+                    box.config = false;
+                    let title = "";
+                    for (let i = 0; i < box.option.length; i++) {
+                        title += box.option[i].title;
+                        if (i < (box.option.length - 1)) {
+                            title += ", ";
+                        }
+                    }
+                    box.title = title
+                } else {
+                    box.config = false;
+                    box.title = option.title;
+                }
+
+                return false;
+            }
+        });
+
+        /*
+        this.setState({
+            boxes: boxes
+        });
+        */
+        this.props.setBoxes(boxes);
+
+        setData("boxes", boxes);
+    };
+
+    addPaperAndAddMetric = (data) => {
+        let key = this.addPaper();
+
+        if (data) {
+            let option = JSON.parse(data);
+            this.setOption(key, option);
+        }
+    };
+
+    clearLayout = () => {
+        this.props.setBoxesLayouts([], {});
+        /*
+        this.setState({
+            boxes: [],
+            layouts: {},
+            layoutChangeTime: (new Date()).getTime()
+        });
+        */
+    };
+
+    getUniqueKey() {
+        let dup = false;
+        let key = null;
+        let i = 1;
+        do {
+            dup = false;
+            key = String(this.props.boxes.length + i);
+            for (let i = 0; i < this.props.boxes.length; i++) {
+                if (this.props.boxes[i].key === key) {
+                    dup = true;
+                    break;
+                }
+            }
+            i++;
+        } while (dup);
+
+        return key;
+    }
+
+    addPaper = () => {
+        let boxes = this.props.boxes;
+        let key = this.getUniqueKey();
+
+        let maxY = 0;
+        let height = 0;
+        for (let i = 0; i < boxes.length; i++) {
+            if (maxY < boxes[i].layout.y) {
+                maxY = boxes[i].layout.y;
+                height = boxes[i].layout.h;
+            }
+        }
+
+        boxes.push({
+            key: key,
+            title: "NO TITLE ",
+            layout: {w: 6, h: 4, x: 0, y: (maxY + height), minW: 1, minH: 3, i: key}
+        });
+
+
+        this.props.setBoxes(boxes);
+        /*
+        this.setState({
+            boxes: boxes
+        });
+        */
+
+        setData("boxes", boxes);
+
+        return key;
+    };
+
     render() {
         return (
             <article className={"controller-wrapper scrollbar noselect " + this.props.control.Controller}>
                 <Logo></Logo>
-                <div className="control-item first">
-                    <div className="row desc">
-                        <div className="step"><span>1</span></div>
-                        <div className="row-message">SELECT API SERVER</div>
-                    </div>
-                    <div className="row control">
-                        <div>
-                            <SimpleSelector selected={getDefaultServerConfigIndex(this.props.config)} list={this.props.config.servers} onChange={this.onChangeScouterServer}></SimpleSelector>
-                        </div>
-                    </div>
+                <div className="controller-tabs">
+                    <div onClick={this.changeCurrentTab.bind(this, "CONTROL")} className={this.state.currentTab === "CONTROL" ? "selected" : ""}>CONTROL</div>
+                    <div onClick={this.changeCurrentTab.bind(this, "CONFIGURATION")} className={this.state.currentTab === "CONFIGURATION" ? "selected" : ""}>CONFIGURATION</div>
                 </div>
-                <div className="control-item">
-                    <div className="row desc">
-                        <div className="step"><span>2</span></div>
-                        <div className="row-message">SELECT TARGET OBJECTS</div>
-                    </div>
-                    <div className="row control">
-                        <div>
-                            <div className="object-navigator-btn">
-                                {this.props.objects.length > 0 && <span>{Object.keys(this.props.filterMap).length} / {this.props.objects.length} OBJECTS</span>}
-                                {this.props.objects.length <= 0 && <span>NO SELECTED</span>}
-                                <span className="toggle-filter-icon" onClick={this.toggleFilterControl}><i className="fa fa-angle-down" aria-hidden="true"></i></span>
-                                <span className="popup-icon" onClick={this.toggleSelectorVisible}><i className="fa fa-crosshairs" aria-hidden="true"></i></span>
+                {this.state.currentTab === "CONTROL" &&
+                <div>
+                    <div className="control-item first">
+                        <div className="row desc">
+                            <div className="step"><span>1</span></div>
+                            <div className="row-message">SELECT API SERVER</div>
+                        </div>
+                        <div className="row control">
+                            <div>
+                                <SimpleSelector selected={getDefaultServerConfigIndex(this.props.config)}
+                                                list={this.props.config.servers}
+                                                onChange={this.onChangeScouterServer}></SimpleSelector>
                             </div>
-                            {this.state.filterOpened &&
-                            <div className="object-filter-list scrollbar">
-                                <ul>
-                                    {this.props.objects.sort((a,b) => {
-                                        return a.objName.localeCompare(b.objName);
-                                    }).map((object, i) => {
-                                        return <li key={i} className={this.props.filterMap[object.objHash] ? "filtered" : ""} onClick={this.toggleFilteredObject.bind(this, object.objHash)}>{object.objName}</li>;
-                                    })}
-                                </ul>
+                        </div>
+                    </div>
+                    <div className="control-item">
+                        <div className="row desc">
+                            <div className="step"><span>2</span></div>
+                            <div className="row-message">SELECT TARGET OBJECTS</div>
+                        </div>
+                        <div className="row control">
+                            <div>
+                                <div className="object-navigator-btn">
+                                    {this.props.objects.length > 0 &&
+                                    <span>{Object.keys(this.props.filterMap).length} / {this.props.objects.length}
+                                        OBJECTS</span>}
+                                    {this.props.objects.length <= 0 && <span>NO SELECTED</span>}
+                                    <span className="toggle-filter-icon" onClick={this.toggleFilterControl}><i
+                                        className="fa fa-angle-down" aria-hidden="true"></i></span>
+                                    <span className="popup-icon" onClick={this.toggleSelectorVisible}><i
+                                        className="fa fa-crosshairs" aria-hidden="true"></i></span>
+                                </div>
+                                {this.state.filterOpened &&
+                                <div className="object-filter-list scrollbar">
+                                    <ul>
+                                        {this.props.objects.sort((a, b) => {
+                                            return a.objName.localeCompare(b.objName);
+                                        }).map((object, i) => {
+                                            return <li key={i}
+                                                       className={this.props.filterMap[object.objHash] ? "filtered" : ""}
+                                                       onClick={this.toggleFilteredObject.bind(this, object.objHash)}>{object.objName}</li>;
+                                        })}
+                                    </ul>
+                                </div>
+                                }
                             </div>
-                            }
                         </div>
                     </div>
-                </div>
-                <div className="control-item">
-                    <div className="row desc">
-                        <div className="step"><span>3</span></div>
-                        <div className="row-message">SEARCH</div>
-                    </div>
-                    <div className="row control">
-                        <div>
-                            <RangeControl visible={this.state.rangeControl} search={this.search} fixedControl={this.state.fixedControl} changeLongTerm={this.changeLongTerm}/>
+                    <div className="control-item">
+                        <div className="row desc">
+                            <div className="step"><span>3</span></div>
+                            <div className="row-message">SEARCH</div>
+                        </div>
+                        <div className="row control">
+                            <div>
+                                <RangeControl visible={this.state.rangeControl} search={this.search}
+                                              fixedControl={this.state.fixedControl}
+                                              changeLongTerm={this.changeLongTerm}/>
+                            </div>
                         </div>
                     </div>
-                </div>
 
-                <div className="control-item">
-                    <div className="row desc">
-                        <div className="step"><span>4</span></div>
-                        <div className="row-message">CHANGE LAYOUT</div>
-                    </div>
-                    <div className="row control">
-                        <div>
-                            <LayoutManager visible={true}></LayoutManager>
+                    <div className="control-item">
+                        <div className="row desc">
+                            <div className="step"><span>4</span></div>
+                            <div className="row-message">CHANGE LAYOUT</div>
+                        </div>
+                        <div className="row control">
+                            <div>
+                                <LayoutManager visible={true}></LayoutManager>
+                            </div>
                         </div>
                     </div>
                 </div>
-
+                }
+                {this.state.currentTab === "CONFIGURATION" &&
+                    <div>
+                        <PaperControl addPaper={this.addPaper} addPaperAndAddMetric={this.addPaperAndAddMetric} clearLayout={this.clearLayout} fixedControl={this.state.fixedControl} toggleRangeControl={this.toggleRangeControl} realtime={this.props.range.realTime} alert={this.state.alert} clearAllAlert={this.clearAllAlert} clearOneAlert={this.clearOneAlert} setRewind={this.setRewind} showAlert={this.state.showAlert} toggleShowAlert={this.toggleShowAlert} />
+                    </div>
+                }
                 {this.state.selector &&
                 <InstanceSelector onFilterChange={this.onFilterChange}
                                   clearFilter={this.clearFilter}
@@ -727,7 +910,10 @@ let mapStateToProps = (state) => {
         counterInfo: state.counterInfo,
         config: state.config,
         user: state.user,
-        range: state.range
+        range: state.range,
+        boxes : state.paper.boxes,
+        layouts : state.paper.layouts,
+        layoutChangeTime : state.paper.layoutChangeTime,
     };
 };
 
@@ -742,7 +928,11 @@ let mapDispatchToProps = (dispatch) => {
         setConfig: (config) => dispatch(setConfig(config)),
         setFilterMap: (filterMap) => dispatch(setFilterMap(filterMap)),
         addFilteredObject: (objHash) => dispatch(addFilteredObject(objHash)),
-        removeFilteredObject: (objHash) => dispatch(removeFilteredObject(objHash))
+        removeFilteredObject: (objHash) => dispatch(removeFilteredObject(objHash)),
+
+        setBoxes: (boxes) => dispatch(setBoxes(boxes)),
+        setLayouts: (layouts) => dispatch(setLayouts(layouts)),
+        setBoxesLayouts: (boxes, layouts) => dispatch(setBoxesLayouts(boxes, layouts))
     };
 };
 
