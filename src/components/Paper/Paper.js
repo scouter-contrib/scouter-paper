@@ -11,7 +11,6 @@ import {errorHandler, getData, getHttpProtocol, getWithCredentials, setAuthHeade
 import Profiler from "./XLog/Profiler/Profiler";
 import ServerDate from "../../common/ServerDate";
 import * as common from "../../common/common";
-import RangeControl from "./RangeControl/RangeControl";
 import moment from "moment";
 import _ from "lodash";
 import notificationIcon from '../../img/notification.png';
@@ -264,8 +263,6 @@ class Paper extends Component {
     };
 
     componentWillReceiveProps(nextProps) {
-
-        console.log(nextProps.searchCondition);
 
         if (this.props.searchCondition.time !== nextProps.searchCondition.time) {
             this.search(nextProps.searchCondition.from, nextProps.searchCondition.to);

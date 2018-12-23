@@ -124,7 +124,6 @@ class Controller extends Component {
 
     setObjects = () => {
         let objects = [];
-        console.log(this.state.selectedObjects);
         for (let hash in this.state.selectedObjects) {
             objects.push(this.state.selectedObjects[hash]);
         }
@@ -138,7 +137,7 @@ class Controller extends Component {
             this.props.setTarget(objects);
             this.props.setControlVisibility("TargetSelector", false);
             setRangePropsToUrl(this.props, undefined, objects);
-            this.toggleSelectorVisible();
+            this.closeSelectorPopup();
         }
     };
 
@@ -622,9 +621,8 @@ class Controller extends Component {
 
     render() {
         return (
-            <article className={"controller-wrapper noselect " + this.props.control.Controller}>
+            <article className={"controller-wrapper scrollbar noselect " + this.props.control.Controller}>
                 <Logo></Logo>
-
                 <div className="control-item first">
                     <div className="row desc">
                         <div className="step"><span>1</span></div>

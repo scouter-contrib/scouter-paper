@@ -11,6 +11,7 @@
     z-index: 30;
     transition: width 0.3s;
     color: white;
+    overflow-y: auto;
 }
 
 .controller-wrapper.min {
