@@ -795,6 +795,23 @@ class Controller extends Component {
                     <div onClick={this.changeCurrentTab.bind(this, "CONTROL")} className={this.state.currentTab === "CONTROL" ? "selected" : ""}>CONTROL</div>
                     {menu === "paper" && <div onClick={this.changeCurrentTab.bind(this, "CONFIGURATION")} className={this.state.currentTab === "CONFIGURATION" ? "selected" : ""}>PAPER CONFIG</div>}
                 </div>
+                {this.props.control.Controller === "min" &&
+                <div>
+                    <div className="controller-min-info">
+                        <div className="controller-min-info-row">
+                            <div className="short-label"><span>OBJ</span></div>
+                            {this.props.objects.length > 0 &&
+                            <div className="short-value">{Object.keys(this.props.filterMap).length} / {this.props.objects.length}</div>}
+                            {this.props.objects.length <= 0 && <div className="short-value">-</div>}
+                        </div>
+                        <div className="controller-min-info-row">
+                            {this.props.range.realTime && <div className="realtime-short-label"><span>RT</span></div>}
+                            {!this.props.range.realTime && <div className="realtime-short-label"><span>HISTO</span></div>}
+                            {!this.props.range.realTime && <div className="short-time-value"><span>{this.props.range.value}m</span></div>}
+                        </div>
+                    </div>
+                </div>
+                }
                 {this.state.currentTab === "CONTROL" &&
                 <div>
                     <div className="control-item first">
@@ -817,8 +834,7 @@ class Controller extends Component {
                             <div>
                                 <div className="object-navigator-btn">
                                     {this.props.objects.length > 0 &&
-                                    <span>{Object.keys(this.props.filterMap).length} / {this.props.objects.length}
-                                        OBJECTS</span>}
+                                    <span>{Object.keys(this.props.filterMap).length} / {this.props.objects.length} OBJECTS</span>}
                                     {this.props.objects.length <= 0 && <span>NO SELECTED</span>}
                                     <span className="toggle-filter-icon" onClick={this.toggleFilterControl}><i className="fa fa-angle-down" aria-hidden="true"></i></span>
                                     <span className="popup-icon" onClick={this.toggleSelectorVisible}><i className="fa fa-crosshairs" aria-hidden="true"></i></span>

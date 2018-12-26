@@ -14,6 +14,39 @@
     overflow-y: auto;
 }
 
+.controller-wrapper .controller-min-info {
+    text-align: center;
+    font-size: 10px;
+}
+
+.controller-wrapper .controller-min-info .controller-min-info-row {
+    margin-top: 20px;
+}
+
+.controller-wrapper .controller-min-info .short-label {
+
+}
+
+.controller-wrapper .controller-min-info .short-label > span {
+    display: inline-block;
+    padding: 4px;
+    background-color: rgba(0,0,0,0.8);
+    border-radius: 4px;
+}
+
+.controller-wrapper .controller-min-info .short-time-value,
+.controller-wrapper .controller-min-info .short-value {
+    margin-top: 5px;
+}
+
+.controller-wrapper .controller-min-info .realtime-short-label > span {
+    background-color: rgba(0,0,0,0.8);
+    border-radius: 4px;
+    display: inline-block;
+    padding: 4px;
+}
+
+
 .controller-wrapper.topology .paper-only {
     display: none;
 }
@@ -26,6 +59,10 @@
 .controller-wrapper .controller-tabs {
     background-color: rgba(0,0,0,0.5);
     font-size: 10px;
+}
+
+.min.controller-wrapper .controller-tabs {
+    display: none;
 }
 
 .controller-wrapper .controller-tabs > div {

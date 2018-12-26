@@ -115,7 +115,7 @@ class Topology extends Component {
     componentWillReceiveProps(nextProps) {
         if (!this.polling) {
             this.polling = setInterval(() => {
-                this.getTopology(nextProps.config, nextProps.objects, nextProps.user);
+                this.getTopology(nextProps.config, nextProps.filterMap, nextProps.user);
             }, this.interval);
         }
 
@@ -123,8 +123,8 @@ class Topology extends Component {
             this.getAllInstanceInfo(nextProps.config);
         }
 
-        if (this.completeInstanceList && JSON.stringify(this.props.objects) !== JSON.stringify(nextProps.objects)) {
-            this.getTopology(nextProps.config, nextProps.objects, nextProps.user);
+        if (this.completeInstanceList && JSON.stringify(this.props.filterMap) !== JSON.stringify(nextProps.filterMap)) {
+            this.getTopology(nextProps.config, nextProps.filterMap, nextProps.user);
         }
     }
 
@@ -173,7 +173,7 @@ class Topology extends Component {
     componentDidMount() {
         if (!this.polling) {
             this.polling = setInterval(() => {
-                this.getTopology(this.props.config, this.props.objects, this.props.user);
+                this.getTopology(this.props.config, this.props.filterMap, this.props.user);
             }, this.interval);
         }
 
@@ -258,7 +258,7 @@ class Topology extends Component {
                 }
 
                 if (this.doneServerCnt >= this.serverCnt) {
-                    this.getTopology(this.props.config, this.props.objects, this.props.user);
+                    this.getTopology(this.props.config, this.props.filterMap, this.props.user);
                     this.completeInstanceList = true;
                 }
             }
@@ -336,9 +336,11 @@ class Topology extends Component {
         return result;
     };
 
-    getTopology = (config, objects, user) => {
+    getTopology = (config, filterMap, user) => {
 
         let that = this;
+
+        let objects = Object.keys(filterMap);
 
         if (objects && objects.length > 0) {
             this.props.addRequest();
@@ -346,7 +348,7 @@ class Topology extends Component {
                 method: "GET",
                 async: true,
                 url: getHttpProtocol(config) + '/scouter/v1/interactionCounter/realTime?objHashes=' + JSON.stringify(objects.map((instance) => {
-                    return Number(instance.objHash);
+                    return Number(instance);
                 })),
                 xhrFields: getWithCredentials(config),
                 beforeSend: function (xhr) {
@@ -530,6 +532,12 @@ class Topology extends Component {
             }).fail((xhr, textStatus, errorThrown) => {
                 errorHandler(xhr, textStatus, errorThrown, this.props);
             });
+        } else {
+            this.nodes= [];
+            this.topology=[];
+            this.links =[];
+            this.linked = {};
+            this.update();
         }
     };
 
@@ -601,6 +609,7 @@ class Topology extends Component {
                 nodeMap[node.id].node.objCategory = node.objCategory;
                 nodeMap[node.id].node.objName = node.objName;
                 nodeMap[node.id].node.objTypeFamily = node.objTypeFamily;
+                nodeMap[node.id].node.instanceCount = node.instanceCount;
             } else {
                 nodeMap[node.id] = {
                     update : true,
@@ -1102,7 +1111,7 @@ class Topology extends Component {
         }
 
         if (property === "grouping") {
-            this.getTopology(this.props.config, this.props.objects, this.props.user);
+            this.getTopology(this.props.config, this.props.filterMap, this.props.user);
         }
 
         this.setState(state);
@@ -1135,7 +1144,6 @@ class Topology extends Component {
     };
 
     render() {
-        console.log(this.props.filterMap);
         return (
             <div className="topology-wrapper">
                 {!this.props.supported.supported && <OldVersion />}
