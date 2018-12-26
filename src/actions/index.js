@@ -30,6 +30,8 @@ export const SET_BOXES = 'SET_BOXES';
 export const SET_LAYOUTS = 'SET_LAYOUTS';
 export const SET_BOXES_LAYOUTS = 'SET_BOXES_LAYOUTS';
 export const SET_MENU = 'SET_MENU';
+export const SET_TOPOLOGY_OPTION = 'SET_TOPOLOGY_OPTION';
+
 
 export function setBoxes(boxes) {
     return {
@@ -280,6 +282,13 @@ export function setMenu(menu) {
     return {
         type: SET_MENU,
         menu: menu
+    };
+}
+
+export function setTopologyOption(topologyOption) {
+    return {
+        type: SET_TOPOLOGY_OPTION,
+        topologyOption: topologyOption
     };
 }
 

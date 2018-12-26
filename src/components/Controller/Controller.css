@@ -51,6 +51,10 @@
     display: none;
 }
 
+.controller-wrapper.paper .topology-only {
+    display: none;
+}
+
 .controller-wrapper.min {
     width: 40px;
     transition: width 0.3s;

@@ -8,6 +8,7 @@ import SimpleSelector from "../SimpleSelector/SimpleSelector";
 import InstanceSelector from "../Menu/InstanceSelector/InstanceSelector";
 import AgentColor from "../../common/InstanceColor";
 import RangeControl from "../Paper/RangeControl/RangeControl";
+import TopologyControl from "../TopologyControl/TopologyControl";
 import LayoutManager from "../Menu/LayoutManager/LayoutManager";
 import PresetManager from "../Menu/PresetManager/PresetManager";
 import {getDefaultServerConfig, getDefaultServerConfigIndex, setServerTimeGap, setRangePropsToUrl, getHttpProtocol, errorHandler, getWithCredentials, setAuthHeader, getCurrentUser, setData} from '../../common/common';
@@ -877,6 +878,18 @@ class Controller extends Component {
                         <div className="row control">
                             <div>
                                 <LayoutManager visible={true}></LayoutManager>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div className="control-item topology-only">
+                        <div className="row desc">
+                            <div className="step"><span>3</span></div>
+                            <div className="row-message">TOPOLOGY OPTION</div>
+                        </div>
+                        <div className="row control">
+                            <div>
+                                <TopologyControl></TopologyControl>
                             </div>
                         </div>
                     </div>
