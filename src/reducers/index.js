@@ -484,7 +484,9 @@ let topologyOptionState = {
     zoom : false,
     pin : false,
     lastUpdateTime : null,
-    grouping : false
+    grouping : false,
+    nodeCount : 0,
+    linkCount : 0
 };
 
 if (localStorage) {

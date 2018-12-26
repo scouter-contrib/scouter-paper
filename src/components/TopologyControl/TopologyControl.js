@@ -12,32 +12,19 @@ import * as d3 from "d3";
 
 class TopologyControl extends Component {
 
-    componentWillReceiveProps(nextProps) {
 
+    constructor(props) {
+        super(props);
+        this.state = {
+            opened: true
+        };
     }
 
-    setTopolopyOptions = (key, value) => {
-        let option = {};
-        option[key] = value;
-        this.props.setTopologyOption(option);
+    toggleOpened = () => {
+        this.setState({
+            opened : !this.state.opened
+        });
     };
-
-    componentDidMount() {
-
-    }
-
-
-    componentWillUnmount() {
-
-
-
-    }
-
-    componentDidUpdate(prevProps, prevState) {
-
-    }
-
-
 
     changeSpeedLevel = (level) => {
         let option = {};
@@ -88,65 +75,84 @@ class TopologyControl extends Component {
         return (
             <div className="topology-option-control">
                 <div className="controller noselect">
-                    {/*<div className="summary">{this.nodes.length} NODES</div>
-                    <div className="summary">{this.links.length} LINKS</div>*/}
-                    <div className="group">
-                        <div className={"check-btn " + (this.props.topologyOption.grouping ? "on" : "off")} onClick={this.checkBtnClick.bind(this, "grouping")}>
-                            <span className="icon"><i className="fa fa-object-group" aria-hidden="true"></i></span>
-                            <span className="text">GROUPING</span>
-                        </div>
+                    <div className="summary-wrapper">
+                        <div className="summary">{this.props.topologyOption.nodeCount} NODES</div>
+                        <div className="summary">{this.props.topologyOption.linkCount} LINKS</div>
+                        <span className="toggle-filter-icon" onClick={this.toggleOpened}><i className="fa fa-angle-down" aria-hidden="true"></i></span>
                     </div>
-                    <div className="group">
-                        <div className={"check-btn tps " + (this.props.topologyOption.tpsToLineSpeed ? "on" : "off")} onClick={this.checkBtnClick.bind(this, "tpsToLineSpeed")}>
-                            <span className="icon"><i className="fa fa-motorcycle" aria-hidden="true"></i></span>
-                            <span className="text">TPS TO LINE SPEED</span>
-                        </div>
-                        <div className="radio-group">
-                            <div className={"radio-btn " + (!this.props.topologyOption.tpsToLineSpeed ? "disable " : " ") + (this.props.topologyOption.speedLevel === "slow" ? "on" : "off")} onClick={this.changeSpeedLevel.bind(this, "slow")}>
-                                <span className="text">SLOW</span>
-                            </div>
-                            <div className={"radio-btn " + (!this.props.topologyOption.tpsToLineSpeed ? "disable " : " ") + (this.props.topologyOption.speedLevel === "medium" ? "on" : "off")} onClick={this.changeSpeedLevel.bind(this, "medium")}>
-                                <span className="text">MEDIUM</span>
-                            </div>
-                            <div className={"radio-btn " + (!this.props.topologyOption.tpsToLineSpeed ? "disable " : " ") + (this.props.topologyOption.speedLevel === "fast" ? "on" : "off")} onClick={this.changeSpeedLevel.bind(this, "fast")}>
-                                <span className="text">FAST</span>
+                    {this.state.opened && <div>
+                        <div className="group">
+                            <div className={"check-btn " + (this.props.topologyOption.grouping ? "on" : "off")}
+                                 onClick={this.checkBtnClick.bind(this, "grouping")}>
+                                <span className="icon"><i className="fa fa-object-group" aria-hidden="true"></i></span>
+                                <span className="text">GROUPING</span>
                             </div>
                         </div>
-                    </div>
-                    <div className="group">
-                        <div className={"check-btn " + (this.props.topologyOption.highlight ? "on" : "off")} onClick={this.checkBtnClick.bind(this, "highlight")}>
-                            <span className="icon"><i className="fa fa-lightbulb-o" aria-hidden="true"></i></span>
-                            <span className="text">HIGHLIGHT</span>
+                        <div className="group">
+                            <div
+                                className={"check-btn tps " + (this.props.topologyOption.tpsToLineSpeed ? "on" : "off")}
+                                onClick={this.checkBtnClick.bind(this, "tpsToLineSpeed")}>
+                                <span className="icon"><i className="fa fa-motorcycle" aria-hidden="true"></i></span>
+                                <span className="text">TPS TO LINE SPEED</span>
+                            </div>
+                            <div className="radio-group">
+                                <div
+                                    className={"radio-btn " + (!this.props.topologyOption.tpsToLineSpeed ? "disable " : " ") + (this.props.topologyOption.speedLevel === "slow" ? "on" : "off")}
+                                    onClick={this.changeSpeedLevel.bind(this, "slow")}>
+                                    <span className="text">SLOW</span>
+                                </div>
+                                <div
+                                    className={"radio-btn " + (!this.props.topologyOption.tpsToLineSpeed ? "disable " : " ") + (this.props.topologyOption.speedLevel === "medium" ? "on" : "off")}
+                                    onClick={this.changeSpeedLevel.bind(this, "medium")}>
+                                    <span className="text">MEDIUM</span>
+                                </div>
+                                <div
+                                    className={"radio-btn " + (!this.props.topologyOption.tpsToLineSpeed ? "disable " : " ") + (this.props.topologyOption.speedLevel === "fast" ? "on" : "off")}
+                                    onClick={this.changeSpeedLevel.bind(this, "fast")}>
+                                    <span className="text">FAST</span>
+                                </div>
+                            </div>
+                        </div>
+                        <div className="group">
+                            <div className={"check-btn " + (this.props.topologyOption.highlight ? "on" : "off")}
+                                 onClick={this.checkBtnClick.bind(this, "highlight")}>
+                                <span className="icon"><i className="fa fa-lightbulb-o" aria-hidden="true"></i></span>
+                                <span className="text">HIGHLIGHT</span>
+                            </div>
+                        </div>
+                        <div className="group">
+                            <div className={"check-btn " + (this.props.topologyOption.zoom ? "on" : "off")}
+                                 onClick={this.checkBtnClick.bind(this, "zoom")}>
+                                <span className="icon"><i className="fa fa-search" aria-hidden="true"></i></span>
+                                <span className="text">ZOOM</span>
+                            </div>
+                        </div>
+                        <div className="group">
+                            <div className={"check-btn " + (this.props.topologyOption.pin ? "on" : "pin")}
+                                 onClick={this.checkBtnClick.bind(this, "pin")}>
+                                <span className="icon"><i className="fa fa-map-pin" aria-hidden="true"></i></span>
+                                <span className="text">PIN</span>
+                            </div>
+                        </div>
+                        <div className="group">
+                            <div className={"check-btn " + (this.props.topologyOption.redLine ? "on" : "redLine")}
+                                 onClick={this.checkBtnClick.bind(this, "redLine")}>
+                                <span className="icon"><i className="fa fa-exclamation-triangle" aria-hidden="true"></i></span>
+                                <span className="text">RED LINE</span>
+                            </div>
+                        </div>
+                        <div className="group">
+                            <div className="action-btn" onClick={this.changeDistance.bind(this, "minus")}>
+                                <span className="icon"><i className="fa fa-compress" aria-hidden="true"></i></span>
+                                <span className="text">DISTANCE-</span>
+                            </div>
+                            <div className="action-btn" onClick={this.changeDistance.bind(this, "plus")}>
+                                <span className="icon"><i className="fa fa-expand" aria-hidden="true"></i></span>
+                                <span className="text">DISTANCE+</span>
+                            </div>
                         </div>
                     </div>
-                    <div className="group">
-                        <div className={"check-btn " + (this.props.topologyOption.zoom ? "on" : "off")} onClick={this.checkBtnClick.bind(this, "zoom")}>
-                            <span className="icon"><i className="fa fa-search" aria-hidden="true"></i></span>
-                            <span className="text">ZOOM</span>
-                        </div>
-                    </div>
-                    <div className="group">
-                        <div className={"check-btn " + (this.props.topologyOption.pin ? "on" : "pin")} onClick={this.checkBtnClick.bind(this, "pin")}>
-                            <span className="icon"><i className="fa fa-map-pin" aria-hidden="true"></i></span>
-                            <span className="text">PIN</span>
-                        </div>
-                    </div>
-                    <div className="group">
-                        <div className={"check-btn " + (this.props.topologyOption.redLine ? "on" : "redLine")} onClick={this.checkBtnClick.bind(this, "redLine")}>
-                            <span className="icon"><i className="fa fa-exclamation-triangle" aria-hidden="true"></i></span>
-                            <span className="text">RED LINE</span>
-                        </div>
-                    </div>
-                    <div className="group">
-                        <div className="action-btn" onClick={this.changeDistance.bind(this, "minus")}>
-                            <span className="icon"><i className="fa fa-compress" aria-hidden="true"></i></span>
-                            <span className="text">DISTANCE-</span>
-                        </div>
-                        <div className="action-btn" onClick={this.changeDistance.bind(this, "plus")} >
-                            <span className="icon"><i className="fa fa-expand" aria-hidden="true"></i></span>
-                            <span className="text">DISTANCE+</span>
-                        </div>
-                    </div>
+                    }
                 </div>
             </div>
         );
