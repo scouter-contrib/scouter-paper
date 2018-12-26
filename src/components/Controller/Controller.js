@@ -43,7 +43,7 @@ class Controller extends Component {
             selector: false,
             preset : false,
             filterOpened : false,
-            currentTab : "CONFIGURATION"
+            currentTab : "CONTROL"
         };
     }
 
@@ -68,6 +68,11 @@ class Controller extends Component {
             this.getServers(nextProps.config);
         }
 
+        if (nextProps.menu !== "/paper" && this.state.currentTab === "CONFIGURATION") {
+            this.setState({
+                currentTab : "CONTROL"
+            });
+        }
     }
 
     componentDidUpdate(prevProps, prevState) {
@@ -781,12 +786,14 @@ class Controller extends Component {
     };
 
     render() {
+
+        let menu = this.props.menu.replace("/", "");
         return (
-            <article className={"controller-wrapper scrollbar noselect " + this.props.control.Controller}>
+            <article className={"controller-wrapper scrollbar noselect " + this.props.control.Controller + " " + menu}>
                 <Logo></Logo>
                 <div className="controller-tabs">
                     <div onClick={this.changeCurrentTab.bind(this, "CONTROL")} className={this.state.currentTab === "CONTROL" ? "selected" : ""}>CONTROL</div>
-                    <div onClick={this.changeCurrentTab.bind(this, "CONFIGURATION")} className={this.state.currentTab === "CONFIGURATION" ? "selected" : ""}>CONFIGURATION</div>
+                    {menu === "paper" && <div onClick={this.changeCurrentTab.bind(this, "CONFIGURATION")} className={this.state.currentTab === "CONFIGURATION" ? "selected" : ""}>PAPER CONFIG</div>}
                 </div>
                 {this.state.currentTab === "CONTROL" &&
                 <div>
@@ -797,9 +804,7 @@ class Controller extends Component {
                         </div>
                         <div className="row control">
                             <div>
-                                <SimpleSelector selected={getDefaultServerConfigIndex(this.props.config)}
-                                                list={this.props.config.servers}
-                                                onChange={this.onChangeScouterServer}></SimpleSelector>
+                                <SimpleSelector selected={getDefaultServerConfigIndex(this.props.config)} list={this.props.config.servers} onChange={this.onChangeScouterServer}></SimpleSelector>
                             </div>
                         </div>
                     </div>
@@ -815,10 +820,8 @@ class Controller extends Component {
                                     <span>{Object.keys(this.props.filterMap).length} / {this.props.objects.length}
                                         OBJECTS</span>}
                                     {this.props.objects.length <= 0 && <span>NO SELECTED</span>}
-                                    <span className="toggle-filter-icon" onClick={this.toggleFilterControl}><i
-                                        className="fa fa-angle-down" aria-hidden="true"></i></span>
-                                    <span className="popup-icon" onClick={this.toggleSelectorVisible}><i
-                                        className="fa fa-crosshairs" aria-hidden="true"></i></span>
+                                    <span className="toggle-filter-icon" onClick={this.toggleFilterControl}><i className="fa fa-angle-down" aria-hidden="true"></i></span>
+                                    <span className="popup-icon" onClick={this.toggleSelectorVisible}><i className="fa fa-crosshairs" aria-hidden="true"></i></span>
                                 </div>
                                 {this.state.filterOpened &&
                                 <div className="object-filter-list scrollbar">
@@ -836,7 +839,7 @@ class Controller extends Component {
                             </div>
                         </div>
                     </div>
-                    <div className="control-item">
+                    <div className="control-item paper-only">
                         <div className="row desc">
                             <div className="step"><span>3</span></div>
                             <div className="row-message">SEARCH</div>
@@ -850,7 +853,7 @@ class Controller extends Component {
                         </div>
                     </div>
 
-                    <div className="control-item">
+                    <div className="control-item paper-only">
                         <div className="row desc">
                             <div className="step"><span>4</span></div>
                             <div className="row-message">CHANGE LAYOUT</div>
@@ -905,6 +908,7 @@ class Controller extends Component {
 let mapStateToProps = (state) => {
     return {
         control: state.control,
+        menu: state.control.menu,
         objects: state.target.objects,
         filterMap: state.target.filterMap,
         counterInfo: state.counterInfo,

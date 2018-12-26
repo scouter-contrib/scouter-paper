@@ -66,12 +66,12 @@ class PaperControl extends Component {
                             <div className="paper-control-metrics">
                                 <div key={"GENERAL"} className={"paper-control multi-control " + (this.state.currentGroup === "GENERAL" ? "opened" : "")} >
                                 <div className="group-name">
-                                    <span>GENERAL</span>
-                                    <span class="toggle-filter-icon" onClick={this.openGroup.bind(this, "GENERAL")}><i class="fa fa-angle-down" aria-hidden="true"></i></span>
+                                    <span className="name">GENERAL</span>
+                                    <span className="toggle-filter-icon" onClick={this.openGroup.bind(this, "GENERAL")}><i className="fa fa-angle-down" aria-hidden="true"></i></span>
                                 </div>
                                 <ul>
                                     {Object.keys(this.options).map((name, i) => {
-                                        return <li>
+                                        return <li key={i}>
                                             <div key={i} className="paper-control" data-tip={this.options[name].title} >
                                                 {(!this.touch) &&
                                                 <Draggable type="metric" className="draggable paper-control-item" data={JSON.stringify(this.options[name])} >
@@ -97,11 +97,11 @@ class PaperControl extends Component {
                                 return <div key={i} className={"paper-control multi-control " + (this.state.currentGroup === family.name ? "opened" : "")} >
                                     {(!this.touch) && <div className="multi-metrics">
                                         <div className="group-name">
-                                            <span>{family.name}</span>
-                                            <span class="toggle-filter-icon" onClick={this.openGroup.bind(this, family.name)}><i class="fa fa-angle-down" aria-hidden="true"></i></span>
+                                            <span className="name">{family.name}</span>
+                                            <span className="toggle-filter-icon" onClick={this.openGroup.bind(this, family.name)}><i className="fa fa-angle-down" aria-hidden="true"></i></span>
                                         </div>
                                         <ul>
-                                            {family.counters.sort((a,b) => {
+                                            {family.counters.length > 0 && family.counters.sort((a,b) => {
                                                 return a.displayName.localeCompare(b.displayName);
                                             }).map((counter, j) => {
                                                 counter.familyName = family.name;
@@ -112,6 +112,7 @@ class PaperControl extends Component {
                                                     </Draggable>
                                                 </li>
                                             })}
+                                            {family.counters.length < 1 && <li className="no-metric">NO METRIC</li>}
                                         </ul>
                                     </div>}
                                     {(this.touch) && <div className="multi-metrics">

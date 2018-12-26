@@ -1135,6 +1135,7 @@ class Topology extends Component {
     };
 
     render() {
+        console.log(this.props.filterMap);
         return (
             <div className="topology-wrapper">
                 {!this.props.supported.supported && <OldVersion />}
@@ -1217,7 +1218,8 @@ let mapStateToProps = (state) => {
         template: state.template,
         range: state.range,
         counterInfo: state.counterInfo,
-        supported : state.supported
+        supported : state.supported,
+        filterMap: state.target.filterMap
     };
 };
 

@@ -5,7 +5,6 @@
     position: relative;
 }
 
-
 .papers-controls .paper-control-btn {
     display: block;
     padding: 8px 5px;
@@ -16,7 +15,7 @@
 .papers-controls .paper-control-btn:hover {
     background-color: #FFCC11;
     color: #333;
-    border-radius : 2px;
+    border-radius: 2px;
 }
 
 .papers-controls .paper-control .paper-control-text {
@@ -55,6 +54,18 @@
     position: relative;
 }
 
+.papers-controls .group-name span.name {
+    display: inline-block;
+    padding: 2px 4px;
+    font-size: 10px;
+    border-radius: 2px;
+}
+
+.papers-controls .opened .group-name span.name {
+    color: #333;
+    background-color: #FFCC11;
+}
+
 .papers-controls .group-name .toggle-filter-icon {
     position: absolute;
     font-size: 14px;
@@ -65,11 +76,11 @@
     display: inline-block;
     text-align: center;
     right: 5px;
-    top : 3px;
+    top: 3px;
 }
 
 .papers-controls .group-name .toggle-filter-icon:hover {
-    background-color: rgba(0,0,0,0.3);
+    background-color: rgba(0, 0, 0, 0.3);
     color: #333;
     background-color: #FFCC11;
     cursor: pointer;
@@ -86,7 +97,7 @@
 }
 
 .papers-controls .paper-control.opened {
-    background-color: rgba(0,0,0,0.2);
+    background-color: rgba(0, 0, 0, 0.2);
 }
 
 .papers-controls .paper-control.opened ul {
@@ -96,19 +107,28 @@
 
 .papers-controls ul li {
     display: inline-block;
-    width: calc((100% - 5px)/2);
+    width: calc((100% - 5px) / 2);
     overflow-x: hidden;
     text-overflow: ellipsis;
     box-sizing: border-box;
     margin-bottom: 5px;
     position: relative;
+    overflow-y: hidden;
 }
+
+.papers-controls ul li.no-metric {
+    display: block;
+    text-align: center;
+    width: 100%;
+    font-size: 10px;
+}
+
 
 .papers-controls ul li .draggable-icon {
     position: absolute;
     font-size: 8px;
-    top : 6px;
-    right : 4px;
+    top: 6px;
+    right: 4px;
     text-transform: uppercase;
     padding: 2px 4px;
     background-color: orange;
@@ -121,7 +141,6 @@
     display: inline-block;
 }
 
-
 .papers-controls ul li:nth-child(2n-1) {
     margin-right: 5px;
 }
@@ -131,8 +150,8 @@
     padding: 8px 5px;
     overflow: hidden;
     text-overflow: ellipsis;
-    _border: 1px solid rgba(0,0,0,0.4);
-    background-color: rgba(0,0,0,0.3);
+    _border: 1px solid rgba(0, 0, 0, 0.4);
+    background-color: rgba(0, 0, 0, 0.3);
     border-radius: 2px;
 }
 
@@ -147,9 +166,6 @@
     white-space: nowrap;
     position: static !important;
 }
-
-
-
 
 .papers-controls .paper-alert {
     position: relative;

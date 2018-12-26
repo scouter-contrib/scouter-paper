@@ -3,16 +3,16 @@ import {NavLink} from 'react-router-dom'
 import './Menu.css';
 import {connect} from 'react-redux';
 import {withRouter} from 'react-router-dom';
-
 import {getDefaultServerConfig} from '../../common/common';
+import {
+    setMenu
+} from '../../actions';
 
 class Menu extends Component {
 
     constructor(props) {
         super(props);
         this.state = {
-
-            presetManager: false,
             menu: null
         };
     }
@@ -21,6 +21,7 @@ class Menu extends Component {
         this.setState({
             menu: this.props.location.pathname
         });
+        this.props.setMenu(this.props.location.pathname);
     }
 
     menuClick = (name, e) => {
@@ -28,6 +29,7 @@ class Menu extends Component {
             this.setState({
                 menu: name
             });
+            this.props.setMenu(name);
         } else {
             if (this.props.location.pathname === name) {
                 e.preventDefault();
@@ -109,6 +111,12 @@ let mapStateToProps = (state) => {
     };
 };
 
-Menu = connect(mapStateToProps, undefined)(Menu);
+let mapDispatchToProps = (dispatch) => {
+    return {
+        setMenu: (menu) => dispatch(setMenu(menu))
+    };
+};
+
+Menu = connect(mapStateToProps, mapDispatchToProps)(Menu);
 export default withRouter(Menu);
 

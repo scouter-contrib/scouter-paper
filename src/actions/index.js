@@ -29,6 +29,7 @@ export const SET_SEARCH_CONDITION = 'SET_SEARCH_CONDITION';
 export const SET_BOXES = 'SET_BOXES';
 export const SET_LAYOUTS = 'SET_LAYOUTS';
 export const SET_BOXES_LAYOUTS = 'SET_BOXES_LAYOUTS';
+export const SET_MENU = 'SET_MENU';
 
 export function setBoxes(boxes) {
     return {
@@ -275,5 +276,11 @@ export function setSearchCondition(from, to, time) {
     };
 }
 
+export function setMenu(menu) {
+    return {
+        type: SET_MENU,
+        menu: menu
+    };
+}
 
 
