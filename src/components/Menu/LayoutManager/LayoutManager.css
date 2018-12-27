@@ -7,6 +7,12 @@
     position: relative;
 }
 
+.layout-manager-bg .layout-summary:hover {
+    background-color: #FFCC11;
+    color: #333;
+    cursor: pointer;
+}
+
 .layout-manager-bg .layout-summary .drop-icon {
     position: absolute;
     top: 0;
@@ -18,11 +24,6 @@
     padding-top: 3px;
     box-sizing: border-box;
     cursor: pointer;
-}
-
-.layout-manager-bg .layout-summary .drop-icon:hover {
-    background-color: #FFCC11;
-    color: #333;
 }
 
 .layout-manager {

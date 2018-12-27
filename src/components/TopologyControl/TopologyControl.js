@@ -73,12 +73,12 @@ class TopologyControl extends Component {
         return (
             <div className="topology-option-control">
                 <div className="controller noselect">
-                    <div className="summary-wrapper">
+                    <div className="summary-wrapper" onClick={this.toggleOpened}>
                         <div className="summary">{this.props.topologyOption.nodeCount} NODES</div>
                         <div className="summary">{this.props.topologyOption.linkCount} LINKS</div>
-                        <span className="toggle-filter-icon" onClick={this.toggleOpened}><i className="fa fa-angle-down" aria-hidden="true"></i></span>
+                        <span className="toggle-filter-icon"><i className="fa fa-angle-down" aria-hidden="true"></i></span>
                     </div>
-                    {this.state.opened && <div>
+                    {this.state.opened && <div className="control-groups">
                         <div className="group">
                             <div className={"check-btn " + (this.props.topologyOption.grouping ? "on" : "off")}
                                  onClick={this.checkBtnClick.bind(this, "grouping")}>

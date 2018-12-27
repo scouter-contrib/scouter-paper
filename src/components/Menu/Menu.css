@@ -131,12 +131,3 @@
     display: none;
 }
 
-@media screen and (max-width: 500px) {
-    .menu .menu-item .menu-text {
-        display: none;
-    }
-
-    .menu .menu-item .menu-icon {
-        display: inline-block;
-    }
-}

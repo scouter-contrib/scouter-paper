@@ -65,9 +65,9 @@ class PaperControl extends Component {
                         <div>
                             <div className="paper-control-metrics">
                                 <div key={"GENERAL"} className={"paper-control multi-control " + (this.state.currentGroup === "GENERAL" ? "opened" : "")} >
-                                <div className="group-name">
+                                <div className="group-name" onClick={this.openGroup.bind(this, "GENERAL")}>
                                     <span className="name">GENERAL</span>
-                                    <span className="toggle-filter-icon" onClick={this.openGroup.bind(this, "GENERAL")}><i className="fa fa-angle-down" aria-hidden="true"></i></span>
+                                    <span className="toggle-filter-icon"><i className="fa fa-angle-down" aria-hidden="true"></i></span>
                                 </div>
                                 <ul>
                                     {Object.keys(this.options).map((name, i) => {
@@ -96,9 +96,9 @@ class PaperControl extends Component {
                             {this.props.counterInfo.families.map((family, i) => {
                                 return <div key={i} className={"paper-control multi-control " + (this.state.currentGroup === family.name ? "opened" : "")} >
                                     {(!this.touch) && <div className="multi-metrics">
-                                        <div className="group-name">
+                                        <div className="group-name" onClick={this.openGroup.bind(this, family.name)}>
                                             <span className="name">{family.name}</span>
-                                            <span className="toggle-filter-icon" onClick={this.openGroup.bind(this, family.name)}><i className="fa fa-angle-down" aria-hidden="true"></i></span>
+                                            <span className="toggle-filter-icon"><i className="fa fa-angle-down" aria-hidden="true"></i></span>
                                         </div>
                                         <ul>
                                             {family.counters.length > 0 && family.counters.sort((a,b) => {

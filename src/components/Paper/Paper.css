@@ -3,7 +3,7 @@
     position: relative;
 }
 
-@media screen and (max-width: 1200px) {
+@media screen and (max-width: 800px) {
     .papers {
         height: calc(100% - 45px);
     }

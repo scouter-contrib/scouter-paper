@@ -21,6 +21,15 @@
 .controller-wrapper .controller-min-info {
     text-align: center;
     font-size: 10px;
+
+    -webkit-animation-name: fadeIn;
+    animation-name: fadeIn;
+    -webkit-animation-duration: 0.5s;
+    animation-duration: 0.5s;
+    -webkit-animation-fill-mode: both;
+    animation-fill-mode: both;
+    animation-delay: 0.3s;
+
 }
 
 .controller-wrapper .controller-min-info .controller-min-info-row {
@@ -43,6 +52,13 @@
     margin-top: 5px;
 }
 
+.controller-wrapper .controller-min-info .selector-open-btn:hover {
+    background-color: #FFCC11;
+    cursor: pointer;
+    color: #333;
+}
+
+
 .controller-wrapper .controller-min-info .realtime-short-label > span {
     background-color: rgba(0, 0, 0, 0.8);
     border-radius: 4px;
@@ -50,20 +66,17 @@
     padding: 4px;
 }
 
-.controller-wrapper.topology-menu .paper-only {
+.controller-wrapper .paper-only,
+.controller-wrapper .topology-only{
     display: none;
 }
 
-.controller-wrapper.paper-menu .topology-only {
-    display: none;
+.controller-wrapper.paper-menu .paper-only {
+    display: block;
 }
 
-.controller-wrapper.settings-menu .topology-only {
-    display: none;
-}
-
-.controller-wrapper.settings-menu .paper-only {
-    display: none;
+.controller-wrapper.topology-menu .topology-only {
+    display: block;
 }
 
 .controller-wrapper.min {
@@ -94,6 +107,11 @@
     margin-top: 10px;
     border-bottom: 1px dashed rgba(0, 0, 0, 0.2);
     padding-bottom: 10px;
+    position: relative;
+}
+
+.controller-wrapper .control-item.first {
+    z-index: 1;
 }
 
 .min.controller-wrapper .control-item {
@@ -165,14 +183,29 @@
     background-color: rgba(0, 0, 0, 0.2);
     border-radius: 2px;
 }
+.controller-wrapper .row .object-navigator-btn-wrapper {
+    position: relative;
+}
 
 .controller-wrapper .row .object-navigator-btn {
     padding: 5px;
     position: relative;
+    margin-right: 20px;
 }
 
+.controller-wrapper .row .object-navigator-btn:hover {
+    color: #333;
+    background-color: #FFCC11;
+    cursor: pointer;
+}
+
+.controller-wrapper .row .object-navigator-btn:hover .popup-icon {
+    color: white;
+}
+
+
 .controller-wrapper .row .object-navigator-btn .toggle-filter-icon,
-.controller-wrapper .row .object-navigator-btn .popup-icon {
+.controller-wrapper .row .object-navigator-btn-wrapper .popup-icon  {
     position: absolute;
     font-size: 14px;
     width: 20px;
@@ -183,18 +216,22 @@
     text-align: center;
 }
 
-.controller-wrapper .row .object-navigator-btn .popup-icon {
+
+.controller-wrapper .row .object-navigator-btn .toggle-filter-icon {
     top: 0;
     right: 0;
 }
 
-.controller-wrapper .row .object-navigator-btn .toggle-filter-icon {
-    top: 0;
-    right: 20px;
+.controller-wrapper .row .object-navigator-btn-wrapper .popup-icon {
+    top: 5px;
+    right: 5px;
+    height: 22px;
 }
 
+
+
 .controller-wrapper .row .object-navigator-btn .toggle-filter-icon:hover,
-.controller-wrapper .row .object-navigator-btn .popup-icon:hover {
+.controller-wrapper .row .object-navigator-btn-wrapper .popup-icon:hover {
     background-color: rgba(0, 0, 0, 0.3);
     color: #333;
     background-color: #FFCC11;

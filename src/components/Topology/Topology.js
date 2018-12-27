@@ -563,6 +563,12 @@ class Topology extends Component {
             this.topology=[];
             this.links =[];
             this.linked = {};
+
+            this.props.setTopologyOption({
+                nodeCount : 0,
+                linkCount : 0
+            });
+
             this.update(this.props.topologyOption.pin);
         }
     };

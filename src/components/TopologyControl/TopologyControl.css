@@ -15,9 +15,20 @@
 .topology-option-control .controller .group:first-child {
     padding-top: 0;
 }
+
 .topology-option-control .controller .summary-wrapper {
     position: relative;
     padding: 5px;
+}
+
+.topology-option-control .controller .control-groups {
+    margin-top: 5px;
+}
+
+.topology-option-control .controller .summary-wrapper:hover {
+    color: #333;
+    background-color: #FFCC11;
+    cursor: pointer;
 }
 
 .topology-option-control .controller .summary-wrapper .toggle-filter-icon {
@@ -30,24 +41,14 @@
     display: inline-block;
     text-align: center;
     right: 5px;
-    top: 3px;
+    top: 0;
 }
-
-
-.topology-option-control .controller .summary-wrapper .toggle-filter-icon:hover {
-    background-color: rgba(0, 0, 0, 0.3);
-    color: #333;
-    background-color: #FFCC11;
-    cursor: pointer;
-}
-
 
 .topology-option-control .controller .summary {
-    color: white;
     display: inline-block;
     font-size: 11px;
     margin-right: 5px;
-    padding: 2px 4px;
+    padding: 0px 4px;
 }
 
 .topology-option-control .controller .icon {
@@ -74,7 +75,7 @@
     background-color: white;
     color: #333;
     text-align: left;
-    width: calc((50% - 5px)/2);
+    width: calc((50% - 5px) / 2);
     margin-right: 5px;
 }
 

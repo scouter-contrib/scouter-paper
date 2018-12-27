@@ -296,10 +296,10 @@ class LayoutManager extends Component {
     render() {
         return (
             <div className="layout-manager-bg">
-                <div className="layout-summary">
+                <div className="layout-summary" onClick={this.toggleOpen}>
                     <span>{this.state.templates.length} LAYOUTS</span>
-                    <span onClick={this.toggleOpen} className="drop-icon"><span><i className="fa fa-angle-down"
-                                                                                   aria-hidden="true"></i></span></span>
+                    <span className="drop-icon"><span><i className="fa fa-angle-down"
+                                                         aria-hidden="true"></i></span></span>
                 </div>
                 <div className={"layout-manager " + (this.state.visible ? "" : "hidden")}
                      onClick={(e) => e.stopPropagation()}>
@@ -361,7 +361,7 @@ let mapDispatchToProps = (dispatch) => {
     return {
         setTemplate: (boxes, layouts) => dispatch(setTemplate(boxes, layouts)),
         setControlVisibility: (name, value) => dispatch(setControlVisibility(name, value)),
-        pushMessage: (category, title, content) => dispatch(pushMessage(category, title, content)),
+        pushMessage: (category, title, content) => dispatch(pushMessage(category, title, content))
     };
 };
 

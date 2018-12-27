@@ -804,8 +804,8 @@ class Controller extends Component {
                         <div className="controller-min-info-row">
                             <div className="short-label"><span>OBJ</span></div>
                             {this.props.objects.length > 0 &&
-                            <div className="short-value">{Object.keys(this.props.filterMap).length} / {this.props.objects.length}</div>}
-                            {this.props.objects.length <= 0 && <div className="short-value">-</div>}
+                            <div className="selector-open-btn short-value" onClick={this.toggleSelectorVisible}>{Object.keys(this.props.filterMap).length} / {this.props.objects.length}</div>}
+                            {this.props.objects.length <= 0 && <div onClick={this.toggleSelectorVisible} className="selector-open-btn short-value">-</div>}
                         </div>
                         <div className="controller-min-info-row paper-only">
                             {this.props.range.realTime && <div className="realtime-short-label"><span>RT</span></div>}
@@ -837,14 +837,14 @@ class Controller extends Component {
                             <div className="row-message">SELECT TARGET OBJECTS</div>
                         </div>
                         <div className="row control">
-                            <div>
-                                <div className="object-navigator-btn">
+                            <div className="object-navigator-btn-wrapper">
+                                <div className="object-navigator-btn" onClick={this.toggleFilterControl}>
                                     {this.props.objects.length > 0 &&
                                     <span>{Object.keys(this.props.filterMap).length} / {this.props.objects.length} OBJECTS</span>}
                                     {this.props.objects.length <= 0 && <span>NO SELECTED</span>}
-                                    <span className="toggle-filter-icon" onClick={this.toggleFilterControl}><i className="fa fa-angle-down" aria-hidden="true"></i></span>
-                                    <span className="popup-icon" onClick={this.toggleSelectorVisible}><i className="fa fa-crosshairs" aria-hidden="true"></i></span>
+                                    <span className="toggle-filter-icon"><i className="fa fa-angle-down" aria-hidden="true"></i></span>
                                 </div>
+                                <span className="popup-icon" onClick={this.toggleSelectorVisible}><i className="fa fa-crosshairs" aria-hidden="true"></i></span>
                                 {this.state.filterOpened &&
                                 <div className="object-filter-list scrollbar">
                                     <ul>

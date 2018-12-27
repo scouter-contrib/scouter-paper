@@ -48,6 +48,12 @@ class Paper extends Component {
         let layouts = getData("layouts");
         let boxes = getData("boxes");
 
+        // xs와 xxs를 제거하면서, 기존에 저장된 데이터 warning 로그가 생성되어, 있는 경우 삭제
+        if (layouts && (layouts.xs || layouts.xxs)) {
+            delete layouts.xs;
+            delete layouts.xxs;
+        }
+
         if (!(layouts)) {
             layouts = {};
         }
@@ -200,7 +206,6 @@ class Paper extends Component {
                 to: null
             },
 
-            fixedControl: false,
             visible: true,
             rangeControl: false,
             alert: {
@@ -362,7 +367,6 @@ class Paper extends Component {
             window.dispatchEvent(new Event('resize'));
         }, 1000);
 
-        document.addEventListener("scroll", this.scroll.bind(this));
         document.addEventListener('visibilitychange', this.visibilitychange.bind(this));
 
         this.setState({
@@ -398,7 +402,6 @@ class Paper extends Component {
         clearInterval(this.alertTimer);
         this.alertTimer = null;
 
-        document.removeEventListener("scroll", this.scroll.bind(this));
         document.removeEventListener('visibilitychange', this.visibilitychange.bind(this));
     }
 
@@ -782,18 +785,6 @@ class Paper extends Component {
         this.getCounterHistory(objects || this.props.objects, from, to, this.props.range.longTerm);
         this.getXLogHistory(from, to, objects || this.props.objects, this.props.range.longTerm);
 
-    };
-
-    scroll = () => {
-        if (document.documentElement.scrollTop > 60) {
-            this.setState({
-                fixedControl: true
-            });
-        } else {
-            this.setState({
-                fixedControl: false
-            });
-        }
     };
 
     visibilitychange = () => {
@@ -1664,7 +1655,7 @@ class Paper extends Component {
                 {!this.props.supported.supported && <OldVersion />}
                 {this.props.supported.supported &&
                 <div>
-                <div className={"fixed-alter-object " + (this.state.fixedControl ? 'show' : '')}></div>
+                <div className="fixed-alter-object"></div>
                 {(objectSelected && (!this.props.boxes || this.props.boxes.length === 0)) &&
                 <div className="quick-usage">
                     <div>
@@ -1695,7 +1686,7 @@ class Paper extends Component {
                     })}
                 </ResponsiveReactGridLayout>
                 {!objectSelected &&
-                <div className={"select-instance " + (this.state.fixedControl ? 'fixed' : '')}>
+                <div className="select-instance">
                     <div>
                         <div className="select-instance-message">
                             <div className="icon">
