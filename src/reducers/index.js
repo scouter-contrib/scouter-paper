@@ -1,4 +1,4 @@
-import {SET_MENU, SET_BOXES_LAYOUTS, SET_LAYOUTS, SET_BOXES, SET_SUPPORTED, ADD_REQUEST, SET_CONFIG, SET_USER_ID, SET_USER_DATA, SET_TARGET, PUSH_MESSAGE, SET_CONTROL_VISIBILITY, CLEAR_ALL_MESSAGE, SET_BG_COLOR, SET_SELECTION, SET_TEMPLATE, SET_REAL_TIME, SET_RANGE_DATE, SET_RANGE_HOURS, SET_RANGE_MINUTES, SET_RANGE_VALUE, SET_REAL_TIME_VALUE, SET_RANGE_DATE_HOURS_MINUTES, SET_REAL_TIME_RANGE_STEP_VALUE, SET_RANGE_DATE_HOURS_MINUTES_VALUE, SET_RANGE_ALL, SET_COUNTER_INFO, SET_CONTROLLER_STATE, SET_FILTER_MAP, ADD_FILTERED_OBJECT, REMOVE_FILTERED_OBJECT, SET_SEARCH_CONDITION, SET_TOPOLOGY_OPTION} from '../actions';
+import {SET_MENU, SET_BOXES_LAYOUTS, SET_LAYOUTS, SET_BOXES, SET_SUPPORTED, ADD_REQUEST, SET_CONFIG, SET_USER_ID, SET_USER_DATA, SET_TARGET, PUSH_MESSAGE, SET_CONTROL_VISIBILITY, CLEAR_ALL_MESSAGE, SET_BG_COLOR, SET_SELECTION, SET_TEMPLATE, SET_REAL_TIME, SET_RANGE_DATE, SET_RANGE_HOURS, SET_RANGE_MINUTES, SET_RANGE_VALUE, SET_REAL_TIME_VALUE, SET_RANGE_DATE_HOURS_MINUTES, SET_REAL_TIME_RANGE_STEP_VALUE, SET_RANGE_DATE_HOURS_MINUTES_VALUE, SET_RANGE_ALL, SET_COUNTER_INFO, SET_CONTROLLER_STATE, SET_FILTER_MAP, ADD_FILTERED_OBJECT, REMOVE_FILTERED_OBJECT, SET_SEARCH_CONDITION, SET_TOPOLOGY_OPTION, SET_ALERT} from '../actions';
 import {combineReducers} from 'redux';
 import moment from 'moment';
 const configState = {
@@ -520,6 +520,25 @@ const topologyOption = (state = topologyOptionState, action) => {
     }
 };
 
+let alertInfo = JSON.parse(localStorage.getItem("alert"));
+
+const alertState = {
+    data: [],
+    offset: {},
+    clearTime: alertInfo ? alertInfo.clearTime : null,
+    clearItem: alertInfo ? alertInfo.clearItem : {}
+};
+
+const alert = (state = alertState, action) => {
+    switch (action.type) {
+        case SET_ALERT:
+            let options = Object.assign({}, state, action.alert);
+            return options;
+        default:
+            return state;
+    }
+};
+
 const scouterApp = combineReducers({
     supported,
     target,
@@ -534,7 +553,8 @@ const scouterApp = combineReducers({
     range,
     searchCondition,
     paper,
-    topologyOption
+    topologyOption,
+    alert
 });
 
 export default scouterApp;

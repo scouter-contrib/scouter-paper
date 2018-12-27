@@ -4,8 +4,11 @@ import './Menu.css';
 import {connect} from 'react-redux';
 import {withRouter} from 'react-router-dom';
 import {getDefaultServerConfig} from '../../common/common';
+import AlertList from "../Paper/PaperControl/AlertList";
+import moment from "moment";
 import {
-    setMenu
+    setMenu,
+    setRangeAll
 } from '../../actions';
 
 class Menu extends Component {
@@ -13,7 +16,8 @@ class Menu extends Component {
     constructor(props) {
         super(props);
         this.state = {
-            menu: null
+            menu: null,
+            showAlert: false
         };
     }
 
@@ -22,6 +26,12 @@ class Menu extends Component {
             menu: this.props.location.pathname
         });
         this.props.setMenu(this.props.location.pathname);
+
+        if (this.props.config.alert.notification === "Y") {
+            if (Notification && (Notification.permission !== "granted" || Notification.permission === "denied")) {
+                Notification.requestPermission();
+            }
+        }
     }
 
     menuClick = (name, e) => {
@@ -35,6 +45,93 @@ class Menu extends Component {
                 e.preventDefault();
             }
         }
+    };
+
+    toggleShowAlert = () => {
+        this.setState({
+            showAlert : !this.state.showAlert
+        });
+    };
+
+    clearAllAlert = () => {
+        let clearTime;
+        let clearItem;
+        if (this.props.alert.data && this.props.alert.data.length > 0) {
+            let last = this.props.alert.data[0];
+            clearTime = Number(last.time);
+            clearItem = {};
+        } else {
+            clearTime = (new Date()).getTime();
+            clearItem = {};
+        }
+
+        this.props.setAlert({
+            data : [],
+            offset : this.state.alert.offset,
+            clearTime: clearTime,
+            clearItem: clearItem
+        });
+
+        this.setState({
+            showAlert : false
+        });
+
+        if (localStorage) {
+            localStorage.setItem("alert", JSON.stringify({
+                clearTime: clearTime,
+                clearItem: clearItem
+            }));
+        }
+    };
+
+    clearOneAlert = (objHash, time) => {
+
+        let clearItem = this.props.alert.clearItem;
+
+        if (!clearItem[objHash]) {
+            clearItem[objHash] = {};
+        }
+
+        clearItem[objHash][time] = true;
+
+        let data = this.props.alert.data;
+        if (data && data.length > 0) {
+            for (let i=0; i<data.length; i++) {
+                if (data[i].objHash === objHash && Number(data[i].time) === Number(time)) {
+                    data.splice(i, 1);
+                    break;
+                }
+            }
+        }
+
+        this.props.setAlert({
+            data: data,
+            offset: this.state.alert.offset,
+            clearTime: this.state.alert.clearTime,
+            clearItem: clearItem
+        });
+
+        if (localStorage) {
+            localStorage.setItem("alert", JSON.stringify({
+                clearTime: this.state.alert.clearTime,
+                clearItem: clearItem
+            }));
+        }
+    };
+
+    setRewind = (time) => {
+
+        let start = moment(Math.floor(time / (1000 * 60)) * (1000 * 60));
+        start.subtract(5, "minutes");
+        let end = start.clone().add(10, "minutes");
+        // 메뉴 이동 필요
+        this.props.setRangeAll(start, start.hours(), start.minutes(), 10, false, false, this.props.config.range.shortHistoryRange, this.props.config.range.shortHistoryStep);
+        setTimeout(() => {
+            //this.search(start, end, this.props.objects);
+            console.log("Search");
+        }, 100);
+
+
     };
 
     render() {
@@ -87,8 +184,12 @@ class Menu extends Component {
                         </div>
                     </NavLink>
                     }
+                    <div className="alert-btn menu-item right" data-count={this.props.alert.data.length > 99 ? "99+" : this.props.alert.data.length} onClick={this.toggleShowAlert} data-tip="CLICK TO SHOW ALERT">
+                        <span className="alert-icon"><i className="fa fa-exclamation-circle" aria-hidden="true"></i></span>
+                    </div>
                 </div>
                 <div className="bar"></div>
+                <AlertList alert={this.props.alert} show={this.state.showAlert} setRewind={this.setRewind} clearAllAlert={this.clearAllAlert} clearOneAlert={this.clearOneAlert} />
             </div>
         );
     }
@@ -98,13 +199,15 @@ let mapStateToProps = (state) => {
     return {
         objects: state.target.objects,
         config: state.config,
-        user: state.user
+        user: state.user,
+        alert: state.alert
     };
 };
 
 let mapDispatchToProps = (dispatch) => {
     return {
-        setMenu: (menu) => dispatch(setMenu(menu))
+        setMenu: (menu) => dispatch(setMenu(menu)),
+        setRangeAll: (date, hours, minutes, value, realTime, longTerm, range, step) => dispatch(setRangeAll(date, hours, minutes, value, realTime, longTerm, range, step)),
     };
 };
 

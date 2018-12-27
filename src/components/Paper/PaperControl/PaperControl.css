@@ -164,27 +164,3 @@
     white-space: nowrap;
     position: static !important;
 }
-
-.papers-controls .paper-alert {
-    position: relative;
-}
-
-.papers-controls .paper-alert[data-count]:after {
-    content: attr(data-count);
-    position: absolute;
-    top: -10px;
-    right: -10px;
-    font-size: 9px;
-    background: #FF3300;
-    color: white;
-    width: 19px;
-    height: 19px;
-    text-align: center;
-    line-height: 18px;
-    border-radius: 50%;
-    box-shadow: 0 0 1px #333;
-}
-
-.papers-controls .paper-alert[data-count='0']:after {
-    display: none;
-}

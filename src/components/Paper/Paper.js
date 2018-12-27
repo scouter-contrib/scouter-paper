@@ -36,7 +36,7 @@ class Paper extends Component {
 
     boxesRef = {};
 
-    alertTimer = null;
+
     breakpoint = "lg";
 
     constructor(props) {
@@ -66,7 +66,7 @@ class Paper extends Component {
         let endTime = (new ServerDate()).getTime();
         let startTime = endTime - range;
 
-        let alertInfo = JSON.parse(localStorage.getItem("alert"));
+
 
         //URL로부터 XLOG 응답시간 축 시간 값 세팅
         let xlogElapsedTime = common.getParam(this.props, "xlogElapsedTime");
@@ -207,14 +207,7 @@ class Paper extends Component {
             },
 
             visible: true,
-            rangeControl: false,
-            alert: {
-                data: [],
-                offset: {},
-                clearTime: alertInfo ? alertInfo.clearTime : null,
-                clearItem: alertInfo ? alertInfo.clearItem : {}
-            },
-            showAlert: false
+            rangeControl: false
         };
 
         this.props.setBoxesLayouts(boxes, layouts);
@@ -312,10 +305,6 @@ class Paper extends Component {
             this.getVisitor(nextProps);
         }
 
-        if (JSON.stringify(this.props.objects) !== JSON.stringify(nextProps.objects) || JSON.stringify(this.props.user) !== JSON.stringify(nextProps.user) || JSON.stringify(this.props.config) !== JSON.stringify(nextProps.config)) {
-            this.checkRealtimeAlert();
-        }
-
         if (this.props.range.realTime !== nextProps.range.realTime) {
             this.setState({
                 counters: {
@@ -373,34 +362,14 @@ class Paper extends Component {
             visible: document.visibilityState === 'visible'
         });
 
-        if (this.props.config.alert.notification === "Y") {
-            if (Notification && (Notification.permission !== "granted" || Notification.permission === "denied")) {
-                Notification.requestPermission();
-            }
-        }
-
-        this.checkRealtimeAlert();
     }
 
-    checkRealtimeAlert = () => {
-        if (this.alertTimer === null) {
-            let seconds = this.props.config.alertInterval;
-            if (!seconds) {
-                seconds = 60;
-            }
-            this.alertTimer = setInterval(() => {
-                this.getRealTimeAlert(this.props.objects);
-            }, seconds * 1000);
-        }
-    };
+
 
     componentWillUnmount() {
         this.mounted = false;
         clearInterval(this.dataRefreshTimer);
         this.dataRefreshTimer = null;
-
-        clearInterval(this.alertTimer);
-        this.alertTimer = null;
 
         document.removeEventListener('visibilitychange', this.visibilitychange.bind(this));
     }
@@ -510,177 +479,7 @@ class Paper extends Component {
         }
     };
 
-    toggleShowAlert = () => {
-        this.setState({
-            showAlert : !this.state.showAlert
-        });
-    };
 
-    clearAllAlert = () => {
-        let clearTime;
-        let clearItem;
-        if (this.state.alert.data && this.state.alert.data.length > 0) {
-            let last = this.state.alert.data[0];
-            clearTime = Number(last.time);
-            clearItem = {};
-        } else {
-            clearTime = (new Date()).getTime();
-            clearItem = {};
-        }
-
-        this.setState({
-            alert: {
-                data : [],
-                offset : this.state.alert.offset,
-                clearTime: clearTime,
-                clearItem: clearItem
-            },
-            showAlert : false
-        });
-
-        if (localStorage) {
-            localStorage.setItem("alert", JSON.stringify({
-                clearTime: clearTime,
-                clearItem: clearItem
-            }));
-        }
-    };
-
-    clearOneAlert = (objHash, time) => {
-
-        let clearItem = this.state.alert.clearItem;
-
-        if (!clearItem[objHash]) {
-            clearItem[objHash] = {};
-        }
-
-        clearItem[objHash][time] = true;
-
-        let data = this.state.alert.data;
-        if (data && data.length > 0) {
-            for (let i=0; i<data.length; i++) {
-                if (data[i].objHash === objHash && Number(data[i].time) === Number(time)) {
-                    data.splice(i, 1);
-                    break;
-                }
-            }
-        }
-
-        this.setState({
-            alert : {
-                data: data,
-                offset: this.state.alert.offset,
-                clearTime: this.state.alert.clearTime,
-                clearItem: clearItem
-            }
-        });
-
-        if (localStorage) {
-            localStorage.setItem("alert", JSON.stringify({
-                clearTime: this.state.alert.clearTime,
-                clearItem: clearItem
-            }));
-        }
-    };
-
-    setRewind = (time) => {
-        let start = moment(Math.floor(time / (1000 * 60)) * (1000 * 60));
-        start.subtract(5, "minutes");
-        let end = start.clone().add(10, "minutes");
-        this.props.setRangeAll(start, start.hours(), start.minutes(), 10, false, false, this.props.config.range.shortHistoryRange, this.props.config.range.shortHistoryStep);
-        setTimeout(() => {
-            this.search(start, end, this.props.objects);
-        }, 100);
-
-    };
-
-    getRealTimeAlert = (objects) => {
-        const that = this;
-
-        let objTypes = [];
-        if (objects && objects.length > 0) {
-            objTypes = _.chain(objects).map((d) => d.objType).uniq().value();
-        }
-
-        if (objTypes && objTypes.length > 0) {
-            objTypes.forEach((objType) => {
-                this.props.addRequest();
-
-                let offset1 = this.state.alert.offset[objType] ? this.state.alert.offset[objType].offset1 : 0;
-                let offset2 = this.state.alert.offset[objType] ? this.state.alert.offset[objType].offset2 : 0;
-
-                jQuery.ajax({
-                    method: "GET",
-                    async: true,
-                    url: getHttpProtocol(this.props.config) + "/scouter/v1/alert/realTime/" + offset1 + "/" + offset2 + "?objType=" + objType,
-                    xhrFields: getWithCredentials(that.props.config),
-                    beforeSend: function (xhr) {
-                        setAuthHeader(xhr, that.props.config, getCurrentUser(that.props.config, that.props.user));
-                    }
-                }).done((msg) => {
-                    if (msg) {
-
-                        let alert = this.state.alert;
-                        if (!alert.offset[objType]) {
-                            alert.offset[objType] = {};
-                        }
-
-                        alert.offset[objType].offset1 = msg.result.offset1;
-                        alert.offset[objType].offset2 = msg.result.offset2;
-                        alert.data = alert.data.concat(msg.result.alerts);
-
-                        if (alert.data.length > 0) {
-                            alert.data = alert.data.sort((a, b) => {
-                                return Number(b.time) - Number(a.time)
-                            });
-
-                            alert.data = alert.data.filter((alert) => {
-                                if (this.state.alert.clearTime) {
-                                    if (this.state.alert.clearTime >= Number(alert.time)) {
-                                        return false;
-                                    } else {
-                                        if (this.state.alert.clearItem[alert.objHash] && this.state.alert.clearItem[alert.objHash][alert.time]) {
-                                            return false;
-                                        } else {
-                                            return true;
-                                        }
-                                    }
-                                } else {
-                                    if (this.state.alert.clearItem[alert.objHash] && this.state.alert.clearItem[alert.objHash][alert.time]) {
-                                        return false;
-                                    } else {
-                                        return true;
-                                    }
-                                }
-                            });
-
-                            if (Notification && this.props.config.alert.notification === "Y" && Notification.permission === "granted") {
-                                for (let i=0; i<alert.data.length; i++) {
-                                    if (Number(alert.data[i].time) > this.mountTime && !alert.data[i]["_notificated"]) {
-                                        alert.data[i]["_notificated"] = true;
-
-                                        var options = {
-                                            body: alert.data[i].objName + "\n" + alert.data[i].message,
-                                            icon: notificationIcon
-                                        };
-                                        new Notification("[" + alert.data[i].level + "]" +  alert.data[i].title, options);
-                                    }
-                                }
-                            }
-
-                            this.setState({
-                                alert: alert
-                            });
-                        }
-                    }
-                }).fail((xhr, textStatus, errorThrown) => {
-                    clearInterval(this.alertTimer);
-                    this.alertTimer = null;
-                    errorHandler(xhr, textStatus, errorThrown, this.props);
-                });
-            });
-        }
-    };
 
 
     getCounterHistory = (objects, from, to, longTerm) => {
