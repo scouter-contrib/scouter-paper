@@ -292,11 +292,17 @@ const request = (state = requestState, action) => {
     }
 };
 
+
+let storageController = null;
+if (localStorage) {
+    storageController = localStorage.getItem("controller");
+}
+
 const controlState = {
     TargetSelector: false,
     Message : false,
     Loading : false,
-    Controller : "max",
+    Controller : storageController ? storageController : "min",
     menu : "/"
 };
 
@@ -310,6 +316,11 @@ const control = (state = controlState, action) => {
         }
 
         case SET_CONTROLLER_STATE: {
+
+            if (localStorage) {
+                localStorage.setItem("controller", action.state);
+            }
+
             return Object.assign({}, state, {Controller : action.state});
         }
 

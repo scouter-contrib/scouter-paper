@@ -37,6 +37,7 @@ class Paper extends Component {
     boxesRef = {};
 
     alertTimer = null;
+    breakpoint = "lg";
 
     constructor(props) {
         super(props);
@@ -54,8 +55,6 @@ class Paper extends Component {
         if (!boxes) {
             boxes = [];
         }
-
-        console.log(boxes);
 
         let range = 1000 * 60 * 10;
         let endTime = (new ServerDate()).getTime();
@@ -1284,7 +1283,6 @@ class Paper extends Component {
             });
         });
 
-        console.log(boxes);
         setData("layouts", layouts);
         setData("boxes", boxes);
         this.props.setLayouts(layouts);
@@ -1654,14 +1652,12 @@ class Paper extends Component {
         });
     };
 
+    onBreakpointChange(newBreakpoint, newCols) {
+        this.breakpoint = newBreakpoint;
+    }
+
     render() {
         let objectSelected = this.props.objects.length > 0;
-
-        if (objectSelected) {
-            document.querySelector("body").style.overflow = "auto";
-        } else {
-            //document.querySelector("body").style.overflow = "hidden";
-        }
 
         return (
             <div className="papers">
@@ -1669,7 +1665,6 @@ class Paper extends Component {
                 {this.props.supported.supported &&
                 <div>
                 <div className={"fixed-alter-object " + (this.state.fixedControl ? 'show' : '')}></div>
-                {/*<PaperControl addPaper={this.addPaper} addPaperAndAddMetric={this.addPaperAndAddMetric} clearLayout={this.clearLayout} fixedControl={this.state.fixedControl} toggleRangeControl={this.toggleRangeControl} realtime={this.props.range.realTime} alert={this.state.alert} clearAllAlert={this.clearAllAlert} clearOneAlert={this.clearOneAlert} setRewind={this.setRewind} showAlert={this.state.showAlert} toggleShowAlert={this.toggleShowAlert} />*/}
                 {(objectSelected && (!this.props.boxes || this.props.boxes.length === 0)) &&
                 <div className="quick-usage">
                     <div>
@@ -1684,7 +1679,7 @@ class Paper extends Component {
                         </div>
                     </div>
                 </div>}
-                <ResponsiveReactGridLayout className="layout" cols={{lg: 12, md: 10, sm: 6, xs: 4, xxs: 2}} layouts={this.props.layouts} rowHeight={30} onLayoutChange={(layout, layouts) => this.onLayoutChange(layout, layouts)}>
+                <ResponsiveReactGridLayout className="layout" breakpoints={{lg: 1600, md: 1200, sm: 800}} cols={{lg: 12, md: 10, sm: 6}} layouts={this.props.layouts} rowHeight={30} onLayoutChange={(layout, layouts) => this.onLayoutChange(layout, layouts)} onBreakpointChange={(newBreakpoint, newCols) => this.onBreakpointChange(newBreakpoint, newCols)}>
                     {this.props.boxes.map((box, i) => {
                         let filterInfo = this.state.filters.filter((d) => d.key === box.key)[0];
                         return (

@@ -1,7 +1,13 @@
 .topology-wrapper {
-    height: calc(100% - 40px);
+    height: calc(100% - 60px);
     box-sizing: border-box;
     position: relative;
+}
+
+@media screen and (max-width: 800px) {
+    .topology-wrapper {
+        height: calc(100% - 45px);
+    }
 }
 
 

@@ -70,8 +70,6 @@ class TopologyControl extends Component {
     };
 
     render() {
-
-        console.log(this.props.topologyOption);
         return (
             <div className="topology-option-control">
                 <div className="controller noselect">

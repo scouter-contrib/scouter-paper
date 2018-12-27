@@ -2,7 +2,10 @@
     padding: 4px 0 0;
     position: relative;
     background-color: #207ce5;
+    background-color: rgba(0,0,0,0.05);
     font-family: 'Bungee', sans-serif;
+    height: 60px;
+    box-sizing: border-box;
 }
 
 .menu-div .bar {
@@ -19,78 +22,13 @@
     margin: 0 auto;
     font-weight: normal;
     box-sizing: border-box;
-}
-
-.menu div.logo {
-    font-size: 16px;
-    padding: 0;
-    text-align: center;
-    position: relative;
-    box-sizing: border-box;
-    color: white;
-    display: inline-block;
-    cursor: pointer;
-    -webkit-touch-callout: none;
-    -webkit-user-select: none;
-    -moz-user-select: none;
-    -ms-user-select: none;
-    user-select: none;
-    width: 80px;
-}
-
-.menu div.logo a {
-    color: white;
-    text-decoration: none;
-    display: inline-block;
-}
-
-.menu div.logo a:hover {
-    color: #FFCC11;
-}
-
-.menu div.logo .logo-icon {
-    text-align: center;
-    width: 100%;
-    box-sizing: border-box;
-    z-index: 2;
-    font-size: 16px;
-    position: relative;
-    top: -10px;
-}
-
-.menu div.logo .logo-text-div {
-    width: 100%;
-    text-align: center;
-    height: 0;
-    padding-right: 10px;
-}
-
-.menu div.logo .logo-text {
-    font-size: 10px;
-    padding: 0;
-    border-radius: 5px;
-    text-decoration: none;
-    position: absolute;
-    left: 0;
-    width: 100%;
-}
-
-.menu div.logo .logo-text-1 {
-    top: 0;
-}
-
-.menu div.logo .logo-text-2 {
-    top: 10px;
-}
-
-.menu div.logo:hover {
-    color: #FFCC11;
+    height: 100%;
 }
 
 .menu a.menu-item {
     display: inline-block;
     color: #CCC;
-    padding: 10px 10px;
+    padding: 20px 20px 0;
     cursor: pointer;
     border-bottom: 4px solid transparent;
     transition: border-bottom-colo, colorr 0.3s;
@@ -131,10 +69,6 @@
     transition: opacity 0.3s;
 }
 
-.menu div.logo:hover {
-    border-bottom: 4px solid transparent;
-}
-
 .menu .menu-item.active {
     border-bottom: 4px solid rgba(255, 255, 255, 0.8);
     color: white;
@@ -157,17 +91,25 @@
     margin-right: 10px;
 }
 
-@media screen and (max-width: 600px) {
-    .menu a.menu-item {
-        padding: 10px 5px;
-        font-size: 10px;
+@media screen and (max-width: 800px) {
+
+    .min .menu {
+        margin-left: 40px;
     }
 
-    .menu div.logo .logo-icon {
-        font-size: 16px;
-        position: relative;
-        top: -7px;
+    .menu-div {
+        padding: 4px 0 0;
+        height: 45px;
+        box-sizing: border-box;
     }
+
+    .menu a.menu-item {
+        font-size: 10px;
+        padding: 12px 10px 0;
+    }
+}
+
+@media screen and (max-width: 600px) {
 
     .layout-manager-selector,
     .menu-instance-selector {

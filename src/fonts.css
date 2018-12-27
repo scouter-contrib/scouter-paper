@@ -58,11 +58,11 @@
     font-family: 'Nanum Gothic';
     font-style: normal;
     font-weight: 400;
-    src: url('./fonts/Nanum_Gothic/NanumGothic-Regular.ttf');
+    src: url('./fonts/Nanum_Gothic/NanumGothic-Bold.ttf');
 }
 
 @font-face {
-    font-family: 'Nanum Gothic';
+    font-family: 'Nanum Gothic Coding';
     font-style: normal;
     font-weight: 400;
     src: url('./fonts/Nanum_Gothic_Coding/NanumGothicCoding-Regular.ttf');

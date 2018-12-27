@@ -28,9 +28,6 @@ h3 {
 
 h3 > span {
     display: inline-block;
-    _padding: 4px 8px;
-    _background-color: #333;
-    _color: white;
     border-radius: 5px;
 }
 

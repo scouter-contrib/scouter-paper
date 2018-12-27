@@ -1,3 +1,7 @@
+@keyframes fadeIn {
+    0% {opacity: 0;}
+    100% {opacity: 1;}
+}
 .controller-wrapper {
     position: fixed;
     top: 0px;
@@ -30,7 +34,7 @@
 .controller-wrapper .controller-min-info .short-label > span {
     display: inline-block;
     padding: 4px;
-    background-color: rgba(0,0,0,0.8);
+    background-color: rgba(0, 0, 0, 0.8);
     border-radius: 4px;
 }
 
@@ -40,18 +44,25 @@
 }
 
 .controller-wrapper .controller-min-info .realtime-short-label > span {
-    background-color: rgba(0,0,0,0.8);
+    background-color: rgba(0, 0, 0, 0.8);
     border-radius: 4px;
     display: inline-block;
     padding: 4px;
 }
 
-
-.controller-wrapper.topology .paper-only {
+.controller-wrapper.topology-menu .paper-only {
     display: none;
 }
 
-.controller-wrapper.paper .topology-only {
+.controller-wrapper.paper-menu .topology-only {
+    display: none;
+}
+
+.controller-wrapper.settings-menu .topology-only {
+    display: none;
+}
+
+.controller-wrapper.settings-menu .paper-only {
     display: none;
 }
 
@@ -61,7 +72,7 @@
 }
 
 .controller-wrapper .controller-tabs {
-    background-color: rgba(0,0,0,0.5);
+    background-color: rgba(0, 0, 0, 0.5);
     font-size: 10px;
 }
 
@@ -81,7 +92,7 @@
 
 .controller-wrapper .control-item {
     margin-top: 10px;
-    border-bottom: 1px dashed rgba(0,0,0,0.2);
+    border-bottom: 1px dashed rgba(0, 0, 0, 0.2);
     padding-bottom: 10px;
 }
 
@@ -119,7 +130,7 @@
 .controller-wrapper .row .step span {
     width: 16px;
     height: 16px;
-    background-color: rgba(0,0,0,0.4);
+    background-color: rgba(0, 0, 0, 0.4);
     border-radius: 50%;
     padding-top: 2px;
     display: inline-block;
@@ -127,8 +138,15 @@
     text-align: center;
 }
 
-.controller-wrapper .row .step span {
-
+.controller-wrapper .control-item .row.control,
+.controller-wrapper .row.desc {
+    -webkit-animation-name: fadeIn;
+    animation-name: fadeIn;
+    -webkit-animation-duration: 0.5s;
+    animation-duration: 0.5s;
+    -webkit-animation-fill-mode: both;
+    animation-fill-mode: both;
+    animation-delay: 0.3s;
 }
 
 .min.controller-wrapper .row.desc {
@@ -144,7 +162,7 @@
     width: calc(100% - 20px);
     box-sizing: border-box;
     font-size: 11px;
-    background-color: rgba(0,0,0,0.2);
+    background-color: rgba(0, 0, 0, 0.2);
     border-radius: 2px;
 }
 
@@ -166,18 +184,18 @@
 }
 
 .controller-wrapper .row .object-navigator-btn .popup-icon {
-    top : 0;
-    right : 0;
+    top: 0;
+    right: 0;
 }
 
 .controller-wrapper .row .object-navigator-btn .toggle-filter-icon {
-    top : 0;
-    right : 20px;
+    top: 0;
+    right: 20px;
 }
 
 .controller-wrapper .row .object-navigator-btn .toggle-filter-icon:hover,
 .controller-wrapper .row .object-navigator-btn .popup-icon:hover {
-    background-color: rgba(0,0,0,0.3);
+    background-color: rgba(0, 0, 0, 0.3);
     color: #333;
     background-color: #FFCC11;
     cursor: pointer;
@@ -198,18 +216,42 @@
 .controller-wrapper .object-filter-list ul li {
     padding: 5px;
     cursor: pointer;
-    border-bottom: 1px solid rgba(0,0,0,0.2);
+    border-bottom: 1px solid rgba(0, 0, 0, 0.2);
 }
 
 .controller-wrapper .object-filter-list ul li:first-child {
-    border-top: 1px solid rgba(0,0,0,0.2);
+    border-top: 1px solid rgba(0, 0, 0, 0.2);
 }
 
 .controller-wrapper .object-filter-list ul li:hover {
-    background-color: rgba(0,0,0,0.2);
+    background-color: rgba(0, 0, 0, 0.2);
 }
 
 .controller-wrapper .object-filter-list ul li.filtered {
     background-color: #FFCC11;
     color: #333;
+}
+
+@media screen and (max-width: 800px) {
+
+    .min.controller-wrapper {
+        position: absolute;
+        top: 0;
+        left: 0;
+        bottom: auto;
+        height: 45px;
+        overflow-y: hidden;
+        background-color: transparent;
+    }
+
+    .max.controller-wrapper {
+        position: fixed;
+        top: 0;
+        left: 0;
+        bottom: 50%;
+        margin: 10px;
+        width: calc(100% - 20px);
+
+    }
+
 }

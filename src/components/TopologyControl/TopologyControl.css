@@ -60,8 +60,8 @@
 .topology-option-control .controller .radio-btn,
 .topology-option-control .controller .check-btn {
     display: inline-block;
-    font-size: 9px;
-    padding: 2px 4px;
+    font-size: 10px;
+    padding: 4px 6px;
     border-right: none;
     width: 50%;
     box-sizing: border-box;

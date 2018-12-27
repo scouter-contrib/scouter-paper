@@ -41,10 +41,13 @@ class Logo extends Component {
                         <div className="max-wrapper" onClick={this.toggleMinMax}>
                             <span className={"max-btn " + this.props.control.Controller}>
                                 <i className="fa fa-angle-left max" aria-hidden="true"></i>
-                                <i className="fa fa-angle-right min" aria-hidden="true"></i>
+                                <i className="fa fa-bars min" aria-hidden="true"></i>
                             </span>
                         </div>
                     </div>
+                </div>
+                <div className="short-side-icon" onClick={this.toggleMinMax}>
+                    <i className="fa fa-bars" aria-hidden="true"></i>
                 </div>
             </div>
         );

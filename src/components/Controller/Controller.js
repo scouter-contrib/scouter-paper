@@ -9,6 +9,8 @@ import InstanceSelector from "../Menu/InstanceSelector/InstanceSelector";
 import AgentColor from "../../common/InstanceColor";
 import RangeControl from "../Paper/RangeControl/RangeControl";
 import TopologyControl from "../TopologyControl/TopologyControl";
+import TopologyMinControl from "../TopologyMinControl/TopologyMinControl";
+
 import LayoutManager from "../Menu/LayoutManager/LayoutManager";
 import PresetManager from "../Menu/PresetManager/PresetManager";
 import {getDefaultServerConfig, getDefaultServerConfigIndex, setServerTimeGap, setRangePropsToUrl, getHttpProtocol, errorHandler, getWithCredentials, setAuthHeader, getCurrentUser, setData} from '../../common/common';
@@ -790,7 +792,7 @@ class Controller extends Component {
 
         let menu = this.props.menu.replace("/", "");
         return (
-            <article className={"controller-wrapper scrollbar noselect " + this.props.control.Controller + " " + menu}>
+            <article className={"controller-wrapper scrollbar noselect " + this.props.control.Controller + " " + menu + "-menu"}>
                 <Logo></Logo>
                 <div className="controller-tabs">
                     <div onClick={this.changeCurrentTab.bind(this, "CONTROL")} className={this.state.currentTab === "CONTROL" ? "selected" : ""}>CONTROL</div>
@@ -805,10 +807,13 @@ class Controller extends Component {
                             <div className="short-value">{Object.keys(this.props.filterMap).length} / {this.props.objects.length}</div>}
                             {this.props.objects.length <= 0 && <div className="short-value">-</div>}
                         </div>
-                        <div className="controller-min-info-row">
+                        <div className="controller-min-info-row paper-only">
                             {this.props.range.realTime && <div className="realtime-short-label"><span>RT</span></div>}
                             {!this.props.range.realTime && <div className="realtime-short-label"><span>HISTO</span></div>}
                             {!this.props.range.realTime && <div className="short-time-value"><span>{this.props.range.value}m</span></div>}
+                        </div>
+                        <div className="topology-only">
+                            <TopologyMinControl></TopologyMinControl>
                         </div>
                     </div>
                 </div>
@@ -947,6 +952,7 @@ let mapStateToProps = (state) => {
         boxes : state.paper.boxes,
         layouts : state.paper.layouts,
         layoutChangeTime : state.paper.layoutChangeTime,
+        topologyOption: state.topologyOption
     };
 };
 

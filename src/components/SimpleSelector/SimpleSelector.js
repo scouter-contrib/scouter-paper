@@ -26,9 +26,11 @@ class SimpleSelector extends Component {
     render() {
         let selectedItem = this.props.list[this.props.selected];
         return (
-            <div className="simple-selector-wrapper" onClick={this.props.toggleSelectorVisible}>
-                <div className="selected-server">{selectedItem ? selectedItem.name : this.props.emptyMessage}</div>
-                <div onClick={this.toggleOpen} className="drop-icon"><span><i className="fa fa-angle-down" aria-hidden="true"></i></span></div>
+            <div className={"simple-selector-wrapper " + (this.state.open)} onClick={this.toggleOpen}>
+                <div className="simple-selector-text">
+                    <div className="selected-server">{selectedItem ? selectedItem.name : this.props.emptyMessage}</div>
+                    <div className="drop-icon"><span className="down"><i className="fa fa-angle-down" aria-hidden="true"></i></span><span className="up"><i className="fa fa-angle-up" aria-hidden="true"></i></span></div>
+                </div>
                 {this.state.open &&
                 <div className="server-list scrollbar">
                     <ul>

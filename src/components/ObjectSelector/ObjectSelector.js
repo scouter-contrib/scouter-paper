@@ -275,8 +275,6 @@ class ObjectSelector extends Component {
             async: true,
             url: getHttpProtocol(config) + '/scouter/v1/info/server'
         }).done((msg) => {
-
-            console.log("get");
             let servers = msg.result;
             let activeServerId = null;
             if (servers.length > 0) {

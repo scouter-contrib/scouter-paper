@@ -5,7 +5,7 @@
     background-color: #104E8B;
     background-color: #26466D;
     position: relative;
-    height: 40px;
+    height: 60px;
     box-sizing: border-box;
     background-color: rgba(0,0,0,0.2);
 }
@@ -31,7 +31,7 @@
     user-select: none;
     width: 40px;
     font-family: 'Bungee', sans-serif;
-    top : -6px;
+    top : 2px;
 }
 
 .paper-logo-wrapper div.paper-logo a {
@@ -70,6 +70,10 @@
     display: none;
 }
 
+.min .paper-logo-wrapper div.paper-logo .logo-icon {
+    display: none;
+}
+
 .paper-logo-wrapper div.paper-logo .logo-text {
     font-size: 10px;
     padding: 0;
@@ -102,9 +106,19 @@
     height: 100%;
 }
 
+.paper-logo-wrapper .short-side-icon {
+    display: none;
+    font-size: 16px;
+    padding-top: 20px;
+    cursor: pointer;
+    height: 100%;
+    box-sizing: border-box;
+
+}
+
 .min .paper-logo-wrapper .side-icon {
     display: block;
-    height: 20px;
+    height: 60px;
     bottom : 0;
     top : auto;
     width: 100%;
@@ -124,14 +138,14 @@
     display: table-cell;
     vertical-align: middle;
     height: 100%;
-    width: 20px;
+    width: 40px;
     text-align: center;
 }
 
 .min .paper-logo-wrapper .side-icon > div > div {
     display: block;
     width: auto;
-    padding: 4px 0;
+    padding: 0;
 }
 
 .paper-logo-wrapper .side-icon > div > div.max-wrapper:hover {
@@ -154,9 +168,15 @@
     padding-top: 5px;
 }
 
-.paper-logo-wrapper .side-icon > span.max-btn {
-    padding-top: 3px;
-    margin-left: 5px;
+.paper-logo-wrapper .side-icon span.max-btn.min {
+    height: 60px;
+    display: inline-block;
+    padding-top: 24px;
+    box-sizing: border-box;
+}
+
+.paper-logo-wrapper .side-icon span.max-btn.max {
+    font-size: 22px;
 }
 
 .paper-logo-wrapper .side-icon .fixed-btn .fixed,
@@ -182,5 +202,31 @@
 
 .paper-logo-wrapper .side-icon .max-btn.min .max {
     display: none;
+}
+
+@media screen and (max-width: 800px) {
+    .min .paper-logo-wrapper .short-side-icon {
+        display: block;
+        padding-top: 13px;
+    }
+
+    .min .paper-logo-wrapper .paper-logo {
+        display: none;
+    }
+
+    .min .paper-logo-wrapper .side-icon {
+        display: none;
+    }
+
+}
+
+@media screen and (max-width: 800px) {
+    .paper-logo-wrapper {
+        height: 45px;
+    }
+
+    .min .paper-logo-wrapper {
+        height: 45px;
+    }
 }
 

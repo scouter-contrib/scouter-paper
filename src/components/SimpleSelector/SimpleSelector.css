@@ -1,11 +1,34 @@
 .simple-selector-wrapper {
     text-transform: uppercase;
     position: relative;
-    padding: 5px 0px 5px 5px;
+}
+
+.simple-selector-wrapper .up,
+.simple-selector-wrapper .down {
+    display: none;
+}
+
+.simple-selector-wrapper.true .up {
+    display: inline-block;
+}
+
+.simple-selector-wrapper.false .down {
+    display: inline-block;
 }
 
 .simple-selector-wrapper .selected-server {
     margin-right: 40px;
+}
+
+
+.simple-selector-wrapper .simple-selector-text {
+    padding: 5px 0 5px 5px;
+    cursor: pointer;
+}
+
+.simple-selector-wrapper .simple-selector-text:hover {
+    background-color: #FFCC11;
+    color: #333;
 }
 
 .simple-selector-wrapper .drop-icon {

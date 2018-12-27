@@ -1,7 +1,6 @@
 .settings {
     text-align: left;
     padding: 10px;
-    max-width: 1600px;
     margin: 0 auto;
 }
 
@@ -52,23 +51,30 @@
     font-size: 10px;
 }
 
-@media screen and (max-width: 1400px) {
-    .settings .forms {
-        margin: 0 100px 0;
+@media screen and (max-width: 2400px) {
+    .max .settings .forms {
+        margin: 0 20px 0;
     }
 }
 
-@media screen and (max-width: 1200px) {
-    .settings .forms {
-        margin: 0 50px 0;
-    }
-}
-
-@media screen and (max-width: 1000px) {
+@media screen and (max-width: 2000px) {
     .settings .forms {
         margin: 0 20px 0;
     }
 }
+
+@media screen and (max-width: 1200px) {
+    .max .settings .forms {
+        margin: 0 10px 0;
+    }
+}
+
+@media screen and (max-width: 800px) {
+    .settings .forms {
+        margin: 0 10px 0;
+    }
+}
+
 
 @media screen and (max-width: 600px) {
     .settings .forms {
@@ -164,7 +170,39 @@
     padding-right: 0;
 }
 
-@media screen and (max-width: 1100px) {
+@media screen and (max-width: 1600px) {
+
+    .max .settings .setting-box {
+        padding: 15px 20px 20px 20px;
+    }
+
+    .max .settings .server-setting-box {
+        padding-top: 40px;
+    }
+
+    .max .settings .forms .row {
+        margin: 0;
+        width: 50%;
+        padding-top: 10px;
+        padding-right: 20px;
+    }
+
+    .max .settings .forms .row:nth-child(4n) {
+        padding-right: 20px;
+    }
+
+    .max .settings .forms .row:nth-child(2n) {
+        padding-right: 0;
+    }
+
+    .max .settings .forms .server-row .row:nth-child(2n) {
+        padding-right: 5px;
+    }
+
+}
+
+
+@media screen and (max-width: 1200px) {
 
     .settings .setting-box {
         padding: 15px 20px 20px 20px;
@@ -194,6 +232,7 @@
     }
 
 }
+
 
 @media screen and (max-width: 800px) {
     .settings .forms .row {

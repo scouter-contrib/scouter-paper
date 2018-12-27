@@ -1,8 +1,12 @@
 .papers {
-
-    height: calc(100% - 61px);
+    height: calc(100% - 60px);
     position: relative;
+}
 
+@media screen and (max-width: 1200px) {
+    .papers {
+        height: calc(100% - 45px);
+    }
 }
 
 .papers > div {
@@ -43,8 +47,8 @@
 }
 
 .papers .select-instance {
-    position: fixed;
-    top: 55px;
+    position: absolute;
+    top: 0px;
     left: 0;
     right: 0;
     bottom: 0;
@@ -113,7 +117,7 @@
 }
 
 .papers .quick-usage {
-    height: calc(100% - 46px);
+    height: calc(100% - 10px);
     box-sizing: border-box;
     padding: 10px 10px 0;
 }
@@ -165,14 +169,9 @@
     text-align: center;
 }
 
-@media screen and (max-width: 680px) {
-    .papers .quick-usage {
-        height: calc(100% - 72px);
-    }
-}
 
 @media screen and (max-width: 600px) {
     .papers .quick-usage {
-        height: calc(100% - 62px);
+        height: calc(100% - 10px);
     }
 }
