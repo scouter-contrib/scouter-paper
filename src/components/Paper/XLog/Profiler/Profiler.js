@@ -6,7 +6,6 @@ import {connect} from 'react-redux';
 import jQuery from "jquery";
 import {
     setTxidPropsToUrl,
-    getFilteredData,
     getHttpProtocol,
     errorHandler,
     getWithCredentials,
@@ -23,7 +22,6 @@ import _ from "lodash";
 import moment from "moment";
 import copy from 'copy-to-clipboard';
 import {IdAbbr} from "../../../../common/idAbbr";
-//import {disableBodyScroll, enableBodyScroll} from 'body-scroll-lock';
 
 const xlogMaxSelectionCount = 200;
 

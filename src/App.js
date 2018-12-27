@@ -11,9 +11,7 @@ import {
     Login,
     Overlay,
     Message,
-    ContentWrapper,
-    Logo,
-    Navigator
+    ContentWrapper
 } from './components';
 import {Route, Switch} from 'react-router-dom';
 import {connect} from 'react-redux';
@@ -30,8 +28,7 @@ import {
     getWithCredentials,
     getHttpProtocol,
     getDefaultServerConfig,
-    getCurrentUser,
-    getCurrentDefaultServer
+    getCurrentUser
 } from './common/common';
 
 import Home from "./components/Home/Home";
@@ -368,8 +365,6 @@ class App extends Component {
                 </ContentWrapper>
                 }
                 {support && <Controller>
-
-                    {/*<Navigator></Navigator>*/}
                     {/*<ObjectSelector></ObjectSelector>*/}
 
                 </Controller>

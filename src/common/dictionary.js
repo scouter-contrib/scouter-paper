@@ -136,11 +136,3 @@ async function record(dicts, props, yyyymmdd) {
 
     return true;
 }
-
-function load() {
-
-}
-
-function persist() {
-
-}

@@ -13,34 +13,11 @@ import jQuery from "jquery";
 import {withRouter} from 'react-router-dom';
 import {getHttpProtocol, errorHandler, getWithCredentials, setAuthHeader, getCurrentUser} from '../../../common/common';
 import 'url-search-params-polyfill';
-import * as common from '../../../common/common'
 import * as PaperIcons from '../../../common/PaperIcons'
 
 import InnerLoading from "../../InnerLoading/InnerLoading";
 
 class InstanceSelector extends Component {
-
-    init = false;
-
-    constructor(props) {
-        super(props);
-
-    }
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
 
     savePreset = () => {
         let that = this;

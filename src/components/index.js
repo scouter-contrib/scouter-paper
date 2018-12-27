@@ -16,7 +16,6 @@ import Settings from './Settings/Settings';
 import InstanceSelector from './Menu/InstanceSelector/InstanceSelector';
 import XLogFilter from './Paper/XLogFilter/XLogFilter';
 import Logo from './Logo/Logo';
-import Navigator from './Navigator/Navigator';
 import ObjectSelector from './ObjectSelector/ObjectSelector';
 import SimpleSelector from './SimpleSelector/SimpleSelector';
 
@@ -39,7 +38,6 @@ export {
     InstanceSelector,
     XLogFilter,
     Logo,
-    Navigator,
     ObjectSelector,
     SimpleSelector
 };
