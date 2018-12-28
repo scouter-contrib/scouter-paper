@@ -42,12 +42,13 @@ import notificationIcon from './img/notification.png';
 const browser = detect();
 const support = (browser.name !== "ie" && browser.name !== "edge");
 
-// setting에 저장해도, 컨트롤러 영역이 새로고침되지 않음
-
 class App extends Component {
+
+    // 차트 크기가 변경되었을 경우, 차트가 다시 그려지지 않음 (window event만 동작)
 
     alertTimer = null;
     initAlert = false;
+
 
     constructor(props) {
         super(props);

@@ -88,7 +88,7 @@ button {
 }
 
 .scrollbar::-webkit-scrollbar-thumb {
-    background-color: #333;
+    background-color: #FCDC3B;
 }
 
 body::-webkit-scrollbar {

@@ -143,6 +143,14 @@
     font-size: 14px;
 }
 
+.papers .quick-usage .add-paper-btn {
+    background-color: rgba(0,0,0,0.3);
+    display: inline-block;
+    padding: 2px 4px;
+    margin: 0 2px;
+    border-radius: 2px;
+}
+
 .papers .quick-usage h3:before {
     content: '<';
 }

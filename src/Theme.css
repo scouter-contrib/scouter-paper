@@ -1,10 +1,10 @@
 /* THEME, index.css */
 html.theme-gray {
-    background: #222;
+    background: #444;
 }
 
 .theme-gray body {
-    background: #222;
+    background: #444;
 }
 
 .theme-gray .popup-div {
@@ -148,7 +148,7 @@ html.theme-gray, .theme-gray body {
 
 /* THEME, Menu.css */
 .theme-gray .menu-div {
-    background-color: #111;
+    background-color: #333;
 }
 
 /* THEME, Paper.css */
@@ -159,13 +159,13 @@ html.theme-gray, .theme-gray body {
 
 /* THEME, Resizable.css */
 .theme-gray .react-grid-item {
-    background-color: #0A0A0A;
+    background-color: #171717;
     color: white;
 }
 
 /* THEME, Settings.css */
 .theme-gray .settings .setting-box {
-    background-color: #111;
+    background-color: #171717;
     color: white;
     box-shadow: 0 0 5px black;
     box-shadow: none;
@@ -249,4 +249,12 @@ html.theme-gray, .theme-gray body {
 
 .theme-gray .papers .box-layout .box-control.filter-btn.filtered i.fa {
     color: #0198E1;
+}
+
+.theme-gray .controller-wrapper {
+    background-color: #282828;
+}
+
+.theme-gray .controller-wrapper .controller-tabs > div.selected {
+    background-color: #282828;
 }

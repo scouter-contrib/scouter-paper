@@ -2,15 +2,15 @@ import React, {Component} from "react";
 import "./Paper.css";
 import "./Resizable.css";
 import {connect} from "react-redux";
-import {withRouter} from 'react-router-dom';
-import {addRequest, pushMessage, setControlVisibility, setRealTime, setRealTimeValue, setRangeDate, setRangeHours, setRangeMinutes, setRangeValue, setRangeDateHoursMinutes, setRangeDateHoursMinutesValue, setRangeAll, setTemplate, setBoxes, setLayouts, setBoxesLayouts} from "../../actions";
+import {withRouter} from "react-router-dom";
+import {addRequest, pushMessage, setBoxes, setBoxesLayouts, setControlVisibility, setLayouts, setRangeDateHoursMinutesValue, setRealTime, setTemplate} from "../../actions";
 import {Responsive, WidthProvider} from "react-grid-layout";
 import {Box, BoxConfig, XLogFilter} from "../../components";
 import jQuery from "jquery";
-import {errorHandler, getData, getHttpProtocol, getWithCredentials, setAuthHeader, setData, getSearchDays, getDivideDays, getCurrentUser} from "../../common/common";
+import * as common from "../../common/common";
+import {errorHandler, getCurrentUser, getData, getDivideDays, getHttpProtocol, getSearchDays, getWithCredentials, setAuthHeader, setData} from "../../common/common";
 import Profiler from "./XLog/Profiler/Profiler";
 import ServerDate from "../../common/ServerDate";
-import * as common from "../../common/common";
 import moment from "moment";
 import OldVersion from "../OldVersion/OldVersion";
 
@@ -65,7 +65,6 @@ class Paper extends Component {
         let startTime = endTime - range;
 
 
-
         //URL로부터 XLOG 응답시간 축 시간 값 세팅
         let xlogElapsedTime = common.getParam(this.props, "xlogElapsedTime");
 
@@ -83,7 +82,7 @@ class Paper extends Component {
             }).done((msg) => {
                 if (msg && Number(msg.status) === 200) {
                     let templates = JSON.parse(msg.result);
-                    for (let i=0; i<templates.length; i++) {
+                    for (let i = 0; i < templates.length; i++) {
                         if (layout === templates[i].name) {
                             this.props.setTemplate(templates[i].boxes, templates[i].layouts);
                             break;
@@ -133,9 +132,9 @@ class Paper extends Component {
                 this.props.setRealTime(false, true);
             } else {
                 //no longterm param then check config
-                if(params[1] === undefined || params[1] === null) {
+                if (params[1] === undefined || params[1] === null) {
                     const shortLimitMillis = this.props.config.range.shortHistoryRange * 60 * 1000;
-                    if(shortLimitMillis && shortLimitMillis < to.diff(from)) {
+                    if (shortLimitMillis && shortLimitMillis < to.diff(from)) {
                         this.props.setRealTime(false, true);
                     } else {
                         this.props.setRealTime(false, false);
@@ -158,10 +157,8 @@ class Paper extends Component {
 
 
         this.state = {
-            //layouts: layouts,
             layoutChangeTime: null,
-            //boxes: boxes,
-            filters : [],
+            filters: [],
 
             data: {
                 tempXlogs: [],
@@ -177,13 +174,13 @@ class Paper extends Component {
                 endTime: endTime,
                 range: range,
                 maxElapsed: 2000,
-                paramMaxElapsed : xlogElapsedTime,
+                paramMaxElapsed: xlogElapsedTime,
                 lastRequestTime: null,
                 clearTimestamp: null
             },
-            xlogHistoryDoing : false,
-            xlogHistoryRequestCnt : 0,
-            xlogNotSupportedInRange : false,
+            xlogHistoryDoing: false,
+            xlogHistoryRequestCnt: 0,
+            xlogNotSupportedInRange: false,
 
             pastTimestamp: null,
 
@@ -271,13 +268,6 @@ class Paper extends Component {
         if (JSON.stringify(nextProps.template) !== JSON.stringify(this.props.template)) {
             if (JSON.stringify(nextProps.template.boxes) !== JSON.stringify(this.state.boxes) || JSON.stringify(nextProps.template.layouts) !== JSON.stringify(this.state.layouts)) {
                 this.props.setBoxesLayouts(nextProps.template.boxes, nextProps.template.layouts);
-                /*
-                this.setState({
-                    layouts: nextProps.template.layouts,
-                    layoutChangeTime: (new Date()).getTime(),
-                    boxes: nextProps.template.boxes,
-                });
-                */
             }
         }
 
@@ -361,7 +351,6 @@ class Paper extends Component {
         });
 
     }
-
 
 
     componentWillUnmount() {
@@ -478,8 +467,6 @@ class Paper extends Component {
     };
 
 
-
-
     getCounterHistory = (objects, from, to, longTerm) => {
 
         if (objects && objects.length > 0) {
@@ -495,8 +482,8 @@ class Paper extends Component {
                         if (innerOption.type === "counter") {
                             counterKeyMap[innerOption.counterKey] = true;
                             counterHistoryKeyMap[innerOption.counterKey] = {
-                                key : innerOption.counterKey,
-                                familyName : innerOption.familyName
+                                key: innerOption.counterKey,
+                                familyName: innerOption.familyName
                             };
                         }
                     }
@@ -527,16 +514,16 @@ class Paper extends Component {
                 if (longTerm) {
 
                     url = getHttpProtocol(this.props.config) + '/scouter/v1/counter/stat/' + encodeURI(counterKey) + '?objHashes=' + JSON.stringify(objects.filter((d) => {
-                        return d.objFamily === familyName;
-                    }).map((obj) => {
+                            return d.objFamily === familyName;
+                        }).map((obj) => {
                             return Number(obj.objHash);
                         })) + "&startYmd=" + moment(startTime).format("YYYYMMDD") + "&endYmd=" + moment(endTime).format("YYYYMMDD");
                     this.getCounterHistoryData(url, counterKey, from, to, now, false);
 
                 } else {
                     url = getHttpProtocol(this.props.config) + '/scouter/v1/counter/' + encodeURI(counterKey) + '?objHashes=' + JSON.stringify(objects.filter((d) => {
-                        return d.objFamily === familyName;
-                    }).map((obj) => {
+                            return d.objFamily === familyName;
+                        }).map((obj) => {
                             return Number(obj.objHash);
                         })) + "&startTimeMillis=" + startTime + "&endTimeMillis=" + endTime;
                     this.getCounterHistoryData(url, counterKey, from, to, now, false);
@@ -724,8 +711,8 @@ class Paper extends Component {
     setStopXlogHistory = () => {
         this.xlogHistoryRequestTime = null;
         this.setState({
-            xlogHistoryDoing : false,
-            xlogHistoryRequestCnt : 0
+            xlogHistoryDoing: false,
+            xlogHistoryRequestCnt: 0
         });
 
     };
@@ -750,7 +737,7 @@ class Paper extends Component {
         }
 
         //xlog retrieve limit is 60 minute
-        if(to - from > 60 * 60 * 1000) {
+        if (to - from > 60 * 60 * 1000) {
             let data = this.state.data;
             let now = (new ServerDate()).getTime();
             data.lastRequestTime = now;
@@ -782,8 +769,8 @@ class Paper extends Component {
             this.setState({
                 data: data,
                 pastTimestamp: now,
-                xlogHistoryDoing : true,
-                xlogHistoryRequestCnt : 0,
+                xlogHistoryDoing: true,
+                xlogHistoryRequestCnt: 0,
                 xlogNotSupportedInRange: false
             });
 
@@ -867,7 +854,7 @@ class Paper extends Component {
                 this.setState({
                     data: data,
                     pageCnt: (new Date()).getTime(),
-                    xlogHistoryRequestCnt : this.state.xlogHistoryRequestCnt + 1
+                    xlogHistoryRequestCnt: this.state.xlogHistoryRequestCnt + 1
                 });
 
                 if (hasMore) {
@@ -880,8 +867,8 @@ class Paper extends Component {
                         this.setState({
                             data: data,
                             pageCnt: (new Date()).getTime(),
-                            xlogHistoryDoing : false,
-                            xlogHistoryRequestCnt : 0
+                            xlogHistoryDoing: false,
+                            xlogHistoryRequestCnt: 0
                         });
                     }
                 }
@@ -1042,7 +1029,7 @@ class Paper extends Component {
         }).fail((xhr, textStatus, errorThrown) => {
             errorHandler(xhr, textStatus, errorThrown, this.props);
         });
-    }
+    };
 
     removeOverTimeXLogFrom(tempXlogs, startTime) {
         let outOfRangeIndex = -1;
@@ -1057,7 +1044,7 @@ class Paper extends Component {
         if (outOfRangeIndex > -1) {
             tempXlogs.splice(0, outOfRangeIndex + 1);
         }
-    }
+    };
 
     onLayoutChange(layout, layouts) {
 
@@ -1074,36 +1061,12 @@ class Paper extends Component {
         setData("layouts", layouts);
         setData("boxes", boxes);
         this.props.setLayouts(layouts);
-        /*this.setState({
-            layouts: layouts,
-            layoutChangeTime: (new Date()).getTime()
-        });*/
 
         setTimeout(() => {
             window.dispatchEvent(new Event('resize'));
         }, 500);
 
-    }
-
-    //d
-    getUniqueKey() {
-        let dup = false;
-        let key = null;
-        let i = 1;
-        do {
-            dup = false;
-            key = String(this.props.boxes.length + i);
-            for (let i = 0; i < this.props.boxes.length; i++) {
-                if (this.props.boxes[i].key === key) {
-                    dup = true;
-                    break;
-                }
-            }
-            i++;
-        } while (dup);
-
-        return key;
-    }
+    };
 
     toggleRangeControl = () => {
         this.setState({
@@ -1111,49 +1074,6 @@ class Paper extends Component {
         });
     };
 
-    //d
-    addPaper = () => {
-        let boxes = this.props.boxes;
-        let key = this.getUniqueKey();
-
-        let maxY = 0;
-        let height = 0;
-        for (let i = 0; i < boxes.length; i++) {
-            if (maxY < boxes[i].layout.y) {
-                maxY = boxes[i].layout.y;
-                height = boxes[i].layout.h;
-            }
-        }
-
-        boxes.push({
-            key: key,
-            title: "NO TITLE ",
-            layout: {w: 6, h: 4, x: 0, y: (maxY + height), minW: 1, minH: 3, i: key}
-        });
-
-
-        this.props.setBoxes(boxes);
-        /*
-        this.setState({
-            boxes: boxes
-        });
-        */
-
-        setData("boxes", boxes);
-
-        return key;
-    };
-
-    addPaperAndAddMetric = (data) => {
-        let key = this.addPaper();
-
-        if (data) {
-            let option = JSON.parse(data);
-            this.setOption(key, option);
-        }
-    };
-
-    //d
     removePaper = (key) => {
 
         let boxes = this.props.boxes;
@@ -1178,30 +1098,12 @@ class Paper extends Component {
         }
 
         this.props.setBoxesLayouts(boxes, layouts);
-        /*this.setState({
-            boxes: boxes,
-            layouts: layouts,
-            layoutChangeTime: (new Date()).getTime()
-        });
-        */
 
         setData("layouts", layouts);
         setData("boxes", boxes);
     };
 
-    //d
-    clearLayout = () => {
-        this.props.setBoxesLayouts([], {});
-        /*
-        this.setState({
-            boxes: [],
-            layouts: {},
-            layoutChangeTime: (new Date()).getTime()
-        });
-        */
-    };
 
-    //d
     setOption = (key, option) => {
 
         let boxes = this.props.boxes.slice(0);
@@ -1242,7 +1144,7 @@ class Paper extends Component {
                             config: option.config,
                             counterKey: option.name,
                             title: option.displayName,
-                            familyName : option.familyName
+                            familyName: option.familyName
                         });
                     }
                 }
@@ -1271,11 +1173,6 @@ class Paper extends Component {
             }
         });
 
-        /*
-        this.setState({
-            boxes: boxes
-        });
-        */
         this.props.setBoxes(boxes);
 
         setData("boxes", boxes);
@@ -1294,11 +1191,6 @@ class Paper extends Component {
         });
 
         this.props.setBoxes(boxes);
-        /*
-        this.setState({
-            boxes: boxes
-        });
-        */
 
         setData("boxes", boxes);
     };
@@ -1340,11 +1232,6 @@ class Paper extends Component {
             }
         });
 
-        /*
-        this.setState({
-            boxes: boxes
-        });
-        */
         this.props.setBoxes(boxes);
 
         setData("boxes", boxes);
@@ -1357,12 +1244,6 @@ class Paper extends Component {
                 box.config = false;
             }
         });
-
-        /*
-        this.setState({
-            boxes: boxes
-        });
-        */
 
         this.props.setBoxes(boxes);
 
@@ -1378,12 +1259,6 @@ class Paper extends Component {
                 return false;
             }
         });
-
-        /*
-        this.setState({
-            boxes: boxes
-        });
-        */
 
         this.props.setBoxes(boxes);
 
@@ -1402,14 +1277,14 @@ class Paper extends Component {
 
         if (!found) {
             filters.push({
-                key : key,
-                show : true,
-                data : {
-                    filtering : false
+                key: key,
+                show: true,
+                data: {
+                    filtering: false
                 }
             });
         }
-        
+
         this.setState({
             filters: filters
         });
@@ -1423,7 +1298,7 @@ class Paper extends Component {
             filter.filtering = true;
             filterInfo.data = filter;
         } else {
-            filterInfo.data = {filtering : false};
+            filterInfo.data = {filtering: false};
         }
 
         this.setState({
@@ -1452,57 +1327,57 @@ class Paper extends Component {
                 {!this.props.supported.supported && <OldVersion />}
                 {this.props.supported.supported &&
                 <div>
-                <div className="fixed-alter-object"></div>
-                {(objectSelected && (!this.props.boxes || this.props.boxes.length === 0)) &&
-                <div className="quick-usage">
-                    <div>
+                    <div className="fixed-alter-object"></div>
+                    {(objectSelected && (!this.props.boxes || this.props.boxes.length === 0)) &&
+                    <div className="quick-usage">
                         <div>
                             <div>
-                                <h3>NO PAPER</h3>
-                                <ol>
-                                    <li>CLICK [<i className="fa fa-plus-circle" aria-hidden="true"></i>] BUTTON TO ADD PAPER</li>
-                                    <li>AND DRAG METRIC TO PAPER</li>
-                                </ol>
+                                <div>
+                                    <h3>NO PAPER</h3>
+                                    <ol>
+                                        <li>CLICK <span className="add-paper-btn"><i className="fa fa-plus-circle" aria-hidden="true"></i> ADD PAPER</span> BUTTON IN LEFT PAPER CONFIG TO ADD PAPER</li>
+                                        <li>AND DRAG METRIC TO PAPER</li>
+                                    </ol>
+                                </div>
+                            </div>
+                        </div>
+                    </div>}
+                    <ResponsiveReactGridLayout className="layout" breakpoints={{lg: 1600, md: 1200, sm: 800}} cols={{lg: 12, md: 10, sm: 6}} layouts={this.props.layouts} rowHeight={30} onLayoutChange={(layout, layouts) => this.onLayoutChange(layout, layouts)} onBreakpointChange={(newBreakpoint, newCols) => this.onBreakpointChange(newBreakpoint, newCols)}>
+                        {this.props.boxes.map((box, i) => {
+                            let filterInfo = this.state.filters.filter((d) => d.key === box.key)[0];
+                            return (
+                                <div className="box-layout" key={box.key} data-grid={box.layout}>
+                                    <button className="box-control box-layout-remove-btn last" onClick={this.removePaper.bind(null, box.key)}><i className="fa fa-times-circle-o" aria-hidden="true"></i></button>
+                                    {box.option && <button className="box-control box-layout-config-btn" onClick={this.toggleConfig.bind(null, box.key)}><i className="fa fa-cog" aria-hidden="true"></i></button>}
+                                    {box.option && (box.option.length > 1 || box.option.config ) && box.option.type === "xlog" && <button className={"box-control filter-btn " + (filterInfo && filterInfo.data && filterInfo.data.filtering ? "filtered" : "")} onClick={this.toggleFilter.bind(null, box.key)}><i className="fa fa-filter" aria-hidden="true"></i></button>}
+                                    {box.config && <BoxConfig box={box} setOptionValues={this.setOptionValues} setOptionClose={this.setOptionClose} removeMetrics={this.removeMetrics}/>}
+                                    {filterInfo && filterInfo.show && <XLogFilter box={box} filterInfo={filterInfo ? filterInfo.data : {filtering: false}} setXlogFilter={this.setXlogFilter} closeFilter={this.closeFilter}/>}
+                                    <Box onRef={ref => this.boxesRef[box.key] = ref} visible={this.state.visible} setOption={this.setOption} box={box} filter={filterInfo ? filterInfo.data : {filtering: false}} pastTimestamp={this.state.pastTimestamp} pageCnt={this.state.pageCnt} data={this.state.data} config={this.props.config} visitor={this.state.visitor} counters={this.state.counters} countersHistory={this.state.countersHistory.data} countersHistoryFrom={this.state.countersHistory.from} countersHistoryTo={this.state.countersHistory.to} countersHistoryTimestamp={this.state.countersHistory.time} longTerm={this.props.range.longTerm} layoutChangeTime={this.props.layoutChangeTime} realtime={this.props.range.realTime} xlogHistoryDoing={this.state.xlogHistoryDoing} xlogHistoryRequestCnt={this.state.xlogHistoryRequestCnt} setStopXlogHistory={this.setStopXlogHistory} xlogNotSupportedInRange={this.state.xlogNotSupportedInRange}/>
+                                </div>
+                            )
+                        })}
+                    </ResponsiveReactGridLayout>
+                    {!objectSelected &&
+                    <div className="select-instance">
+                        <div>
+                            <div className="select-instance-message">
+                                <div className="icon">
+                                    <div><i className="fa fa-info-circle" aria-hidden="true"></i></div>
+                                </div>
+                                <div className="msg">NO INSTANCE SELECTED</div>
                             </div>
                         </div>
                     </div>
-                </div>}
-                <ResponsiveReactGridLayout className="layout" breakpoints={{lg: 1600, md: 1200, sm: 800}} cols={{lg: 12, md: 10, sm: 6}} layouts={this.props.layouts} rowHeight={30} onLayoutChange={(layout, layouts) => this.onLayoutChange(layout, layouts)} onBreakpointChange={(newBreakpoint, newCols) => this.onBreakpointChange(newBreakpoint, newCols)}>
-                    {this.props.boxes.map((box, i) => {
-                        let filterInfo = this.state.filters.filter((d) => d.key === box.key)[0];
-                        return (
-                            <div className="box-layout" key={box.key} data-grid={box.layout}>
-                                <button className="box-control box-layout-remove-btn last" onClick={this.removePaper.bind(null, box.key)}><i className="fa fa-times-circle-o" aria-hidden="true"></i></button>
-                                {box.option && <button className="box-control box-layout-config-btn" onClick={this.toggleConfig.bind(null, box.key)}><i className="fa fa-cog" aria-hidden="true"></i></button>}
-                                {box.option && (box.option.length > 1 || box.option.config ) && box.option.type === "xlog" && <button className={"box-control filter-btn " + (filterInfo && filterInfo.data && filterInfo.data.filtering ? "filtered" : "")} onClick={this.toggleFilter.bind(null, box.key)}><i className="fa fa-filter" aria-hidden="true"></i></button>}                                
-                                {box.config && <BoxConfig box={box} setOptionValues={this.setOptionValues} setOptionClose={this.setOptionClose} removeMetrics={this.removeMetrics}/>}
-                                {filterInfo && filterInfo.show && <XLogFilter box={box} filterInfo={filterInfo ? filterInfo.data : {filtering : false}} setXlogFilter={this.setXlogFilter} closeFilter={this.closeFilter} />}
-                                <Box onRef={ref => this.boxesRef[box.key] = ref} visible={this.state.visible} setOption={this.setOption} box={box} filter={filterInfo ? filterInfo.data : {filtering : false}} pastTimestamp={this.state.pastTimestamp} pageCnt={this.state.pageCnt} data={this.state.data} config={this.props.config} visitor={this.state.visitor} counters={this.state.counters} countersHistory={this.state.countersHistory.data} countersHistoryFrom={this.state.countersHistory.from} countersHistoryTo={this.state.countersHistory.to} countersHistoryTimestamp={this.state.countersHistory.time} longTerm={this.props.range.longTerm} layoutChangeTime={this.props.layoutChangeTime} realtime={this.props.range.realTime} xlogHistoryDoing={this.state.xlogHistoryDoing} xlogHistoryRequestCnt={this.state.xlogHistoryRequestCnt} setStopXlogHistory={this.setStopXlogHistory} xlogNotSupportedInRange={this.state.xlogNotSupportedInRange}/>
+                    }
+                    <Profiler selection={this.props.selection} newXLogs={this.state.data.newXLogs} xlogs={this.state.data.xlogs} startTime={this.state.data.startTime} realtime={this.props.range.realTime}/>
+                    <div className="loading" ref="loading">
+                        <div>
+                            <div className="spinner">
+                                <div className="cube1"></div>
+                                <div className="cube2"></div>
                             </div>
-                        )
-                    })}
-                </ResponsiveReactGridLayout>
-                {!objectSelected &&
-                <div className="select-instance">
-                    <div>
-                        <div className="select-instance-message">
-                            <div className="icon">
-                                <div><i className="fa fa-info-circle" aria-hidden="true"></i></div>
-                            </div>
-                            <div className="msg">NO INSTANCE SELECTED</div>
                         </div>
                     </div>
-                </div>
-                }
-                <Profiler selection={this.props.selection} newXLogs={this.state.data.newXLogs} xlogs={this.state.data.xlogs} startTime={this.state.data.startTime} realtime={this.props.range.realTime}/>
-                <div className="loading" ref="loading">
-                    <div>
-                        <div className="spinner">
-                            <div className="cube1"></div>
-                            <div className="cube2"></div>
-                        </div>
-                    </div>
-                </div>
                 </div>}
             </div>
         );
@@ -1510,46 +1385,35 @@ class Paper extends Component {
 }
 
 let mapStateToProps = (state) => {
-        return {
-            objects: state.target.objects,
-            filterMap: state.target.filterMap,
-            selection: state.target.selection,
-            config: state.config,
-            user: state.user,
-            template: state.template,
-            range: state.range,
-            supported : state.supported,
-            boxes : state.paper.boxes,
-            layouts : state.paper.layouts,
-            layoutChangeTime : state.paper.layoutChangeTime,
-            searchCondition: state.searchCondition
-        };
+    return {
+        objects: state.target.objects,
+        filterMap: state.target.filterMap,
+        selection: state.target.selection,
+        config: state.config,
+        user: state.user,
+        template: state.template,
+        range: state.range,
+        supported: state.supported,
+        boxes: state.paper.boxes,
+        layouts: state.paper.layouts,
+        layoutChangeTime: state.paper.layoutChangeTime,
+        searchCondition: state.searchCondition
     };
+};
 
 let mapDispatchToProps = (dispatch) => {
-        return {
-            addRequest: () => dispatch(addRequest()),
-            pushMessage: (category, title, content) => dispatch(pushMessage(category, title, content)),
-            setControlVisibility: (name, value) => dispatch(setControlVisibility(name, value)),
-
-            setRealTime : (realTime, longTerm) => dispatch(setRealTime(realTime, longTerm)),
-            setRealTimeValue: (realTime, longTerm, value) => dispatch(setRealTimeValue(realTime, longTerm, value)),
-            setRangeDate: (date) => dispatch(setRangeDate(date)),
-            setRangeHours: (hours) => dispatch(setRangeHours(hours)),
-            setRangeMinutes: (minutes) => dispatch(setRangeMinutes(minutes)),
-            setRangeValue: (value) => dispatch(setRangeValue(value)),
-            setRangeDateHoursMinutes: (date, hours, minutes) => dispatch(setRangeDateHoursMinutes(date, hours, minutes)),
-            setRangeDateHoursMinutesValue: (date, hours, minutes, value) => dispatch(setRangeDateHoursMinutesValue(date, hours, minutes, value)),
-            setRangeAll: (date, hours, minutes, value, realTime, longTerm, range, step) => dispatch(setRangeAll(date, hours, minutes, value, realTime, longTerm, range, step)),
-
-            setTemplate: (boxes, layouts) => dispatch(setTemplate(boxes, layouts)),
-
-            setBoxes: (boxes) => dispatch(setBoxes(boxes)),
-            setLayouts: (layouts) => dispatch(setLayouts(layouts)),
-            setBoxesLayouts: (boxes, layouts) => dispatch(setBoxesLayouts(boxes, layouts))
-
-        };
+    return {
+        addRequest: () => dispatch(addRequest()),
+        pushMessage: (category, title, content) => dispatch(pushMessage(category, title, content)),
+        setControlVisibility: (name, value) => dispatch(setControlVisibility(name, value)),
+        setRealTime: (realTime, longTerm) => dispatch(setRealTime(realTime, longTerm)),
+        setRangeDateHoursMinutesValue: (date, hours, minutes, value) => dispatch(setRangeDateHoursMinutesValue(date, hours, minutes, value)),
+        setTemplate: (boxes, layouts) => dispatch(setTemplate(boxes, layouts)),
+        setBoxes: (boxes) => dispatch(setBoxes(boxes)),
+        setLayouts: (layouts) => dispatch(setLayouts(layouts)),
+        setBoxesLayouts: (boxes, layouts) => dispatch(setBoxesLayouts(boxes, layouts))
     };
+};
 
 Paper = connect(mapStateToProps, mapDispatchToProps)(Paper);
 export default withRouter(Paper);
