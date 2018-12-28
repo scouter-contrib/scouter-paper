@@ -43,8 +43,6 @@ const browser = detect();
 const support = (browser.name !== "ie" && browser.name !== "edge");
 
 // setting에 저장해도, 컨트롤러 영역이 새로고침되지 않음
-// 필터링 대상이 없는 경우, 컨트롤 영역에 없음 알리지 않음
-// 얼럿 클릭하여 이동하지 않음
 
 class App extends Component {
 

@@ -10,7 +10,7 @@ import AgentColor from "../../common/InstanceColor";
 import RangeControl from "../Paper/RangeControl/RangeControl";
 import TopologyControl from "../TopologyControl/TopologyControl";
 import TopologyMinControl from "../TopologyMinControl/TopologyMinControl";
-
+import * as PaperIcons from '../../common/PaperIcons'
 import LayoutManager from "../Menu/LayoutManager/LayoutManager";
 import PresetManager from "../Menu/PresetManager/PresetManager";
 import {getDefaultServerConfig, getDefaultServerConfigIndex, setServerTimeGap, setRangePropsToUrl, getHttpProtocol, errorHandler, getWithCredentials, setAuthHeader, getCurrentUser, setData} from '../../common/common';
@@ -788,6 +788,21 @@ class Controller extends Component {
         return key;
     };
 
+    toggleAllObjectFilter = (e) => {
+        e.stopPropagation();
+        if (this.props.objects.length === Object.keys(this.props.filterMap).length) {
+            this.props.objects.forEach((o) => {
+                this.props.removeFilteredObject(o.objHash);
+            });
+        } else {
+            this.props.objects.forEach((o) => {
+                if (!this.props.filterMap[o.objHash]) {
+                    this.props.addFilteredObject(o.objHash);
+                }
+            });
+        }
+    };
+
     render() {
 
         let menu = this.props.menu.replace("/", "");
@@ -842,18 +857,48 @@ class Controller extends Component {
                                     {this.props.objects.length > 0 &&
                                     <span>{Object.keys(this.props.filterMap).length} / {this.props.objects.length} OBJECTS</span>}
                                     {this.props.objects.length <= 0 && <span>NO SELECTED</span>}
+                                    <span className={"check-all-btn " + ((this.props.objects.length === Object.keys(this.props.filterMap).length) ? "selected" : "")} onClick={this.toggleAllObjectFilter.bind(this)}>ALL</span>
                                     <span className="toggle-filter-icon"><i className="fa fa-angle-down" aria-hidden="true"></i></span>
                                 </div>
                                 <span className="popup-icon" onClick={this.toggleSelectorVisible}><i className="fa fa-crosshairs" aria-hidden="true"></i></span>
                                 {this.state.filterOpened &&
                                 <div className="object-filter-list scrollbar">
                                     <ul>
+                                        {this.props.objects.length < 1 && <li className="empty-object">NO OBJECT SELECTED</li>}
                                         {this.props.objects.sort((a, b) => {
-                                            return a.objName.localeCompare(b.objName);
+                                            let compare = a.objType.localeCompare(b.objType);
+                                            if (compare === 0) {
+                                                return a.objName.localeCompare(b.objName);
+                                            } else {
+                                                return compare;
+                                            }
                                         }).map((object, i) => {
-                                            return <li key={i}
-                                                       className={this.props.filterMap[object.objHash] ? "filtered" : ""}
-                                                       onClick={this.toggleFilteredObject.bind(this, object.objHash)}>{object.objName}</li>;
+
+                                            let objType = this.props.counterInfo.objTypesMap[object.objType];
+                                            let icon = "";
+                                            let displayName = "";
+                                            if (objType) {
+                                                icon = objType.icon ? objType.icon : object.objType;
+                                                displayName = objType.displayName;
+                                            }
+
+                                            let iconInfo = PaperIcons.getObjectIcon(icon);
+
+                                            return (
+                                                <li key={i} className={this.props.filterMap[object.objHash] ? "filtered" : ""} onClick={this.toggleFilteredObject.bind(this, object.objHash)}>
+                                                    <div className="row">
+                                                        <div className="type-icon">
+                                                            <div className="type-icon-wrapper" style={{color : iconInfo.color, backgroundColor : iconInfo.bgColor}}>
+                                                                {iconInfo.fontFamily === "text" && <div className={"object-icon " + iconInfo.fontFamily}>{iconInfo.text}</div>}
+                                                                {iconInfo.fontFamily !== "text" && <div className={"object-icon " + iconInfo.fontFamily + " " + iconInfo.text}></div>}
+                                                            </div>
+                                                        </div>
+                                                        <div className="instance-text-info">
+                                                            <div className="instance-name">{object.objName}</div>
+                                                            <div className="instance-other"><span>{object.address}</span><span className="instance-objtype">{displayName}</span></div>
+                                                        </div>
+                                                    </div>
+                                                </li>)
                                         })}
                                     </ul>
                                 </div>

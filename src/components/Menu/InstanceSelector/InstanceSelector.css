@@ -49,11 +49,11 @@
 }
 
 .instance-selector {
-    margin: 0 auto;
+    margin: 0 auto 400px;
     border: 1px solid rgba(0, 0, 0, 0.6);
     color: white;
     width: 100%;
-    max-width: 800px;
+    max-width: 1000px;
     height: 360px;
     padding: 0;
     -webkit-touch-callout: none;
@@ -61,6 +61,24 @@
     -moz-user-select: none;
     -ms-user-select: none;
     user-select: none;
+}
+
+@media only screen and (max-height: 1200px) {
+    .instance-selector {
+        margin: 0 auto 200px;
+    }
+}
+
+@media only screen and (max-height: 800px) {
+    .instance-selector {
+        margin: 0 auto 100px;
+    }
+}
+
+@media only screen and (max-height: 600px) {
+    .instance-selector {
+        margin: 0 auto 0;
+    }
 }
 
 .instance-selector > div {
@@ -241,7 +259,7 @@
     display: table-cell;
     width: 30%;
     border-right: 1px solid rgba(0, 0, 0, 0.3);
-    font-size: 10px;
+    font-size: 12px;
 }
 
 .instance-selector .host-list div.host {

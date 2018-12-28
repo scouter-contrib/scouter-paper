@@ -61,12 +61,6 @@
     color: white;
 }
 
-@media screen and (max-width: 600px) {
-    .papers .select-instance {
-        top: 45px;
-    }
-}
-
 .papers .select-instance.fixed {
     top: 0;
 }

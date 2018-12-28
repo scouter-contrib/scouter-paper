@@ -193,6 +193,21 @@
     margin-right: 20px;
 }
 
+.controller-wrapper .row .object-navigator-btn .check-all-btn {
+    display: inline-block;
+    margin-left: 5px;
+    font-size: 10px;
+    padding: 2px 4px;
+    background-color: rgba(0,0,0,0.4);
+    border-radius: 3px;
+}
+
+.controller-wrapper .row .object-navigator-btn .check-all-btn.selected {
+    color: #333;
+    background-color: #FFCC11;
+    cursor: pointer;
+}
+
 .controller-wrapper .row .object-navigator-btn:hover {
     color: #333;
     background-color: #FFCC11;
@@ -251,9 +266,78 @@
 }
 
 .controller-wrapper .object-filter-list ul li {
-    padding: 5px;
+    padding: 0;
     cursor: pointer;
     border-bottom: 1px solid rgba(0, 0, 0, 0.2);
+    margin-bottom: 5px;
+}
+
+.controller-wrapper .object-filter-list ul li:last-child {
+    margin-bottom: 0;
+}
+
+.controller-wrapper .object-filter-list ul li div.type-icon {
+    width: 40px;
+    height: 40px;
+    text-align: center;
+    box-sizing: border-box;
+    padding: 5px;
+}
+
+
+.controller-wrapper .object-filter-list ul li div.type-icon .type-icon-wrapper {
+    border-radius: 3px;
+    display: inline-block;
+    width: 30px;
+    height: 30px;
+    text-align: center;
+}
+
+.controller-wrapper .object-filter-list ul li div.type-icon .type-icon-wrapper .object-icon {
+    background-color: transparent;
+    font-size: 18px;
+    padding-top: 7px;
+}
+
+.controller-wrapper .object-filter-list ul li div.type-icon .type-icon-wrapper .object-icon.technology-icons {
+    font-family: "technology-icons";
+}
+
+.controller-wrapper .object-filter-list ul li div.type-icon .type-icon-wrapper .object-icon.FontAwesome {
+    font-family: "FontAwesome";
+}
+
+.controller-wrapper .object-filter-list ul li div.type-icon .type-icon-wrapper .object-icon.text {
+    font-size: 9px;
+    padding-top: 10px;
+    letter-spacing: -0.5px;
+    text-transform: uppercase;
+}
+
+.controller-wrapper .object-filter-list ul li .row {
+    display: table;
+    table-layout: fixed;
+    width: 100%;
+}
+
+.controller-wrapper .object-filter-list ul li .row > div {
+    display: table-cell;
+    vertical-align: middle;
+}
+
+.controller-wrapper .object-filter-list ul li .row > div.type-icon {
+    width: 40px;
+    height: 40px;
+    text-align: center;
+    box-sizing: border-box;
+    padding: 5px;
+}
+
+.controller-wrapper .object-filter-list ul li.empty-object {
+    text-align: center;
+    border-bottom: none;
+    padding-top: 10px;
+    cursor: auto;
 }
 
 .controller-wrapper .object-filter-list ul li:first-child {
@@ -262,6 +346,10 @@
 
 .controller-wrapper .object-filter-list ul li:hover {
     background-color: rgba(0, 0, 0, 0.2);
+}
+
+.controller-wrapper .object-filter-list ul li.empty-object:hover {
+    background-color: transparent;
 }
 
 .controller-wrapper .object-filter-list ul li.filtered {
@@ -292,3 +380,26 @@
     }
 
 }
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
