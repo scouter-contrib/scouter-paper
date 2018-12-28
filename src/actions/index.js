@@ -294,7 +294,7 @@ export function setTopologyOption(topologyOption) {
 
 export function setAlert(alert) {
     return {
-        type: SET_TOPOLOGY_OPTION,
+        type: SET_ALERT,
         alert: alert
     };
 }

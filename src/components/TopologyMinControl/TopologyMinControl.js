@@ -3,9 +3,6 @@ import "./TopologyMinControl.css";
 import {connect} from "react-redux";
 import {withRouter} from 'react-router-dom';
 import {
-    addRequest,
-    pushMessage,
-    setControlVisibility,
     setTopologyOption
 } from "../../actions";
 import ReactTooltip from 'react-tooltip'

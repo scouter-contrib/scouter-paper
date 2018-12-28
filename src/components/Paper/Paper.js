@@ -5,15 +5,13 @@ import {connect} from "react-redux";
 import {withRouter} from 'react-router-dom';
 import {addRequest, pushMessage, setControlVisibility, setRealTime, setRealTimeValue, setRangeDate, setRangeHours, setRangeMinutes, setRangeValue, setRangeDateHoursMinutes, setRangeDateHoursMinutesValue, setRangeAll, setTemplate, setBoxes, setLayouts, setBoxesLayouts} from "../../actions";
 import {Responsive, WidthProvider} from "react-grid-layout";
-import {Box, BoxConfig, PaperControl, XLogFilter} from "../../components";
+import {Box, BoxConfig, XLogFilter} from "../../components";
 import jQuery from "jquery";
 import {errorHandler, getData, getHttpProtocol, getWithCredentials, setAuthHeader, setData, getSearchDays, getDivideDays, getCurrentUser} from "../../common/common";
 import Profiler from "./XLog/Profiler/Profiler";
 import ServerDate from "../../common/ServerDate";
 import * as common from "../../common/common";
 import moment from "moment";
-import _ from "lodash";
-import notificationIcon from '../../img/notification.png';
 import OldVersion from "../OldVersion/OldVersion";
 
 const ResponsiveReactGridLayout = WidthProvider(Responsive);
@@ -1524,7 +1522,7 @@ let mapStateToProps = (state) => {
             boxes : state.paper.boxes,
             layouts : state.paper.layouts,
             layoutChangeTime : state.paper.layoutChangeTime,
-            searchCondition: state.searchCondition,
+            searchCondition: state.searchCondition
         };
     };
 

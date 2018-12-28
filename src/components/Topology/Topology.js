@@ -712,7 +712,7 @@ class Topology extends Component {
         let dry = dr;
         let xRotation = 0;
         let largeArc = 0;
-        if(d.sweep == undefined) {
+        if(d.sweep === undefined) {
             d.sweep = true;
         }
         let sweep = d.sweep ? 1 : 0;

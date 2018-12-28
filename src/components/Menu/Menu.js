@@ -8,7 +8,9 @@ import AlertList from "../Paper/PaperControl/AlertList";
 import moment from "moment";
 import {
     setMenu,
-    setRangeAll
+    setRangeAll,
+    setAlert,
+    setSearchCondition
 } from '../../actions';
 
 class Menu extends Component {
@@ -42,7 +44,9 @@ class Menu extends Component {
             this.props.setMenu(name);
         } else {
             if (this.props.location.pathname === name) {
-                e.preventDefault();
+                if (e) {
+                    e.preventDefault();
+                }
             }
         }
     };
@@ -67,7 +71,7 @@ class Menu extends Component {
 
         this.props.setAlert({
             data : [],
-            offset : this.state.alert.offset,
+            offset : this.props.alert.offset,
             clearTime: clearTime,
             clearItem: clearItem
         });
@@ -106,14 +110,14 @@ class Menu extends Component {
 
         this.props.setAlert({
             data: data,
-            offset: this.state.alert.offset,
-            clearTime: this.state.alert.clearTime,
+            offset: this.props.alert.offset,
+            clearTime: this.props.alert.clearTime,
             clearItem: clearItem
         });
 
         if (localStorage) {
             localStorage.setItem("alert", JSON.stringify({
-                clearTime: this.state.alert.clearTime,
+                clearTime: this.props.alert.clearTime,
                 clearItem: clearItem
             }));
         }
@@ -124,12 +128,32 @@ class Menu extends Component {
         let start = moment(Math.floor(time / (1000 * 60)) * (1000 * 60));
         start.subtract(5, "minutes");
         let end = start.clone().add(10, "minutes");
-        // 메뉴 이동 필요
+        this.menuClick("/paper");
         this.props.setRangeAll(start, start.hours(), start.minutes(), 10, false, false, this.props.config.range.shortHistoryRange, this.props.config.range.shortHistoryStep);
-        setTimeout(() => {
-            //this.search(start, end, this.props.objects);
-            console.log("Search");
-        }, 100);
+
+        if (this.props.history.location.pathname === "/paper") {
+            setTimeout(() => {
+                this.props.setSearchCondition(start, end, (new Date()).getTime());
+            }, 100);
+
+        } else {
+            let search = new URLSearchParams(this.props.history.location.search);
+
+            search.set("realtime", false);
+            search.set("longterm", false);
+
+            search.set("from", start.format("YYYYMMDDHHmmss"));
+            search.set("to", end.format("YYYYMMDDHHmmss"));
+
+            this.props.history.push({
+                pathname: '/paper',
+                search: search.toString()
+            });
+
+            setTimeout(() => {
+                this.props.setSearchCondition(start, end, (new Date()).getTime());
+            }, 100);
+        }
 
 
     };
@@ -185,7 +209,7 @@ class Menu extends Component {
                     </NavLink>
                     }
                     <div className="alert-btn menu-item right" data-count={this.props.alert.data.length > 99 ? "99+" : this.props.alert.data.length} onClick={this.toggleShowAlert} data-tip="CLICK TO SHOW ALERT">
-                        <span className="alert-icon"><i className="fa fa-exclamation-circle" aria-hidden="true"></i></span>
+                        <span className={"alert-icon " + (this.props.alert.data.length > 0 ? "has-alert" : "")}><i className="fa fa-exclamation-circle" aria-hidden="true"></i></span>
                     </div>
                 </div>
                 <div className="bar"></div>
@@ -208,6 +232,8 @@ let mapDispatchToProps = (dispatch) => {
     return {
         setMenu: (menu) => dispatch(setMenu(menu)),
         setRangeAll: (date, hours, minutes, value, realTime, longTerm, range, step) => dispatch(setRangeAll(date, hours, minutes, value, realTime, longTerm, range, step)),
+        setAlert: (alert) => dispatch(setAlert(alert)),
+        setSearchCondition: (from, to, time) => dispatch(setSearchCondition(from, to, time))
     };
 };
 

@@ -55,10 +55,12 @@
     content: attr(data-count);
     position: absolute;
     top: 2px;
-    left: -1px;
+    right: 0;
     font-size: 10px;
-    background: #FF3300;
-    color: white;
+    _background: #FF3300;
+    _color: white;
+    color: #FF3300;
+    _background-color: #FFCC11;
     width: 19px;
     height: 19px;
     text-align: center;
@@ -74,6 +76,11 @@
 .menu .menu-item.alert-btn .alert-icon {
     font-size: 16px;
 }
+
+.menu .menu-item.alert-btn .alert-icon.has-error {
+    color: #FF3300;
+}
+
 
 .menu .menu-item .icon {
     position: absolute;

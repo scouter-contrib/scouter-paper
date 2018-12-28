@@ -8,7 +8,6 @@ import {
     setControlVisibility,
     setTopologyOption
 } from "../../actions";
-import * as d3 from "d3";
 
 class TopologyControl extends Component {
 

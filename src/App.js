@@ -42,10 +42,14 @@ import notificationIcon from './img/notification.png';
 const browser = detect();
 const support = (browser.name !== "ie" && browser.name !== "edge");
 
+// setting에 저장해도, 컨트롤러 영역이 새로고침되지 않음
+// 필터링 대상이 없는 경우, 컨트롤 영역에 없음 알리지 않음
+// 얼럿 클릭하여 이동하지 않음
 
 class App extends Component {
 
     alertTimer = null;
+    initAlert = false;
 
     constructor(props) {
         super(props);
@@ -136,13 +140,20 @@ class App extends Component {
 
 
         if (JSON.stringify(this.props.objects) !== JSON.stringify(nextProps.objects) || JSON.stringify(this.props.user) !== JSON.stringify(nextProps.user) || JSON.stringify(this.props.config) !== JSON.stringify(nextProps.config)) {
-            this.checkRealtimeAlert();
+            this.checkRealtimeAlert(nextProps);
         }
 
 
     };
 
-    checkRealtimeAlert = () => {
+    checkRealtimeAlert = (props) => {
+
+        if (!this.initAlert) {
+            this.getRealTimeAlert(props.objects);
+            this.initAlert = true;
+        }
+
+
         if (this.alertTimer === null) {
             let seconds = this.props.config.alertInterval;
             if (!seconds) {
@@ -150,7 +161,7 @@ class App extends Component {
             }
 
             this.alertTimer = setInterval(() => {
-                this.getRealTimeAlert(this.props.objects);
+                this.getRealTimeAlert(props.objects);
             }, seconds * 1000);
         }
     };
