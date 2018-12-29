@@ -17,6 +17,8 @@ import {
     getFilteredData0
 } from '../../../../common/common';
 import SingleProfile from "./SingleProfile/SingleProfile";
+import FrameProfile from "./FrameProfile/FrameProfile";
+
 import ProfileList from "./ProfileList/ProfileList";
 import _ from "lodash";
 import moment from "moment";
@@ -677,8 +679,14 @@ class Profiler extends Component {
                         </div>
                         <div className={"profile-steps " + (this.state.narrow ? 'narrow' : '')}>
                             <div className="profile-steps-content scrollbar">
-                                {(this.state.paramTxid || this.state.txid) &&
+                                {/*(this.state.paramTxid || this.state.txid) &&
                                 <SingleProfile rowClick={this.rowClick} txid={this.state.txid}
+                                               profile={this.state.profile} steps={this.state.steps}
+                                               summary={this.state.summary} narrow={this.state.narrow} indent={this.state.indent}
+                                               bind={this.state.bind} wrap={this.state.wrap} gap={this.state.gap}
+                                               formatter={this.state.formatter}/>*/}
+                                {(this.state.paramTxid || this.state.txid) &&
+                                <FrameProfile rowClick={this.rowClick} txid={this.state.txid}
                                                profile={this.state.profile} steps={this.state.steps}
                                                summary={this.state.summary} narrow={this.state.narrow} indent={this.state.indent}
                                                bind={this.state.bind} wrap={this.state.wrap} gap={this.state.gap}

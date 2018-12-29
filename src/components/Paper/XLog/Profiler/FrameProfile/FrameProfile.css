@@ -1,0 +1,220 @@
+.frame-profile {
+    padding: 20px;
+    font-size: 12px;
+}
+
+.frame-profile .sub-title {
+    padding: 10px;
+    border-radius: 3px 3px 0 0;
+    background-color: #333;
+    color: white;
+    display: block;
+    border: 1px solid #333;
+}
+
+.narrow .frame-profile .sub-title {
+    padding: 3px 10px;
+}
+
+.frame-profile div.xlog-data {
+    margin-bottom: 20px;
+}
+
+.frame-profile div.xlog-data > div {
+    white-space: nowrap;
+    display: table;
+    table-layout: fixed;
+    width: 100%;
+}
+
+.frame-profile div.xlog-data span {
+    padding: 7px 10px;
+    box-sizing: border-box;
+    display: table-cell;
+}
+
+.narrow .frame-profile div.xlog-data span {
+    padding: 3px 10px;
+}
+
+.frame-profile div.xlog-data span.label {
+    width: 100px;
+    background-color: #EEE;
+}
+
+.frame-profile div.xlog-data span.data {
+    white-space: nowrap;
+}
+
+.frame-profile div.xlog-data.wrap span.data {
+    white-space: normal;
+    word-break: break-all;
+}
+
+.frame-profile .frame-xlog-steps {
+    margin: 0 20px;
+}
+
+.frame-profile .line {
+    height: 5px;
+    margin: 0;
+    width: 100%;
+}
+
+.frame-xlog-steps .step {
+    padding: 0;
+    white-space: nowrap;
+    text-align: justify;
+    _border: 1px solid #DDD;
+    height: 20px;
+    box-sizing: border-box;
+    margin-bottom: 5px;
+    border-radius: 0;
+    background-color: #eee;
+    position: relative;
+
+}
+
+.frame-xlog-steps .step .step-info {
+    display: inline-block;
+    width: 80px;
+    height: 100%;
+}
+
+.frame-xlog-steps .step .span-info {
+    display: inline-block;
+    width: calc(100% - 80px);
+    height: 100%;
+    position: relative;
+}
+
+.frame-xlog-steps .step .span {
+    display: inline-block;
+    height: 100%;
+    background-color: rgba(0,0,0,0.3);
+    position: absolute;
+    top : 0;
+}
+
+.frame-xlog-steps .step .main-value {
+    position: absolute;
+    top : 0;
+    white-space: nowrap;
+    width: 0px;
+    height: 100%;
+    padding-top: 4px;
+    box-sizing: border-box;
+    padding-left: 4px;
+}
+
+.frame-xlog-steps .step .main-value .main-value-text {
+    overflow-x: hidden;
+    text-overflow: ellipsis;
+    height: 100%;
+    overflow-y: hidden;
+    padding: 0 7px;
+}
+
+.frame-xlog-steps .step .main-value .main-value-text.left-side {
+    position: absolute;
+    left : 0;
+    width: 50%;
+    text-align: left;
+}
+
+.frame-xlog-steps .step .main-value .main-value-text.right-side {
+    position: absolute;
+    right : 0;
+    text-align: right;
+}
+
+
+.frame-xlog-steps.wrap .step {
+    white-space: normal;
+    word-break: break-all;
+}
+
+@media screen and (max-width: 800px) {
+    .frame-profile {
+        padding: 10px;
+        font-size: 12px;
+    }
+
+    .frame-profile div.xlog-data {
+        margin-bottom: 10px;
+    }
+}
+
+
+.frame-profile .tx-nav {
+    /*margin-bottom: 10px;*/
+    margin-bottom: 1px;
+    vertical-align: top;
+}
+
+.narrow .frame-profile .tx-nav {
+    margin-bottom: 1px;
+}
+
+.frame-profile .tx-nav .main,
+.frame-profile .tx-nav .sub {
+    display: inline-block;
+    vertical-align: top;
+}
+
+.frame-profile .tx-nav .tx-link-wrapper {
+    display: inline-block;
+    font-size: 10px;
+    vertical-align: top;
+}
+
+.frame-profile .tx-nav .sub .tx-link-wrapper {
+    display: block;
+    margin-bottom: 5px;
+}
+
+.frame-profile .tx-nav .tx-link-wrapper > div {
+    display: inline-block;
+}
+
+.frame-profile .tx-nav .tx-link {
+    margin-right: 5px;
+    display: inline-block;
+    border: 1px solid rgba(0,0,0,0.3);
+    border-radius: 3px;
+    /*background-color: #007FFF;
+    color: white;*/
+}
+
+.frame-profile .tx-nav .tx-link.current {
+    font-weight: bold;
+}
+
+.frame-profile .tx-nav .tx-link-wrapper .arrow {
+    margin-right: 5px;
+}
+
+.frame-profile .tx-nav .tx-link span {
+    padding: 2px 4px;
+}
+
+.frame-profile .tx-nav .tx-link .type {
+    border-right: 1px solid rgba(0,0,0,0.3);
+    display: inline-block;
+    text-transform: uppercase;
+}
+
+.frame-profile .tx-nav .tx-link .txid {
+    text-decoration: underline;
+    cursor: pointer;
+    min-width: 50px;
+    display: inline-block;
+    box-sizing: border-box;
+}
+
+.frame-profile .tx-nav .tx-link .elapsed {
+    border-left: 1px solid rgba(0,0,0,0.3);
+    min-width: 50px;
+    display: inline-block;
+    box-sizing: border-box;
+}
