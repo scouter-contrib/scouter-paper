@@ -1,7 +1,12 @@
 @keyframes fadeIn {
-    0% {opacity: 0;}
-    100% {opacity: 1;}
+    0% {
+        opacity: 0;
+    }
+    100% {
+        opacity: 1;
+    }
 }
+
 .controller-wrapper {
     position: fixed;
     top: 0px;
@@ -58,7 +63,6 @@
     color: #333;
 }
 
-
 .controller-wrapper .controller-min-info .realtime-short-label > span {
     background-color: rgba(0, 0, 0, 0.8);
     border-radius: 4px;
@@ -67,7 +71,7 @@
 }
 
 .controller-wrapper .paper-only,
-.controller-wrapper .topology-only{
+.controller-wrapper .topology-only {
     display: none;
 }
 
@@ -126,7 +130,7 @@
 }
 
 .controller-wrapper .control-item .row > div {
-    padding: 5px;
+    _padding: 5px;
     display: table-cell;
     box-sizing: border-box;
 }
@@ -183,29 +187,30 @@
     background-color: rgba(0, 0, 0, 0.2);
     border-radius: 2px;
 }
+
 .controller-wrapper .row .object-navigator-btn-wrapper {
     position: relative;
 }
 
 .controller-wrapper .row .object-navigator-btn {
-    padding: 5px;
+    padding: 8px 5px;
     position: relative;
-    margin-right: 20px;
+    margin-right: 25px;
 }
 
 .controller-wrapper .row .object-navigator-btn .check-all-btn {
     display: inline-block;
     margin-left: 5px;
     font-size: 10px;
-    padding: 2px 4px;
-    background-color: rgba(0,0,0,0.4);
+    padding: 0 4px;
+    background-color: rgba(0, 0, 0, 0.4);
     border-radius: 3px;
+    cursor: pointer;
 }
 
 .controller-wrapper .row .object-navigator-btn .check-all-btn.selected {
     color: #333;
-    background-color: #FFCC11;
-    cursor: pointer;
+    background-color: #EEB422;
 }
 
 .controller-wrapper .row .object-navigator-btn:hover {
@@ -218,19 +223,17 @@
     color: white;
 }
 
-
 .controller-wrapper .row .object-navigator-btn .toggle-filter-icon,
-.controller-wrapper .row .object-navigator-btn-wrapper .popup-icon  {
+.controller-wrapper .row .object-navigator-btn-wrapper .popup-icon {
     position: absolute;
     font-size: 14px;
     width: 20px;
     height: 100%;
-    padding-top: 4px;
+    padding-top: 7px;
     box-sizing: border-box;
     display: inline-block;
     text-align: center;
 }
-
 
 .controller-wrapper .row .object-navigator-btn .toggle-filter-icon {
     top: 0;
@@ -238,12 +241,11 @@
 }
 
 .controller-wrapper .row .object-navigator-btn-wrapper .popup-icon {
-    top: 5px;
+    top: 0;
     right: 5px;
-    height: 22px;
+    height: 28px;
+    padding-top: 7px;
 }
-
-
 
 .controller-wrapper .row .object-navigator-btn .toggle-filter-icon:hover,
 .controller-wrapper .row .object-navigator-btn-wrapper .popup-icon:hover {
@@ -251,6 +253,10 @@
     color: #333;
     background-color: #FFCC11;
     cursor: pointer;
+}
+
+.controller-wrapper .row .instance-objtype {
+    margin-left: 5px;
 }
 
 .controller-wrapper .object-filter-list {
@@ -277,13 +283,12 @@
 }
 
 .controller-wrapper .object-filter-list ul li div.type-icon {
-    width: 40px;
-    height: 40px;
+    width: 34px;
+    height: 34px;
     text-align: center;
     box-sizing: border-box;
-    padding: 5px;
+    padding: 2px;
 }
-
 
 .controller-wrapper .object-filter-list ul li div.type-icon .type-icon-wrapper {
     border-radius: 3px;
@@ -326,11 +331,11 @@
 }
 
 .controller-wrapper .object-filter-list ul li .row > div.type-icon {
-    width: 40px;
-    height: 40px;
+    width: 34px;
+    height: 34px;
     text-align: center;
     box-sizing: border-box;
-    padding: 5px;
+    padding: 2px;
 }
 
 .controller-wrapper .object-filter-list ul li.empty-object {

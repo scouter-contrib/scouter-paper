@@ -13,7 +13,6 @@
     box-sizing: border-box;
 }
 
-
 .instance-selector-bg > div {
     display: table-cell;
     width: 100%;
@@ -53,7 +52,7 @@
     border: 1px solid rgba(0, 0, 0, 0.6);
     color: white;
     width: 100%;
-    max-width: 1000px;
+    max-width: 1200px;
     height: 360px;
     padding: 0;
     -webkit-touch-callout: none;
@@ -63,21 +62,29 @@
     user-select: none;
 }
 
+@media screen and (max-width: 1200px) {
+    .instance-selector {
+        width: calc(100% - 20px);
+        margin-left: 10px;
+        margin-right: 10px;
+    }
+}
+
 @media only screen and (max-height: 1200px) {
     .instance-selector {
-        margin: 0 auto 200px;
+        margin-bottom: 200px;
     }
 }
 
 @media only screen and (max-height: 800px) {
     .instance-selector {
-        margin: 0 auto 100px;
+        margin-bottom: 100px;
     }
 }
 
 @media only screen and (max-height: 600px) {
     .instance-selector {
-        margin: 0 auto 0;
+        margin-bottom: 0;
     }
 }
 
@@ -396,14 +403,6 @@
 
 .instance-selector .buttons .save-preset-btn {
     float: left;
-}
-
-@media screen and (max-width: 800px) {
-    .instance-selector {
-        width: calc(100% - 20px);
-        margin: 0 10px;
-
-    }
 }
 
 .instance-selector .scouter-servers {

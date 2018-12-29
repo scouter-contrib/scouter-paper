@@ -85,10 +85,13 @@ button {
 .scrollbar::-webkit-scrollbar {
     width: 7px;
     height: 7px;
+    background-color: rgba(0, 0, 0, 0.2);
 }
 
 .scrollbar::-webkit-scrollbar-thumb {
-    background-color: #FCDC3B;
+    background-color: #1D88EA;
+    background-color: rgba(0, 0, 0, 0.6);
+    _background-color: #FCDC3B;
 }
 
 body::-webkit-scrollbar {
