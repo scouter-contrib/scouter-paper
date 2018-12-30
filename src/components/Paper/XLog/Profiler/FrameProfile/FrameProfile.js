@@ -1,6 +1,6 @@
 import React, {Component} from 'react';
 import './FrameProfile.css';
-
+import FrameStepDetail from "./FrameStepDetail/FrameStepDetail";
 import {connect} from 'react-redux';
 import {withRouter} from 'react-router-dom';
 import * as d3 from "d3";
@@ -276,10 +276,19 @@ class FrameProfile extends Component {
     dateFormat = null;
     fullTimeFormat = null;
 
+    constructor(props) {
+        super(props);
+
+        this.state = {
+            selectedStep: null
+        };
+    }
+
     componentDidMount() {
         this.dateFormat = this.props.config.dateFormat;
         this.fullTimeFormat = this.props.config.dateFormat + " " + this.props.config.timeFormat;
-    }
+
+    };
 
     getNavData = (endtime, gxid, caller, txid, steps) => {
 
@@ -315,6 +324,7 @@ class FrameProfile extends Component {
             });
         }
 
+        /*
         steps && steps.forEach((d, i) => {
             const meta = stepMeta[d.step.stepType];
             if (d.step.txid && meta && meta.getNavName(d.step)) {
@@ -327,11 +337,13 @@ class FrameProfile extends Component {
                 });
             }
         });
+        */
 
         return flow;
     };
 
-    txNavClick = (xlog, endtime) => {
+    txNavClick = (xlog, endtime, e) => {
+        e.stopPropagation();
         this.props.rowClick({txid:xlog}, moment(new Date(Number(endtime))).format("YYYYMMDD"));
     };
 
@@ -342,7 +354,7 @@ class FrameProfile extends Component {
     margin = {
         left : 100,
         right : 20,
-        top : 28
+        top : 22
     };
 
     scale = null;
@@ -360,7 +372,7 @@ class FrameProfile extends Component {
             }
 
             svg = d3.select(frameAxis).append("svg")
-                .attr("width", width).attr("height", "40px")
+                .attr("width", width).attr("height", "30px")
                 .append("g").attr("class", "top-group").attr("transform", "translate(" + this.margin.left + "," + this.margin.top + ")");
 
             this.scale = d3.scaleLinear().range([0, this.axisWidth]).domain([0, nextProps.profile.elapsed]);
@@ -371,95 +383,148 @@ class FrameProfile extends Component {
         }
     }
 
-    componentDidUpdate(prevProps, prevState) {
-
-        /*
-        console.log(this.refs.frameAxis);
-
-        let frameAxis = this.refs.frameAxis;
-        if (frameAxis && this.props.profile) {
-            let width = frameAxis.offsetWidth;
-            let axisWidth = width - this.margin.left - this.margin.right;
-
-
-
-            let svg = d3.select(frameAxis).select("svg");
-            if (svg.size() > 0) {
-                svg.remove();
+    getStepName = (step) => {
+        let stepName = step.stepTypeName;
+        switch (step.stepType) {
+            case "17" :
+            case "9" :
+            case "3" : {
+                stepName = "MSG";
+                break;
             }
 
-            svg = d3.select(frameAxis).append("svg")
-                         .attr("width", width).attr("height", "40px")
-                         .append("g").attr("class", "top-group").attr("transform", "translate(" + this.margin.left + "," + this.margin.top + ")");
+            case "16" :
+            case "2" :
+            case "8" : {
+                stepName = "SQL";
+                break;
+            }
 
-            console.log(this.props.profile.elapsed);
-            console.log(width, axisWidth);
-            this.scale = d3.scaleLinear().range([0, axisWidth]).domain([0, this.props.profile.elapsed]);
-            svg.call(d3.axisTop(this.scale).tickFormat((d) => {
-                return d + "ms";
-            }).ticks(4));
+            case "10" :
+            case "1" : {
+                stepName = "METHOD";
+                break;
+            }
 
-            console.log(width);
+            case "51" : {
+                stepName = "SPAN";
+                break;
+            }
+
+            case "52" : {
+                stepName = "SPAN CALL";
+                break;
+            }
+
+            case "5" : {
+                stepName = "SOCKET";
+                break;
+            }
+
+            case "15" :
+            case "6" : {
+                stepName = "API CALL";
+                break;
+            }
+
+            case "7" : {
+                stepName = "THREAD SUBMIT";
+                break;
+            }
+
+            case "12" : {
+                stepName = "DUMP";
+                break;
+            }
+
+            case "13" : {
+                stepName = "DISPATCH";
+                break;
+            }
+
+            case "1" :
+            case "14" : {
+                stepName = "THREAD CALL";
+                break;
+            }
+
+            case "11" : {
+                stepName = "METHOD SUM";
+                break;
+            }
+
+            case "21" : {
+                stepName = "SQL SUM";
+                break;
+            }
+
+            case "31" : {
+                stepName = "MESSAGE SUM";
+                break;
+            }
+
+            case "42" : {
+                stepName = "SOCKET SUM";
+                break;
+            }
+
+            case "43" : {
+                stepName = "API CALL SUM";
+                break;
+            }
+
+            case "99" : {
+                stepName = "CONTROL";
+                break;
+            }
+
+            default : {
+                stepName = step.stepTypeName;
+                break
+            }
         }
 
-*/
+        return stepName;
+    };
 
-    }
+    showDetail = (step) => {
+        this.setState({
+            selectedStep : step
+        });
+    };
 
     render() {
-        let startTime;
-        if (this.props.profile) {
-            startTime = Number(this.props.profile.endTime - this.props.profile.elapsed);
-        }
-
-        let beforeStepStartTime;
 
         let nav = null;
         if (this.props.profile) {
             nav = this.getNavData(this.props.profile.endTime, this.props.profile.gxid, this.props.profile.caller, this.props.profile.txid, this.props.steps);
         }
 
-        console.log(this.props.profile);
-        console.log(this.props.steps);
-
-
-
-
         return (
             <div className='frame-profile'>
-                <div className="tx-nav">
-                    <div className="main">
-                        {(nav && nav.main.length > 0) && nav.main.map((d, i) => {
-                            return (
-                                <div className="tx-link-wrapper" key={i}>
-                                    {i !== 0 && <div className="arrow"><i className="fa fa-long-arrow-right" aria-hidden="true"></i></div>}
-                                    <div className={"tx-link " + d.type}>
-                                        <span className="type">{d.type}</span>
-                                        <span className="txid" onClick={this.txNavClick.bind(this, d.id, d.endtime)}>{d.idx}</span>
-                                    </div>
-                                </div>
-                            )
-                        })}
-                    </div>
-                    <div className="sub">
-                        {(nav && nav.sub.length > 0) && nav.sub.map((d, i) => {
-                            return (
-                                <div className="tx-link-wrapper" key={i}>
-                                    <div className="arrow"><i className="fa fa-long-arrow-right" aria-hidden="true"></i></div>
-                                    <div className="tx-link">
-                                        <span className="type">{d.type}</span>
-                                        <span className="txid" onClick={this.txNavClick.bind(this, d.id, d.endtime)}>{d.idx}</span>
-                                        {d.elapsed >= 0 && <span className="elapsed">{d.elapsed} ms</span>}
-                                    </div>
-                                </div>
-                            )
-                        })}
-                    </div>
-                </div>
                 {/*<div className={"sub-title " + (this.props.narrow ? 'narrow' : '')}>GENERAL INFO</div>*/}
                 {/*<div className={"xlog-data " + (this.props.wrap ? 'wrap' : '') + (this.props.narrow ? 'narrow' : '')}>*/}
                 <div className={"sub-title "}>GENERAL INFO</div>
                 <div className={"xlog-data " + (this.props.wrap ? 'wrap' : '')}>
+                    {(nav && nav.main.length > 1) &&
+                    <div>
+                        <span className="label">TX FLOW</span>
+                        <span className="data">
+                            {nav.main.map((d, i) => {
+                                return (
+                                    <div className="tx-link-wrapper" key={i}>
+                                        {i !== 0 && <div className="arrow"><i className="fa fa-long-arrow-right" aria-hidden="true"></i></div>}
+                                        <div className={"tx-link link-other-tx " + d.type}>
+                                            <span className="type">{d.type}</span>
+                                            <span className="txid"
+                                                  onClick={this.txNavClick.bind(this, d.id, d.endtime)}>{d.idx}</span>
+                                        </div>
+                                    </div>
+                                )
+                            })}
+                        </span>
+                    </div>
+                    }
                     {this.props.profile && profileMetas && profileMetas.filter((d) => {return this.props.summary ? d.show : true}).map((meta, i) => {
                         return <div key={i}>
                             <span className="label">{meta.name}</span>
@@ -492,22 +557,50 @@ class FrameProfile extends Component {
                                 width =  3;
                             }
 
+                            let textPadding = 15;
                             let rate = stepStartTime / this.props.profile.elapsed;
+                            let textWidth = "50%";
+                            if (rate <= 0.5) {
+                                textWidth = (this.axisWidth - start - textPadding) + "px";
+                            } else {
+                                textWidth = (start - textPadding) + "px";
+                            }
 
+                            let percentage = (Math.round((row.step.elapsed / this.props.profile.elapsed) * 1000) / 10);
+                            let percentageGrade = "normal";
+                            if (percentage > 50) {
+                                percentageGrade = "warning";
+                            }
 
-                            return (<div key={i} className="step">
-                                <div className="step-info"></div>
+                            return (<div key={i} className={"step " + ("step-type-" + row.step.stepType)} onClick={this.showDetail.bind(this, row)}>
+                                <div className="step-info">
+                                    <span className="index">{row.step.index}</span>
+                                    <div className="step-general-info">
+                                        {row.step.txid &&
+                                        <div className="step-name link-other-tx" onClick={this.txNavClick.bind(this, row.step.txid, this.props.profile.endTime)}><i className="fa fa-share" aria-hidden="true"></i> {this.getStepName(row.step)}</div>
+                                            }
+                                        {!row.step.txid && <div className="step-name">{this.getStepName(row.step)}</div>}
+                                        <div className="step-elapsed">{isNaN(row.step.elapsed) ? "" : row.step.elapsed + " ms"} <span className={"percentage " + percentageGrade}>{isNaN(percentage) ? "" : percentage + "%"}</span></div>
+                                    </div>
+                                </div>
                                 <div className="span-info">
                                     <div className="span" style={{left : start + "px", width : width + "px"}}></div>
                                     <div className={"main-value "} style={{left : start + "px"}}>
-                                    {(rate <= 0.5) && <div className="main-value-text left-side" style={{width : this.axisWidth / 2}}>{row.mainValue}</div>}
-                                    {(rate > 0.5) && <div className="main-value-text right-side" style={{width : this.axisWidth / 2}}>{row.mainValue}</div>}
+                                        <div className={"main-value-text " + (rate <= 0.5 ? "left-side" : "right-side")} style={{width : textWidth}}><span>{row.mainValue}</span></div>
                                     </div>
                                 </div>
                             </div>)
                         })}
                     </div>
                 </div>
+                {this.state.selectedStep &&
+                <div className="frame-step-detail-popup">
+                    <div>
+                        <FrameStepDetail
+                            bind={this.props.bind} wrap={this.props.wrap} formatter={this.props.formatter}
+                            showDetail={this.showDetail} profile={this.props.profile} getStepName={this.getStepName} steps={this.props.steps} info={this.state.selectedStep}></FrameStepDetail>
+                    </div>
+                </div>}
             </div>
         );
     }

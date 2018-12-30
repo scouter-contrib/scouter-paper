@@ -3,6 +3,11 @@
     font-size: 12px;
 }
 
+
+.frame-profile .top-group text {
+    font-family: 'Righteous','Nanum Gothic',cursive !important;
+}
+
 .frame-profile .sub-title {
     padding: 10px;
     border-radius: 3px 3px 0 0;
@@ -66,19 +71,74 @@
     white-space: nowrap;
     text-align: justify;
     _border: 1px solid #DDD;
-    height: 20px;
+    height: 24px;
     box-sizing: border-box;
     margin-bottom: 5px;
     border-radius: 0;
     background-color: #eee;
     position: relative;
-
+    cursor: pointer;
 }
 
 .frame-xlog-steps .step .step-info {
     display: inline-block;
     width: 80px;
     height: 100%;
+    vertical-align: top;
+    position: relative;
+    background-color: #FEFEFE;
+}
+
+.frame-xlog-steps .step .step-info .index {
+    display: inline-block;
+    padding : 4px 4px 0;
+    width: 30px;
+    box-sizing: border-box;
+    height: 100%;
+    position: absolute;
+    top : 0;
+    left : -30px;
+}
+
+.frame-xlog-steps .step .step-info .step-general-info {
+    font-size: 10px;
+    padding : 0 2px 0 0;
+    white-space: nowrap;
+    display: inline-block;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    width: 100%;
+    box-sizing: border-box;
+    height: 100%;
+}
+
+.frame-xlog-steps .step .step-info .step-general-info .step-name {
+    text-align: right;
+}
+
+.frame-xlog-steps .step .step-info .step-general-info .step-name.link-other-tx {
+    color: #0276FD;
+    cursor: pointer;
+}
+
+.frame-xlog-steps .step .step-info .step-general-info .step-name.link-other-tx:hover {
+    color: #003F87;
+}
+
+
+
+.frame-xlog-steps .step .step-info .step-general-info .step-elapsed {
+    text-align: right;
+}
+
+.frame-xlog-steps .step .step-info .step-general-info .step-elapsed .percentage {
+    display: inline-block;
+    width: 30px;
+    background-color: rgba(0,0,0,0.1);
+}
+
+.frame-xlog-steps .step .step-info .step-general-info .step-elapsed .percentage.warning {
+    background-color: #FCB514;
 }
 
 .frame-xlog-steps .step .span-info {
@@ -96,11 +156,87 @@
     top : 0;
 }
 
+.frame-profile .step-type-17 .span,
+.frame-profile .step-type-9 .span,
+.frame-profile .step-type-3 .span {
+    background-color: #28AE7B;
+}
+
+.frame-profile .step-type-16 .span,
+.frame-profile .step-type-2 .span,
+.frame-profile .step-type-8 .span {
+    background-color: #0000C3;
+}
+
+.frame-profile .step-type-10 .span,
+.frame-profile .step-type-1 .span {
+    background-color: #5B59BA;
+}
+
+.frame-profile .step-type-51 .span {
+    background-color: #5B59BA;
+}
+
+.frame-profile .step-type-52 .span {
+    background-color: #1a237e;
+}
+
+.frame-profile .step-type-5 .span {
+    background-color: #FCD116;
+}
+
+.frame-profile .step-type-15 .span,
+.frame-profile .step-type-6 .span {
+    background-color: #1a237e;
+}
+
+.frame-profile .step-type-7 .span {
+    background-color: #01579b;
+}
+
+.frame-profile .step-type-12 .span {
+    background-color: #999;
+}
+
+.frame-profile .step-type-13 .span {
+    background-color: #01579b;
+}
+
+.frame-profile .step-type-1 .span,
+.frame-profile .step-type-14 .span {
+    background-color: #01579b;
+}
+
+.frame-profile .step-type-11 .span {
+    background-color: #603311;
+}
+
+.frame-profile .step-type-21 .span {
+    background-color: #603311;
+}
+
+.frame-profile .step-type-31 .span {
+    background-color: #603311;
+}
+
+.frame-profile .step-type-42 .span {
+    background-color: #FCD116;
+}
+
+.frame-profile .step-type-43 .span {
+    background-color: #1a237e;
+}
+
+.frame-profile .step-type-99 .span {
+    background-color: #28AE7B;
+}
+
+
 .frame-xlog-steps .step .main-value {
     position: absolute;
     top : 0;
     white-space: nowrap;
-    width: 0px;
+    width: 0;
     height: 100%;
     padding-top: 4px;
     box-sizing: border-box;
@@ -110,15 +246,19 @@
 .frame-xlog-steps .step .main-value .main-value-text {
     overflow-x: hidden;
     text-overflow: ellipsis;
-    height: 100%;
     overflow-y: hidden;
-    padding: 0 7px;
+    padding: 0 7px 0;
+    top : 0;
+    width: 50%;
+    font-size: 10px;
+    box-sizing: border-box;
+    color: #888;
+    margin-top: 6px;
 }
 
 .frame-xlog-steps .step .main-value .main-value-text.left-side {
     position: absolute;
     left : 0;
-    width: 50%;
     text-align: left;
 }
 
@@ -132,6 +272,7 @@
 .frame-xlog-steps.wrap .step {
     white-space: normal;
     word-break: break-all;
+    vertical-align: top;
 }
 
 @media screen and (max-width: 800px) {
@@ -152,69 +293,75 @@
     vertical-align: top;
 }
 
-.narrow .frame-profile .tx-nav {
-    margin-bottom: 1px;
-}
-
-.frame-profile .tx-nav .main,
-.frame-profile .tx-nav .sub {
+.frame-profile .tx-link-wrapper {
     display: inline-block;
     vertical-align: top;
 }
 
-.frame-profile .tx-nav .tx-link-wrapper {
-    display: inline-block;
-    font-size: 10px;
-    vertical-align: top;
-}
-
-.frame-profile .tx-nav .sub .tx-link-wrapper {
-    display: block;
-    margin-bottom: 5px;
-}
-
-.frame-profile .tx-nav .tx-link-wrapper > div {
-    display: inline-block;
-}
-
-.frame-profile .tx-nav .tx-link {
+.frame-profile .tx-link {
     margin-right: 5px;
     display: inline-block;
-    border: 1px solid rgba(0,0,0,0.3);
+    _border: 1px solid rgba(0,0,0,0.3);
     border-radius: 3px;
     /*background-color: #007FFF;
     color: white;*/
 }
 
-.frame-profile .tx-nav .tx-link.current {
+.frame-profile .tx-link.link-other-tx {
+    color: #0276FD;
+    cursor: pointer;
+}
+
+.frame-profile .tx-link.link-other-tx:hover {
+    color: #003F87;
+}
+
+.frame-profile .tx-link .type {
+    padding: 0;
+    display: inline-block;
+    display: none;
+}
+
+.frame-profile .tx-link .txid {
+    padding: 0;
+    display: inline-block;
+}
+
+.frame-profile .tx-link.current {
     font-weight: bold;
 }
 
-.frame-profile .tx-nav .tx-link-wrapper .arrow {
+.frame-profile .tx-link-wrapper .arrow {
     margin-right: 5px;
-}
-
-.frame-profile .tx-nav .tx-link span {
-    padding: 2px 4px;
-}
-
-.frame-profile .tx-nav .tx-link .type {
-    border-right: 1px solid rgba(0,0,0,0.3);
     display: inline-block;
-    text-transform: uppercase;
 }
 
-.frame-profile .tx-nav .tx-link .txid {
-    text-decoration: underline;
-    cursor: pointer;
-    min-width: 50px;
-    display: inline-block;
-    box-sizing: border-box;
+.frame-profile .frame-step-detail-popup {
+    position: absolute;
+    top : 0;
+    left : 0;
+    right : 0;
+    bottom : 0;
+    background-color: rgba(0,0,0,0.6);
+    display: table;
+    width: 100%;
+    height: 100%;
 }
 
-.frame-profile .tx-nav .tx-link .elapsed {
-    border-left: 1px solid rgba(0,0,0,0.3);
-    min-width: 50px;
-    display: inline-block;
-    box-sizing: border-box;
+.frame-profile .frame-step-detail-popup > div {
+    display: table-cell;
+    width: 100%;
+    height: 100%;
+    vertical-align: middle;
+    padding: 0 10px;
+    position: relative;
 }
+
+.frame-profile .frame-step-detail-popup > div > div {
+    background-color: white;
+    height: 500px;
+    width: 100%;
+
+
+}
+
