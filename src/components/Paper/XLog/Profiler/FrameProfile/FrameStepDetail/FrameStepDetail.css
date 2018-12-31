@@ -45,7 +45,7 @@
 
 .frame-profile-step-detail .sub-detail-title {
     text-transform: uppercase;
-    padding: 5px 5px 0;
+    padding: 5px 0 0;
     margin-top: 0;
     font-size: 10px;
     position: relative;
@@ -101,6 +101,9 @@
     padding: 4px;
     background-color: #333;
     color: white;
+    background-color: #EEE;
+    color: #333;
+    border-radius: 2px;
 }
 
 .frame-profile-step-detail .main-value {
@@ -109,6 +112,10 @@
     padding: 5px;
     box-sizing: border-box;
     position: relative;
+}
+
+.frame-profile-step-detail .main-value .gab-from-start {
+    margin-right: 5px;
 }
 
 .frame-profile-step-detail .main-value.error {
@@ -120,9 +127,7 @@
 }
 
 .frame-profile-step-detail .main-value .value {
-    margin-right: 5px;
-    background-color: rgba(0,0,0,0.1);
-    padding: 0 8px;
+    margin-left: 5px;
 }
 
 .frame-profile-step-detail .main-value .text {

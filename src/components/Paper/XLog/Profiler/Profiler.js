@@ -650,7 +650,15 @@ class Profiler extends Component {
                                                profile={this.state.profile} steps={this.state.steps}
                                                summary={this.state.summary} narrow={this.state.narrow}
                                                bind={this.state.bind} wrap={this.state.wrap}
-                                               formatter={this.state.formatter}/>}
+                                               formatter={this.state.formatter}
+                                               toggleFormatter={this.toggleFormatter}
+                                               toggleBind={this.toggleBind}
+                                               toggleWrap={this.toggleWrap}
+                                />
+
+
+
+                                }
                                 {(!this.state.paramTxid && !this.state.txid) && <div className="no-profile">
                                     <div>NO PROFILE SELECTED</div>
                                 </div>}

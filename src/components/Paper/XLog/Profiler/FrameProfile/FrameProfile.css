@@ -87,15 +87,13 @@
     height: 24px;
 }
 
-
-
 .frame-xlog-steps .step .step-hover {
     position: absolute;
-    top : 0;
-    left : 0;
-    right : 0;
-    bottom : 0;
-    background-color: rgba(0,255,255,0.1);
+    top: 0;
+    left: -20px;
+    right: 0;
+    bottom: 0;
+    background-color: rgba(0, 255, 255, 0.1);
     display: none;
 }
 
@@ -114,17 +112,17 @@
 
 .frame-xlog-steps .step .step-info .index {
     display: inline-block;
-    padding: 12px 4px 0;
-    width: 30px;
+    padding: 12px 2px 0;
+    width: 20px;
     box-sizing: border-box;
     height: 100%;
     position: absolute;
     top: 0;
-    left: 0;
+    left: -20px;
 }
 
 .narrow .frame-xlog-steps .step .step-info .index {
-    padding: 6px 4px 0;
+    padding: 6px 2px 0;
 }
 
 .frame-xlog-steps .step .step-info .step-general-info {
@@ -186,8 +184,8 @@
 
 .frame-xlog-steps .step .span-info .error {
     position: absolute;
-    top : 6px;
-    right : -30px;
+    top: 6px;
+    right: -30px;
     background-color: #FF030D;
     color: white;
     font-size: 10px;
@@ -410,7 +408,6 @@
     width: 100%;
 
 }
-
 
 .frame-profile-step-detail pre {
     font-family: 'Righteous', 'Nanum Gothic', cursive !important;

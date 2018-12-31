@@ -280,7 +280,7 @@ class FrameProfile extends Component {
         super(props);
 
         this.state = {
-            selectedStep: null
+            selectedStepIndex: null
         };
     }
 
@@ -490,9 +490,9 @@ class FrameProfile extends Component {
         return stepName;
     };
 
-    showDetail = (step) => {
+    showDetail = (index) => {
         this.setState({
-            selectedStep : step
+            selectedStepIndex : index
         });
     };
 
@@ -538,7 +538,6 @@ class FrameProfile extends Component {
 
     getMainValue = (row) => {
         // needs check 10 (Method2Step) , 5 (SOCKET), 6(ApiCallStep), 13(DispatchStep), 14(ThreadCallPossibleStep), 11, 21, 31
-        console.log(row.step.stepType, row.mainValue);
         switch (row.step.stepType) {
             case "9" : {
                 return row.mainValue + (row.step.time >= 0 ? ' #' + row.step.value + ' ' + row.step.time + 'ms' : "");
@@ -660,9 +659,7 @@ class FrameProfile extends Component {
 
         return (
             <div className='frame-profile'>
-                {/*<div className={"sub-title " + (this.props.narrow ? 'narrow' : '')}>GENERAL INFO</div>*/}
-                {/*<div className={"xlog-data " + (this.props.wrap ? 'wrap' : '') + (this.props.narrow ? 'narrow' : '')}>*/}
-                <div className={"sub-title "}>GENERAL INFO</div>
+                <div className={"sub-title " + (this.props.narrow ? 'narrow' : '')}>GENERAL INFO</div>
                 <div className={"xlog-data " + (this.props.wrap ? 'wrap' : '')}>
                     {(nav && nav.main.length > 1) &&
                     <div>
@@ -732,8 +729,7 @@ class FrameProfile extends Component {
 
                             let mainValue = this.getMainValue(row);
 
-
-                            return (<div key={i} className={"step " + ("step-type-" + row.step.stepType)} onClick={this.showDetail.bind(this, row)}>
+                            return (<div key={i} className={"step " + ("step-type-" + row.step.stepType)} onClick={this.showDetail.bind(this, i)}>
                                 <div className="step-info">
                                     <span className="index">{row.step.index}</span>
                                     <div className="step-general-info">
@@ -755,10 +751,10 @@ class FrameProfile extends Component {
                         })}
                     </div>
                 </div>
-                {this.state.selectedStep &&
+                {this.state.selectedStepIndex !== null &&
                 <div className="frame-step-detail-popup">
                     <div>
-                        <FrameStepDetail bind={this.props.bind} wrap={this.props.wrap} formatter={this.props.formatter} showDetail={this.showDetail} profile={this.props.profile} getStepName={this.getStepName} steps={this.props.steps} info={this.state.selectedStep}></FrameStepDetail>
+                        <FrameStepDetail bind={this.props.bind} wrap={this.props.wrap} formatter={this.props.formatter} showDetail={this.showDetail} profile={this.props.profile} getStepName={this.getStepName} steps={this.props.steps} selectedIndex={this.state.selectedStepIndex} getMainValue={this.getMainValue} getElapsedTime={this.getElapsedTime} toggleFormatter={this.props.toggleFormatter} toggleBind={this.props.toggleBind} toggleWrap={this.props.toggleWrap}></FrameStepDetail>
                     </div>
                 </div>}
             </div>
