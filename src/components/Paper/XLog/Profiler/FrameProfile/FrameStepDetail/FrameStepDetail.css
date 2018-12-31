@@ -111,6 +111,10 @@
     position: relative;
 }
 
+.frame-profile-step-detail .main-value.error {
+    color: #FF030D;
+}
+
 .frame-profile-step-detail .main-value.dump {
     padding: 5px 10px;
 }

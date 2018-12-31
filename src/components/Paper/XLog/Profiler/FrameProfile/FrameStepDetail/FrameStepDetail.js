@@ -5,6 +5,7 @@ import {connect} from 'react-redux';
 import {withRouter} from 'react-router-dom';
 import * as d3 from "d3";
 import sqlFormatter from "sql-formatter";
+import JSONPretty from 'react-json-pretty';
 import numeral from "numeral";
 import moment from "moment";
 
@@ -52,8 +53,12 @@ class FrameStepDetail extends Component {
 
         console.log(this.props.profile);
         console.log(this.props.info);
+        console.log(this.props.steps);
 
         let prevList = this.props.steps.filter((d) => {
+            if (this.props.steps.annotation && this.props.steps.annotation.length > 0) {
+                console.log(this.props.steps.annotation);
+            }
             return Number(d.step.index) === (this.props.info.step.index - 1);
         });
 
@@ -124,6 +129,12 @@ class FrameStepDetail extends Component {
                         <div className="main-value">{this.props.info.step.elapsed}ms <span className="percentage">({Math.round((this.props.info.step.elapsed / this.props.profile.elapsed) * 1000) / 10}%)</span></div>
                     </div>
                     }
+                    {this.props.info.step.error &&
+                    <div className="frame-row">
+                        <div className="sub-detail-title"><span>ERROR</span></div>
+                        <div className="main-value error">{/*this.props.info.step.error*/}HAS ERROR (SCOUTER PAPER NOT YET SUPPORT DISPLAY ERROR MESSAGE)</div>
+                    </div>
+                    }
                     {this.props.info.step.stepType !== "12" &&
                     <div className="frame-row">
                         <div className="sub-detail-title">
@@ -151,8 +162,7 @@ class FrameStepDetail extends Component {
                             <span className="value">{'#' + this.props.info.step.updated}</span>}
                             {(this.props.info.step.stepType !== "16" && !isNaN(this.props.info.step.value)) &&
                             <span className="value">{'#' + this.props.info.step.value}</span>}
-                            {sql && <div className={"sql-statement " + (this.state.formatter ? 'formatter' : '') + ' ' + (this.state.wrap ? 'wrap' : '')}
-                                         dangerouslySetInnerHTML={{__html: sql}}></div>}
+                            {sql && <div className={"sql-statement " + (this.state.formatter ? 'formatter' : '') + ' ' + (this.state.wrap ? 'wrap' : '')} dangerouslySetInnerHTML={{__html: sql}}></div>}
                             {!sql && <div className="text">{this.props.info && this.props.info.mainValue}</div>}
                         </div>
                     </div>
@@ -175,20 +185,55 @@ class FrameStepDetail extends Component {
                         </div>
                     </div>
                     }
-                    {this.props.info.step.tags &&
-                    <div className="frame-row">
-                        <div className="sub-detail-title"><span>TAGS</span></div>
-                        <div className="tags">
-                            <div>
-                            {Object.keys(this.props.info.step.tags).map((key, i) => {
-                                return (<div key={i}>
-                                    <div className="tag-key">{key}</div>
-                                    <div className="tag-value">{this.props.info.step.tags[key]}</div>
-                                </div>)
-                            })}
+                    {(this.props.info.step.stepType === "51" || this.props.info.step.stepType === "52") &&
+                        <div>
+                        {this.props.info.step.localEndpoint.serviceName &&
+                        <div className="frame-row">
+                            <div className="sub-detail-title"><span>LOCAL ENDPOINT</span></div>
+                            <div className="main-value">
+                                <div>
+                                    <JSONPretty json={this.props.info.step.localEndpoint}></JSONPretty>
+                                </div>
                             </div>
                         </div>
-                    </div>
+                        }
+                        {this.props.info.step.remoteEndpoint.serviceName &&
+                        <div className="frame-row">
+                            <div className="sub-detail-title"><span>REMOTE ENDPOINT</span></div>
+                            <div className="main-value">
+                                <div>
+                                    <JSONPretty json={this.props.info.step.remoteEndpoint}></JSONPretty>
+                                </div>
+                            </div>
+                        </div>
+                        }
+                        {(this.props.info.step.annotations && this.props.info.step.annotations.length > 0) &&
+                        <div className="frame-row">
+                            <div className="sub-detail-title"><span>ANNOTATIONS</span></div>
+                            <div className="main-value">
+                                <div>
+                                    <JSONPretty json={this.props.info.step.annotations}></JSONPretty>
+                                </div>
+                            </div>
+                        </div>
+                        }
+                        {this.props.info.step.tags &&
+                            <div className="frame-row">
+                                <div className="sub-detail-title"><span>TAGS</span></div>
+                                <div className="tags">
+                                    <div>
+                                        {Object.keys(this.props.info.step.tags).map((key, i) => {
+                                            return (<div key={i}>
+                                                <div className="tag-key">{key}</div>
+                                                <div className="tag-value">{this.props.info.step.tags[key]}</div>
+                                            </div>)
+                                        })}
+                                    </div>
+                                </div>
+                            </div>
+                        }
+
+                        </div>
                     }
                 </div>
             </div>

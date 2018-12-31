@@ -386,7 +386,10 @@ class FrameProfile extends Component {
     getStepName = (step) => {
         let stepName = step.stepTypeName;
         switch (step.stepType) {
-            case "17" :
+            case "17" :{
+                stepName = "CUSTOM";
+                break;
+            }
             case "9" :
             case "3" : {
                 stepName = "MSG";
@@ -493,6 +496,161 @@ class FrameProfile extends Component {
         });
     };
 
+    //sql3 literal bind?
+    getElapsedTime = (row) => {
+        switch (row.step.stepType) {
+            case "9" : {
+                return Number(row.step.time) >= 0 ? Number(row.step.time) : undefined;
+            }
+
+            case "12" :
+            case "31" :
+            case "99" : {
+                return undefined;
+            }
+
+            case "16" :
+            case "2" :
+            case "8" :
+            case "1" :
+            case "51" :
+            case "52" :
+            case "10" :
+            case "3" :
+            case "5" :
+            case "6" :
+            case "15" :
+            case "7" :
+            case "17" :
+            case "13" :
+            case "14" :
+            case "11" :
+            case "21" :
+            case "42" :
+            case "43" :
+
+            default : {
+                return Number(row.step.elapsed);
+            }
+        }
+
+    };
+
+    getMainValue = (row) => {
+        // needs check 10 (Method2Step) , 5 (SOCKET), 6(ApiCallStep), 13(DispatchStep), 14(ThreadCallPossibleStep), 11, 21, 31
+        console.log(row.step.stepType, row.mainValue);
+        switch (row.step.stepType) {
+            case "9" : {
+                return row.mainValue + (row.step.time >= 0 ? ' #' + row.step.value + ' ' + row.step.time + 'ms' : "");
+            }
+
+            case "10" :
+            case "1" : {
+                const fullMethod = row.mainValue;
+                const parts = fullMethod.split('.');
+                let methodNameSimple = fullMethod;
+                if(parts.length >= 2) {
+                    const methodName = parts[parts.length - 1];
+                    const bracePos = methodName.indexOf('(');
+                    if(bracePos > 0) {
+                        methodNameSimple = parts[parts.length - 2] + "#" + methodName.substring(0, bracePos) + "()";
+                    }
+
+                    return methodNameSimple + " [" + fullMethod + "]";
+                }
+            }
+
+            case "15" :
+            case "6" : {
+                return (String(row.step.async) === "1" ? '[async]' : '') + row.mainValue + (String(row.step.opt) === '1' ? ' [addr] ' + row.step.address : '');
+            }
+
+            case "12" : {
+                return "[" + row.step.threadState + "] " + "ID:" + row.step.threadId + " "  + row.step.threadName + (row.additionalValueList && row.additionalValueList.length > 0 ? " [" + row.additionalValueList[0] + "]" : "");
+            }
+
+            case "13" : {
+                return row.step.address + " " + row.step.opt;
+            }
+
+            case "14" : {
+                let status = "";
+                if (Number(row.step.threaded) === 0) {
+                    status = "";
+                }
+
+                if (Number(row.step.threaded) === 1) {
+                    status = "[THREAD DISPATCHING]";
+                }
+
+                return status + " " + row.mainValue;
+            }
+
+            case "21" :
+            case "11" : {
+                return row.mainValue + " " + row.step.count + " "  + row.step.cputime + "ms";
+            }
+
+            case "31" : {
+                return row.step.message + " " + row.step.count;
+            }
+
+            case "42" : {
+                return row.step.ipaddr + ":" + row.step.port + " " + row.step.count;
+            }
+
+            case "43" : {
+                return row.mainValue + " " + row.step.count + " " + (row.step.opt ? row.step.opt : '');
+            }
+
+            case "99" : {
+                return row.step.code + " " + row.step.message;
+            }
+
+            case "16" :
+            case "2" :
+            case "8" : {
+                return row.step.xtypePrefix + row.mainValue;
+            }
+
+            case "17" : {
+                let level = "";
+                if (Number(row.step.level) === 0 || row.step.level === "DEBUG") {
+                    level = "DEBUG";
+                }
+
+                if (Number(row.step.level) === 1 || row.step.level === "INFO") {
+                    level = "INFO";
+                }
+
+                if (Number(row.step.level) === 2 || row.step.level === "WARN") {
+                    level = "WARN";
+                }
+
+                if (Number(row.step.level) === 3 || row.step.level === "ERROR") {
+                    level = "ERROR";
+                }
+
+                return (level ? "[" + level + "]" : "") + row.mainValue;
+            }
+
+            case "5" : {
+                return "[Connect] " + row.mainValue + ":" + row.step.port;
+            }
+
+            case "51" :
+            case "52" :
+            case "3" :
+            case "7" :
+            default : {
+                return row.mainValue;
+            }
+        }
+
+    };
+
+
+
     render() {
 
         let nav = null;
@@ -528,7 +686,7 @@ class FrameProfile extends Component {
                     {this.props.profile && profileMetas && profileMetas.filter((d) => {return this.props.summary ? d.show : true}).map((meta, i) => {
                         return <div key={i}>
                             <span className="label">{meta.name}</span>
-                            <span className="data">
+                            <span className={"data " + (meta.name.toLowerCase() === "error" ? "error" : "")}>
                                 {meta.type === "datetime" && d3.timeFormat(this.fullTimeFormat)(new Date(Number(this.props.profile[meta.key])))}
                                 {meta.type === "ms" && numeral(this.props.profile[meta.key]).format(this.props.config.numberFormat)+ " ms"}
                                 {meta.type === "bytes" && numeral(this.props.profile[meta.key]).format(this.props.config.numberFormat + "b")}
@@ -540,12 +698,12 @@ class FrameProfile extends Component {
                 </div>
                 <div className="sub-title">PROFILE STEP</div>
                 {/*<div className={"xlog-steps " + (this.props.wrap ? 'wrap' : '') + (this.props.narrow ? 'narrow' : '')}>*/}
-                <div className="frame-graph">
+                <div className={"frame-graph " + (this.props.narrow ? 'narrow' : '')}>
                     <div ref="frameAxis" className="frame-axis"></div>
                     <div className={"frame-xlog-steps " + (this.props.wrap ? 'wrap' : '')}>
                         {this.scale && this.props.steps && this.props.steps.map((row, i) => {
                             const stepStartTime = Number(row.step.start_time);
-                            const elapsed = Number(row.step.elapsed);
+                            const elapsed = this.getElapsedTime(row);
 
                             let start = this.scale(stepStartTime);
                             let width = 3;
@@ -558,37 +716,41 @@ class FrameProfile extends Component {
                             }
 
                             let textPadding = 15;
-                            let rate = stepStartTime / this.props.profile.elapsed;
+                            let rate = this.props.profile.elapsed > 0 ? stepStartTime / this.props.profile.elapsed : 0;
                             let textWidth = "50%";
                             if (rate <= 0.5) {
                                 textWidth = (this.axisWidth - start - textPadding) + "px";
                             } else {
-                                textWidth = (start - textPadding) + "px";
+                                textWidth = (start + width - textPadding) + "px";
                             }
 
-                            let percentage = (Math.round((row.step.elapsed / this.props.profile.elapsed) * 1000) / 10);
+                            let percentage = ((elapsed !== undefined) ? (Math.round((elapsed / this.props.profile.elapsed) * 1000) / 10) : undefined);
                             let percentageGrade = "normal";
                             if (percentage > 50) {
                                 percentageGrade = "warning";
                             }
 
+                            let mainValue = this.getMainValue(row);
+
+
                             return (<div key={i} className={"step " + ("step-type-" + row.step.stepType)} onClick={this.showDetail.bind(this, row)}>
                                 <div className="step-info">
                                     <span className="index">{row.step.index}</span>
                                     <div className="step-general-info">
-                                        {row.step.txid &&
-                                        <div className="step-name link-other-tx" onClick={this.txNavClick.bind(this, row.step.txid, this.props.profile.endTime)}><i className="fa fa-share" aria-hidden="true"></i> {this.getStepName(row.step)}</div>
-                                            }
+                                        {row.step.txid && <div className="step-name link-other-tx" onClick={this.txNavClick.bind(this, row.step.txid, this.props.profile.endTime)}><i className="fa fa-share" aria-hidden="true"></i> {this.getStepName(row.step)}</div>}
                                         {!row.step.txid && <div className="step-name">{this.getStepName(row.step)}</div>}
-                                        <div className="step-elapsed">{isNaN(row.step.elapsed) ? "" : row.step.elapsed + " ms"} <span className={"percentage " + percentageGrade}>{isNaN(percentage) ? "" : percentage + "%"}</span></div>
+                                        <div className={"step-elapsed " + percentageGrade}><span>{isNaN(elapsed) ? "" : elapsed + " ms"}</span></div>
+                                        <div className={"percentage " + percentageGrade}><span>{isNaN(percentage) ? "" : percentage + "%"}</span></div>
                                     </div>
                                 </div>
                                 <div className="span-info">
                                     <div className="span" style={{left : start + "px", width : width + "px"}}></div>
-                                    <div className={"main-value "} style={{left : start + "px"}}>
-                                        <div className={"main-value-text " + (rate <= 0.5 ? "left-side" : "right-side")} style={{width : textWidth}}><span>{row.mainValue}</span></div>
+                                    <div className={"main-value "} style={{left : (rate <= 0.5 ? start : start + width - 5) + "px"}}>
+                                        <div className={"main-value-text " + (rate <= 0.5 ? "left-side" : "right-side")} style={{width : textWidth}}><span>{mainValue}</span></div>
                                     </div>
+                                    {(row.step.error && Number(row.step.error) !== 0) && <div className="error">ERR</div>}
                                 </div>
+                                <div className="step-hover"></div>
                             </div>)
                         })}
                     </div>
@@ -596,9 +758,7 @@ class FrameProfile extends Component {
                 {this.state.selectedStep &&
                 <div className="frame-step-detail-popup">
                     <div>
-                        <FrameStepDetail
-                            bind={this.props.bind} wrap={this.props.wrap} formatter={this.props.formatter}
-                            showDetail={this.showDetail} profile={this.props.profile} getStepName={this.getStepName} steps={this.props.steps} info={this.state.selectedStep}></FrameStepDetail>
+                        <FrameStepDetail bind={this.props.bind} wrap={this.props.wrap} formatter={this.props.formatter} showDetail={this.showDetail} profile={this.props.profile} getStepName={this.getStepName} steps={this.props.steps} info={this.state.selectedStep}></FrameStepDetail>
                     </div>
                 </div>}
             </div>
