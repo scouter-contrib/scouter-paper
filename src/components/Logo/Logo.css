@@ -138,7 +138,7 @@
     display: table-cell;
     vertical-align: middle;
     height: 100%;
-    width: 40px;
+    width: 30px;
     text-align: center;
 }
 
@@ -147,7 +147,11 @@
     width: auto;
     padding: 0;
 }
+.min .paper-logo-wrapper .side-icon > div > div.pin-wrapper {
+    display: none;
+}
 
+.paper-logo-wrapper .side-icon > div > div.pin-wrapper:hover,
 .paper-logo-wrapper .side-icon > div > div.max-wrapper:hover {
     background-color: rgba(0,0,0,0.3);
     color: #333;
@@ -164,8 +168,17 @@
     vertical-align: top;
 }
 
-.paper-logo-wrapper .side-icon > span.fixed-btn {
-    padding-top: 5px;
+.paper-logo-wrapper .side-icon span.pin-btn .pinned,
+.paper-logo-wrapper .side-icon span.pin-btn .no-pinned {
+    display: none;
+}
+
+.paper-logo-wrapper .side-icon span.pin-btn.pinned .pinned {
+    display: inline-block;
+}
+
+.paper-logo-wrapper .side-icon span.pin-btn.no-pinned .no-pinned {
+    display: inline-block;
 }
 
 .paper-logo-wrapper .side-icon span.max-btn.min {
@@ -177,19 +190,6 @@
 
 .paper-logo-wrapper .side-icon span.max-btn.max {
     font-size: 22px;
-}
-
-.paper-logo-wrapper .side-icon .fixed-btn .fixed,
-.paper-logo-wrapper .side-icon .fixed-btn .no-fixed {
-    display: none;
-}
-
-.paper-logo-wrapper .side-icon .fixed-btn.max .no-fixed {
-    display: inline-block;
-}
-
-.paper-logo-wrapper .side-icon .fixed-btn.fixed .fixed {
-    display: inline-block;
 }
 
 .paper-logo-wrapper .side-icon .max-btn.fixed .min {

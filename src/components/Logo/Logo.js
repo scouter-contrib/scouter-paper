@@ -3,7 +3,7 @@ import './Logo.css';
 import {NavLink} from 'react-router-dom';
 import {connect} from 'react-redux';
 import {withRouter} from 'react-router-dom';
-import {setControllerState} from '../../actions';
+import {setControllerState, setControllerPin} from '../../actions';
 
 class Logo extends Component {
 
@@ -12,6 +12,18 @@ class Logo extends Component {
             this.props.setControllerState("max");
         } else {
             this.props.setControllerState("min");
+        }
+
+        setTimeout(() => {
+            window.dispatchEvent(new Event('resize'));
+        }, 300);
+    };
+
+    togglePin = () => {
+        if (this.props.control.pin) {
+            this.props.setControllerPin(false);
+        } else {
+            this.props.setControllerPin(true);
         }
 
         setTimeout(() => {
@@ -38,6 +50,12 @@ class Logo extends Component {
                 </div>
                 <div className="side-icon">
                     <div>
+                        <div className="pin-wrapper" onClick={this.togglePin}>
+                            <span className={"pin-btn " + (this.props.control.pin ? "pinned" : "no-pinned")}>
+                                <i className="fa fa-heart pinned" aria-hidden="true"></i>
+                                <i className="fa fa-heart-o no-pinned" aria-hidden="true"></i>
+                            </span>
+                        </div>
                         <div className="max-wrapper" onClick={this.toggleMinMax}>
                             <span className={"max-btn " + this.props.control.Controller}>
                                 <i className="fa fa-angle-left max" aria-hidden="true"></i>
@@ -64,7 +82,8 @@ let mapStateToProps = (state) => {
 
 let mapDispatchToProps = (dispatch) => {
     return {
-        setControllerState: (state) => dispatch(setControllerState(state))
+        setControllerState: (state) => dispatch(setControllerState(state)),
+        setControllerPin: (pin) => dispatch(setControllerPin(pin))
     };
 };
 

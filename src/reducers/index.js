@@ -1,4 +1,4 @@
-import {SET_MENU, SET_BOXES_LAYOUTS, SET_LAYOUTS, SET_BOXES, SET_LAYOUT_CHANGETIME, SET_SUPPORTED, ADD_REQUEST, SET_CONFIG, SET_USER_ID, SET_USER_DATA, SET_TARGET, PUSH_MESSAGE, SET_CONTROL_VISIBILITY, CLEAR_ALL_MESSAGE, SET_BG_COLOR, SET_SELECTION, SET_TEMPLATE, SET_REAL_TIME, SET_RANGE_DATE, SET_RANGE_HOURS, SET_RANGE_MINUTES, SET_RANGE_VALUE, SET_REAL_TIME_VALUE, SET_RANGE_DATE_HOURS_MINUTES, SET_REAL_TIME_RANGE_STEP_VALUE, SET_RANGE_DATE_HOURS_MINUTES_VALUE, SET_RANGE_ALL, SET_COUNTER_INFO, SET_CONTROLLER_STATE, SET_FILTER_MAP, ADD_FILTERED_OBJECT, REMOVE_FILTERED_OBJECT, SET_SEARCH_CONDITION, SET_TOPOLOGY_OPTION, SET_ALERT} from '../actions';
+import {SET_MENU, SET_BOXES_LAYOUTS, SET_LAYOUTS, SET_BOXES, SET_LAYOUT_CHANGETIME, SET_SUPPORTED, ADD_REQUEST, SET_CONFIG, SET_USER_ID, SET_USER_DATA, SET_TARGET, PUSH_MESSAGE, SET_CONTROL_VISIBILITY, CLEAR_ALL_MESSAGE, SET_BG_COLOR, SET_SELECTION, SET_TEMPLATE, SET_REAL_TIME, SET_RANGE_DATE, SET_RANGE_HOURS, SET_RANGE_MINUTES, SET_RANGE_VALUE, SET_REAL_TIME_VALUE, SET_RANGE_DATE_HOURS_MINUTES, SET_REAL_TIME_RANGE_STEP_VALUE, SET_RANGE_DATE_HOURS_MINUTES_VALUE, SET_RANGE_ALL, SET_COUNTER_INFO, SET_CONTROLLER_STATE, SET_CONTROLLER_PIN, SET_FILTER_MAP, ADD_FILTERED_OBJECT, REMOVE_FILTERED_OBJECT, SET_SEARCH_CONDITION, SET_TOPOLOGY_OPTION, SET_ALERT} from '../actions';
 import {combineReducers} from 'redux';
 import moment from 'moment';
 const configState = {
@@ -162,7 +162,11 @@ const configState = {
         axis : "Bungee",
         tooltip : "Righteous",
         profiler : "Righteous"
-    }
+    },
+    others : {
+        checkUpdate : "Y",
+        errorReport : "Y"
+    },
 };
 
 const config = (state = configState, action) => {
@@ -294,8 +298,15 @@ const request = (state = requestState, action) => {
 
 
 let storageController = null;
+let pin = null;
 if (localStorage) {
     storageController = localStorage.getItem("controller");
+    pin = localStorage.getItem("pin");
+    if (pin === "true") {
+        pin = true;
+    } else {
+        pin = false;
+    }
 }
 
 const controlState = {
@@ -303,7 +314,8 @@ const controlState = {
     Message : false,
     Loading : false,
     Controller : storageController ? storageController : "min",
-    menu : "/"
+    menu : "/",
+    pin : pin !== null ? pin : false
 };
 
 const control = (state = controlState, action) => {
@@ -316,12 +328,17 @@ const control = (state = controlState, action) => {
         }
 
         case SET_CONTROLLER_STATE: {
-
             if (localStorage) {
                 localStorage.setItem("controller", action.state);
             }
-
             return Object.assign({}, state, {Controller : action.state});
+        }
+
+        case SET_CONTROLLER_PIN: {
+            if (localStorage) {
+                localStorage.setItem("pin", action.pin);
+            }
+            return Object.assign({}, state, {pin : action.pin});
         }
 
         case SET_MENU: {

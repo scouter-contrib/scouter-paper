@@ -6,8 +6,6 @@ import {withRouter} from 'react-router-dom';
 import * as d3 from "d3";
 import sqlFormatter from "sql-formatter";
 import JSONPretty from 'react-json-pretty';
-import numeral from "numeral";
-import moment from "moment";
 
 class FrameStepDetail extends Component {
 
@@ -123,11 +121,6 @@ class FrameStepDetail extends Component {
             next = this.props.steps[selectedIndex + 1];
         }
 
-        console.log(this.props.profile);
-        console.log(info);
-        console.log(this.props.steps);
-
-
         let isSql = false;
         if (info.step.stepType === "16" || info.step.stepType === "2" || info.step.stepType === "8") {
             isSql = true;
@@ -148,15 +141,15 @@ class FrameStepDetail extends Component {
                 <div className="detail-nav noselect">
                     <div className={"prev " + ("step-type-" + (prev && prev.step.stepType))}>
                         {prev && <div className="nav-name"><span>prev</span></div>}
-                        {prev && <span onClick={this.goStep.bind(this, selectedIndex - 1)} className="span"><i className="fa fa-angle-left" aria-hidden="true"></i> {this.props.getStepName(prev.step)}</span>}
+                        {prev && <span onClick={this.goStep.bind(this, selectedIndex - 1)} className="span span-bg-color"><i className="fa fa-angle-left" aria-hidden="true"></i> {this.props.getStepName(prev.step)}</span>}
                     </div>
                     <div className={"current " + ("step-type-" + info.step.stepType)}>
                         <div className="nav-name"><span>current</span></div>
-                        <span className="span">{this.props.getStepName(info.step)}</span>
+                        <span className="span span-bg-color">{this.props.getStepName(info.step)}</span>
                     </div>
                     <div className={"next " + ("step-type-" + (next && next.step.stepType))}>
                         {next && <div className="nav-name"><span>next</span></div>}
-                        {next && <span onClick={this.goStep.bind(this, selectedIndex + 1)} className="span">{this.props.getStepName(next.step)} <i className="fa fa-angle-right" aria-hidden="true"></i></span>}
+                        {next && <span onClick={this.goStep.bind(this, selectedIndex + 1)} className="span span-bg-color">{this.props.getStepName(next.step)} <i className="fa fa-angle-right" aria-hidden="true"></i></span>}
                     </div>
                 </div>
                 <div className="frame-step-detail-content scrollbar">

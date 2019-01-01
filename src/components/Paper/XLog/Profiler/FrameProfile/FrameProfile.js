@@ -421,12 +421,10 @@ class FrameProfile extends Component {
                             {nav.main.map((d, i) => {
                                 return (
                                     <div className="tx-link-wrapper" key={i}>
-                                        {i !== 0 && <div className="arrow"><i className="fa fa-long-arrow-right"
-                                                                              aria-hidden="true"></i></div>}
+                                        {i !== 0 && <div className="arrow"><i className="fa fa-long-arrow-right" aria-hidden="true"></i></div>}
                                         <div className={"tx-link link-other-tx " + d.type}>
                                             <span className="type">{d.type}</span>
-                                            <span className="txid"
-                                                  onClick={this.txNavClick.bind(this, d.id, d.endtime)}>{d.idx}</span>
+                                            <span className="txid" onClick={this.txNavClick.bind(this, d.id, d.endtime)}>{d.idx}</span>
                                         </div>
                                     </div>
                                 )
@@ -485,35 +483,50 @@ class FrameProfile extends Component {
 
                             let mainValue = this.getMainValue(row);
 
-                            return (<div key={i} className={"step " + ("step-type-" + row.step.stepType)}
-                                         onClick={this.showDetail.bind(this, i)}>
-                                <div className="step-info">
-                                    <span className="index">{row.step.index}</span>
-                                    <div className="step-general-info">
-                                        {row.step.txid && <div className="step-name link-other-tx"
-                                                               onClick={this.txNavClick.bind(this, row.step.txid, this.props.profile.endTime)}>
-                                            <i className="fa fa-share"
-                                               aria-hidden="true"></i> {this.getStepName(row.step)}</div>}
-                                        {!row.step.txid &&
-                                        <div className="step-name">{this.getStepName(row.step)}</div>}
-                                        <div className={"step-elapsed " + percentageGrade}>
-                                            <span>{isNaN(elapsed) ? "" : elapsed + " ms"}</span></div>
-                                        <div className={"percentage " + percentageGrade}>
-                                            <span>{isNaN(percentage) ? "" : percentage + "%"}</span></div>
+                            let isExtenalStep = false;
+                            if ((row.step.stepType === "2" || row.step.stepType === "8" || row.step.stepType === "16" || row.step.stepType === "6" || row.step.stepType === "15") || (row.step.stepType === "17" && (row.mainValue.toUpperCase().indexOf("[REDIS]") > -1 || row.mainValue.toUpperCase().indexOf("[KAFKA]") > -1 || row.mainValue.toUpperCase().indexOf("[RABBIT]") > -1))) {
+                                isExtenalStep = true;
+                            }
+
+                            let isDump = false;
+                            if (row.step.stepType === "12") {
+                                isDump = true;
+                            }
+
+                            return (
+                                <div key={i} className={"step " + ("step-type-" + row.step.stepType)} onClick={this.showDetail.bind(this, i)}>
+                                    <div className="step-info">
+                                        <span className="index">{row.step.index}</span>
+                                        <div className="step-general-info">
+                                            {row.step.txid &&
+                                            <div className="step-name link-other-tx" onClick={this.txNavClick.bind(this, row.step.txid, this.props.profile.endTime)}>
+                                                <i className="fa fa-share" aria-hidden="true"></i> {this.getStepName(row.step)}
+                                            </div>
+                                            }
+                                            {!row.step.txid &&
+                                            <div className={"step-name " + (isExtenalStep ? "external-step " : " ") + (isDump ? "dump-step" : "")}><span className="span-color">{this.getStepName(row.step)}</span></div>
+                                            }
+                                            <div className={"step-elapsed " + percentageGrade}>
+                                                <span>{isNaN(elapsed) ? "" : elapsed + " ms"}</span>
+                                            </div>
+                                            <div className={"percentage " + percentageGrade}>
+                                                <span>{isNaN(percentage) ? "" : percentage + "%"}</span>
+                                            </div>
+                                        </div>
                                     </div>
-                                </div>
-                                <div className="span-info">
-                                    <div className="span" style={{left: start + "px", width: width + "px"}}></div>
-                                    <div className={"main-value "}
-                                         style={{left: (rate <= 0.5 ? start : start + width - 5) + "px"}}>
-                                        <div className={"main-value-text " + (rate <= 0.5 ? "left-side" : "right-side")}
-                                             style={{width: textWidth}}><span>{mainValue}</span></div>
+                                    <div className="span-info">
+                                        <div className="span span-bg-color" style={{left: start + "px", width: width + "px"}}></div>
+                                        <div className={"main-value "}
+                                             style={{left: (rate <= 0.5 ? start : start + width - 5) + "px"}}>
+                                            <div className={"main-value-text " + (rate <= 0.5 ? "left-side" : "right-side")}
+                                                 style={{width: textWidth}}><span>{mainValue}</span></div>
+                                        </div>
+                                        {(row.step.error && Number(row.step.error) !== 0) &&
+                                        <div className="error">ERR</div>}
                                     </div>
-                                    {(row.step.error && Number(row.step.error) !== 0) &&
-                                    <div className="error">ERR</div>}
+                                    <div className="step-hover"></div>
                                 </div>
-                                <div className="step-hover"></div>
-                            </div>)
+                            )
                         })}
                     </div>
                 </div>

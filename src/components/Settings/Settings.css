@@ -52,7 +52,7 @@
 }
 
 @media screen and (max-width: 2400px) {
-    .max .settings .forms {
+    .max.pinned .settings .forms {
         margin: 0 20px 0;
     }
 }
@@ -64,7 +64,7 @@
 }
 
 @media screen and (max-width: 1200px) {
-    .max .settings .forms {
+    .max.pinned .settings .forms {
         margin: 0 10px 0;
     }
 }
@@ -172,30 +172,30 @@
 
 @media screen and (max-width: 1600px) {
 
-    .max .settings .setting-box {
+    .max.pinned .settings .setting-box {
         padding: 15px 20px 20px 20px;
     }
 
-    .max .settings .server-setting-box {
+    .max.pinned .settings .server-setting-box {
         padding-top: 40px;
     }
 
-    .max .settings .forms .row {
+    .max.pinned .settings .forms .row {
         margin: 0;
         width: 50%;
         padding-top: 10px;
         padding-right: 20px;
     }
 
-    .max .settings .forms .row:nth-child(4n) {
+    .max.pinned .settings .forms .row:nth-child(4n) {
         padding-right: 20px;
     }
 
-    .max .settings .forms .row:nth-child(2n) {
+    .max.pinned .settings .forms .row:nth-child(2n) {
         padding-right: 0;
     }
 
-    .max .settings .forms .server-row .row:nth-child(2n) {
+    .max.pinned .settings .forms .server-row .row:nth-child(2n) {
         padding-right: 5px;
     }
 

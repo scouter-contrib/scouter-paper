@@ -15,7 +15,7 @@ article.content-wrapper {
     transition: all 0.3s;
 }
 
-article.content-wrapper.max {
+article.content-wrapper.max.pinned {
     margin-left: 400px;
     width: calc(100% - 400px);
     transition: all 0.3s;

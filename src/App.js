@@ -390,7 +390,9 @@ class App extends Component {
         // Notice를 조회한다. 이미 조회한 Notice인지 확인하여 하루에 한번만 보여주던지..
         // X-Scouter-Notice-Token 응답 헤더는 LocalStorage에 저장하여 다음 요청 헤더로 사용한다.
         // TODO Notice가 관리되면 화면에 보여준다.
-        this.getNotice();
+        if(this.props.config.others.checkUpdate === "Y") {
+            this.getNotice();
+        }
 
         window.addEventListener("keydown", this.keyDown.bind(this));
 

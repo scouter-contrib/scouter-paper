@@ -22,6 +22,7 @@ export const SET_RANGE_DATE_HOURS_MINUTES_VALUE = 'SET_RANGE_DATE_HOURS_MINUTES_
 export const SET_RANGE_ALL = 'SET_RANGE_ALL';
 export const SET_COUNTER_INFO = 'SET_COUNTER_INFO';
 export const SET_CONTROLLER_STATE = 'SET_CONTROLLER_STATE';
+export const SET_CONTROLLER_PIN = 'SET_CONTROLLER_PIN';
 export const SET_FILTER_MAP = 'SET_FILTER_MAP';
 export const ADD_FILTERED_OBJECT = 'ADD_FILTERED_OBJECT';
 export const REMOVE_FILTERED_OBJECT = 'REMOVE_FILTERED_OBJECT';
@@ -273,6 +274,13 @@ export function setControllerState(state) {
     return {
         type: SET_CONTROLLER_STATE,
         state: state
+    };
+}
+
+export function setControllerPin(pin) {
+    return {
+        type: SET_CONTROLLER_PIN,
+        pin: pin
     };
 }
 

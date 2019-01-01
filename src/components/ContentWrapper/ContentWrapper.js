@@ -6,7 +6,7 @@ import {withRouter} from 'react-router-dom';
 class ContentWrapper extends Component {
     render() {
         return (
-            <article className={"content-wrapper " + this.props.control.Controller}>
+            <article className={"content-wrapper " + this.props.control.Controller + " " + (this.props.control.pin ? "pinned" : "")}>
                 <div>{this.props.children}</div>
             </article>
         );
