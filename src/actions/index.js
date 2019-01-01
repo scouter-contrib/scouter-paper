@@ -29,6 +29,7 @@ export const SET_SEARCH_CONDITION = 'SET_SEARCH_CONDITION';
 export const SET_BOXES = 'SET_BOXES';
 export const SET_LAYOUTS = 'SET_LAYOUTS';
 export const SET_BOXES_LAYOUTS = 'SET_BOXES_LAYOUTS';
+export const SET_LAYOUT_CHANGETIME = 'SET_LAYOUT_CHANGETIME';
 export const SET_MENU = 'SET_MENU';
 export const SET_TOPOLOGY_OPTION = 'SET_TOPOLOGY_OPTION';
 export const SET_ALERT = 'SET_ALERT';
@@ -52,6 +53,12 @@ export function setBoxesLayouts(boxes, layouts) {
         type: SET_BOXES_LAYOUTS,
         boxes : boxes,
         layouts : layouts
+    };
+}
+
+export function setLayoutChangeTime() {
+    return {
+        type: SET_LAYOUT_CHANGETIME
     };
 }
 

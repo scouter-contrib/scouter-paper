@@ -144,6 +144,8 @@
 .frame-xlog-steps .step .step-info .step-general-info .step-name.link-other-tx {
     color: #0276FD;
     cursor: pointer;
+    position: relative;
+    z-index:10;
 }
 
 .frame-xlog-steps .step .step-info .step-general-info .step-name.link-other-tx:hover {
@@ -368,7 +370,7 @@
 }
 
 .frame-profile .tx-link .txid {
-    padding: 0;
+    padding: 0 !important;
     display: inline-block;
 }
 

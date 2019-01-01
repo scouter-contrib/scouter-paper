@@ -3,7 +3,7 @@ import "./Paper.css";
 import "./Resizable.css";
 import {connect} from "react-redux";
 import {withRouter} from "react-router-dom";
-import {addRequest, pushMessage, setBoxes, setBoxesLayouts, setControlVisibility, setLayouts, setRangeDateHoursMinutesValue, setRealTime, setTemplate} from "../../actions";
+import {addRequest, pushMessage, setBoxes, setBoxesLayouts, setLayoutChangeTime, setControlVisibility, setLayouts, setRangeDateHoursMinutesValue, setRealTime, setTemplate} from "../../actions";
 import {Responsive, WidthProvider} from "react-grid-layout";
 import {Box, BoxConfig, XLogFilter} from "../../components";
 import jQuery from "jquery";
@@ -36,6 +36,8 @@ class Paper extends Component {
 
 
     breakpoint = "lg";
+
+    resizeTimer = null;
 
     constructor(props) {
         super(props);
@@ -157,7 +159,6 @@ class Paper extends Component {
 
 
         this.state = {
-            layoutChangeTime: null,
             filters: [],
 
             data: {
@@ -340,15 +341,17 @@ class Paper extends Component {
             }
         }
 
-        setTimeout(() => {
+        /*setTimeout(() => {
             window.dispatchEvent(new Event('resize'));
-        }, 1000);
+        }, 1000);*/
 
         document.addEventListener('visibilitychange', this.visibilitychange.bind(this));
 
         this.setState({
             visible: document.visibilityState === 'visible'
         });
+
+        window.addEventListener("resize", this.resize);
 
     }
 
@@ -358,8 +361,23 @@ class Paper extends Component {
         clearInterval(this.dataRefreshTimer);
         this.dataRefreshTimer = null;
 
+        window.removeEventListener("resize", this.resize);
+
         document.removeEventListener('visibilitychange', this.visibilitychange.bind(this));
+
     }
+
+    resize = () => {
+        if (this.resizeTimer) {
+            clearTimeout(this.resizeTimer);
+            this.resizeTimer = null;
+        }
+
+        this.resizeTimer = setTimeout(() => {
+            this.props.setLayoutChangeTime();
+        }, 1000);
+
+    };
 
     getLatestData(clear, objects) {
         if (clear) {
@@ -1062,9 +1080,9 @@ class Paper extends Component {
         setData("boxes", boxes);
         this.props.setLayouts(layouts);
 
-        setTimeout(() => {
+        /*setTimeout(() => {
             window.dispatchEvent(new Event('resize'));
-        }, 500);
+        }, 500);*/
 
     };
 
@@ -1411,7 +1429,9 @@ let mapDispatchToProps = (dispatch) => {
         setTemplate: (boxes, layouts) => dispatch(setTemplate(boxes, layouts)),
         setBoxes: (boxes) => dispatch(setBoxes(boxes)),
         setLayouts: (layouts) => dispatch(setLayouts(layouts)),
-        setBoxesLayouts: (boxes, layouts) => dispatch(setBoxesLayouts(boxes, layouts))
+        setBoxesLayouts: (boxes, layouts) => dispatch(setBoxesLayouts(boxes, layouts)),
+        setLayoutChangeTime: () => dispatch(setLayoutChangeTime())
+
     };
 };
 

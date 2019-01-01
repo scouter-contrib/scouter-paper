@@ -590,16 +590,10 @@ class Profiler extends Component {
                 className={"xlog-profiler " + (this.state.paramTxid ? 'param-mode ' : ' ') + (this.state.show ? ' ' : 'hidden')}>
                 <div>
                     <div className="size-control-btns">
-                        {!this.state.paramTxid && <button onClick={this.changeListWidth.bind(this, "min")}><i
-                            className="fa fa-angle-double-left"></i></button>}
-                        {!this.state.paramTxid &&
-                        <button onClick={this.changeListWidth.bind(this, "small")}><i className="fa fa-angle-left"></i>
-                        </button>}
-                        {!this.state.paramTxid &&
-                        <button onClick={this.changeListWidth.bind(this, "big")}><i className="fa fa-angle-right"></i>
-                        </button>}
-                        {!this.state.paramTxid && <button onClick={this.changeListWidth.bind(this, "max")}><i
-                            className="fa fa-angle-double-right"></i></button>}
+                        {!this.state.paramTxid && <button onClick={this.changeListWidth.bind(this, "min")}><i className="fa fa-angle-double-left"></i></button>}
+                        {!this.state.paramTxid && <button onClick={this.changeListWidth.bind(this, "small")}><i className="fa fa-angle-left"></i></button>}
+                        {!this.state.paramTxid && <button onClick={this.changeListWidth.bind(this, "big")}><i className="fa fa-angle-right"></i></button>}
+                        {!this.state.paramTxid && <button onClick={this.changeListWidth.bind(this, "max")}><i className="fa fa-angle-double-right"></i></button>}
                         <div className="close-btn" onClick={this.close}></div>
                     </div>
                     {!this.state.paramTxid &&
@@ -654,6 +648,7 @@ class Profiler extends Component {
                                                toggleFormatter={this.toggleFormatter}
                                                toggleBind={this.toggleBind}
                                                toggleWrap={this.toggleWrap}
+                                               listWidth={this.state.listWidth}
                                 />
 
 

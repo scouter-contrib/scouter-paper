@@ -23,7 +23,7 @@
 
 .preset-manager-bg .selector-type-btns {
     width: 100%;
-    max-width: 800px;
+    max-width: 1200px;
     margin: 0 auto 5px;
 }
 
@@ -52,7 +52,7 @@
     border: 1px solid rgba(0, 0, 0, 0.6);
     color: white;
     width: 100%;
-    max-width: 800px;
+    max-width: 1200px;
     height: 360px;
     padding: 0;
     position: relative;
@@ -61,6 +61,32 @@
     -moz-user-select: none;
     -ms-user-select: none;
     user-select: none;
+}
+
+@media screen and (max-width: 1200px) {
+    .preset-manager {
+        width: calc(100% - 20px);
+        margin-left: 10px;
+        margin-right: 10px;
+    }
+}
+
+@media only screen and (max-height: 1200px) {
+    .preset-manager {
+        margin-bottom: 200px;
+    }
+}
+
+@media only screen and (max-height: 800px) {
+    .preset-manager {
+        margin-bottom: 100px;
+    }
+}
+
+@media only screen and (max-height: 600px) {
+    .preset-manager {
+        margin-bottom: 0;
+    }
 }
 
 .preset-manager > div {
