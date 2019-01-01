@@ -2,6 +2,7 @@ import React, {Component} from 'react';
 import './App.css';
 import './Theme.css';
 import './fonts/technology-icons-gh-pages/styles/technology-icons.css';
+import './fonts/glyphter/css/Glyphter.css';
 import {
     Settings,
     Paper,

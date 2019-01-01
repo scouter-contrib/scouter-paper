@@ -58,6 +58,18 @@ class Topology extends Component {
             text: "\uf15c",
             color: "#a42122"
         },
+        KAFKA: {
+            fontFamily: "Glyphter",
+            fontSize: "18px",
+            text: "\u004a",
+            color: "#000000"
+        },
+        RABBITMQ: {
+            fontFamily: "Glyphter",
+            fontSize: "18px",
+            text: "\u0049",
+            color: "#F55708"
+        },
         DB: {
             fontFamily: "technology-icons",
             fontSize: "18px",
@@ -328,7 +340,8 @@ class Topology extends Component {
             }
             case "INTR_REDIS_CALL" : {
                 result["objType"] = "REDIS" + data[position + "ObjHash"];
-                result["objTypeName"] = "REDIS";
+                const redisName = data[position + "ObjName"] || "-";
+                result["objTypeName"] = redisName.length > 1 ? redisName : "REDIS";
                 if (position === "from") {
 
                 } else {
@@ -336,7 +349,28 @@ class Topology extends Component {
                 }
                 break;
             }
+            case "INTR_KAFKA_CALL" : {
+                result["objType"] = "KAFKA" + data[position + "ObjHash"];
+                const kafkaName = data[position + "ObjName"] || "-";
+                result["objTypeName"] = kafkaName.length > 1 ? kafkaName : "KFAKA";
+                if (position === "from") {
 
+                } else {
+                    result["category"] = "KAFKA";
+                }
+                break;
+            }
+            case "INTR_RABBITMQ_CALL" : {
+                result["objType"] = "RABBITMQ" + data[position + "ObjHash"];
+                const rabbitName = data[position + "ObjName"] || "-";
+                result["objTypeName"] = rabbitName.length > 1 ? rabbitName : "RABBITMQ";
+                if (position === "from") {
+
+                } else {
+                    result["category"] = "RABBITMQ";
+                }
+                break;
+            }
             case "INTR_DB_CALL" : {
                 result["objType"] = "DB" + data[position + "ObjHash"];
                 result["objTypeName"] = data[position + "ObjName"];
