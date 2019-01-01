@@ -1,160 +1,22 @@
 .topology-wrapper {
-    height: calc(100% - 71px);
-    margin: 10px auto;
+    height: calc(100% - 60px);
     box-sizing: border-box;
     position: relative;
-    max-width: 1600px;
 }
 
-@media only screen and (max-width: 600px) {
+@media screen and (max-width: 800px) {
     .topology-wrapper {
-        height: calc(100% - 61px);
-
-
+        height: calc(100% - 45px);
     }
 }
+
 
 .topology-wrapper > div {
     height: 100%;
 }
 
-.topology-wrapper .controller {
-    height: 30px;
-    text-align: right;
-    position: relative;
-    background-color: rgba(0, 0, 0, 0.1);
-}
-
-.topology-wrapper .controller > div {
-    height: 100%;
-    display: inline-block;
-    position: absolute;
-    top: 0;
-    box-sizing: border-box;
-}
-
-.topology-wrapper .controller .right {
-    right: 6px;
-    padding-top: 6px;
-}
-
-@media only screen and (max-width: 500px) {
-    .topology-wrapper .controller .left {
-        display: none;
-    }
-
-    .topology-wrapper .controller .right {
-        left: 0;
-        right: 0;
-        text-align: center;
-    }
-}
-
-.topology-wrapper .controller .right .group {
-    display: inline-block;
-    margin-left: 6px;
-}
-
-.topology-wrapper .controller .left {
-    left: 6px;
-    padding-top: 8px;
-}
-
-.topology-wrapper .controller .summary {
-    color: white;
-    display: inline-block;
-    font-size: 9px;
-    margin-right: 5px;
-    padding: 2px 4px;
-}
-
-.topology-wrapper .controller .radio-btn,
-.topology-wrapper .controller .check-btn {
-    display: inline-block;
-    font-size: 9px;
-    padding: 2px 4px;
-    border: 1px solid rgba(0, 0, 0, 0.4);
-    border-right: none;
-    width: 60px;
-    box-sizing: border-box;
-    text-align: center;
-    background-color: white;
-    cursor: pointer;
-}
-
-.topology-wrapper .controller .radio-btn {
-    width: 50px;
-}
-
-.topology-wrapper .controller .radio-btn .icon,
-.topology-wrapper .controller .check-btn .icon {
-    display: none;
-}
-
-.topology-wrapper .controller .check-btn.tps {
-    width: 120px;
-}
-
-@media only screen and (max-width: 1000px) {
-    .topology-wrapper .controller .radio-btn .text,
-    .topology-wrapper .controller .check-btn .text {
-        display: none;
-    }
-
-    .topology-wrapper .controller .radio-btn .icon,
-    .topology-wrapper .controller .check-btn .icon {
-        display: inline-block;
-    }
-
-    .topology-wrapper .controller .radio-btn,
-    .topology-wrapper .controller .check-btn {
-        width: 30px;
-    }
-
-    .topology-wrapper .controller .check-btn.tps {
-        width: 70px;
-    }
-}
-
-
-
-.topology-wrapper .controller .radio-btn.disable {
-    background-color: #DDD;
-}
-
-.topology-wrapper .controller .radio-group {
-    display: inline-block;
-}
-
-.topology-wrapper .controller .radio-btn:hover,
-.topology-wrapper .controller .check-btn:hover {
-    background-color: #EEE;
-}
-
-.topology-wrapper .controller .radio-btn.disable:hover {
-    background-color: #DDD;
-}
-
-.topology-wrapper .controller .radio-btn.on,
-.topology-wrapper .controller .check-btn.on {
-    background-color: #FFCC11;
-}
-
-.topology-wrapper .controller .check-btn.on:hover {
-    background-color: #FFC125;
-}
-
-.topology-wrapper .controller .check-btn:first-child {
-    border-radius: 3px 0 0 3px;
-}
-
-.topology-wrapper .controller .check-btn:last-child {
-    border-right: 1px solid rgba(0, 0, 0, 0.4);
-    border-radius: 0 3px 3px 0;
-}
-
 .topology-wrapper .topology-chart {
-    height: calc(100% - 30px);
+    height: 100%;
     overflow: hidden;
 }
 

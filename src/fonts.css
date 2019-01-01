@@ -1,0 +1,69 @@
+@font-face {
+    font-family: 'Bungee';
+    font-style: normal;
+    font-weight: 400;
+    src: url('./fonts/Bungee/Bungee-Regular.ttf');
+}
+
+@font-face {
+    font-family: 'Righteous';
+    font-style: normal;
+    font-weight: 400;
+    src: url('./fonts/Righteous/Righteous-Regular.ttf');
+}
+
+@font-face {
+    font-family: 'Mina';
+    font-style: normal;
+    font-weight: 400;
+    src: url('./fonts/Mina/Mina-Regular.ttf');
+}
+
+@font-face {
+    font-family: 'Noto Sans';
+    font-style: normal;
+    font-weight: 400;
+    src: url('./fonts/Noto_Sans/NotoSans-Regular.ttf');
+}
+
+@font-face {
+    font-family: 'Cousine';
+    font-style: normal;
+    font-weight: 400;
+    src: url('./fonts/Cousine/Cousine-Regular.ttf');
+}
+
+@font-face {
+    font-family: 'Space Mono';
+    font-style: normal;
+    font-weight: 400;
+    src: url('./fonts/Space_Mono/SpaceMono-Regular.ttf');
+}
+
+@font-face {
+    font-family: 'Handlee';
+    font-style: normal;
+    font-weight: 400;
+    src: url('./fonts/Handlee/Handlee-Regular.ttf');
+}
+
+@font-face {
+    font-family: 'Kavivanar';
+    font-style: normal;
+    font-weight: 400;
+    src: url('./fonts/Kavivanar/Kavivanar-Regular.ttf');
+}
+
+@font-face {
+    font-family: 'Nanum Gothic';
+    font-style: normal;
+    font-weight: 400;
+    src: url('./fonts/Nanum_Gothic/NanumGothic-Bold.ttf');
+}
+
+@font-face {
+    font-family: 'Nanum Gothic Coding';
+    font-style: normal;
+    font-weight: 400;
+    src: url('./fonts/Nanum_Gothic_Coding/NanumGothicCoding-Regular.ttf');
+}

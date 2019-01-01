@@ -1,10 +1,9 @@
 .home {
     width: 100%;
-    height: calc(100% - 53px);
+    height: calc(100% - 60px);
     color: white;
     padding: 10px;
     box-sizing: border-box;
-    max-width: 1600px;
     margin: 0 auto;
 }
 

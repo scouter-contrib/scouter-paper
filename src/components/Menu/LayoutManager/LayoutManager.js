@@ -15,10 +15,16 @@ class LayoutManager extends Component {
         super(props);
         this.state = {
             templates: [],
-            selectedTemplateNo : null,
-            selectedEditNo : null,
-            editText : null
+            selectedTemplateNo: null,
+            selectedEditNo: null,
+            editText: null,
+            visible: false,
+            savedNo: null
         };
+    }
+
+    componentDidMount() {
+        this.loadTemplates(this.props.config, this.props.user);
     }
 
     componentWillReceiveProps(nextProps) {
@@ -34,8 +40,8 @@ class LayoutManager extends Component {
     saveTemplate = (templates) => {
         let that = this;
         let data = {
-            key : "__scouter_paper_layout",
-            value : JSON.stringify(templates)
+            key: "__scouter_paper_layout",
+            value: JSON.stringify(templates)
         };
 
         jQuery.ajax({
@@ -43,15 +49,15 @@ class LayoutManager extends Component {
             async: true,
             url: getHttpProtocol(this.props.config) + "/scouter/v1/kv",
             xhrFields: getWithCredentials(this.props.config),
-            contentType : "application/json",
-            data : JSON.stringify(data),
+            contentType: "application/json",
+            data: JSON.stringify(data),
             beforeSend: function (xhr) {
                 setAuthHeader(xhr, that.props.config, getCurrentUser(that.props.config, that.props.user));
             }
         }).done((msg) => {
             if (msg && Number(msg.status) === 200) {
                 that.setState({
-                    templates : templates
+                    templates: templates
                 });
             }
         }).fail((xhr, textStatus, errorThrown) => {
@@ -103,22 +109,22 @@ class LayoutManager extends Component {
 
                     if (list && list.length > 0) {
                         this.setState({
-                            templates : list,
-                            selectedTemplateNo : null,
-                            selectedEditNo : null
+                            templates: list,
+                            selectedTemplateNo: null,
+                            selectedEditNo: null
                         });
                     } else {
                         this.setState({
-                        templates : defaultTemplate,
-                        selectedTemplateNo : null,
-                        selectedEditNo : null
-                    });
+                            templates: defaultTemplate,
+                            selectedTemplateNo: null,
+                            selectedEditNo: null
+                        });
                     }
                 } else {
                     this.setState({
-                        templates : defaultTemplate,
-                        selectedTemplateNo : null,
-                        selectedEditNo : null
+                        templates: defaultTemplate,
+                        selectedTemplateNo: null,
+                        selectedEditNo: null
                     });
                 }
             }
@@ -127,9 +133,6 @@ class LayoutManager extends Component {
         });
     };
 
-    cancelClick = () => {
-        this.props.toggleLayoutManagerVisible();
-    };
 
     saveClick = () => {
         let templates = this.state.templates.slice(0);
@@ -145,101 +148,137 @@ class LayoutManager extends Component {
         });
 
         templates.push({
-            no : templates.length,
-            name : "template-" + (inx + 1),
-            creationTime : (new Date()).getTime(),
-            boxes : boxes,
-            layouts : layouts
+            no: templates.length,
+            name: "template-" + (inx + 1),
+            creationTime: (new Date()).getTime(),
+            boxes: boxes,
+            layouts: layouts
         });
 
         this.saveTemplate(templates);
     };
 
-    deleteClick = () => {
-        if (this.state.selectedTemplateNo === null) {
-            this.props.pushMessage("info", "NO LAYOUT SELECTED", "select layout to delete first");
-            this.props.setControlVisibility("Message", true);
-        } else {
-            let templates = Object.assign(this.state.templates);
-            for (let i=0; i<templates.length; i++) {
-                let template = templates[i];
+    deleteClick = (no, e) => {
+        let templates = Object.assign(this.state.templates);
+        for (let i = 0; i < templates.length; i++) {
+            let template = templates[i];
 
-                if (template.no === this.state.selectedTemplateNo) {
-                    templates.splice(i, 1);
-                    this.setState({
-                        templates : templates,
-                        selectedTemplateNo : null,
-                        selectedEditNo : null
-                    });
+            if (template.no === no) {
+                templates.splice(i, 1);
+                this.setState({
+                    templates: templates,
+                    selectedTemplateNo: null,
+                    selectedEditNo: null
+                });
 
-                    this.saveTemplate(templates);
-                    break;
-                }
+                this.saveTemplate(templates);
+                break;
             }
         }
+
+        e.stopPropagation();
+
     };
 
-    loadClick = () => {
-        if (this.state.selectedTemplateNo === null) {
-            this.props.pushMessage("info", "NO LAYOUT SELECTED", "select layout to load first");
-            this.props.setControlVisibility("Message", true);
-        } else {
-            for (let i=0; i<this.state.templates.length; i++) {
-                let template = this.state.templates[i];
+    saveAsClick = (no, e) => {
+        let templates = this.state.templates.slice(0);
+        if (!templates) {
+            templates = [];
+        }
+        let layouts = getData("layouts");
+        let boxes = getData("boxes");
 
-                if (template.no === this.state.selectedTemplateNo) {
-                    setData("boxes", template.boxes);
-                    setData("layouts", template.layouts);
-
-                    this.props.setTemplate(template.boxes, template.layouts);
-                    this.props.toggleLayoutManagerVisible();
-
-                    let search = '?objects=' + this.props.objects.map((d) => {
-                        return d.objHash
-                    });
-
-                    if (!(this.props.history.location.pathname === "/paper" &&  this.props.history.location.search === search)) {
-                        this.props.history.push({
-                            pathname: '/paper',
-                            search: search
-                        });
-                    }
-
-                    break;
-                }
+        for (let i = 0; i < templates.length; i++) {
+            if (templates[i].no === no) {
+                templates[i].boxes = boxes;
+                templates[i].layouts = layouts;
+                templates[i].creationTime = (new Date()).getTime();
             }
         }
+
+        this.saveTemplate(templates);
+        this.setState({
+            savedNo: no
+        });
+
+        setTimeout(() => {
+            this.setState({
+                savedNo: null
+            });
+        }, 1000);
+
+        e.stopPropagation();
+    };
+
+    loadClick = (no) => {
+
+        for (let i = 0; i < this.state.templates.length; i++) {
+            let template = this.state.templates[i];
+
+            if (template.no === no) {
+                setData("boxes", template.boxes);
+                setData("layouts", template.layouts);
+
+                this.props.setTemplate(template.boxes, template.layouts);
+
+                let search = '?objects=' + this.props.objects.map((d) => {
+                    return d.objHash
+                });
+
+                if (!(this.props.history.location.pathname === "/paper" && this.props.history.location.search === search)) {
+                    this.props.history.push({
+                        pathname: '/paper',
+                        search: search
+                    });
+                }
+
+                break;
+            }
+        }
+
 
     };
 
     templateClick = (no) => {
         this.setState({
-            selectedTemplateNo : no
+            selectedTemplateNo: no
         });
+
+        this.loadClick(no);
     };
 
-    editClick = (no, name) => {
+    editClick = (no, name, e) => {
         this.setState({
-            selectedEditNo : no,
-            editText : name
+            selectedEditNo: no,
+            editText: name
         });
+
+        e.stopPropagation();
     };
 
-    updateClick = (no) => {
+    updateClick = (no, e) => {
         let templates = Object.assign(this.state.templates);
-        for (let i=0; i<templates.length; i++) {
+        for (let i = 0; i < templates.length; i++) {
             let template = templates[i];
             if (template.no === no) {
                 template.name = this.state.editText;
                 this.setState({
-                    templates : templates,
-                    selectedTemplateNo : null,
-                    selectedEditNo : null
+                    templates: templates,
+                    selectedEditNo: null,
+                    savedNo: no
                 });
                 break;
             }
         }
         this.saveTemplate(templates);
+
+        setTimeout(() => {
+            this.setState({
+                savedNo: null
+            });
+        }, 1000);
+
+        e.stopPropagation();
     };
 
     onTextChange = (event) => {
@@ -248,42 +287,63 @@ class LayoutManager extends Component {
         });
     };
 
-    render() {
+    toggleOpen = () => {
+        this.setState({
+            visible: !this.state.visible
+        });
+    };
 
+    render() {
         return (
-            <div className={"layout-manager-bg " + (this.props.visible ? "" : "hidden")} onClick={this.props.toggleLayoutManagerVisible}>
-                <div className={"layout-manager-fixed-bg"}></div>
-                <div className="layout-manager popup-div" onClick={(e) => e.stopPropagation()}>
-                    <div className="title">
-                        <div>LAYOUTS</div>
-                    </div>
+            <div className="layout-manager-bg">
+                <div className="layout-summary" onClick={this.toggleOpen}>
+                    <span>{this.state.templates.length} LAYOUTS</span>
+                    <span className="drop-icon"><span><i className="fa fa-angle-down"
+                                                         aria-hidden="true"></i></span></span>
+                </div>
+                <div className={"layout-manager " + (this.state.visible ? "" : "hidden")}
+                     onClick={(e) => e.stopPropagation()}>
                     <div className="content-ilst scrollbar">
                         {(this.state.templates && this.state.templates.length > 0) &&
                         <ul>
                             {this.state.templates.map((d, i) => {
-                                return (<li key={i} className={d.no === this.state.selectedTemplateNo ? 'selected' : ''} onClick={this.templateClick.bind(this, d.no)}>
+                                return (<li key={i} className={d.no === this.state.selectedTemplateNo ? 'selected' : ''}
+                                            onClick={this.templateClick.bind(this, d.no)}>
+                                    <div className={"saved-info " + (d.no === this.state.savedNo ? "show " : " ")}>
+                                        SAVED
+                                    </div>
                                     <div>
-                                        {d.deprecated && <div className="deprecated"><span data-tip="this template is no longer working properly at this paper version">DEPRECATED</span></div>}
-                                        <span className="no">{d.no}</span>
+                                        {d.deprecated && <div className="deprecated"><span
+                                            data-tip="this template is no longer working properly at this paper version">DEPRECATED</span>
+                                        </div>}
                                         {(d.no !== this.state.selectedEditNo) && <span className="name">{d.name}</span>}
-                                        {(d.no === this.state.selectedEditNo) && <span className="name edit"><input type="text" value={this.state.editText} onChange={this.onTextChange.bind(this )} /></span>}
-                                        {(d.no !== this.state.selectedEditNo) && <span className="edit-btn" onClick={this.editClick.bind(this, d.no, d.name)}>EDIT</span>}
-                                        {(d.no === this.state.selectedEditNo) && <span className="done-btn" onClick={this.updateClick.bind(this, d.no)}>DONE</span>}
+                                        {(d.no === this.state.selectedEditNo) &&
+                                        <span className="name edit"><input type="text" value={this.state.editText}
+                                                                           onChange={this.onTextChange.bind(this)}/></span>}
+                                    </div>
+                                    <div className="btn-control">
+                                        <span className="paper-count">{d.boxes.length} PAPERS</span>
+                                        {(d.no !== this.state.selectedEditNo) &&
+                                        <span className="edit-btn" onClick={this.editClick.bind(this, d.no, d.name)}>EDIT</span>}
+                                        {(d.no === this.state.selectedEditNo) && <span className="done-btn"
+                                                                                       onClick={this.updateClick.bind(this, d.no)}>DONE</span>}
+                                        {(d.no !== this.state.selectedEditNo) &&
+                                        <span className="save-as-btn" onClick={this.saveAsClick.bind(this, d.no)}>SAVE AS</span>}
+                                        {(d.no !== this.state.selectedEditNo) && <span className="del-btn"
+                                                                                       onClick={this.deleteClick.bind(this, d.no)}>DEL</span>}
                                     </div>
                                 </li>)
                             })}
                         </ul>
                         }
-                        {(!this.state.templates || this.state.templates.length < 1) && <div className="empty-content">NO LAYOUT</div>}
-                    </div>
-                    <div className="buttons">
-                        <button className="delete-btn" onClick={this.deleteClick}>DELETE</button>
-                        <button className="save-btn" onClick={this.saveClick}>SAVE CURRENT LAYOUT</button>
-                        <button className="cancel-btn" onClick={this.cancelClick}>CANCEL</button>
-                        <button className="load-btn" onClick={this.loadClick}>LOAD</button>
+                        <div className="save-new-btn">
+                            <div><span onClick={this.saveClick}>SAVE CURRENT LAYOUT</span></div>
+                        </div>
+                        {(!this.state.templates || this.state.templates.length < 1) &&
+                        <div className="empty-content">NO LAYOUT</div>}
                     </div>
                 </div>
-                <ReactTooltip />
+                <ReactTooltip/>
             </div>
         );
     }
@@ -301,7 +361,7 @@ let mapDispatchToProps = (dispatch) => {
     return {
         setTemplate: (boxes, layouts) => dispatch(setTemplate(boxes, layouts)),
         setControlVisibility: (name, value) => dispatch(setControlVisibility(name, value)),
-        pushMessage: (category, title, content) => dispatch(pushMessage(category, title, content)),
+        pushMessage: (category, title, content) => dispatch(pushMessage(category, title, content))
     };
 };
 

@@ -7,7 +7,7 @@ import 'react-datepicker/dist/react-datepicker.css';
 import InputRange from 'react-input-range';
 import 'react-input-range/lib/css/index.css';
 import './RangeControl.css';
-import {setRealTimeValue, setRealTimeRangeStepValue, setRangeDate, setRangeHours, setRangeMinutes, setRangeValue, setRangeDateHoursMinutes} from '../../../actions';
+import {setRealTimeValue, setRealTimeRangeStepValue, setRangeDate, setRangeHours, setRangeMinutes, setRangeValue, setRangeDateHoursMinutes, setSearchCondition} from '../../../actions';
 
 class RangeControl extends Component {
 
@@ -97,9 +97,10 @@ class RangeControl extends Component {
         this.search(startDate, endDate);
     };
 
-    search = (startDateParam, endDateParam, instances) => {
+    search = (startDateParam, endDateParam) => {
+
         if (startDateParam && endDateParam) {
-            this.props.search(startDateParam.valueOf(), endDateParam.valueOf(), instances);
+            this.props.setSearchCondition(startDateParam.valueOf(), endDateParam.valueOf(), (new Date()).getTime());
         } else {
             let startDate = this.props.range.date.clone();
             startDate.seconds(0);
@@ -109,7 +110,7 @@ class RangeControl extends Component {
             let endDate = startDate.clone();
             endDate.add(this.props.range.value, "minutes");
 
-            this.props.search(startDate.valueOf(), endDate.valueOf(), instances);
+            this.props.setSearchCondition(startDate.valueOf(), endDate.valueOf(), (new Date()).getTime());
         }
     };
 
@@ -124,8 +125,7 @@ class RangeControl extends Component {
 
 
         return (
-            <div className={"range-controls popup-div noselect " + (this.props.visible ? 'visible ' : ' ') + (this.props.fixedControl ? 'fixed' : '') }>
-                <div className="close-btn" onClick={this.props.toggleRangeControl}></div>
+            <div className={"range-controls noselect " + (this.props.visible ? 'visible ' : ' ') + (this.props.fixedControl ? 'fixed' : '') }>
                 <div className="time-type">
                     <div onClick={this.changeTimeType.bind(this, "realtime")} className={"time-type-item real-time " + (this.props.range.realTime ? "selected" : "")}>REALTIME</div>
                     <div onClick={this.changeTimeType.bind(this, "search")} className={"time-type-item search-time " + (!this.props.range.realTime ? "selected" : "")}>SEARCH</div>
@@ -214,7 +214,9 @@ let mapDispatchToProps = (dispatch) => {
         setRangeMinutes: (minutes) => dispatch(setRangeMinutes(minutes)),
         setRangeValue: (value) => dispatch(setRangeValue(value)),
         setRangeDateHoursMinutes: (date, hours, minutes) => dispatch(setRangeDateHoursMinutes(date, hours, minutes)),
-        setRealTimeRangeStepValue: (realTime, longTerm, value, range, step) => dispatch(setRealTimeRangeStepValue(realTime, longTerm, value, range, step))
+        setRealTimeRangeStepValue: (realTime, longTerm, value, range, step) => dispatch(setRealTimeRangeStepValue(realTime, longTerm, value, range, step)),
+        setSearchCondition: (from, to, time) => dispatch(setSearchCondition(from, to, time))
+
     };
 };
 

@@ -1,7 +1,6 @@
-import {SET_SUPPORTED, ADD_REQUEST, SET_CONFIG, SET_USER_ID, SET_USER_DATA, SET_TARGET, PUSH_MESSAGE, SET_CONTROL_VISIBILITY, CLEAR_ALL_MESSAGE, SET_BG_COLOR, SET_SELECTION, SET_TEMPLATE, SET_REAL_TIME, SET_RANGE_DATE, SET_RANGE_HOURS, SET_RANGE_MINUTES, SET_RANGE_VALUE, SET_REAL_TIME_VALUE, SET_RANGE_DATE_HOURS_MINUTES, SET_REAL_TIME_RANGE_STEP_VALUE, SET_RANGE_DATE_HOURS_MINUTES_VALUE, SET_RANGE_ALL, SET_COUNTER_INFO} from '../actions';
+import {SET_MENU, SET_BOXES_LAYOUTS, SET_LAYOUTS, SET_BOXES, SET_LAYOUT_CHANGETIME, SET_SUPPORTED, ADD_REQUEST, SET_CONFIG, SET_USER_ID, SET_USER_DATA, SET_TARGET, PUSH_MESSAGE, SET_CONTROL_VISIBILITY, CLEAR_ALL_MESSAGE, SET_BG_COLOR, SET_SELECTION, SET_TEMPLATE, SET_REAL_TIME, SET_RANGE_DATE, SET_RANGE_HOURS, SET_RANGE_MINUTES, SET_RANGE_VALUE, SET_REAL_TIME_VALUE, SET_RANGE_DATE_HOURS_MINUTES, SET_REAL_TIME_RANGE_STEP_VALUE, SET_RANGE_DATE_HOURS_MINUTES_VALUE, SET_RANGE_ALL, SET_COUNTER_INFO, SET_CONTROLLER_STATE, SET_CONTROLLER_PIN, SET_FILTER_MAP, ADD_FILTERED_OBJECT, REMOVE_FILTERED_OBJECT, SET_SEARCH_CONDITION, SET_TOPOLOGY_OPTION, SET_ALERT} from '../actions';
 import {combineReducers} from 'redux';
 import moment from 'moment';
-
 const configState = {
     servers : [
         {
@@ -163,7 +162,11 @@ const configState = {
         axis : "Bungee",
         tooltip : "Righteous",
         profiler : "Righteous"
-    }
+    },
+    others : {
+        checkUpdate : "Y",
+        errorReport : "Y"
+    },
 };
 
 const config = (state = configState, action) => {
@@ -227,6 +230,7 @@ const user = (state = userState, action) => {
 
 const targetState = {
     objects: [],
+    filterMap : {},
     selection : {
         x1: null,
         x2: null,
@@ -238,13 +242,38 @@ const targetState = {
 const target = (state = targetState, action) => {
     switch (action.type) {
         case SET_TARGET:
+            let filterMap = {};
+            action.objects.forEach((object) => {
+                filterMap[object.objHash] = true;
+            });
+
             return Object.assign({}, state, {
-                objects: action.objects
+                objects: action.objects,
+                filterMap : filterMap
             });
         case SET_SELECTION:
             return Object.assign({}, state, {
                 selection: action.selection
             });
+        case SET_FILTER_MAP:
+            return Object.assign({}, state, {
+                filterMap: action.filterMap
+            });
+        case ADD_FILTERED_OBJECT: {
+            let currentFilterMap = Object.assign({}, state.filterMap);
+            currentFilterMap[action.objHash] = true;
+            return Object.assign({}, state, {
+                filterMap: currentFilterMap
+            });
+        }
+
+        case REMOVE_FILTERED_OBJECT: {
+            let currentFilterMap = Object.assign({}, state.filterMap);
+            delete currentFilterMap[action.objHash];
+            return Object.assign({}, state, {
+                filterMap: currentFilterMap
+            });
+        }
         default:
             return state;
     }
@@ -267,10 +296,26 @@ const request = (state = requestState, action) => {
     }
 };
 
+
+let storageController = null;
+let pin = null;
+if (localStorage) {
+    storageController = localStorage.getItem("controller");
+    pin = localStorage.getItem("pin");
+    if (pin === "true") {
+        pin = true;
+    } else {
+        pin = false;
+    }
+}
+
 const controlState = {
     TargetSelector: false,
     Message : false,
-    Loading : false
+    Loading : false,
+    Controller : storageController ? storageController : "min",
+    menu : "/",
+    pin : pin !== null ? pin : false
 };
 
 const control = (state = controlState, action) => {
@@ -281,6 +326,25 @@ const control = (state = controlState, action) => {
             obj[action.name] = action.value;
             return Object.assign({}, state, obj);
         }
+
+        case SET_CONTROLLER_STATE: {
+            if (localStorage) {
+                localStorage.setItem("controller", action.state);
+            }
+            return Object.assign({}, state, {Controller : action.state});
+        }
+
+        case SET_CONTROLLER_PIN: {
+            if (localStorage) {
+                localStorage.setItem("pin", action.pin);
+            }
+            return Object.assign({}, state, {pin : action.pin});
+        }
+
+        case SET_MENU: {
+            return Object.assign({}, state, {menu : action.menu});
+        }
+
         default:
             return state;
     }
@@ -334,6 +398,44 @@ const template = (state = templateState, action) => {
 
         case SET_TEMPLATE:
             return Object.assign({}, state, {boxes : action.boxes, layouts: action.layouts});
+        default:
+            return state;
+    }
+};
+
+const paperState = {
+    boxes: [],
+    layouts : {},
+    layoutChangeTime : null
+};
+
+const paper = (state = paperState, action) => {
+    switch (action.type) {
+
+        case SET_BOXES:
+            return Object.assign({}, state, {boxes : action.boxes, layoutChangeTime : (new Date()).getTime()});
+        case SET_LAYOUTS:
+            return Object.assign({}, state, {layouts : action.layouts, layoutChangeTime : (new Date()).getTime()});
+        case SET_BOXES_LAYOUTS:
+            return Object.assign({}, state, {boxes : action.boxes, layouts : action.layouts, layoutChangeTime : (new Date()).getTime()});
+        case SET_LAYOUT_CHANGETIME:
+            return Object.assign({}, state, {layoutChangeTime : (new Date()).getTime()});
+        default:
+            return state;
+    }
+};
+
+const searchConditionState = {
+    from: null,
+    to : null,
+    time : null
+};
+
+const searchCondition = (state = searchConditionState, action) => {
+    switch (action.type) {
+
+        case SET_SEARCH_CONDITION:
+            return Object.assign({}, state, {from : action.from, to: action.to, time:action.time});
         default:
             return state;
     }
@@ -403,6 +505,59 @@ const supported = (state = supportedState, action) => {
     }
 };
 
+let topologyOptionState = {
+    tpsToLineSpeed : true,
+    speedLevel : "fast",
+    redLine : false,
+    highlight : false,
+    distance : 300,
+    zoom : false,
+    pin : false,
+    lastUpdateTime : null,
+    grouping : false,
+    nodeCount : 0,
+    linkCount : 0
+};
+
+if (localStorage) {
+    let storageTopologyOptionState = localStorage.getItem("topologyOptions");
+    if (storageTopologyOptionState) {
+        topologyOptionState = JSON.parse(storageTopologyOptionState);
+    }
+}
+
+const topologyOption = (state = topologyOptionState, action) => {
+    switch (action.type) {
+        case SET_TOPOLOGY_OPTION:
+            let options = Object.assign({}, state, action.topologyOption);
+
+
+            localStorage && localStorage.setItem("topologyOptions", JSON.stringify(options));
+            return options;
+        default:
+            return state;
+    }
+};
+
+let alertInfo = JSON.parse(localStorage.getItem("alert"));
+
+const alertState = {
+    data: [],
+    offset: {},
+    clearTime: alertInfo ? alertInfo.clearTime : null,
+    clearItem: alertInfo ? alertInfo.clearItem : {}
+};
+
+const alert = (state = alertState, action) => {
+    switch (action.type) {
+        case SET_ALERT:
+            let options = Object.assign({}, state, action.alert);
+            return options;
+        default:
+            return state;
+    }
+};
+
 const scouterApp = combineReducers({
     supported,
     target,
@@ -414,7 +569,11 @@ const scouterApp = combineReducers({
     config,
     request,
     template,
-    range
+    range,
+    searchCondition,
+    paper,
+    topologyOption,
+    alert
 });
 
 export default scouterApp;

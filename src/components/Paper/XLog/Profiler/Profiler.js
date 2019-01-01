@@ -6,7 +6,6 @@ import {connect} from 'react-redux';
 import jQuery from "jquery";
 import {
     setTxidPropsToUrl,
-    getFilteredData,
     getHttpProtocol,
     errorHandler,
     getWithCredentials,
@@ -18,12 +17,13 @@ import {
     getFilteredData0
 } from '../../../../common/common';
 import SingleProfile from "./SingleProfile/SingleProfile";
+import FrameProfile from "./FrameProfile/FrameProfile";
+
 import ProfileList from "./ProfileList/ProfileList";
 import _ from "lodash";
 import moment from "moment";
 import copy from 'copy-to-clipboard';
 import {IdAbbr} from "../../../../common/idAbbr";
-//import {disableBodyScroll, enableBodyScroll} from 'body-scroll-lock';
 
 const xlogMaxSelectionCount = 200;
 
@@ -42,19 +42,15 @@ class Profiler extends Component {
         if (options) {
             options.summary = options.summary === undefined ? true : options.summary;
             options.narrow = options.narrow === undefined ? false : options.narrow;
-            options.indent = options.indent === undefined ? true : options.indent;
             options.bind = options.bind === undefined ? true : options.bind;
             options.wrap = options.wrap === undefined ? false : options.wrap;
-            options.gap = options.gap === undefined ? true : options.gap;
             options.formatter = options.formatter === undefined ? true : options.formatter;
         } else {
             options = {
                 summary: true,
                 narrow: false,
-                indent: true,
                 bind: true,
                 wrap: false,
-                gap: true,
                 formatter: true
             }
         }
@@ -68,10 +64,8 @@ class Profiler extends Component {
             steps: null,
             summary: options.summary,
             narrow: options.narrow,
-            indent: options.indent,
             bind: options.bind,
             wrap: options.wrap,
-            gap: options.gap,
             formatter: options.formatter,
             listWidth: 40,
             smallScreen: false,
@@ -139,19 +133,11 @@ class Profiler extends Component {
             return true;
         }
 
-        if (nextState.indent !== this.state.indent) {
-            return true;
-        }
-
         if (nextState.bind !== this.state.bind) {
             return true;
         }
 
         if (nextState.wrap !== this.state.wrap) {
-            return true;
-        }
-
-        if (nextState.gap !== this.state.gap) {
             return true;
         }
 
@@ -195,7 +181,7 @@ class Profiler extends Component {
                     let y1 = nextProps.selection.y1;
                     let y2 = nextProps.selection.y2;
                     let filter = nextProps.selection.filter;
-                    this.getList(x1, x2, y1, y2, filter);
+                    this.getList(x1, x2, y1, y2, filter, nextProps.filterMap);
                 }
             } else {
                 if (!this.txidInit) {
@@ -245,7 +231,7 @@ class Profiler extends Component {
         return null;
     };
 
-    getList = (x1, x2, y1, y2, filter) => {
+    getList = (x1, x2, y1, y2, filter, filterMap) => {
         let days = getSearchDays(x1, x2);
         let fromTos = getDivideDays(x1, x2);
 
@@ -255,17 +241,17 @@ class Profiler extends Component {
             });
 
             for (let i = 0; i < fromTos.length; i++) {
-                this.getListData(fromTos[i].from, fromTos[i].to, y1, y2, true, filter);
+                this.getListData(fromTos[i].from, fromTos[i].to, y1, y2, true, filter, filterMap);
             }
 
         } else {
-            this.getListData(x1, x2, y1, y2, false, filter);
+            this.getListData(x1, x2, y1, y2, false, filter, filterMap);
         }
     };
 
 
     // search의 경우, 마지막 newXLogs가 allXLogs에 들어 있는 문제 있음
-    getListData = async (x1, x2, y1, y2, append, filter) => {
+    getListData = async (x1, x2, y1, y2, append, filter, filterMap) => {
         let that = this;
         let allXLogs = that.props.xlogs;
         let newXLogs = that.props.newXLogs;
@@ -305,6 +291,10 @@ class Profiler extends Component {
         }
 
         filtered = await getFilteredData0(filtered, filter);
+
+        filtered = filtered.filter((d) => {
+            return filterMap[d.objHash];
+        });
 
         let date = moment(new Date(x1)).format("YYYYMMDD");
 
@@ -439,7 +429,6 @@ class Profiler extends Component {
                     }
                 }).done((msg) => {
                     const orderedSteps = _.orderBy(msg.result, (e) => Number(e.step.order), ['asc']);
-                    this.addIndentPropertyTo(orderedSteps);
                     this.addTxidAbbrPropertyTo(orderedSteps)
 
                     const eos = {
@@ -476,15 +465,6 @@ class Profiler extends Component {
         });
     };
 
-    addIndentPropertyTo(orderedSteps) {
-        const indentMap = {};
-        orderedSteps.forEach((v) => {
-            const indent = indentMap.hasOwnProperty(v.step.parent) ? indentMap[v.step.parent] + 1 : 0;
-            indentMap[v.step.index] = indent;
-            v.step.indent = indent;
-        });
-    }
-
     addTxidAbbrPropertyTo(steps) {
         steps.forEach((v) => {
             if (v.step.txid) {
@@ -507,13 +487,6 @@ class Profiler extends Component {
         this.setProfilerOptions("narrow", !this.state.narrow);
     };
 
-    toggleIndent = () => {
-        this.setState({
-            indent: !this.state.indent
-        });
-        this.setProfilerOptions("indent", !this.state.indent);
-    };
-
     toggleBind = () => {
         this.setState({
             bind: !this.state.bind
@@ -526,13 +499,6 @@ class Profiler extends Component {
             wrap: !this.state.wrap
         });
         this.setProfilerOptions("wrap", !this.state.wrap);
-    };
-
-    toggleGap = () => {
-        this.setState({
-            gap: !this.state.gap
-        });
-        this.setProfilerOptions("gap", !this.state.gap);
     };
 
     toggleFormatter = () => {
@@ -624,16 +590,10 @@ class Profiler extends Component {
                 className={"xlog-profiler " + (this.state.paramTxid ? 'param-mode ' : ' ') + (this.state.show ? ' ' : 'hidden')}>
                 <div>
                     <div className="size-control-btns">
-                        {!this.state.paramTxid && <button onClick={this.changeListWidth.bind(this, "min")}><i
-                            className="fa fa-angle-double-left"></i></button>}
-                        {!this.state.paramTxid &&
-                        <button onClick={this.changeListWidth.bind(this, "small")}><i className="fa fa-angle-left"></i>
-                        </button>}
-                        {!this.state.paramTxid &&
-                        <button onClick={this.changeListWidth.bind(this, "big")}><i className="fa fa-angle-right"></i>
-                        </button>}
-                        {!this.state.paramTxid && <button onClick={this.changeListWidth.bind(this, "max")}><i
-                            className="fa fa-angle-double-right"></i></button>}
+                        {!this.state.paramTxid && <button onClick={this.changeListWidth.bind(this, "min")}><i className="fa fa-angle-double-left"></i></button>}
+                        {!this.state.paramTxid && <button onClick={this.changeListWidth.bind(this, "small")}><i className="fa fa-angle-left"></i></button>}
+                        {!this.state.paramTxid && <button onClick={this.changeListWidth.bind(this, "big")}><i className="fa fa-angle-right"></i></button>}
+                        {!this.state.paramTxid && <button onClick={this.changeListWidth.bind(this, "max")}><i className="fa fa-angle-double-right"></i></button>}
                         <div className="close-btn" onClick={this.close}></div>
                     </div>
                     {!this.state.paramTxid &&
@@ -665,22 +625,35 @@ class Profiler extends Component {
                             <div className="profile-steps-control noselect">
                                 <div className={"profile-control-btn " + (this.state.summary ? 'active' : '')} onClick={this.toggleSummary}>{this.state.summary ? <i className="fa fa-check-circle"></i> : <i className="fa fa-circle-o"></i>} SUMMARY</div>
                                 <div className={"profile-control-btn " + (this.state.narrow ? 'active' : '')} onClick={this.toggleNarrow}>{this.state.narrow ? <i className="fa fa-check-circle"></i> : <i className="fa fa-circle-o"></i>} NARROW</div>
-                                <div className={"profile-control-btn " + (this.state.indent ? 'active' : '')} onClick={this.toggleIndent}>{this.state.indent ? <i className="fa fa-check-circle"></i> : <i className="fa fa-circle-o"></i>} INDENT</div>
                                 <div className={"profile-control-btn " + (this.state.bind ? 'active' : '')} onClick={this.toggleBind}>{this.state.bind ? <i className="fa fa-check-circle"></i> : <i className="fa fa-circle-o"></i>} BIND</div>
                                 <div className={"profile-control-btn " + (this.state.wrap ? 'active' : '')} onClick={this.toggleWrap}>{this.state.wrap ? <i className="fa fa-check-circle"></i> : <i className="fa fa-circle-o"></i>} WRAP</div>
-                                <div className={"profile-control-btn " + (this.state.gap ? 'active' : '')} onClick={this.toggleGap}>{this.state.gap ? <i className="fa fa-check-circle"></i> : <i className="fa fa-circle-o"></i>} GAP</div>
                                 <div className={"profile-control-btn " + (this.state.formatter ? 'active' : '')} onClick={this.toggleFormatter}>{this.state.formatter ? <i className="fa fa-check-circle"></i> : <i className="fa fa-circle-o"></i>} FORMATTER</div>
                             </div>
                             <div className="close-btn" onClick={this.close}></div>
                         </div>
                         <div className={"profile-steps " + (this.state.narrow ? 'narrow' : '')}>
                             <div className="profile-steps-content scrollbar">
-                                {(this.state.paramTxid || this.state.txid) &&
+                                {/*(this.state.paramTxid || this.state.txid) &&
                                 <SingleProfile rowClick={this.rowClick} txid={this.state.txid}
                                                profile={this.state.profile} steps={this.state.steps}
                                                summary={this.state.summary} narrow={this.state.narrow} indent={this.state.indent}
                                                bind={this.state.bind} wrap={this.state.wrap} gap={this.state.gap}
-                                               formatter={this.state.formatter}/>}
+                                               formatter={this.state.formatter}/>*/}
+                                {(this.state.paramTxid || this.state.txid) &&
+                                <FrameProfile rowClick={this.rowClick} txid={this.state.txid}
+                                               profile={this.state.profile} steps={this.state.steps}
+                                               summary={this.state.summary} narrow={this.state.narrow}
+                                               bind={this.state.bind} wrap={this.state.wrap}
+                                               formatter={this.state.formatter}
+                                               toggleFormatter={this.toggleFormatter}
+                                               toggleBind={this.toggleBind}
+                                               toggleWrap={this.toggleWrap}
+                                               listWidth={this.state.listWidth}
+                                />
+
+
+
+                                }
                                 {(!this.state.paramTxid && !this.state.txid) && <div className="no-profile">
                                     <div>NO PROFILE SELECTED</div>
                                 </div>}
@@ -697,7 +670,8 @@ let mapStateToProps = (state) => {
     return {
         objects: state.target.objects,
         config: state.config,
-        user: state.user
+        user: state.user,
+        filterMap: state.target.filterMap
     };
 };
 

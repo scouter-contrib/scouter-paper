@@ -1,0 +1,85 @@
+.topology-min-control {
+    margin-top: 20px;
+}
+
+.topology-min-control .row .control-btn {
+    padding-top: 6px;
+    cursor: pointer;
+    margin-top: 2px;
+}
+
+.topology-min-control .row.first {
+    margin-top: 0;
+}
+
+.topology-min-control .row .control-btn:hover {
+    background-color: rgba(0,0,0,0.1);
+}
+
+.topology-min-control .row .control-btn .text {
+    text-align: center;
+}
+
+.topology-min-control .label {
+    display: inline-block;
+    padding: 4px;
+    background-color: rgba(0,0,0,0.8);
+    border-radius: 4px;
+}
+
+
+.topology-min-control .row .control-btn .text > span {
+    display: inline-block;
+    width: 22px;
+    height: 22px;
+    box-sizing: border-box;
+    border-radius: 50%;
+    background-color: rgba(0,0,0,0.5);
+    text-align: center;
+    font-size: 13px;
+    padding: 5px;
+    font-weight: bold;
+}
+
+.topology-min-control .row .action-btn .text > span {
+    background-color: white;
+    color: #333;
+}
+
+.topology-min-control .row .check-btn.selected .text > span {
+    background-color: #FFCC11;
+    color: #333;
+}
+
+.topology-min-control .row .radio-btn.first {
+    margin-top: 7px;
+}
+
+.topology-min-control .row .radio-btn {
+    padding-top: 0;
+    cursor: pointer;
+    margin-top: 0;
+}
+
+
+.topology-min-control .row .radio-btn .text > span {
+    border-radius: 0;
+    width: 24px;
+}
+
+.topology-min-control .row .radio-btn.selected .text > span {
+    background-color: #EEB422;
+    color: #333;
+}
+
+.topology-min-control .row .radio-btn.first.selected .text > span {
+    background-color: #FFCC11;
+}
+
+.topology-min-control .row .radio-btn.first .text > span {
+    border-radius: 5px 5px 0 0;
+}
+
+.topology-min-control .row .radio-btn.last .text > span {
+    border-radius: 0 0 5px 5px;
+}

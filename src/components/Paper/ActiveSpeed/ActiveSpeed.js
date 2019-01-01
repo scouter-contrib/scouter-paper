@@ -44,7 +44,7 @@ class ActiveSpeed extends Component {
                 <div className="active-speed-content">
                 {(!this.props.realtime) && <div className="no-search-support"><div><div>REALTIME ONLY</div></div></div>}
                 {this.props.realtime && this.props.objects.filter((d) => {
-                    return d.objFamily === "javaee";
+                    return d.objFamily === "javaee" && this.props.filterMap[d.objHash];
                 }).map((d, i) => {
                     let total = 0;
                     let short = 0;
@@ -114,7 +114,8 @@ class ActiveSpeed extends Component {
 let mapStateToProps = (state) => {
     return {
         objects: state.target.objects,
-        config: state.config
+        config: state.config,
+        filterMap: state.target.filterMap
     };
 };
 

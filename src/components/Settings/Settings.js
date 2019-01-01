@@ -127,6 +127,16 @@ class Settings extends Component {
         });
     };
 
+    onChangeOthers = (attr, event) => {
+
+        let config = Object.assign({}, this.state.config);
+        config.others[attr] = event.target.value;
+
+        this.setState({
+            config: config
+        });
+    };
+
     onChangeTheme = (event) => {
         let config = Object.assign({}, this.state.config);
         config.theme = event.target.value;
@@ -982,6 +992,34 @@ class Settings extends Component {
                                             </div>
                                         </div>
                                     </div>
+                                </div>
+                            </div>
+                        </div>
+
+                        <div className="category">
+                            <div>OTHERS</div>
+                        </div>
+                        <div className="setting-box">
+                            <div className="row">
+                                <div className="label">
+                                    <div>CHECK PAPER UPDATE & NOTICE</div>
+                                </div>
+                                <div className="input">
+                                    <select value={this.state.config.others.checkUpdate} onChange={this.onChangeOthers.bind(this, "checkUpdate")} disabled={!this.state.edit}>
+                                        <option value="Y">Y</option>
+                                        <option value="N">N</option>
+                                    </select>
+                                </div>
+                            </div>
+                            <div className="row">
+                                <div className="label">
+                                    <div>SEND SCRIPT ERROR INFO</div>
+                                </div>
+                                <div className="input">
+                                    <select value={this.state.config.others.errorReport} onChange={this.onChangeOthers.bind(this, "errorReport")} disabled={!this.state.edit}>
+                                        <option value="Y">Y</option>
+                                        <option value="N">N</option>
+                                    </select>
                                 </div>
                             </div>
                         </div>

@@ -1,0 +1,99 @@
+.simple-selector-wrapper {
+    text-transform: uppercase;
+    position: relative;
+}
+
+.simple-selector-wrapper .up,
+.simple-selector-wrapper .down {
+    display: none;
+}
+
+.simple-selector-wrapper.true .up {
+    display: inline-block;
+}
+
+.simple-selector-wrapper.false .down {
+    display: inline-block;
+}
+
+.simple-selector-wrapper .selected-server {
+    margin-right: 40px;
+}
+
+
+.simple-selector-wrapper .simple-selector-text {
+    padding: 8px 0 8px 5px;
+    cursor: pointer;
+}
+
+.simple-selector-wrapper .simple-selector-text:hover {
+    background-color: #FFCC11;
+    color: #333;
+}
+
+.simple-selector-wrapper .drop-icon {
+    position: absolute;
+    top : 0;
+    right : 0;
+    height: 100%;
+    font-size: 16px;
+    width: 20px;
+    text-align: center;
+    padding-top: 5px;
+    box-sizing: border-box;
+    cursor: pointer;
+}
+
+.simple-selector-wrapper .drop-icon:hover {
+    background-color: #FFCC11;
+    color: #333;
+}
+
+.simple-selector-wrapper .server-list {
+    position: absolute;
+    top : 100%;
+    width: 100%;
+    left : 0;
+    box-sizing: border-box;
+    z-index: 3;
+    background-color: white;
+    color: #333;
+    max-height: 150px;
+    overflow-y: auto;
+}
+
+.simple-selector-wrapper .server-list ul {
+    list-style: none;
+    margin: 0;
+    padding: 0;
+}
+
+.simple-selector-wrapper .server-list ul li {
+    padding: 5px 10px;
+    position: relative;
+    border-bottom: 1px solid rgba(0,0,0,0.2);
+    cursor: pointer;
+}
+
+.simple-selector-wrapper .server-list ul li:hover {
+    background-color: #FFCC11;
+    background-color: #FFEA9F;
+    color: #333;
+}
+
+.simple-selector-wrapper .server-list ul li .selected-span {
+    display: inline-block;
+    width: 5px;
+    position: absolute;
+    top : 0;
+    left : 0;
+    bottom : 0;
+}
+
+.simple-selector-wrapper .server-list ul li .selected-span.selected {
+    background-color: #FFCC11;
+}
+
+.simple-selector-wrapper .server-list ul li:nth-child(2n) {
+    _background-color: rgba(0,0,0,0.1);
+}

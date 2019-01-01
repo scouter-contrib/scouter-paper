@@ -1,5 +1,3 @@
-@import url('https://fonts.googleapis.com/css?family=Bungee|Righteous|Mina|Nanum+Gothic|Noto+Sans|Nanum+Gothic+Coding|Cousine|Space+Mono|Handlee|Kavivanar');
-
 html, body {
     height: 100%;
     padding: 0;
@@ -87,10 +85,13 @@ button {
 .scrollbar::-webkit-scrollbar {
     width: 7px;
     height: 7px;
+    background-color: rgba(0, 0, 0, 0.2);
 }
 
 .scrollbar::-webkit-scrollbar-thumb {
-    background-color: #333;
+    background-color: #1D88EA;
+    background-color: rgba(0, 0, 0, 0.6);
+    _background-color: #FCDC3B;
 }
 
 body::-webkit-scrollbar {

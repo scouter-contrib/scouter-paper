@@ -1,8 +1,11 @@
 .menu-div {
-    padding: 5px 0 0;
+    padding: 4px 0 0;
     position: relative;
     background-color: #207ce5;
+    background-color: rgba(0,0,0,0.05);
     font-family: 'Bungee', sans-serif;
+    height: 60px;
+    box-sizing: border-box;
 }
 
 .menu-div .bar {
@@ -16,82 +19,16 @@
 
 .menu {
     color: white;
-    max-width: 1600px;
     margin: 0 auto;
     font-weight: normal;
     box-sizing: border-box;
+    height: 100%;
 }
 
-.menu div.logo {
-    font-size: 16px;
-    padding: 0;
-    text-align: center;
-    position: relative;
-    box-sizing: border-box;
-    color: white;
-    display: inline-block;
-    cursor: pointer;
-    -webkit-touch-callout: none;
-    -webkit-user-select: none;
-    -moz-user-select: none;
-    -ms-user-select: none;
-    user-select: none;
-    width: 80px;
-}
-
-.menu div.logo a {
-    color: white;
-    text-decoration: none;
-    display: inline-block;
-}
-
-.menu div.logo a:hover {
-    color: #FFCC11;
-}
-
-.menu div.logo .logo-icon {
-    text-align: center;
-    width: 100%;
-    box-sizing: border-box;
-    z-index: 2;
-    font-size: 16px;
-    position: relative;
-    top: -10px;
-}
-
-.menu div.logo .logo-text-div {
-    width: 100%;
-    text-align: center;
-    height: 0;
-    padding-right: 10px;
-}
-
-.menu div.logo .logo-text {
-    font-size: 10px;
-    padding: 0;
-    border-radius: 5px;
-    text-decoration: none;
-    position: absolute;
-    left: 0;
-    width: 100%;
-}
-
-.menu div.logo .logo-text-1 {
-    top: 0;
-}
-
-.menu div.logo .logo-text-2 {
-    top: 10px;
-}
-
-.menu div.logo:hover {
-    color: #FFCC11;
-}
-
-.menu a.menu-item {
+.menu .menu-item {
     display: inline-block;
     color: #CCC;
-    padding: 15px 10px;
+    padding: 20px 20px 0;
     cursor: pointer;
     border-bottom: 4px solid transparent;
     transition: border-bottom-colo, colorr 0.3s;
@@ -105,6 +42,45 @@
     -ms-user-select: none;
     user-select: none;
 }
+
+.menu .menu-item.alert-btn {
+    padding: 16px 15px 0;
+}
+
+.menu .menu-item.alert-btn {
+    position: relative;
+}
+
+.menu .menu-item.alert-btn[data-count]:after {
+    content: attr(data-count);
+    position: absolute;
+    top: 2px;
+    right: 0;
+    font-size: 10px;
+    _background: #FF3300;
+    _color: white;
+    color: #FF3300;
+    _background-color: #FFCC11;
+    width: 19px;
+    height: 19px;
+    text-align: center;
+    line-height: 18px;
+    border-radius: 50%;
+    box-shadow: 0 0 1px #333;
+}
+
+.menu .menu-item.alert-btn[data-count='0']:after {
+    display: none;
+}
+
+.menu .menu-item.alert-btn .alert-icon {
+    font-size: 16px;
+}
+
+.menu .menu-item.alert-btn .alert-icon.has-alert {
+    color: #FF3300;
+}
+
 
 .menu .menu-item .icon {
     position: absolute;
@@ -132,10 +108,6 @@
     transition: opacity 0.3s;
 }
 
-.menu div.logo:hover {
-    border-bottom: 4px solid transparent;
-}
-
 .menu .menu-item.active {
     border-bottom: 4px solid rgba(255, 255, 255, 0.8);
     color: white;
@@ -158,17 +130,30 @@
     margin-right: 10px;
 }
 
-@media screen and (max-width: 600px) {
-    .menu a.menu-item {
-        padding: 10px 5px;
-        font-size: 10px;
+@media screen and (max-width: 800px) {
+
+    .min .menu {
+        margin-left: 40px;
     }
 
-    .menu div.logo .logo-icon {
-        font-size: 16px;
-        position: relative;
-        top: -7px;
+    .menu-div {
+        padding: 4px 0 0;
+        height: 45px;
+        box-sizing: border-box;
     }
+
+    .menu a.menu-item {
+        font-size: 10px;
+        padding: 12px 10px 0;
+    }
+
+    .menu .menu-item.alert-btn {
+        padding: 10px 15px 0;
+    }
+
+}
+
+@media screen and (max-width: 600px) {
 
     .layout-manager-selector,
     .menu-instance-selector {
@@ -184,18 +169,11 @@
         margin-right: 5px;
     }
 
+
+
 }
 
 .menu .menu-item .menu-icon {
     display: none;
 }
 
-@media screen and (max-width: 500px) {
-    .menu .menu-item .menu-text {
-        display: none;
-    }
-
-    .menu .menu-item .menu-icon {
-        display: inline-block;
-    }
-}

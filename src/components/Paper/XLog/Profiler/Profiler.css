@@ -235,7 +235,7 @@
 
 
 .xlog-profiler .profile-steps-content {
-    overflow-y: auto;
+    overflow-y: scroll;
     height: 100%;
     box-sizing: border-box;
 }

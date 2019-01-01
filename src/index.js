@@ -1,5 +1,6 @@
 import React from 'react';
 import ReactDOM from 'react-dom';
+import "./fonts.css";
 import 'font-awesome/css/font-awesome.min.css';
 import {createStore} from 'redux';
 import {Provider} from 'react-redux';

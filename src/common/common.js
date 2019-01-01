@@ -1,6 +1,5 @@
 // local storage access
 import moment from "moment";
-import jQuery from "jquery";
 import {Dictionary, DictType} from "./dictionary";
 export const version = "2.2.326";
 

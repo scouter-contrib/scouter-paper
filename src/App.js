@@ -16,7 +16,7 @@ import {
 import {Route, Switch} from 'react-router-dom';
 import {connect} from 'react-redux';
 import {withRouter} from 'react-router-dom';
-import {setSupported, setConfig, addRequest, clearAllMessage, setControlVisibility, setUserId, setUserData, pushMessage, setCounterInfo} from './actions';
+import {setSupported, setConfig, addRequest, clearAllMessage, setControlVisibility, setUserId, setUserData, pushMessage, setCounterInfo, setAlert} from './actions';
 import {detect} from 'detect-browser';
 import Unsupport from "./components/Unsupport/Unsupport";
 import jQuery from "jquery";
@@ -28,22 +28,31 @@ import {
     getWithCredentials,
     getHttpProtocol,
     getDefaultServerConfig,
-    getCurrentUser,
-    getCurrentDefaultServer
+    getCurrentUser
 } from './common/common';
 
 import Home from "./components/Home/Home";
 import Topology from "./components/Topology/Topology";
 import * as common from "./common/common";
 import Debug from "./components/Debug/Debug";
+import Controller from "./components/Controller/Controller";
+import _ from "lodash";
+import notificationIcon from './img/notification.png';
 
 const browser = detect();
 const support = (browser.name !== "ie" && browser.name !== "edge");
 
 class App extends Component {
 
+    // 차트 크기가 변경되었을 경우, 차트가 다시 그려지지 않음 (window event만 동작)
+
+    alertTimer = null;
+    initAlert = false;
+
+
     constructor(props) {
         super(props);
+
         this.state = {
             debug : false
         };
@@ -126,6 +135,120 @@ class App extends Component {
                     this.getCounterModel(nextProps.config, nextProps.user, true);
                 }
             }
+        }
+
+
+        if (JSON.stringify(this.props.objects) !== JSON.stringify(nextProps.objects) || JSON.stringify(this.props.user) !== JSON.stringify(nextProps.user) || JSON.stringify(this.props.config) !== JSON.stringify(nextProps.config)) {
+            this.checkRealtimeAlert(nextProps);
+        }
+
+
+    };
+
+    checkRealtimeAlert = (props) => {
+
+        if (!this.initAlert) {
+            this.getRealTimeAlert(props.objects);
+            this.initAlert = true;
+        }
+
+
+        if (this.alertTimer === null) {
+            let seconds = this.props.config.alertInterval;
+            if (!seconds) {
+                seconds = 60;
+            }
+
+            this.alertTimer = setInterval(() => {
+                this.getRealTimeAlert(props.objects);
+            }, seconds * 1000);
+        }
+    };
+
+    getRealTimeAlert = (objects) => {
+        const that = this;
+
+        let objTypes = [];
+        if (objects && objects.length > 0) {
+            objTypes = _.chain(objects).map((d) => d.objType).uniq().value();
+        }
+
+        if (objTypes && objTypes.length > 0) {
+            objTypes.forEach((objType) => {
+                this.props.addRequest();
+
+                let offset1 = this.props.alert.offset[objType] ? this.props.alert.offset[objType].offset1 : 0;
+                let offset2 = this.props.alert.offset[objType] ? this.props.alert.offset[objType].offset2 : 0;
+
+                jQuery.ajax({
+                    method: "GET",
+                    async: true,
+                    url: getHttpProtocol(this.props.config) + "/scouter/v1/alert/realTime/" + offset1 + "/" + offset2 + "?objType=" + objType,
+                    xhrFields: getWithCredentials(that.props.config),
+                    beforeSend: function (xhr) {
+                        setAuthHeader(xhr, that.props.config, getCurrentUser(that.props.config, that.props.user));
+                    }
+                }).done((msg) => {
+                    if (msg) {
+
+                        let alert = Object.assign({}, this.props.alert);
+                        if (!alert.offset[objType]) {
+                            alert.offset[objType] = {};
+                        }
+
+                        alert.offset[objType].offset1 = msg.result.offset1;
+                        alert.offset[objType].offset2 = msg.result.offset2;
+                        alert.data = alert.data.concat(msg.result.alerts);
+
+                        if (alert.data.length > 0) {
+                            alert.data = alert.data.sort((a, b) => {
+                                return Number(b.time) - Number(a.time)
+                            });
+
+                            alert.data = alert.data.filter((alert) => {
+                                if (this.props.alert.clearTime) {
+                                    if (this.props.alert.clearTime >= Number(alert.time)) {
+                                        return false;
+                                    } else {
+                                        if (this.props.alert.clearItem[alert.objHash] && this.props.alert.clearItem[alert.objHash][alert.time]) {
+                                            return false;
+                                        } else {
+                                            return true;
+                                        }
+                                    }
+                                } else {
+                                    if (this.props.alert.clearItem[alert.objHash] && this.props.alert.clearItem[alert.objHash][alert.time]) {
+                                        return false;
+                                    } else {
+                                        return true;
+                                    }
+                                }
+                            });
+
+                            if (Notification && this.props.config.alert.notification === "Y" && Notification.permission === "granted") {
+                                for (let i=0; i<alert.data.length; i++) {
+                                    if (Number(alert.data[i].time) > this.mountTime && !alert.data[i]["_notificated"]) {
+                                        alert.data[i]["_notificated"] = true;
+
+                                        var options = {
+                                            body: alert.data[i].objName + "\n" + alert.data[i].message,
+                                            icon: notificationIcon
+                                        };
+                                        new Notification("[" + alert.data[i].level + "]" +  alert.data[i].title, options);
+                                    }
+                                }
+                            }
+
+                            this.props.setAlert(alert);
+
+                        }
+                    }
+                }).fail((xhr, textStatus, errorThrown) => {
+                    clearInterval(this.alertTimer);
+                    this.alertTimer = null;
+                    errorHandler(xhr, textStatus, errorThrown, this.props);
+                });
+            });
         }
     };
 
@@ -222,6 +345,12 @@ class App extends Component {
             }
         }
 
+        if (config && config.servers) {
+            config.servers.forEach((server) => {
+                server.name = server.protocol + "://" + server.address + ":" + server.port
+            });
+        }
+
         this.props.setConfig(config);
         if (localStorage) {
             localStorage.setItem("config", JSON.stringify(config));
@@ -261,7 +390,9 @@ class App extends Component {
         // Notice를 조회한다. 이미 조회한 Notice인지 확인하여 하루에 한번만 보여주던지..
         // X-Scouter-Notice-Token 응답 헤더는 LocalStorage에 저장하여 다음 요청 헤더로 사용한다.
         // TODO Notice가 관리되면 화면에 보여준다.
-        this.getNotice();
+        if(this.props.config.others.checkUpdate === "Y") {
+            this.getNotice();
+        }
 
         window.addEventListener("keydown", this.keyDown.bind(this));
 
@@ -333,6 +464,8 @@ class App extends Component {
         });
     };
 
+
+
     render() {
         return (
             <div className="black">
@@ -356,7 +489,13 @@ class App extends Component {
                     {this.state.debug && <Debug closeDebug={this.closeDebug}/>}
                 </ContentWrapper>
                 }
+                {support && <Controller>
+                    {/*<ObjectSelector></ObjectSelector>*/}
+
+                </Controller>
+                }
                 {!support && <Unsupport name={browser.name} version={browser.version}/>}
+
             </div>
         );
     }
@@ -371,7 +510,9 @@ let mapStateToProps = (state) => {
         bgColor: state.style.bgColor,
         config: state.config,
         user: state.user,
-        supported : state.supported
+        supported : state.supported,
+        objects: state.target.objects,
+        alert: state.alert
     };
 };
 
@@ -385,7 +526,8 @@ let mapDispatchToProps = (dispatch) => {
         setUserData: (userData) => dispatch(setUserData(userData)),
         pushMessage: (category, title, content) => dispatch(pushMessage(category, title, content)),
         setCounterInfo: (families, objTypes) => dispatch(setCounterInfo(families, objTypes)),
-        setSupported: (supported) => dispatch(setSupported(supported))
+        setSupported: (supported) => dispatch(setSupported(supported)),
+        setAlert: (alert) => dispatch(setAlert(alert))
     };
 };
 

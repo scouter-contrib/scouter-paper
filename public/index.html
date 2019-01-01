@@ -13,10 +13,9 @@
     -->
     <link rel="manifest" href="%PUBLIC_URL%/manifest.json">
     <link rel="shortcut icon" href="%PUBLIC_URL%/favicon.ico">
-    <link href="https://fonts.googleapis.com/css?family=Dosis|Raleway|Titillium+Web" rel="stylesheet">
     <link rel="stylesheet" media="screen" href="./css/react-grid-layout-styles.css">
     <link rel="stylesheet" media="screen" href="./css/react-resizable-styles.css">
-    <script src="https://cdn.ravenjs.com/3.23.1/raven.min.js" crossorigin="anonymous"></script>
+    <script src="./js/raven.min.js" crossorigin="anonymous"></script>
     <!--
       Notice the use of %PUBLIC_URL% in the tags above.
       It will be replaced with the URL of the `public` folder during the build.
@@ -31,7 +30,22 @@
   <body>
     <script>
       if (Raven) {
-          Raven.config('https://c642bed2453746ffa5b6df91960d1217@sentry.io/297961').install();
+
+          let useErrorReporting = "Y";
+          if (window.localStorage) {
+              let configString = window.localStorage.getItem("config");
+              if (configString) {
+                  let config = JSON.parse(configString);
+
+                  if (config.others && config.others.errorReport) {
+                      useErrorReporting = config.others.errorReport;
+                  }
+              }
+          }
+
+          if (useErrorReporting === "Y") {
+              Raven.config('https://c642bed2453746ffa5b6df91960d1217@sentry.io/297961').install();
+          }
       }
     </script>
     <noscript>

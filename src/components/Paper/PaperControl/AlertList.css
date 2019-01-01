@@ -1,38 +1,30 @@
-.papers-controls .alert-list {
+.alert-list-wrapper {
     position: absolute;
     width: 400px;
-    top: 30px;
+    top: 60px;
     right: 0;
     border: 1px solid rgba(0, 0, 0, 0.6);
-    font-size: 9px;
+    font-size: 10px;
     font-weight: normal;
-}
-
-.papers-controls.fixed-control .alert-list {
-    top: 31px;
-    right: 20px;
+    color: white;
+    z-index: 11;
 }
 
 @media screen and (max-width: 800px) {
-    .papers-controls .alert-list {
-        top: 40px;
+    .alert-list-wrapper {
+        top: 45px;
         right: 0;
-    }
-
-    .papers-controls.fixed-control .alert-list {
-        top: 57px;
-        right: 20px;
     }
 }
 
 @media screen and (max-width: 680px) {
 
-    .papers-controls .alert-list {
+    .alert-list-wrapper {
         line-height: 100%;
     }
 
-    .papers-controls .alert-list {
-        top: 40px;
+    .alert-list-wrapper {
+        top: 45px;
         right: 0;
         left: 0;
         width: 100%;
@@ -41,18 +33,13 @@
         font-weight: normal;
     }
 
-    .papers-controls.fixed-control .alert-list {
-        right: 20px;
-        left: 20px;
-        width: calc(100% - 40px);
-    }
 }
 
-.papers-controls .alert-list.hidden {
+.alert-list-wrapper.hidden {
     display: none;
 }
 
-.papers-controls .alert-list .top-control {
+.alert-list-wrapper .top-control {
     padding: 10px;
     border-bottom: 1px solid rgba(0, 0, 0, 0.6);
     position: relative;
@@ -60,7 +47,7 @@
 
 }
 
-.papers-controls .alert-list .top-control button {
+.alert-list-wrapper .top-control button {
     position: absolute;
     top: 7px;
     right: 5px;
@@ -68,7 +55,7 @@
     padding: 4px 8px;
 }
 
-.papers-controls .alert-list ul {
+.alert-list-wrapper ul {
     height: 400px;
     overflow-y: auto;
     padding: 0;
@@ -76,67 +63,67 @@
     list-style: none;
 }
 
-.papers-controls .no-alerts {
+.alert-list-wrapper .no-alerts {
     height: 400px;
     text-align: center;
 
 }
 
-.papers-controls .no-alerts > div {
+.alert-list-wrapper .no-alerts > div {
     display: table;
     width: 100%;
     height: 100%;
 }
 
-.papers-controls .no-alerts > div > div {
+.alert-list-wrapper .no-alerts > div > div {
     display: table-cell;
     width: 100%;
     height: 100%;
     vertical-align: middle;
 }
 
-.papers-controls .alert-list ul::-webkit-scrollbar {
+.alert-list-wrapper ul::-webkit-scrollbar {
     width: 7px;
     height: 7px;
 }
 
-.papers-controls .alert-list ul::-webkit-scrollbar-thumb {
+.alert-list-wrapper ul::-webkit-scrollbar-thumb {
     background-color: rgba(0, 0, 0, 0.4);
 }
 
-.papers-controls .alert-list ul li {
+.alert-list-wrapper ul li {
     padding: 5px;
     position: relative;
 }
 
-.papers-controls .alert-list ul li:nth-child(even) {
+.alert-list-wrapper ul li:nth-child(even) {
     background-color: rgba(0, 0, 0, 0.1);
 }
 
-.papers-controls .alert-list ul li:hover {
+.alert-list-wrapper ul li:hover {
     background-color: rgba(0, 0, 0, 0.3);
 }
 
-.papers-controls .alert-list ul li > div {
+.alert-list-wrapper ul li > div {
     white-space: nowrap;
 }
 
-.papers-controls .alert-list ul li .alert-content {
+.alert-list-wrapper ul li .alert-content {
     display: table;
 }
 
-.papers-controls .alert-list ul li .alert-content > div {
+.alert-list-wrapper ul li .alert-content > div {
     display: table-cell;
     vertical-align: middle;
 }
 
-.papers-controls .alert-list ul li .alert-content > div.alert-control {
+.alert-list-wrapper ul li .alert-content > div.alert-control {
     width: 30px;
     text-align: center;
     font-size: 14px;
 }
 
-.papers-controls .alert-list ul li .alert-content > div.alert-control > div {
+.alert-list-wrapper ul li .alert-content > div.alert-control > div {
     display: inline-block;
     padding: 4px;
     _border: 1px solid rgba(0, 0, 0, 0.3);
@@ -144,31 +131,31 @@
     cursor: pointer;
 }
 
-.papers-controls .alert-list ul li .alert-content > div.alert-control > div:hover {
+.alert-list-wrapper ul li .alert-content > div.alert-control > div:hover {
     background-color: #FCDC3B;
     color: #333;
 }
 
-.papers-controls .alert-list ul li span {
+.alert-list-wrapper ul li span {
     display: inline-block;
     padding: 2px 4px;
     border-radius: 2px;
 }
 
-.papers-controls .alert-list span.level {
+.alert-list-wrapper span.level {
     background-color: #FF8C00;
 }
 
-.papers-controls .alert-list span.level.WARNING {
+.alert-list-wrapper span.level.WARNING {
     background-color: #FF8C00;
 }
 
-.papers-controls .alert-list span.ago {
+.alert-list-wrapper span.ago {
     float: right;
     margin-right: 12px;
 }
 
-.papers-controls .alert-list .close-btn {
+.alert-list-wrapper .close-btn {
     display: inline-block;
     width: 12px;
     height: 12px;
@@ -179,8 +166,8 @@
     right: 5px;
 }
 
-.papers-controls .alert-list .close-btn:before,
-.papers-controls .alert-list .close-btn:after {
+.alert-list-wrapper .close-btn:before,
+.alert-list-wrapper .close-btn:after {
     content: '';
     position: absolute;
     height: 1px;
@@ -192,37 +179,37 @@
     box-sizing: border-box;
 }
 
-.papers-controls .alert-list .close-btn:hover:before,
-.papers-controls .alert-list .close-btn:hover:after {
+.alert-list-wrapper .close-btn:hover:before,
+.alert-list-wrapper .close-btn:hover:after {
     background: #FFE600;
 }
 
-.papers-controls .alert-list .close-btn:before {
+.alert-list-wrapper .close-btn:before {
     transform: rotate(45deg);
 }
 
-.papers-controls .alert-list .close-btn:after {
+.alert-list-wrapper .close-btn:after {
     transform: rotate(-45deg);
 }
 
-.papers-controls .alert-list span.time {
+.alert-list-wrapper span.time {
     min-width: 90px;
 }
 
-.papers-controls .alert-list span.objType {
+.alert-list-wrapper span.objType {
     min-width: 40px;
     text-align: center;
 }
 
-.papers-controls .alert-list span.message {
+.alert-list-wrapper span.message {
 
 }
 
-.papers-controls .alert-list span.objName {
+.alert-list-wrapper span.objName {
 
 }
 
-.papers-controls .alert-list span.title {
+.alert-list-wrapper span.title {
 
 }
 

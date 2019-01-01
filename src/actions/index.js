@@ -21,6 +21,47 @@ export const SET_REAL_TIME_RANGE_STEP_VALUE = 'SET_REAL_TIME_RANGE_STEP_VALUE';
 export const SET_RANGE_DATE_HOURS_MINUTES_VALUE = 'SET_RANGE_DATE_HOURS_MINUTES_VALUE';
 export const SET_RANGE_ALL = 'SET_RANGE_ALL';
 export const SET_COUNTER_INFO = 'SET_COUNTER_INFO';
+export const SET_CONTROLLER_STATE = 'SET_CONTROLLER_STATE';
+export const SET_CONTROLLER_PIN = 'SET_CONTROLLER_PIN';
+export const SET_FILTER_MAP = 'SET_FILTER_MAP';
+export const ADD_FILTERED_OBJECT = 'ADD_FILTERED_OBJECT';
+export const REMOVE_FILTERED_OBJECT = 'REMOVE_FILTERED_OBJECT';
+export const SET_SEARCH_CONDITION = 'SET_SEARCH_CONDITION';
+export const SET_BOXES = 'SET_BOXES';
+export const SET_LAYOUTS = 'SET_LAYOUTS';
+export const SET_BOXES_LAYOUTS = 'SET_BOXES_LAYOUTS';
+export const SET_LAYOUT_CHANGETIME = 'SET_LAYOUT_CHANGETIME';
+export const SET_MENU = 'SET_MENU';
+export const SET_TOPOLOGY_OPTION = 'SET_TOPOLOGY_OPTION';
+export const SET_ALERT = 'SET_ALERT';
+
+export function setBoxes(boxes) {
+    return {
+        type: SET_BOXES,
+        boxes : boxes
+    };
+}
+
+export function setLayouts(layouts) {
+    return {
+        type: SET_LAYOUTS,
+        layouts : layouts
+    };
+}
+
+export function setBoxesLayouts(boxes, layouts) {
+    return {
+        type: SET_BOXES_LAYOUTS,
+        boxes : boxes,
+        layouts : layouts
+    };
+}
+
+export function setLayoutChangeTime() {
+    return {
+        type: SET_LAYOUT_CHANGETIME
+    };
+}
 
 export function setConfig(config) {
     return {
@@ -58,6 +99,27 @@ export function setTarget(objects) {
     return {
         type: SET_TARGET,
         objects : objects
+    };
+}
+
+export function setFilterMap(filterMap) {
+    return {
+        type: SET_FILTER_MAP,
+        filterMap : filterMap
+    };
+}
+
+export function addFilteredObject(objHash) {
+    return {
+        type: ADD_FILTERED_OBJECT,
+        objHash : objHash
+    };
+}
+
+export function removeFilteredObject(objHash) {
+    return {
+        type: REMOVE_FILTERED_OBJECT,
+        objHash : objHash
     };
 }
 
@@ -208,5 +270,48 @@ export function setSupported(value) {
     };
 }
 
+export function setControllerState(state) {
+    return {
+        type: SET_CONTROLLER_STATE,
+        state: state
+    };
+}
+
+export function setControllerPin(pin) {
+    return {
+        type: SET_CONTROLLER_PIN,
+        pin: pin
+    };
+}
+
+export function setSearchCondition(from, to, time) {
+    return {
+        type: SET_SEARCH_CONDITION,
+        from: from,
+        to : to,
+        time : time
+    };
+}
+
+export function setMenu(menu) {
+    return {
+        type: SET_MENU,
+        menu: menu
+    };
+}
+
+export function setTopologyOption(topologyOption) {
+    return {
+        type: SET_TOPOLOGY_OPTION,
+        topologyOption: topologyOption
+    };
+}
+
+export function setAlert(alert) {
+    return {
+        type: SET_ALERT,
+        alert: alert
+    };
+}
 
 

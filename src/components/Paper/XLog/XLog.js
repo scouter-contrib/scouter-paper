@@ -91,6 +91,10 @@ class XLog extends Component {
             return true;
         }
 
+        if (nextProps.filterMap && JSON.stringify(nextProps.filterMap) !== JSON.stringify(this.props.filterMap)) {
+            return true;
+        }
+
         return false;
     }
 
@@ -141,6 +145,11 @@ class XLog extends Component {
             this.clear();
             this.redraw(this.props.filter);
         }
+
+        if (this.props.filterMap && JSON.stringify(prevProps.filterMap) !== JSON.stringify(this.props.filterMap)) {
+            this.clear();
+            this.redraw(this.props.filter);
+        }
     };
 
     graphResize = () => {
@@ -167,6 +176,9 @@ class XLog extends Component {
             //let datas = common.getFilteredData(xlogs, filter);
             let datas = await common.getFilteredData0(xlogs, filter, this.props);
             datas.forEach((d, i) => {
+                if (!this.props.filterMap[d.objHash]) {
+                    return;
+                }
                 let x = this.graph.x(d.endTime);
                 let y = this.graph.y(d.elapsed);
 
@@ -506,7 +518,8 @@ class XLog extends Component {
 let mapStateToProps = (state) => {
     return {
         config: state.config,
-        user: state.user
+        user: state.user,
+        filterMap: state.target.filterMap
     };
 };
 
