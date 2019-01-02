@@ -34,6 +34,7 @@ export const SET_LAYOUT_CHANGETIME = 'SET_LAYOUT_CHANGETIME';
 export const SET_MENU = 'SET_MENU';
 export const SET_TOPOLOGY_OPTION = 'SET_TOPOLOGY_OPTION';
 export const SET_ALERT = 'SET_ALERT';
+export const SET_BREAKPOINT = 'SET_BREAKPOINT';
 
 export function setBoxes(boxes) {
     return {
@@ -311,6 +312,13 @@ export function setAlert(alert) {
     return {
         type: SET_ALERT,
         alert: alert
+    };
+}
+
+export function setBreakpoint(breakpoint) {
+    return {
+        type: SET_BREAKPOINT,
+        breakpoint: breakpoint
     };
 }
 

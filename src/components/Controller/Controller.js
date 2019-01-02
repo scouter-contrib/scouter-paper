@@ -923,7 +923,7 @@ class Controller extends Component {
                     <div className="control-item paper-only">
                         <div className="row desc">
                             <div className="step"><span>4</span></div>
-                            <div className="row-message">CHANGE LAYOUT</div>
+                            <div className="row-message">CHANGE LAYOUT [<span className="breakpoint">{this.props.control.breakpoint}</span>]</div>
                         </div>
                         <div className="row control">
                             <div>

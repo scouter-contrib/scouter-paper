@@ -3,7 +3,7 @@ import "./Paper.css";
 import "./Resizable.css";
 import {connect} from "react-redux";
 import {withRouter} from "react-router-dom";
-import {addRequest, pushMessage, setBoxes, setBoxesLayouts, setLayoutChangeTime, setControlVisibility, setLayouts, setRangeDateHoursMinutesValue, setRealTime, setTemplate} from "../../actions";
+import {addRequest, pushMessage, setBoxes, setBoxesLayouts, setLayoutChangeTime, setControlVisibility, setLayouts, setRangeDateHoursMinutesValue, setRealTime, setTemplate, setBreakpoint} from "../../actions";
 import {Responsive, WidthProvider} from "react-grid-layout";
 import {Box, BoxConfig, XLogFilter} from "../../components";
 import jQuery from "jquery";
@@ -49,7 +49,8 @@ class Paper extends Component {
         let boxes = getData("boxes");
 
         // xs와 xxs를 제거하면서, 기존에 저장된 데이터 warning 로그가 생성되어, 있는 경우 삭제
-        if (layouts && (layouts.xs || layouts.xxs)) {
+        if (layouts && (layouts.xs || layouts.xxs || layouts.sm)) {
+            delete layouts.sm;
             delete layouts.xs;
             delete layouts.xxs;
         }
@@ -1335,6 +1336,8 @@ class Paper extends Component {
 
     onBreakpointChange(newBreakpoint, newCols) {
         this.breakpoint = newBreakpoint;
+        this.props.setBreakpoint(newBreakpoint);
+
     }
 
     render() {
@@ -1360,7 +1363,7 @@ class Paper extends Component {
                             </div>
                         </div>
                     </div>}
-                    <ResponsiveReactGridLayout className="layout" breakpoints={{lg: 1600, md: 1100, sm: 800}} cols={{lg: 12, md: 12, sm: 6}} layouts={this.props.layouts} rowHeight={30} onLayoutChange={(layout, layouts) => this.onLayoutChange(layout, layouts)} onBreakpointChange={(newBreakpoint, newCols) => this.onBreakpointChange(newBreakpoint, newCols)}>
+                    <ResponsiveReactGridLayout className="layout" breakpoints={{lg: 801, md: 800}} cols={{lg: 12, md: 6}} layouts={this.props.layouts} rowHeight={30} onLayoutChange={(layout, layouts) => this.onLayoutChange(layout, layouts)} onBreakpointChange={(newBreakpoint, newCols) => this.onBreakpointChange(newBreakpoint, newCols)}>
                         {this.props.boxes.map((box, i) => {
                             let filterInfo = this.state.filters.filter((d) => d.key === box.key)[0];
                             return (
@@ -1430,8 +1433,8 @@ let mapDispatchToProps = (dispatch) => {
         setBoxes: (boxes) => dispatch(setBoxes(boxes)),
         setLayouts: (layouts) => dispatch(setLayouts(layouts)),
         setBoxesLayouts: (boxes, layouts) => dispatch(setBoxesLayouts(boxes, layouts)),
-        setLayoutChangeTime: () => dispatch(setLayoutChangeTime())
-
+        setLayoutChangeTime: () => dispatch(setLayoutChangeTime()),
+        setBreakpoint: (breakpoint) => dispatch(setBreakpoint(breakpoint))
     };
 };
 

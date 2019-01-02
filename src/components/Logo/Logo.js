@@ -16,7 +16,7 @@ class Logo extends Component {
 
         setTimeout(() => {
             window.dispatchEvent(new Event('resize'));
-        }, 300);
+        }, 1000);
     };
 
     togglePin = () => {
@@ -28,7 +28,7 @@ class Logo extends Component {
 
         setTimeout(() => {
             window.dispatchEvent(new Event('resize'));
-        }, 300);
+        }, 1000);
     };
 
     render() {

@@ -149,6 +149,10 @@
     padding: 5px 0;
 }
 
+.controller-wrapper .control-item .row > div.row-message .breakpoint {
+    text-transform: uppercase;
+}
+
 .controller-wrapper .row .step span {
     width: 16px;
     height: 16px;

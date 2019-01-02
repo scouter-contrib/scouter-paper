@@ -83,6 +83,7 @@ class LayoutManager extends Component {
 
                     list.forEach((template) => {
 
+                        delete template.layouts.sm;
                         delete template.layouts.xs;
                         delete template.layouts.xxs;
 
