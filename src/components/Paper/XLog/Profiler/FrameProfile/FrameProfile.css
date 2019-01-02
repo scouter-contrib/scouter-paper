@@ -60,7 +60,7 @@
 }
 
 .frame-profile .frame-xlog-steps {
-    margin: 0 20px;
+    margin: 0 5px 0 20px;
 }
 
 .frame-profile .line {
@@ -167,6 +167,7 @@
 
 .frame-xlog-steps .step .step-info .step-general-info .step-elapsed.warning > span {
     background-color: #FCB514;
+    color: #333;
 }
 
 .frame-xlog-steps .step .step-info .step-general-info .percentage {
@@ -429,6 +430,7 @@
     vertical-align: middle;
     padding: 0 10px;
     position: relative;
+    box-sizing: border-box;
 }
 
 .frame-profile .frame-step-detail-popup > div > div {

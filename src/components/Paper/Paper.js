@@ -1360,7 +1360,7 @@ class Paper extends Component {
                             </div>
                         </div>
                     </div>}
-                    <ResponsiveReactGridLayout className="layout" breakpoints={{lg: 1600, md: 1200, sm: 800}} cols={{lg: 12, md: 10, sm: 6}} layouts={this.props.layouts} rowHeight={30} onLayoutChange={(layout, layouts) => this.onLayoutChange(layout, layouts)} onBreakpointChange={(newBreakpoint, newCols) => this.onBreakpointChange(newBreakpoint, newCols)}>
+                    <ResponsiveReactGridLayout className="layout" breakpoints={{lg: 1600, md: 1100, sm: 800}} cols={{lg: 12, md: 12, sm: 6}} layouts={this.props.layouts} rowHeight={30} onLayoutChange={(layout, layouts) => this.onLayoutChange(layout, layouts)} onBreakpointChange={(newBreakpoint, newCols) => this.onBreakpointChange(newBreakpoint, newCols)}>
                         {this.props.boxes.map((box, i) => {
                             let filterInfo = this.state.filters.filter((d) => d.key === box.key)[0];
                             return (

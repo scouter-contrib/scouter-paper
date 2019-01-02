@@ -57,4 +57,11 @@ article.content-wrapper.max.pinned {
         margin-left: 0;
         transition: all 0.3s;
     }
+
+    article.content-wrapper.max.pinned {
+        height: 100%;
+        width: 100%;
+        margin-left: 0;
+        transition: all 0.3s;
+    }
 }

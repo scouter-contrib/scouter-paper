@@ -1,9 +1,15 @@
 .login-wrapper {
     width: 100%;
-    height: calc(100% - 51px);
+    height: calc(100% - 60px);
     position: relative;
     padding: 10px;
     box-sizing: border-box;
+}
+
+@media screen and (max-width: 800px) {
+    .login-wrapper {
+        height: calc(100% - 45px);
+    }
 }
 
 .login-wrapper > div {
@@ -74,14 +80,6 @@
 
 .login-wrapper img.logo {
     width: 60px;
-}
-
-@media screen and (max-height: 600px) {
-
-}
-
-@media screen and (max-height: 400px) {
-
 }
 
 .login-wrapper input:-ms-input-placeholder {

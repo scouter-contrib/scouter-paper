@@ -34,6 +34,12 @@
     top : 2px;
 }
 
+@media screen and (max-width: 800px) {
+    .paper-logo-wrapper div.paper-logo {
+        top : -2px;
+    }
+}
+
 .paper-logo-wrapper div.paper-logo a {
     color: white;
     text-decoration: none;
@@ -227,6 +233,10 @@
 
     .min .paper-logo-wrapper {
         height: 45px;
+    }
+
+    .paper-logo-wrapper .side-icon > div > div.pin-wrapper {
+        display: none;
     }
 }
 

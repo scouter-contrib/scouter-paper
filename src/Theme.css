@@ -1,14 +1,14 @@
 /* THEME, index.css */
 html.theme-gray {
-    background: #444;
+    background: #333;
 }
 
 .theme-gray body {
-    background: #444;
+    background: #333;
 }
 
 .theme-gray .popup-div {
-    background: #171717;
+    background: #252525;
 }
 
 /* THEME, PaperControl.css*/
@@ -148,7 +148,7 @@ html.theme-gray, .theme-gray body {
 
 /* THEME, Menu.css */
 .theme-gray .menu-div {
-    background-color: #333;
+    background-color: #222;
 }
 
 /* THEME, Paper.css */
@@ -257,4 +257,65 @@ html.theme-gray, .theme-gray body {
 
 .theme-gray .controller-wrapper .controller-tabs > div.selected {
     background-color: #282828;
+}
+
+
+.theme-gray .instance-selector-bg {
+    background-color: rgba(0, 0, 0, 0.2);
+}
+
+.theme-gray .instance-selector .instance-list div.instance.selected {
+    background-color: #FFCC11;
+    color: #333;
+}
+.theme-gray .instance-selector .host-list div.host.active {
+    background-color: #FFCC11;
+    color: #333;
+}
+
+.theme-gray .xlog-profiler > div {
+    background-color: #222;
+    color: white;
+}
+
+.theme-gray .xlog-profile-list > div.header.row {
+    background-color: #111;
+}
+
+.theme-gray .frame-profile div.xlog-data span.label {
+    background-color: #111;
+}
+
+.theme-gray .frame-xlog-steps .step {
+    background-color: #111;
+}
+
+.theme-gray .frame-xlog-steps .step .step-info {
+    background-color: #111;
+}
+
+.theme-gray .frame-profile .top-group text {
+    fill: white;
+}
+.theme-gray .frame-profile .top-group line,
+.theme-gray .frame-profile .top-group path {
+    stroke: white;
+}
+
+.theme-gray .frame-profile .frame-step-detail-popup > div > div {
+    background-color: #222;
+}
+
+.theme-gray .frame-profile-step-detail .sub-detail-title > span {
+    background-color: #111;
+    color: white;
+}
+
+.theme-gray .frame-profile-step-detail .sql-statement{
+    color: white;
+}
+
+.theme-gray .frame-profile-step-detail .sub-detail-title .sql-btns > div {
+    background-color: rgba(255,255,255,0.4);
+    color: white;
 }

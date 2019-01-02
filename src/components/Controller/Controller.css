@@ -379,8 +379,9 @@
         top: 0;
         left: 0;
         bottom: 50%;
-        margin: 10px;
-        width: calc(100% - 20px);
+        margin: 0;
+        width: 100%;
+        min-height: 425px;
 
     }
 

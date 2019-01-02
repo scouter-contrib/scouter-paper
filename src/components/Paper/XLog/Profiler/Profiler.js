@@ -16,9 +16,7 @@ import {
     getCurrentUser,
     getFilteredData0
 } from '../../../../common/common';
-import SingleProfile from "./SingleProfile/SingleProfile";
 import FrameProfile from "./FrameProfile/FrameProfile";
-
 import ProfileList from "./ProfileList/ProfileList";
 import _ from "lodash";
 import moment from "moment";
@@ -429,20 +427,21 @@ class Profiler extends Component {
                     }
                 }).done((msg) => {
                     const orderedSteps = _.orderBy(msg.result, (e) => Number(e.step.order), ['asc']);
-                    this.addTxidAbbrPropertyTo(orderedSteps)
+                    this.addTxidAbbrPropertyTo(orderedSteps);
 
                     const eos = {
                         mainValue: "end of service",
                         additionalValueList: [],
                         step: {
                             parent: "-1",
-                            index: orderedSteps.length + 1,
+                            index: orderedSteps.length,
                             start_time: this.state.profile && this.state.profile.elapsed,
                             start_cpu: "0",
                             message: "end of service",
                             stepType: "3",
-                            order: orderedSteps.length + 1,
-                            stepTypeName: "MESSAGE"
+                            order: orderedSteps.length,
+                            stepTypeName: "MESSAGE",
+                            elapsed : undefined
                         }
                     };
                     orderedSteps.push(eos);
@@ -611,17 +610,10 @@ class Profiler extends Component {
                     <div className="profiler-layout right" style={rightStyle}>
                         <div className="summary">
                             {(!this.state.paramTxid && this.state.smallScreen) &&
-                            <div onClick={this.clearTxId.bind(this)} className="profile-list-btn"><i
-                                className="fa fa-chevron-circle-left"></i></div>}
+                            <div onClick={this.clearTxId.bind(this)} className="profile-list-btn"><i className="fa fa-chevron-circle-left"></i></div>}
                             {!this.state.txid && <div className="title">NO PROFILE SELECTED</div>}
-                            {this.state.txid && <div className="title">DETAIL <span
-                                className="selected-info">({this.state.txid ? 'TXID : ' + this.state.txid : 'NO PROFILE SELECTED'})</span>{this.state.txid ?
-                                <span className="copy-url-btn"
-                                      onClick={this.copyUrl}>{this.state.copyBtnText}</span> : null}</div>}
-                            {!this.state.txid && this.state.paramTxid && <div className="title">DETAIL <span
-                                className="selected-info">({this.state.paramTxid ? 'TXID : ' + this.state.paramTxid : 'NO PROFILE SELECTED'})</span>{this.state.paramTxid ?
-                                <span className="copy-url-btn"
-                                      onClick={this.copyUrl}>{this.state.copyBtnText}</span> : null}</div>}
+                            {this.state.txid && <div className="title">DETAIL <span className="selected-info">({this.state.txid ? 'TXID : ' + this.state.txid : 'NO PROFILE SELECTED'})</span>{this.state.txid ? <span className="copy-url-btn" onClick={this.copyUrl}>{this.state.copyBtnText}</span> : null}</div>}
+                            {!this.state.txid && this.state.paramTxid && <div className="title">DETAIL <span className="selected-info">({this.state.paramTxid ? 'TXID : ' + this.state.paramTxid : 'NO PROFILE SELECTED'})</span>{this.state.paramTxid ? <span className="copy-url-btn" onClick={this.copyUrl}>{this.state.copyBtnText}</span> : null}</div>}
                             <div className="profile-steps-control noselect">
                                 <div className={"profile-control-btn " + (this.state.summary ? 'active' : '')} onClick={this.toggleSummary}>{this.state.summary ? <i className="fa fa-check-circle"></i> : <i className="fa fa-circle-o"></i>} SUMMARY</div>
                                 <div className={"profile-control-btn " + (this.state.narrow ? 'active' : '')} onClick={this.toggleNarrow}>{this.state.narrow ? <i className="fa fa-check-circle"></i> : <i className="fa fa-circle-o"></i>} NARROW</div>
@@ -633,12 +625,6 @@ class Profiler extends Component {
                         </div>
                         <div className={"profile-steps " + (this.state.narrow ? 'narrow' : '')}>
                             <div className="profile-steps-content scrollbar">
-                                {/*(this.state.paramTxid || this.state.txid) &&
-                                <SingleProfile rowClick={this.rowClick} txid={this.state.txid}
-                                               profile={this.state.profile} steps={this.state.steps}
-                                               summary={this.state.summary} narrow={this.state.narrow} indent={this.state.indent}
-                                               bind={this.state.bind} wrap={this.state.wrap} gap={this.state.gap}
-                                               formatter={this.state.formatter}/>*/}
                                 {(this.state.paramTxid || this.state.txid) &&
                                 <FrameProfile rowClick={this.rowClick} txid={this.state.txid}
                                                profile={this.state.profile} steps={this.state.steps}
@@ -648,11 +634,7 @@ class Profiler extends Component {
                                                toggleFormatter={this.toggleFormatter}
                                                toggleBind={this.toggleBind}
                                                toggleWrap={this.toggleWrap}
-                                               listWidth={this.state.listWidth}
-                                />
-
-
-
+                                               listWidth={this.state.listWidth} />
                                 }
                                 {(!this.state.paramTxid && !this.state.txid) && <div className="no-profile">
                                     <div>NO PROFILE SELECTED</div>

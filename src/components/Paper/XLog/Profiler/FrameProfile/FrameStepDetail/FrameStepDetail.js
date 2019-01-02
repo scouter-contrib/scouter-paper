@@ -132,22 +132,22 @@ class FrameStepDetail extends Component {
         }
 
         return (
-            <div className={'frame-profile-step-detail ' + ("step-type-" + info.step.stepType)}>
+            <div className={"frame-profile-step-detail step-type-" + info.step.stepType}>
                 <div className="title span">
                     <span className="index">{selectedIndex} / {this.props.steps.length - 1}</span>
                     <span className="step-name">{this.props.getStepName(info.step)}</span>
                 </div>
                 <div className="close-btn" onClick={this.close}></div>
                 <div className="detail-nav noselect">
-                    <div className={"prev " + ("step-type-" + (prev && prev.step.stepType))}>
+                    <div className={"prev step-type-" + (prev && prev.step.stepType)}>
                         {prev && <div className="nav-name"><span>prev</span></div>}
                         {prev && <span onClick={this.goStep.bind(this, selectedIndex - 1)} className="span span-bg-color"><i className="fa fa-angle-left" aria-hidden="true"></i> {this.props.getStepName(prev.step)}</span>}
                     </div>
-                    <div className={"current " + ("step-type-" + info.step.stepType)}>
+                    <div className={"current step-type-" + info.step.stepType}>
                         <div className="nav-name"><span>current</span></div>
                         <span className="span span-bg-color">{this.props.getStepName(info.step)}</span>
                     </div>
-                    <div className={"next " + ("step-type-" + (next && next.step.stepType))}>
+                    <div className={"next step-type-" + (next && next.step.stepType)}>
                         {next && <div className="nav-name"><span>next</span></div>}
                         {next && <span onClick={this.goStep.bind(this, selectedIndex + 1)} className="span span-bg-color">{this.props.getStepName(next.step)} <i className="fa fa-angle-right" aria-hidden="true"></i></span>}
                     </div>
@@ -159,7 +159,7 @@ class FrameStepDetail extends Component {
                     </div>
                     {stepElapsedTime !== undefined &&
                     <div className="frame-row">
-                        <div className="sub-detail-title"><span>step elapsed time (percentage of this step from total elapsed time)</span></div>
+                        <div className="sub-detail-title"><span>step elapsed time</span></div>
                         <div className="main-value">{stepElapsedTime}ms <span className="percentage">({Math.round((stepElapsedTime / this.props.profile.elapsed) * 1000) / 10}%)</span></div>
                     </div>
                     }

@@ -69,6 +69,10 @@
         margin-left: 10px;
         margin-right: 10px;
     }
+
+    .preset-manager-bg .selector-type-btns {
+        margin: 0 10px 5px;
+    }
 }
 
 @media only screen and (max-height: 1200px) {
@@ -253,20 +257,22 @@
     background-color: rgba(0, 0, 0, 0.3);
 }
 
-
-@media screen and (max-width: 700px) {
-    .preset-manager {
-        width: calc(100% - 20px);
-        height: 300px;
-        position: absolute;
-        top: 45px;
-        right: 10px;
-        left: 10px;
-        padding: 0;
-    }
-}
-
 .preset-manager .empty-content {
     text-align: center;
     padding-top: 100px;
 }
+
+
+
+
+
+
+
+@media only screen and (max-width: 800px) {
+    .preset-manager {
+        height: calc(100% - 120px);
+        margin-bottom: 0;
+    }
+}
+
+

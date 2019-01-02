@@ -25,6 +25,8 @@
     border-bottom: 1px dashed rgba(0,0,0,0.2);
     padding: 5px 0;
     margin: 0 10px;
+    width: calc(100% - 20px);
+    box-sizing: border-box;
 }
 
 .frame-profile-step-detail .frame-step-detail-content .frame-row:last-child {
@@ -231,13 +233,12 @@
     white-space: pre;
 }
 
-
-.frame-profile-step-detail .sql-statement.formatter {
-    white-space: pre-wrap;
+.frame-profile-step-detail .sql-statement.wrap {
+    white-space: normal;
     word-break: break-all;
 }
 
-.frame-profile-step-detail .sql-statement.wrap {
+.frame-profile-step-detail .sql-statement.wrap.formatter {
     white-space: pre-wrap;
     word-break: break-all;
 }

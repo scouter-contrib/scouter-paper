@@ -16,7 +16,7 @@ class FrameProfile extends Component {
 
     margin = {
         left: 100,
-        right: 20,
+        right: 5,
         top: 22
     };
 
@@ -200,7 +200,6 @@ class FrameProfile extends Component {
                 break;
             }
 
-            case "1" :
             case "14" : {
                 stepName = "THREAD CALL";
                 break;
@@ -282,7 +281,9 @@ class FrameProfile extends Component {
             case "11" :
             case "21" :
             case "42" :
-            case "43" :
+            case "43" : {
+                return row.step.elapsed;
+            }
 
             default : {
                 return Number(row.step.elapsed);
@@ -311,6 +312,8 @@ class FrameProfile extends Component {
                     }
 
                     return methodNameSimple + " [" + fullMethod + "]";
+                } else {
+                    return fullMethod;
                 }
             }
 
@@ -320,7 +323,7 @@ class FrameProfile extends Component {
             }
 
             case "12" : {
-                return "[" + row.step.threadState + "] " + "ID:" + row.step.threadId + " " + row.step.threadName + (row.additionalValueList && row.additionalValueList.length > 0 ? " [" + row.additionalValueList[0] + "]" : "");
+                return "[" + row.step.threadState + "] ID:" + row.step.threadId + " " + row.step.threadName + (row.additionalValueList && row.additionalValueList.length > 0 ? " [" + row.additionalValueList[0] + "]" : "");
             }
 
             case "13" : {
@@ -494,7 +497,7 @@ class FrameProfile extends Component {
                             }
 
                             return (
-                                <div key={i} className={"step " + ("step-type-" + row.step.stepType)} onClick={this.showDetail.bind(this, i)}>
+                                <div key={i} className={"step step-type-" + row.step.stepType} onClick={this.showDetail.bind(this, i)}>
                                     <div className="step-info">
                                         <span className="index">{row.step.index}</span>
                                         <div className="step-general-info">
