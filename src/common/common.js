@@ -1,7 +1,7 @@
 // local storage access
 import moment from "moment";
 import {Dictionary, DictType} from "./dictionary";
-export const version = "2.2.326";
+export const version = "2.3.0";
 
 export function getData(key) {
     let ls = null;
