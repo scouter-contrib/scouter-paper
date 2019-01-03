@@ -870,13 +870,15 @@ class Paper extends Component {
                 that.xlogHistoryTemp.push(xlogs);
                 data.newXLogs = xlogs;
 
-                this.setState({
-                    data: data,
-                    pageCnt: (new Date()).getTime(),
-                    xlogHistoryRequestCnt: this.state.xlogHistoryRequestCnt + 1
-                });
+
 
                 if (hasMore) {
+                    this.setState({
+                        data: data,
+                        pageCnt: (new Date()).getTime(),
+                        xlogHistoryRequestCnt: this.state.xlogHistoryRequestCnt + 1
+                    });
+
                     that.getXLogHistoryData(requestTime, from, to, objects, result.lastTxid, result.lastXLogTime);
                 } else {
                     that.xlogHistoryCurrentDays++;

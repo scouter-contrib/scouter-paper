@@ -149,8 +149,28 @@
     padding: 5px 0;
 }
 
-.controller-wrapper .control-item .row > div.row-message .breakpoint {
-    text-transform: uppercase;
+.controller-wrapper .control-item .row > div.row-message .breakpoints {
+    display: inline-block;
+    margin-left: 10px;
+    position: absolute;
+    top : 2px;
+}
+
+.controller-wrapper .control-item .row > div.row-message .breakpoints .breakpoint {
+    display: inline-block;
+    padding: 2px 4px;
+}
+
+.controller-wrapper .control-item .row > div.row-message .breakpoints .breakpoint:first-child {
+    border-radius: 2px 0 0 2px;
+}
+
+.controller-wrapper .control-item .row > div.row-message .breakpoints .breakpoint:last-child {
+    border-radius: 0 2px 2px 0;
+}
+
+.controller-wrapper .control-item .row > div.row-message .breakpoints .breakpoint.selected {
+    background-color: rgba(0,0,0,0.6);
 }
 
 .controller-wrapper .row .step span {
@@ -346,6 +366,7 @@
     text-align: center;
     border-bottom: none;
     padding-top: 10px;
+    padding-bottom: 10px;
     cursor: auto;
 }
 

@@ -152,19 +152,27 @@ class XLog extends Component {
         }
     };
 
+    resizeTimer = null;
     graphResize = () => {
-        let box = this.refs.xlogViewer.parentNode.parentNode.parentNode;
-
-        let currentWidth = 0;
-        if (this.props.box.values.showPreview === "Y") {
-            currentWidth = box.offsetWidth - this.graph.margin.left - this.graph.preview.width;
-        } else {
-            currentWidth = box.offsetWidth - this.graph.margin.left - this.graph.margin.right;
+        if (this.resizeTimer) {
+            clearTimeout(this.resizeTimer);
+            this.resizeTimer = null;
         }
 
-        if ((currentWidth !== this.graph.width) || (this.graph.height !== box.offsetHeight - this.graph.margin.top - this.graph.margin.bottom - 27)) {
-            this.graphInit();
-        }
+        this.resizeTimer = setTimeout(() => {
+            let box = this.refs.xlogViewer.parentNode.parentNode.parentNode;
+
+            let currentWidth = 0;
+            if (this.props.box.values.showPreview === "Y") {
+                currentWidth = box.offsetWidth - this.graph.margin.left - this.graph.preview.width;
+            } else {
+                currentWidth = box.offsetWidth - this.graph.margin.left - this.graph.margin.right;
+            }
+
+            if ((currentWidth !== this.graph.width) || (this.graph.height !== box.offsetHeight - this.graph.margin.top - this.graph.margin.bottom - 27)) {
+                this.graphInit();
+            }
+        }, 300);
     };
 
     
