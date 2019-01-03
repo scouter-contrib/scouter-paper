@@ -12,6 +12,10 @@
     border: 1px solid #333;
 }
 
+.narrow .single-profile .sub-title {
+    padding: 3px 10px;
+}
+
 .single-profile div.xlog-data {
     margin-bottom: 20px;
 }
@@ -27,6 +31,10 @@
     padding: 7px 10px;
     box-sizing: border-box;
     display: table-cell;
+}
+
+.narrow .single-profile div.xlog-data span {
+    padding: 3px 10px;
 }
 
 .single-profile div.xlog-data span.label {
@@ -79,8 +87,13 @@
 
 
 .single-profile .tx-nav {
-    margin-bottom: 10px;
+    /*margin-bottom: 10px;*/
+    margin-bottom: 1px;
     vertical-align: top;
+}
+
+.narrow .single-profile .tx-nav {
+    margin-bottom: 1px;
 }
 
 .single-profile .tx-nav .main,
@@ -133,6 +146,15 @@
 
 .single-profile .tx-nav .tx-link .txid {
     text-decoration: underline;
-    cursor: pointer
+    cursor: pointer;
+    min-width: 50px;
+    display: inline-block;
+    box-sizing: border-box;
 }
 
+.single-profile .tx-nav .tx-link .elapsed {
+    border-left: 1px solid rgba(0,0,0,0.3);
+    min-width: 50px;
+    display: inline-block;
+    box-sizing: border-box;
+}

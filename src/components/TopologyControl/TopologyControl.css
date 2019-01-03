@@ -1,0 +1,243 @@
+.topology-option-control {
+    height: calc(100% - 40px);
+    box-sizing: border-box;
+    position: relative;
+}
+
+.topology-option-control .controller {
+
+}
+
+.topology-option-control .controller .group {
+    padding: 5px 0 0;
+}
+
+.topology-option-control .controller .group:first-child {
+    padding-top: 0;
+}
+
+.topology-option-control .controller .summary-wrapper {
+    position: relative;
+    padding: 5px;
+}
+
+.topology-option-control .controller .control-groups {
+    margin-top: 5px;
+}
+
+.topology-option-control .controller .summary-wrapper:hover {
+    color: #333;
+    background-color: #FFCC11;
+    cursor: pointer;
+}
+
+.topology-option-control .controller .summary-wrapper .toggle-filter-icon {
+    position: absolute;
+    font-size: 14px;
+    width: 20px;
+    height: 20px;
+    padding-top: 4px;
+    box-sizing: border-box;
+    display: inline-block;
+    text-align: center;
+    right: 5px;
+    top: 0;
+}
+
+.topology-option-control .controller .summary {
+    display: inline-block;
+    font-size: 11px;
+    margin-right: 5px;
+    padding: 0px 4px;
+}
+
+.topology-option-control .controller .icon {
+    margin-right: 5px;
+    display: inline-block;
+    width: 11px;
+}
+
+.topology-option-control .controller .action-btn,
+.topology-option-control .controller .radio-btn,
+.topology-option-control .controller .check-btn {
+    display: inline-block;
+    font-size: 10px;
+    padding: 4px 6px;
+    border-right: none;
+    width: 50%;
+    box-sizing: border-box;
+    text-align: left;
+    background-color: rgba(0, 0, 0, 0.3);
+    cursor: pointer;
+}
+
+.topology-option-control .controller .action-btn {
+    background-color: white;
+    color: #333;
+    text-align: left;
+    width: calc((50% - 5px) / 2);
+    margin-right: 5px;
+}
+
+.topology-option-control .controller .action-btn:hover {
+    background-color: #FFCC11;
+    color: #333;
+
+}
+
+.topology-option-control .controller .radio-btn {
+    width: 50px;
+}
+
+.topology-option-control .controller .radio-btn.disable {
+    color: #666;
+}
+
+.topology-option-control .controller .radio-group {
+    display: inline-block;
+    text-align: center;
+    width: 50%;
+}
+
+.topology-option-control .controller .radio-btn {
+    text-align: center;
+    width: 33.333%;
+}
+
+.topology-option-control .controller .radio-btn:hover,
+.topology-option-control .controller .check-btn:hover {
+    background-color: rgba(0, 0, 0, 0.4);
+}
+
+.topology-option-control .controller .radio-btn.disable:hover {
+    background-color: #DDD;
+}
+
+.topology-option-control .controller .check-btn.on {
+    background-color: #FFCC11;
+    color: #333;
+}
+
+.topology-option-control .controller .radio-btn.on {
+    background-color: #EEB422;
+    color: #333;
+}
+
+.topology-option-control .controller .check-btn.on:hover {
+    background-color: #FFC125;
+    color: #333;
+}
+
+.topology-option-control .topology-chart {
+    height: calc(100% - 40px);
+    overflow: hidden;
+}
+
+.topology-option-control svg text {
+    -webkit-touch-callout: none; /* iOS Safari */
+    -webkit-user-select: none; /* Safari */
+    -khtml-user-select: none; /* Konqueror HTML */
+    -moz-user-select: none; /* Firefox */
+    -ms-user-select: none; /* Internet Explorer/Edge */
+    user-select: none;
+    font-family: 'Righteous', 'Nanum Gothic', cursive;
+}
+
+@keyframes flow {
+    from {
+        stroke-dashoffset: 14;
+    }
+
+    to {
+        stroke-dashoffset: 0;
+    }
+}
+
+@-webkit-keyframes flow {
+    from {
+        stroke-dashoffset: 14;
+    }
+
+    to {
+        stroke-dashoffset: 0;
+    }
+}
+
+.edge-flow-path {
+    fill: none;
+    stroke: white;
+    stroke-opacity: 0.5;
+    stroke-width: 4;
+    stroke-dasharray: 10, 4;
+
+    /*animation: flow 1s infinite steps(20);*/
+    /*webkit-animation: flow 1s infinite steps(20);*/
+
+    /* animation speed optimized in human eyes by speed & frame.*/
+    /*animation: flow 8s infinite steps(160);*/
+    /*webkit-animation: flow 8s infinite steps(160);*/
+    /*animation: flow 4s infinite steps(80);*/
+    /*webkit-animation: flow 4s infinite steps(80);*/
+    /*animation: flow 2s infinite steps(40); */
+    /*webkit-animation: flow 2s infinite steps(40);*/
+    /*animation: flow 1s infinite steps(20); */
+    /*webkit-animation: flow 1s infinite steps(20);*/
+    /*animation: flow 0.7s infinite steps(14); */
+    /*webkit-animation: flow 0.7s infinite steps(14);*/
+    /*animation: flow 0.4s infinite steps(8); */
+    /*webkit-animation: flow 0.4s infinite steps(8);*/
+    /*animation: flow 0.2s infinite steps(4); */
+    /*webkit-animation: flow 0.2s infinite steps(4);*/
+}
+
+.edge-flow-path.error {
+    stroke: red;
+}
+
+.edge-text-path {
+    font-size: 10px;
+    fill: white;
+}
+
+.error-rate-tspan {
+    fill: red;
+}
+
+.edge-path {
+    fill: none;
+    stroke: black;
+    stroke: none;
+    stroke-width: 1.5px;
+}
+
+.edge-text {
+
+}
+
+.topology-option-control .no-topology-data {
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    text-align: center;
+    color: white;
+    display: table;
+}
+
+.topology-option-control .no-topology-data > div {
+    display: table-cell;
+    width: 100%;
+    height: 100%;
+    vertical-align: middle;
+    background-color: rgba(0, 0, 0, 0.3);
+}
+
+.topology-option-control .no-topology-data > div .logo-div {
+    margin-bottom: 10px;
+}
+
+.topology-option-control .no-topology-data > div .logo-div img {
+    width: 60px;
+}
+

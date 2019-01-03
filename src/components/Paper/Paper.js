@@ -2,19 +2,16 @@ import React, {Component} from "react";
 import "./Paper.css";
 import "./Resizable.css";
 import {connect} from "react-redux";
-import {withRouter} from 'react-router-dom';
-import {addRequest, pushMessage, setControlVisibility, setRealTime, setRealTimeValue, setRangeDate, setRangeHours, setRangeMinutes, setRangeValue, setRangeDateHoursMinutes, setRangeDateHoursMinutesValue, setRangeAll, setTemplate} from "../../actions";
+import {withRouter} from "react-router-dom";
+import {addRequest, pushMessage, setBoxes, setBoxesLayouts, setLayoutChangeTime, setControlVisibility, setLayouts, setRangeDateHoursMinutesValue, setRealTime, setTemplate, setBreakpoint} from "../../actions";
 import {Responsive, WidthProvider} from "react-grid-layout";
-import {Box, BoxConfig, PaperControl, XLogFilter} from "../../components";
+import {Box, BoxConfig, XLogFilter} from "../../components";
 import jQuery from "jquery";
-import {errorHandler, getData, getHttpProtocol, getWithCredentials, setAuthHeader, setData, getSearchDays, getDivideDays, getCurrentUser} from "../../common/common";
+import * as common from "../../common/common";
+import {errorHandler, getCurrentUser, getData, getDivideDays, getHttpProtocol, getSearchDays, getWithCredentials, setAuthHeader, setData} from "../../common/common";
 import Profiler from "./XLog/Profiler/Profiler";
 import ServerDate from "../../common/ServerDate";
-import * as common from "../../common/common";
-import RangeControl from "./RangeControl/RangeControl";
 import moment from "moment";
-import _ from "lodash";
-import notificationIcon from '../../img/notification.png';
 import OldVersion from "../OldVersion/OldVersion";
 
 const ResponsiveReactGridLayout = WidthProvider(Responsive);
@@ -37,7 +34,10 @@ class Paper extends Component {
 
     boxesRef = {};
 
-    alertTimer = null;
+
+    breakpoint = "lg";
+
+    resizeTimer = null;
 
     constructor(props) {
         super(props);
@@ -48,19 +48,25 @@ class Paper extends Component {
         let layouts = getData("layouts");
         let boxes = getData("boxes");
 
+        // xs와 xxs를 제거하면서, 기존에 저장된 데이터 warning 로그가 생성되어, 있는 경우 삭제
+        if (layouts && (layouts.xs || layouts.xxs || layouts.sm)) {
+            delete layouts.sm;
+            delete layouts.xs;
+            delete layouts.xxs;
+        }
+
         if (!(layouts)) {
             layouts = {};
         }
 
         if (!boxes) {
             boxes = [];
-        }        
+        }
 
         let range = 1000 * 60 * 10;
         let endTime = (new ServerDate()).getTime();
         let startTime = endTime - range;
 
-        let alertInfo = JSON.parse(localStorage.getItem("alert"));
 
         //URL로부터 XLOG 응답시간 축 시간 값 세팅
         let xlogElapsedTime = common.getParam(this.props, "xlogElapsedTime");
@@ -79,7 +85,7 @@ class Paper extends Component {
             }).done((msg) => {
                 if (msg && Number(msg.status) === 200) {
                     let templates = JSON.parse(msg.result);
-                    for (let i=0; i<templates.length; i++) {
+                    for (let i = 0; i < templates.length; i++) {
                         if (layout === templates[i].name) {
                             this.props.setTemplate(templates[i].boxes, templates[i].layouts);
                             break;
@@ -129,9 +135,9 @@ class Paper extends Component {
                 this.props.setRealTime(false, true);
             } else {
                 //no longterm param then check config
-                if(params[1] === undefined || params[1] === null) {
+                if (params[1] === undefined || params[1] === null) {
                     const shortLimitMillis = this.props.config.range.shortHistoryRange * 60 * 1000;
-                    if(shortLimitMillis && shortLimitMillis < to.diff(from)) {
+                    if (shortLimitMillis && shortLimitMillis < to.diff(from)) {
                         this.props.setRealTime(false, true);
                     } else {
                         this.props.setRealTime(false, false);
@@ -152,11 +158,9 @@ class Paper extends Component {
             }
         }
 
+
         this.state = {
-            layouts: layouts,
-            layoutChangeTime: null,
-            boxes: boxes,
-            filters : [],
+            filters: [],
 
             data: {
                 tempXlogs: [],
@@ -172,13 +176,13 @@ class Paper extends Component {
                 endTime: endTime,
                 range: range,
                 maxElapsed: 2000,
-                paramMaxElapsed : xlogElapsedTime,
+                paramMaxElapsed: xlogElapsedTime,
                 lastRequestTime: null,
                 clearTimestamp: null
             },
-            xlogHistoryDoing : false,
-            xlogHistoryRequestCnt : 0,
-            xlogNotSupportedInRange : false,
+            xlogHistoryDoing: false,
+            xlogHistoryRequestCnt: 0,
+            xlogNotSupportedInRange: false,
 
             pastTimestamp: null,
 
@@ -199,24 +203,18 @@ class Paper extends Component {
                 to: null
             },
 
-            fixedControl: false,
             visible: true,
-            rangeControl: false,
-            alert: {
-                data: [],
-                offset: {},
-                clearTime: alertInfo ? alertInfo.clearTime : null,
-                clearItem: alertInfo ? alertInfo.clearItem : {}
-            },
-            showAlert: false
+            rangeControl: false
         };
+
+        this.props.setBoxesLayouts(boxes, layouts);
     }
 
     componentDidUpdate = (prevProps, prevState) => {
 
         let counterKeyMap = {};
-        for (let i = 0; i < this.state.boxes.length; i++) {
-            let option = this.state.boxes[i].option;
+        for (let i = 0; i < this.props.boxes.length; i++) {
+            let option = this.props.boxes[i].option;
 
             if (option && option.length > 0) {
                 for (let j = 0; j < option.length; j++) {
@@ -229,8 +227,8 @@ class Paper extends Component {
         }
 
         let prevCounterKeyMap = {};
-        for (let i = 0; i < prevState.boxes.length; i++) {
-            let option = prevState.boxes[i].option;
+        for (let i = 0; i < prevProps.boxes.length; i++) {
+            let option = prevProps.boxes[i].option;
 
             if (option && option.length > 0) {
                 for (let j = 0; j < option.length; j++) {
@@ -265,13 +263,13 @@ class Paper extends Component {
 
     componentWillReceiveProps(nextProps) {
 
+        if (this.props.searchCondition.time !== nextProps.searchCondition.time) {
+            this.search(nextProps.searchCondition.from, nextProps.searchCondition.to);
+        }
+
         if (JSON.stringify(nextProps.template) !== JSON.stringify(this.props.template)) {
             if (JSON.stringify(nextProps.template.boxes) !== JSON.stringify(this.state.boxes) || JSON.stringify(nextProps.template.layouts) !== JSON.stringify(this.state.layouts)) {
-                this.setState({
-                    layouts: nextProps.template.layouts,
-                    layoutChangeTime: (new Date()).getTime(),
-                    boxes: nextProps.template.boxes,
-                });
+                this.props.setBoxesLayouts(nextProps.template.boxes, nextProps.template.layouts);
             }
         }
 
@@ -293,8 +291,8 @@ class Paper extends Component {
             }
         }
 
-        if (JSON.stringify(this.props.objects) !== JSON.stringify(nextProps.objects) || JSON.stringify(this.props.user) !== JSON.stringify(nextProps.user) || JSON.stringify(this.props.config) !== JSON.stringify(nextProps.config)) {
-            this.checkRealtimeAlert();
+        if (JSON.stringify(this.props.filterMap) !== JSON.stringify(nextProps.filterMap)) {
+            this.getVisitor(nextProps);
         }
 
         if (this.props.range.realTime !== nextProps.range.realTime) {
@@ -344,49 +342,43 @@ class Paper extends Component {
             }
         }
 
-        setTimeout(() => {
+        /*setTimeout(() => {
             window.dispatchEvent(new Event('resize'));
-        }, 1000);
+        }, 1000);*/
 
-        document.addEventListener("scroll", this.scroll.bind(this));
         document.addEventListener('visibilitychange', this.visibilitychange.bind(this));
 
         this.setState({
             visible: document.visibilityState === 'visible'
         });
 
-        if (this.props.config.alert.notification === "Y") {
-            if (Notification && (Notification.permission !== "granted" || Notification.permission === "denied")) {
-                Notification.requestPermission();
-            }
-        }
+        window.addEventListener("resize", this.resize);
 
-        this.checkRealtimeAlert();
     }
 
-    checkRealtimeAlert = () => {
-        if (this.alertTimer === null) {
-            let seconds = this.props.config.alertInterval;
-            if (!seconds) {
-                seconds = 60;
-            }
-            this.alertTimer = setInterval(() => {
-                this.getRealTimeAlert(this.props.objects);
-            }, seconds * 1000);
-        }
-    };
 
     componentWillUnmount() {
         this.mounted = false;
         clearInterval(this.dataRefreshTimer);
         this.dataRefreshTimer = null;
 
-        clearInterval(this.alertTimer);
-        this.alertTimer = null;
+        window.removeEventListener("resize", this.resize);
 
-        document.removeEventListener("scroll", this.scroll.bind(this));
         document.removeEventListener('visibilitychange', this.visibilitychange.bind(this));
+
     }
+
+    resize = () => {
+        if (this.resizeTimer) {
+            clearTimeout(this.resizeTimer);
+            this.resizeTimer = null;
+        }
+
+        this.resizeTimer = setTimeout(() => {
+            this.props.setLayoutChangeTime();
+        }, 1000);
+
+    };
 
     getLatestData(clear, objects) {
         if (clear) {
@@ -401,7 +393,7 @@ class Paper extends Component {
             this.getXLog(false, objects);
         }
 
-        this.getVisitor();
+        this.getVisitor(this.props);
         this.getRealTimeCounter();
 
         clearInterval(this.dataRefreshTimer);
@@ -419,8 +411,8 @@ class Paper extends Component {
 
         if (this.props.objects && this.props.objects.length > 0) {
             let counterKeyMap = {};
-            for (let i = 0; i < this.state.boxes.length; i++) {
-                let option = this.state.boxes[i].option;
+            for (let i = 0; i < this.props.boxes.length; i++) {
+                let option = this.props.boxes[i].option;
 
                 if (option && option.length > 0) {
                     for (let j = 0; j < option.length; j++) {
@@ -493,178 +485,6 @@ class Paper extends Component {
         }
     };
 
-    toggleShowAlert = () => {
-        this.setState({
-            showAlert : !this.state.showAlert
-        });
-    };
-
-    clearAllAlert = () => {
-        let clearTime;
-        let clearItem;
-        if (this.state.alert.data && this.state.alert.data.length > 0) {
-            let last = this.state.alert.data[0];
-            clearTime = Number(last.time);
-            clearItem = {};
-        } else {
-            clearTime = (new Date()).getTime();
-            clearItem = {};
-        }
-
-        this.setState({
-            alert: {
-                data : [],
-                offset : this.state.alert.offset,
-                clearTime: clearTime,
-                clearItem: clearItem
-            },
-            showAlert : false
-        });
-
-        if (localStorage) {
-            localStorage.setItem("alert", JSON.stringify({
-                clearTime: clearTime,
-                clearItem: clearItem
-            }));
-        }
-    };
-
-    clearOneAlert = (objHash, time) => {
-
-        let clearItem = this.state.alert.clearItem;
-
-        if (!clearItem[objHash]) {
-            clearItem[objHash] = {};
-        }
-
-        clearItem[objHash][time] = true;
-
-        let data = this.state.alert.data;
-        if (data && data.length > 0) {
-            for (let i=0; i<data.length; i++) {
-                if (data[i].objHash === objHash && Number(data[i].time) === Number(time)) {
-                    data.splice(i, 1);
-                    break;
-                }
-            }
-        }
-
-        this.setState({
-            alert : {
-                data: data,
-                offset: this.state.alert.offset,
-                clearTime: this.state.alert.clearTime,
-                clearItem: clearItem
-            }
-        });
-
-        if (localStorage) {
-            localStorage.setItem("alert", JSON.stringify({
-                clearTime: this.state.alert.clearTime,
-                clearItem: clearItem
-            }));
-        }
-    };
-
-    setRewind = (time) => {
-        let start = moment(Math.floor(time / (1000 * 60)) * (1000 * 60));
-        start.subtract(5, "minutes");
-        let end = start.clone().add(10, "minutes");
-        this.props.setRangeAll(start, start.hours(), start.minutes(), 10, false, false, this.props.config.range.shortHistoryRange, this.props.config.range.shortHistoryStep);
-        setTimeout(() => {
-            this.search(start, end, this.props.objects);
-        }, 100);
-
-    };
-
-    getRealTimeAlert = (objects) => {
-        const that = this;
-
-        let objTypes = [];
-        if (objects && objects.length > 0) {
-            objTypes = _.chain(objects).map((d) => d.objType).uniq().value();
-        }
-
-        if (objTypes && objTypes.length > 0) {
-            objTypes.forEach((objType) => {
-                this.props.addRequest();
-
-                let offset1 = this.state.alert.offset[objType] ? this.state.alert.offset[objType].offset1 : 0;
-                let offset2 = this.state.alert.offset[objType] ? this.state.alert.offset[objType].offset2 : 0;
-
-                jQuery.ajax({
-                    method: "GET",
-                    async: true,
-                    url: getHttpProtocol(this.props.config) + "/scouter/v1/alert/realTime/" + offset1 + "/" + offset2 + "?objType=" + objType,
-                    xhrFields: getWithCredentials(that.props.config),
-                    beforeSend: function (xhr) {
-                        setAuthHeader(xhr, that.props.config, getCurrentUser(that.props.config, that.props.user));
-                    }
-                }).done((msg) => {
-                    if (msg) {
-
-                        let alert = this.state.alert;
-                        if (!alert.offset[objType]) {
-                            alert.offset[objType] = {};
-                        }
-
-                        alert.offset[objType].offset1 = msg.result.offset1;
-                        alert.offset[objType].offset2 = msg.result.offset2;
-                        alert.data = alert.data.concat(msg.result.alerts);
-
-                        if (alert.data.length > 0) {
-                            alert.data = alert.data.sort((a, b) => {
-                                return Number(b.time) - Number(a.time)
-                            });
-
-                            alert.data = alert.data.filter((alert) => {
-                                if (this.state.alert.clearTime) {
-                                    if (this.state.alert.clearTime >= Number(alert.time)) {
-                                        return false;
-                                    } else {
-                                        if (this.state.alert.clearItem[alert.objHash] && this.state.alert.clearItem[alert.objHash][alert.time]) {
-                                            return false;
-                                        } else {
-                                            return true;
-                                        }
-                                    }
-                                } else {
-                                    if (this.state.alert.clearItem[alert.objHash] && this.state.alert.clearItem[alert.objHash][alert.time]) {
-                                        return false;
-                                    } else {
-                                        return true;
-                                    }
-                                }
-                            });
-
-                            if (Notification && this.props.config.alert.notification === "Y" && Notification.permission === "granted") {
-                                for (let i=0; i<alert.data.length; i++) {
-                                    if (Number(alert.data[i].time) > this.mountTime && !alert.data[i]["_notificated"]) {
-                                        alert.data[i]["_notificated"] = true;
-
-                                        var options = {
-                                            body: alert.data[i].objName + "\n" + alert.data[i].message,
-                                            icon: notificationIcon
-                                        };
-                                        new Notification("[" + alert.data[i].level + "]" +  alert.data[i].title, options);
-                                    }
-                                }
-                            }
-
-                            this.setState({
-                                alert: alert
-                            });
-                        }
-                    }
-                }).fail((xhr, textStatus, errorThrown) => {
-                    clearInterval(this.alertTimer);
-                    this.alertTimer = null;
-                    errorHandler(xhr, textStatus, errorThrown, this.props);
-                });
-            });
-        }
-    };
-
 
     getCounterHistory = (objects, from, to, longTerm) => {
 
@@ -672,8 +492,8 @@ class Paper extends Component {
             let counterKeyMap = {};
             let counterHistoryKeyMap = {};
 
-            for (let i = 0; i < this.state.boxes.length; i++) {
-                let option = this.state.boxes[i].option;
+            for (let i = 0; i < this.props.boxes.length; i++) {
+                let option = this.props.boxes[i].option;
 
                 if (option && option.length > 0) {
                     for (let j = 0; j < option.length; j++) {
@@ -681,8 +501,8 @@ class Paper extends Component {
                         if (innerOption.type === "counter") {
                             counterKeyMap[innerOption.counterKey] = true;
                             counterHistoryKeyMap[innerOption.counterKey] = {
-                                key : innerOption.counterKey,
-                                familyName : innerOption.familyName
+                                key: innerOption.counterKey,
+                                familyName: innerOption.familyName
                             };
                         }
                     }
@@ -713,16 +533,16 @@ class Paper extends Component {
                 if (longTerm) {
 
                     url = getHttpProtocol(this.props.config) + '/scouter/v1/counter/stat/' + encodeURI(counterKey) + '?objHashes=' + JSON.stringify(objects.filter((d) => {
-                        return d.objFamily === familyName;
-                    }).map((obj) => {
+                            return d.objFamily === familyName;
+                        }).map((obj) => {
                             return Number(obj.objHash);
                         })) + "&startYmd=" + moment(startTime).format("YYYYMMDD") + "&endYmd=" + moment(endTime).format("YYYYMMDD");
                     this.getCounterHistoryData(url, counterKey, from, to, now, false);
 
                 } else {
                     url = getHttpProtocol(this.props.config) + '/scouter/v1/counter/' + encodeURI(counterKey) + '?objHashes=' + JSON.stringify(objects.filter((d) => {
-                        return d.objFamily === familyName;
-                    }).map((obj) => {
+                            return d.objFamily === familyName;
+                        }).map((obj) => {
                             return Number(obj.objHash);
                         })) + "&startTimeMillis=" + startTime + "&endTimeMillis=" + endTime;
                     this.getCounterHistoryData(url, counterKey, from, to, now, false);
@@ -768,18 +588,6 @@ class Paper extends Component {
         this.getCounterHistory(objects || this.props.objects, from, to, this.props.range.longTerm);
         this.getXLogHistory(from, to, objects || this.props.objects, this.props.range.longTerm);
 
-    };
-
-    scroll = () => {
-        if (document.documentElement.scrollTop > 60) {
-            this.setState({
-                fixedControl: true
-            });
-        } else {
-            this.setState({
-                fixedControl: false
-            });
-        }
     };
 
     visibilitychange = () => {
@@ -922,8 +730,8 @@ class Paper extends Component {
     setStopXlogHistory = () => {
         this.xlogHistoryRequestTime = null;
         this.setState({
-            xlogHistoryDoing : false,
-            xlogHistoryRequestCnt : 0
+            xlogHistoryDoing: false,
+            xlogHistoryRequestCnt: 0
         });
 
     };
@@ -948,7 +756,7 @@ class Paper extends Component {
         }
 
         //xlog retrieve limit is 60 minute
-        if(to - from > 60 * 60 * 1000) {
+        if (to - from > 60 * 60 * 1000) {
             let data = this.state.data;
             let now = (new ServerDate()).getTime();
             data.lastRequestTime = now;
@@ -980,8 +788,8 @@ class Paper extends Component {
             this.setState({
                 data: data,
                 pastTimestamp: now,
-                xlogHistoryDoing : true,
-                xlogHistoryRequestCnt : 0,
+                xlogHistoryDoing: true,
+                xlogHistoryRequestCnt: 0,
                 xlogNotSupportedInRange: false
             });
 
@@ -1062,13 +870,15 @@ class Paper extends Component {
                 that.xlogHistoryTemp.push(xlogs);
                 data.newXLogs = xlogs;
 
-                this.setState({
-                    data: data,
-                    pageCnt: (new Date()).getTime(),
-                    xlogHistoryRequestCnt : this.state.xlogHistoryRequestCnt + 1
-                });
+
 
                 if (hasMore) {
+                    this.setState({
+                        data: data,
+                        pageCnt: (new Date()).getTime(),
+                        xlogHistoryRequestCnt: this.state.xlogHistoryRequestCnt + 1
+                    });
+
                     that.getXLogHistoryData(requestTime, from, to, objects, result.lastTxid, result.lastXLogTime);
                 } else {
                     that.xlogHistoryCurrentDays++;
@@ -1078,8 +888,8 @@ class Paper extends Component {
                         this.setState({
                             data: data,
                             pageCnt: (new Date()).getTime(),
-                            xlogHistoryDoing : false,
-                            xlogHistoryRequestCnt : 0
+                            xlogHistoryDoing: false,
+                            xlogHistoryRequestCnt: 0
                         });
                     }
                 }
@@ -1090,34 +900,50 @@ class Paper extends Component {
         }
     };
 
-    getVisitor = () => {
+    getVisitor = (props) => {
         let that = this;
-        if (this.props.objects && this.props.objects.length > 0) {
-            this.props.addRequest();
-            let time = (new ServerDate()).getTime();
-            jQuery.ajax({
-                method: "GET",
-                async: true,
-                url: getHttpProtocol(this.props.config) + '/scouter/v1/visitor/realTime?objHashes=' + JSON.stringify(this.props.objects.map((instance) => {
-                    return Number(instance.objHash);
-                })),
-                xhrFields: getWithCredentials(that.props.config),
-                beforeSend: function (xhr) {
-                    setAuthHeader(xhr, that.props.config, getCurrentUser(that.props.config, that.props.user));
-                }
-            }).done((msg) => {
-                if (!that.mounted) {
-                    return;
-                }
+        if (props.objects && props.objects.length > 0) {
+            let filterdObjects = props.objects.filter((instance) => {
+                return props.filterMap[instance.objHash]
+            });
+
+            if (filterdObjects.length > 0) {
+                props.addRequest();
+                let time = (new ServerDate()).getTime();
+                jQuery.ajax({
+                    method: "GET",
+                    async: true,
+                    url: getHttpProtocol(props.config) + '/scouter/v1/visitor/realTime?objHashes=' + JSON.stringify(filterdObjects.map((instance) => {
+                        return Number(instance.objHash);
+                    })),
+                    xhrFields: getWithCredentials(props.config),
+                    beforeSend: function (xhr) {
+                        setAuthHeader(xhr, props.config, getCurrentUser(props.config, props.user));
+                    }
+                }).done((msg) => {
+                    if (!that.mounted) {
+                        return;
+                    }
+                    this.setState({
+                        visitor: {
+                            time: time,
+                            visitor: msg.result
+                        }
+                    });
+                }).fail((xhr, textStatus, errorThrown) => {
+                    errorHandler(xhr, textStatus, errorThrown, props);
+                });
+            } else {
+                let time = (new ServerDate()).getTime();
                 this.setState({
                     visitor: {
                         time: time,
-                        visitor: msg.result
+                        visitor: 0
                     }
                 });
-            }).fail((xhr, textStatus, errorThrown) => {
-                errorHandler(xhr, textStatus, errorThrown, this.props);
-            });
+            }
+
+
         }
     };
 
@@ -1224,7 +1050,7 @@ class Paper extends Component {
         }).fail((xhr, textStatus, errorThrown) => {
             errorHandler(xhr, textStatus, errorThrown, this.props);
         });
-    }
+    };
 
     removeOverTimeXLogFrom(tempXlogs, startTime) {
         let outOfRangeIndex = -1;
@@ -1239,11 +1065,11 @@ class Paper extends Component {
         if (outOfRangeIndex > -1) {
             tempXlogs.splice(0, outOfRangeIndex + 1);
         }
-    }
+    };
 
     onLayoutChange(layout, layouts) {
 
-        let boxes = this.state.boxes;
+        let boxes = this.props.boxes;
         boxes.forEach((box) => {
             layout.forEach((l) => {
                 if (box.key === l.i) {
@@ -1252,37 +1078,16 @@ class Paper extends Component {
                 }
             });
         });
+
         setData("layouts", layouts);
-        setData("boxes", this.state.boxes);
-        this.setState({
-            layouts: layouts,
-            layoutChangeTime: (new Date()).getTime()
-        });
+        setData("boxes", boxes);
+        this.props.setLayouts(layouts);
 
-        setTimeout(() => {
+        /*setTimeout(() => {
             window.dispatchEvent(new Event('resize'));
-        }, 500);
+        }, 500);*/
 
-    }
-
-    getUniqueKey() {
-        let dup = false;
-        let key = null;
-        let i = 1;
-        do {
-            dup = false;
-            key = String(this.state.boxes.length + i);
-            for (let i = 0; i < this.state.boxes.length; i++) {
-                if (this.state.boxes[i].key === key) {
-                    dup = true;
-                    break;
-                }
-            }
-            i++;
-        } while (dup);
-
-        return key;
-    }
+    };
 
     toggleRangeControl = () => {
         this.setState({
@@ -1290,47 +1095,9 @@ class Paper extends Component {
         });
     };
 
-    addPaper = () => {
-        let boxes = this.state.boxes;
-        let key = this.getUniqueKey();
-
-        let maxY = 0;
-        let height = 0;
-        for (let i = 0; i < boxes.length; i++) {
-            if (maxY < boxes[i].layout.y) {
-                maxY = boxes[i].layout.y;
-                height = boxes[i].layout.h;
-            }
-        }
-
-        boxes.push({
-            key: key,
-            title: "NO TITLE ",
-            layout: {w: 6, h: 4, x: 0, y: (maxY + height), minW: 1, minH: 3, i: key}
-        });
-
-
-        this.setState({
-            boxes: boxes
-        });
-
-        setData("boxes", boxes);
-
-        return key;
-    };
-
-    addPaperAndAddMetric = (data) => {
-        let key = this.addPaper();
-
-        if (data) {
-            let option = JSON.parse(data);
-            this.setOption(key, option);
-        }
-    };
-
     removePaper = (key) => {
 
-        let boxes = this.state.boxes;
+        let boxes = this.props.boxes;
         boxes.forEach((box, i) => {
             if (box.key === key) {
                 boxes.splice(i, 1);
@@ -1338,7 +1105,7 @@ class Paper extends Component {
             }
         });
 
-        let layouts = this.state.layouts;
+        let layouts = this.props.layouts;
 
         for (let unit in layouts) {
             if (layouts[unit] && layouts[unit].length > 0) {
@@ -1351,27 +1118,16 @@ class Paper extends Component {
             }
         }
 
-        this.setState({
-            boxes: boxes,
-            layouts: layouts,
-            layoutChangeTime: (new Date()).getTime()
-        });
+        this.props.setBoxesLayouts(boxes, layouts);
 
         setData("layouts", layouts);
         setData("boxes", boxes);
     };
 
-    clearLayout = () => {
-        this.setState({
-            boxes: [],
-            layouts: {},
-            layoutChangeTime: (new Date()).getTime()
-        });
-    };
 
     setOption = (key, option) => {
 
-        let boxes = this.state.boxes.slice(0);
+        let boxes = this.props.boxes.slice(0);
 
         boxes.forEach((box) => {
             if (box.key === key) {
@@ -1409,7 +1165,7 @@ class Paper extends Component {
                             config: option.config,
                             counterKey: option.name,
                             title: option.displayName,
-                            familyName : option.familyName
+                            familyName: option.familyName
                         });
                     }
                 }
@@ -1438,15 +1194,13 @@ class Paper extends Component {
             }
         });
 
-        this.setState({
-            boxes: boxes
-        });
+        this.props.setBoxes(boxes);
 
         setData("boxes", boxes);
     };
 
     setOptionValues = (key, values) => {
-        let boxes = this.state.boxes;
+        let boxes = this.props.boxes;
         boxes.forEach((box) => {
             if (box.key === key) {
                 for (let attr in values) {
@@ -1457,12 +1211,11 @@ class Paper extends Component {
             }
         });
 
-        this.setState({
-            boxes: boxes
-        });
+        this.props.setBoxes(boxes);
 
         setData("boxes", boxes);
     };
+
 
     removeMetrics = (boxKey, counterKeys) => {
 
@@ -1470,7 +1223,7 @@ class Paper extends Component {
             this.boxesRef[boxKey].removeTitle(counterKeys);
         }
 
-        let boxes = this.state.boxes.slice(0);
+        let boxes = this.props.boxes.slice(0);
         boxes.forEach((box) => {
             if (box.key === boxKey) {
                 box.config = false;
@@ -1500,31 +1253,27 @@ class Paper extends Component {
             }
         });
 
-        this.setState({
-            boxes: boxes
-        });
+        this.props.setBoxes(boxes);
 
         setData("boxes", boxes);
     };
 
     setOptionClose = (key) => {
-        let boxes = this.state.boxes;
+        let boxes = this.props.boxes;
         boxes.forEach((box) => {
             if (box.key === key) {
                 box.config = false;
             }
         });
 
-        this.setState({
-            boxes: boxes
-        });
+        this.props.setBoxes(boxes);
 
         setData("boxes", boxes);
     };
 
 
     toggleConfig = (key) => {
-        let boxes = this.state.boxes;
+        let boxes = this.props.boxes;
         boxes.forEach((box) => {
             if (box.key === key) {
                 box.config = !box.config;
@@ -1532,9 +1281,7 @@ class Paper extends Component {
             }
         });
 
-        this.setState({
-            boxes: boxes
-        });
+        this.props.setBoxes(boxes);
 
     };
 
@@ -1551,14 +1298,14 @@ class Paper extends Component {
 
         if (!found) {
             filters.push({
-                key : key,
-                show : true,
-                data : {
-                    filtering : false
+                key: key,
+                show: true,
+                data: {
+                    filtering: false
                 }
             });
         }
-        
+
         this.setState({
             filters: filters
         });
@@ -1572,7 +1319,7 @@ class Paper extends Component {
             filter.filtering = true;
             filterInfo.data = filter;
         } else {
-            filterInfo.data = {filtering : false};
+            filterInfo.data = {filtering: false};
         }
 
         this.setState({
@@ -1589,75 +1336,71 @@ class Paper extends Component {
         });
     };
 
+    onBreakpointChange(newBreakpoint, newCols) {
+        this.breakpoint = newBreakpoint;
+        this.props.setBreakpoint(newBreakpoint);
 
+    }
 
     render() {
         let objectSelected = this.props.objects.length > 0;
-
-        if (objectSelected) {
-            document.querySelector("body").style.overflow = "auto";
-        } else {
-            //document.querySelector("body").style.overflow = "hidden";
-        }
 
         return (
             <div className="papers">
                 {!this.props.supported.supported && <OldVersion />}
                 {this.props.supported.supported &&
                 <div>
-                <div className={"fixed-alter-object " + (this.state.fixedControl ? 'show' : '')}></div>
-                <PaperControl addPaper={this.addPaper} addPaperAndAddMetric={this.addPaperAndAddMetric} clearLayout={this.clearLayout} fixedControl={this.state.fixedControl} toggleRangeControl={this.toggleRangeControl} realtime={this.props.range.realTime} alert={this.state.alert} clearAllAlert={this.clearAllAlert} clearOneAlert={this.clearOneAlert} setRewind={this.setRewind} showAlert={this.state.showAlert} toggleShowAlert={this.toggleShowAlert} />
-                <RangeControl visible={this.state.rangeControl} search={this.search} fixedControl={this.state.fixedControl} toggleRangeControl={this.toggleRangeControl} changeLongTerm={this.changeLongTerm}/>
-                {(objectSelected && (!this.state.boxes || this.state.boxes.length === 0)) &&
-                <div className="quick-usage">
-                    <div>
+                    <div className="fixed-alter-object"></div>
+                    {(objectSelected && (!this.props.boxes || this.props.boxes.length === 0)) &&
+                    <div className="quick-usage">
                         <div>
                             <div>
-                                <h3>NO PAPER</h3>
-                                <ol>
-                                    <li>CLICK [<i className="fa fa-plus-circle" aria-hidden="true"></i>] BUTTON TO ADD PAPER</li>
-                                    <li>AND DRAG METRIC TO PAPER</li>
-                                </ol>
+                                <div>
+                                    <h3>NO PAPER</h3>
+                                    <ol>
+                                        <li>CLICK <span className="add-paper-btn"><i className="fa fa-plus-circle" aria-hidden="true"></i> ADD PAPER</span> BUTTON IN LEFT PAPER CONFIG TO ADD PAPER</li>
+                                        <li>AND DRAG METRIC TO PAPER</li>
+                                    </ol>
+                                </div>
+                            </div>
+                        </div>
+                    </div>}
+                    <ResponsiveReactGridLayout className="layout" breakpoints={{lg: 801, md: 800}} cols={{lg: 12, md: 6}} layouts={this.props.layouts} rowHeight={30} onLayoutChange={(layout, layouts) => this.onLayoutChange(layout, layouts)} onBreakpointChange={(newBreakpoint, newCols) => this.onBreakpointChange(newBreakpoint, newCols)}>
+                        {this.props.boxes.map((box, i) => {
+                            let filterInfo = this.state.filters.filter((d) => d.key === box.key)[0];
+                            return (
+                                <div className="box-layout" key={box.key} data-grid={box.layout}>
+                                    <button className="box-control box-layout-remove-btn last" onClick={this.removePaper.bind(null, box.key)}><i className="fa fa-times-circle-o" aria-hidden="true"></i></button>
+                                    {box.option && <button className="box-control box-layout-config-btn" onClick={this.toggleConfig.bind(null, box.key)}><i className="fa fa-cog" aria-hidden="true"></i></button>}
+                                    {box.option && (box.option.length > 1 || box.option.config ) && box.option.type === "xlog" && <button className={"box-control filter-btn " + (filterInfo && filterInfo.data && filterInfo.data.filtering ? "filtered" : "")} onClick={this.toggleFilter.bind(null, box.key)}><i className="fa fa-filter" aria-hidden="true"></i></button>}
+                                    {box.config && <BoxConfig box={box} setOptionValues={this.setOptionValues} setOptionClose={this.setOptionClose} removeMetrics={this.removeMetrics}/>}
+                                    {filterInfo && filterInfo.show && <XLogFilter box={box} filterInfo={filterInfo ? filterInfo.data : {filtering: false}} setXlogFilter={this.setXlogFilter} closeFilter={this.closeFilter}/>}
+                                    <Box onRef={ref => this.boxesRef[box.key] = ref} visible={this.state.visible} setOption={this.setOption} box={box} filter={filterInfo ? filterInfo.data : {filtering: false}} pastTimestamp={this.state.pastTimestamp} pageCnt={this.state.pageCnt} data={this.state.data} config={this.props.config} visitor={this.state.visitor} counters={this.state.counters} countersHistory={this.state.countersHistory.data} countersHistoryFrom={this.state.countersHistory.from} countersHistoryTo={this.state.countersHistory.to} countersHistoryTimestamp={this.state.countersHistory.time} longTerm={this.props.range.longTerm} layoutChangeTime={this.props.layoutChangeTime} realtime={this.props.range.realTime} xlogHistoryDoing={this.state.xlogHistoryDoing} xlogHistoryRequestCnt={this.state.xlogHistoryRequestCnt} setStopXlogHistory={this.setStopXlogHistory} xlogNotSupportedInRange={this.state.xlogNotSupportedInRange}/>
+                                </div>
+                            )
+                        })}
+                    </ResponsiveReactGridLayout>
+                    {!objectSelected &&
+                    <div className="select-instance">
+                        <div>
+                            <div className="select-instance-message">
+                                <div className="icon">
+                                    <div><i className="fa fa-info-circle" aria-hidden="true"></i></div>
+                                </div>
+                                <div className="msg">NO INSTANCE SELECTED</div>
                             </div>
                         </div>
                     </div>
-                </div>}
-                <ResponsiveReactGridLayout className="layout" cols={{lg: 12, md: 10, sm: 6, xs: 4, xxs: 2}} layouts={this.state.layouts} rowHeight={30} onLayoutChange={(layout, layouts) => this.onLayoutChange(layout, layouts)}>
-                    {this.state.boxes.map((box, i) => {
-                        let filterInfo = this.state.filters.filter((d) => d.key === box.key)[0];
-                        return (
-                            <div className="box-layout" key={box.key} data-grid={box.layout}>
-                                <button className="box-control box-layout-remove-btn last" onClick={this.removePaper.bind(null, box.key)}><i className="fa fa-times-circle-o" aria-hidden="true"></i></button>
-                                {box.option && <button className="box-control box-layout-config-btn" onClick={this.toggleConfig.bind(null, box.key)}><i className="fa fa-cog" aria-hidden="true"></i></button>}
-                                {box.option && (box.option.length > 1 || box.option.config ) && box.option.type === "xlog" && <button className={"box-control filter-btn " + (filterInfo && filterInfo.data && filterInfo.data.filtering ? "filtered" : "")} onClick={this.toggleFilter.bind(null, box.key)}><i className="fa fa-filter" aria-hidden="true"></i></button>}                                
-                                {box.config && <BoxConfig box={box} setOptionValues={this.setOptionValues} setOptionClose={this.setOptionClose} removeMetrics={this.removeMetrics}/>}
-                                {filterInfo && filterInfo.show && <XLogFilter box={box} filterInfo={filterInfo ? filterInfo.data : {filtering : false}} setXlogFilter={this.setXlogFilter} closeFilter={this.closeFilter} />}
-                                <Box onRef={ref => this.boxesRef[box.key] = ref} visible={this.state.visible} setOption={this.setOption} box={box} filter={filterInfo ? filterInfo.data : {filtering : false}} pastTimestamp={this.state.pastTimestamp} pageCnt={this.state.pageCnt} data={this.state.data} config={this.props.config} visitor={this.state.visitor} counters={this.state.counters} countersHistory={this.state.countersHistory.data} countersHistoryFrom={this.state.countersHistory.from} countersHistoryTo={this.state.countersHistory.to} countersHistoryTimestamp={this.state.countersHistory.time} longTerm={this.props.range.longTerm} layoutChangeTime={this.state.layoutChangeTime} realtime={this.props.range.realTime} xlogHistoryDoing={this.state.xlogHistoryDoing} xlogHistoryRequestCnt={this.state.xlogHistoryRequestCnt} setStopXlogHistory={this.setStopXlogHistory} xlogNotSupportedInRange={this.state.xlogNotSupportedInRange}/>
+                    }
+                    <Profiler selection={this.props.selection} newXLogs={this.state.data.newXLogs} xlogs={this.state.data.xlogs} startTime={this.state.data.startTime} realtime={this.props.range.realTime}/>
+                    <div className="loading" ref="loading">
+                        <div>
+                            <div className="spinner">
+                                <div className="cube1"></div>
+                                <div className="cube2"></div>
                             </div>
-                        )
-                    })}
-                </ResponsiveReactGridLayout>
-                {!objectSelected &&
-                <div className={"select-instance " + (this.state.fixedControl ? 'fixed' : '')}>
-                    <div>
-                        <div className="select-instance-message">
-                            <div className="icon">
-                                <div><i className="fa fa-info-circle" aria-hidden="true"></i></div>
-                            </div>
-                            <div className="msg">NO INSTANCE SELECTED</div>
                         </div>
                     </div>
-                </div>
-                }
-                <Profiler selection={this.props.selection} newXLogs={this.state.data.newXLogs} xlogs={this.state.data.xlogs} startTime={this.state.data.startTime} realtime={this.props.range.realTime}/>
-                <div className="loading" ref="loading">
-                    <div>
-                        <div className="spinner">
-                            <div className="cube1"></div>
-                            <div className="cube2"></div>
-                        </div>
-                    </div>
-                </div>
                 </div>}
             </div>
         );
@@ -1665,37 +1408,37 @@ class Paper extends Component {
 }
 
 let mapStateToProps = (state) => {
-        return {
-            objects: state.target.objects,
-            selection: state.target.selection,
-            config: state.config,
-            user: state.user,
-            template: state.template,
-            range: state.range,
-            supported : state.supported
-        };
+    return {
+        objects: state.target.objects,
+        filterMap: state.target.filterMap,
+        selection: state.target.selection,
+        config: state.config,
+        user: state.user,
+        template: state.template,
+        range: state.range,
+        supported: state.supported,
+        boxes: state.paper.boxes,
+        layouts: state.paper.layouts,
+        layoutChangeTime: state.paper.layoutChangeTime,
+        searchCondition: state.searchCondition
     };
+};
 
 let mapDispatchToProps = (dispatch) => {
-        return {
-            addRequest: () => dispatch(addRequest()),
-            pushMessage: (category, title, content) => dispatch(pushMessage(category, title, content)),
-            setControlVisibility: (name, value) => dispatch(setControlVisibility(name, value)),
-
-            setRealTime : (realTime, longTerm) => dispatch(setRealTime(realTime, longTerm)),
-            setRealTimeValue: (realTime, longTerm, value) => dispatch(setRealTimeValue(realTime, longTerm, value)),
-            setRangeDate: (date) => dispatch(setRangeDate(date)),
-            setRangeHours: (hours) => dispatch(setRangeHours(hours)),
-            setRangeMinutes: (minutes) => dispatch(setRangeMinutes(minutes)),
-            setRangeValue: (value) => dispatch(setRangeValue(value)),
-            setRangeDateHoursMinutes: (date, hours, minutes) => dispatch(setRangeDateHoursMinutes(date, hours, minutes)),
-            setRangeDateHoursMinutesValue: (date, hours, minutes, value) => dispatch(setRangeDateHoursMinutesValue(date, hours, minutes, value)),
-            setRangeAll: (date, hours, minutes, value, realTime, longTerm, range, step) => dispatch(setRangeAll(date, hours, minutes, value, realTime, longTerm, range, step)),
-
-            setTemplate: (boxes, layouts) => dispatch(setTemplate(boxes, layouts))
-
-        };
+    return {
+        addRequest: () => dispatch(addRequest()),
+        pushMessage: (category, title, content) => dispatch(pushMessage(category, title, content)),
+        setControlVisibility: (name, value) => dispatch(setControlVisibility(name, value)),
+        setRealTime: (realTime, longTerm) => dispatch(setRealTime(realTime, longTerm)),
+        setRangeDateHoursMinutesValue: (date, hours, minutes, value) => dispatch(setRangeDateHoursMinutesValue(date, hours, minutes, value)),
+        setTemplate: (boxes, layouts) => dispatch(setTemplate(boxes, layouts)),
+        setBoxes: (boxes) => dispatch(setBoxes(boxes)),
+        setLayouts: (layouts) => dispatch(setLayouts(layouts)),
+        setBoxesLayouts: (boxes, layouts) => dispatch(setBoxesLayouts(boxes, layouts)),
+        setLayoutChangeTime: () => dispatch(setLayoutChangeTime()),
+        setBreakpoint: (breakpoint) => dispatch(setBreakpoint(breakpoint))
     };
+};
 
 Paper = connect(mapStateToProps, mapDispatchToProps)(Paper);
 export default withRouter(Paper);

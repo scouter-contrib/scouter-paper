@@ -1,5 +1,6 @@
 import React, {Component} from 'react';
 import './XLogFilter.css';
+import ScouterPatternMatcher from "../../../common/ScouterPatternMatcher";
 
 class XLogFilter extends Component {
 
@@ -10,13 +11,20 @@ class XLogFilter extends Component {
             txid : "",
             gxid : "",
             type : "ALL",
-            service : "",
             minElapsedTime : "",
             maxElapsedTime : "",
-            address : "",
+            service : "",
             referrer : "",
-            login : "",
             userAgent : "",
+            login : "",
+            desc : "",
+            address : "",
+            serviceMatcher : null,
+            referrerMatcher : null,
+            userAgentMatcher : null,
+            loginMatcher : null,
+            descMatcher : null,
+            addressMatcher : null,
             small : false
         };
     }
@@ -57,6 +65,7 @@ class XLogFilter extends Component {
             address : this.props.filterInfo.address ? this.props.filterInfo.address : "",
             referrer : this.props.filterInfo.referrer ? this.props.filterInfo.referrer : "",
             login : this.props.filterInfo.login ? this.props.filterInfo.login : "",
+            desc : this.props.filterInfo.desc ? this.props.filterInfo.desc : "",
             userAgent : this.props.filterInfo.userAgent ? this.props.filterInfo.userAgent : ""
         });
     }
@@ -80,7 +89,14 @@ class XLogFilter extends Component {
     };
     
     onApply = () => {
-        this.props.setXlogFilter(this.props.box.key, true, this.state);
+        const filterState = Object.assign({}, this.state);
+        filterState.serviceMatcher = new ScouterPatternMatcher(filterState.service);
+        filterState.referrerMatcher = new ScouterPatternMatcher(filterState.referrer);
+        filterState.userAgentMatcher = new ScouterPatternMatcher(filterState.userAgent);
+        filterState.loginMatcher = new ScouterPatternMatcher(filterState.login);
+        filterState.descMatcher = new ScouterPatternMatcher(filterState.desc);
+
+        this.props.setXlogFilter(this.props.box.key, true, filterState);
     };
 
     onClear = () => {
@@ -91,12 +107,17 @@ class XLogFilter extends Component {
         this.props.closeFilter(this.props.box.key);        
     };
 
+    openHelp = () => {
+        window.open("https://github.com/scouter-project/scouter/blob/master/scouter.document/views/XLog-Filter.md", "_blank");
+    };
+
     render() {
         return (
             <div className={"xlog-filter-wrapper " + (this.state.small ? "small" : "")} onMouseDown={(e) => {e.stopPropagation();}} onMouseUp={(e) => {e.stopPropagation();}} ref="XLogFilter">
                 <div className="xlog-filter-wrapper-cell">
                     <div className="xlog-filter scrollbar">
                         <div className="xlog-filter-title">XLOG FILTER</div>
+                        <button className="xlog-filter-help-btn" onClick={this.openHelp}><i className="fa fa-question-circle-o" aria-hidden="true"></i></button>
                         <button className="xlog-filter-close-btn" onClick={this.onClose}><i className="fa fa-times-circle-o" aria-hidden="true"></i></button>
                         <div className="xlog-filter-content">
                             <div className="xlog-filter-content-row half">
@@ -132,6 +153,10 @@ class XLogFilter extends Component {
                                 <div className="xlog-filter-content-row-control"><input type="text" onChange={this.onChangeCondition.bind(this, "login")} value={this.state.login} /></div>
                             </div>
                             <div className="xlog-filter-content-row half">
+                                <div className="xlog-filter-content-row-label">DESC</div>
+                                <div className="xlog-filter-content-row-control"><input type="text" onChange={this.onChangeCondition.bind(this, "desc")} value={this.state.desc} /></div>
+                            </div>
+                            <div className="xlog-filter-content-row half">
                                 <div className="xlog-filter-content-row-label">U-AGENT</div>
                                 <div className="xlog-filter-content-row-control"><input type="text" onChange={this.onChangeCondition.bind(this, "userAgent")} value={this.state.userAgent} /></div>
                             </div>
@@ -146,7 +171,7 @@ class XLogFilter extends Component {
                             </div>
                         </div>
                         <div className="xlog-filter-btns">
-                            <button onClick={this.onClear}>CELAR FILTER</button>
+                            <button onClick={this.onClear}>CLEAR FILTER</button>
                             <button onClick={this.onApply} >SET FILTER</button>
                         </div>
                     </div>

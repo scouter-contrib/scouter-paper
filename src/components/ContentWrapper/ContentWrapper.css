@@ -9,8 +9,16 @@ div#root > div {
 }
 
 article.content-wrapper {
-    height: calc(100% - 50px);
     height: 100%;
+    width: calc(100% - 40px);
+    margin-left: 40px;
+    transition: all 0.3s;
+}
+
+article.content-wrapper.max.pinned {
+    margin-left: 400px;
+    width: calc(100% - 400px);
+    transition: all 0.3s;
 }
 
 .content-wrapper > div {
@@ -33,4 +41,27 @@ article.content-wrapper {
 
 .content-wrapper-leave.content-wrapper-leave-active {
     opacity: 0.01;
+}
+
+@media screen and (max-width: 800px) {
+    article.content-wrapper.min {
+        height: 100%;
+        width: 100%;
+        margin-left: 0;
+        transition: all 0.3s;
+    }
+
+    article.content-wrapper.max {
+        height: 100%;
+        width: 100%;
+        margin-left: 0;
+        transition: all 0.3s;
+    }
+
+    article.content-wrapper.max.pinned {
+        height: 100%;
+        width: 100%;
+        margin-left: 0;
+        transition: all 0.3s;
+    }
 }

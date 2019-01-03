@@ -1,0 +1,38 @@
+.span-step .main-value {
+    color: #5B59BA;
+    padding: 9px 5px 0;
+}
+
+.narrow .span-step .main-value {
+    padding: 2px 10px;
+}
+
+.span-step .main-value .gray {
+    color: #AAAAAA;
+}
+
+.span-step .main-value.tag {
+    font-weight: normal;
+    color: #AAAAAA;
+}
+
+.span-step .span-content pre {
+    font-family: inherit !important;
+    margin: 0;
+}
+
+.span-step .span-content {
+    margin-top: 10px;
+}
+
+.span-step .span-content:last-child {
+    margin-bottom: 10px;
+}
+
+.span-step .span-content .span-title {
+    padding: 0 5px 0;
+}
+
+.span-step .span-content .span-value {
+    padding: 2px 5px 0;
+}

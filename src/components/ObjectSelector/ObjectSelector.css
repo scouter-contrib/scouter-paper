@@ -1,0 +1,371 @@
+.object-selector-wrapper {
+}
+
+.object-selector-wrapper .api-server-select-control-wrapper {
+    _border-bottom: 1px solid rgba(255,255,255,0.1);
+    background-color: rgba(0,0,0,0.2);
+}
+
+.object-selector-wrapper .api-server-select-control {
+    display: table;
+    width: 100%;
+    table-layout: fixed;
+}
+
+.min .object-selector-wrapper .api-server-select-control {
+    display: none;
+}
+
+.object-selector-wrapper .api-server-select-control > div {
+    display: table-cell;
+}
+
+.object-selector-wrapper .control-label {
+    font-size: 10px;
+    width: 80px;
+    text-align: center;
+}
+
+.object-selector-wrapper .control-label > span {
+    display: inline-block;
+    padding: 10px;
+}
+
+.object-selector-wrapper .control-separator {
+    width: 1px;
+}
+
+.object-selector-wrapper .control-separator > span {
+    display: inline-block;
+    width: 1px;
+    height: 8px;
+    background-color: rgba(255,255,255,0.5);
+}
+
+.object-selector-wrapper .control-label > span {
+
+}
+
+.object-selector-wrapper .control-component {
+    font-size: 10px;
+}
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+.object-selector {
+
+    color: white;
+
+    height: 350px;
+    padding: 0;
+    -webkit-touch-callout: none;
+    -webkit-user-select: none;
+    -moz-user-select: none;
+    -ms-user-select: none;
+    user-select: none;
+    z-index: 31;
+}
+
+.object-selector > div {
+    -webkit-touch-callout: none;
+    -webkit-user-select: none;
+    -moz-user-select: none;
+    -ms-user-select: none;
+    user-select: none;
+}
+
+.object-selector .object-selector-content {
+    display: table;
+    width: 100%;
+    height: calc(100% - 74px);
+    table-layout: fixed;
+}
+
+.object-selector .object-selector-content > div {
+    display: table-cell;
+    vertical-align: top;
+    line-height: 100%;
+    height: 100%;
+}
+
+.object-selector .object-selector-content > div > div {
+    height: 100%;
+    position: relative;
+}
+
+.object-selector .object-selector-content .title {
+    position: absolute;
+    top: 0;
+    text-align: center;
+    width: 100%;
+    height: 30px;
+    padding-top: 5px;
+    box-sizing: border-box;
+}
+
+.object-selector .object-selector-content .filter {
+    position: absolute;
+    top: 0;
+    width: 100%;
+    padding: 4px 0;
+    height: 30px;
+    box-sizing: border-box;
+    border-bottom: 1px solid rgba(0, 0, 0, 0.2);
+
+}
+
+.object-selector .object-selector-content .filter .check-btn {
+    display: inline-block;
+    width: 45px;
+    padding: 4px 0;
+    margin-left: 4px;
+    text-align: center;
+    background-color: white;
+    color: #333;
+    cursor: pointer;
+    border-radius: 3px;
+}
+
+.object-selector .object-selector-content .filter .check-btn:hover {
+    background-color: #DDD;
+}
+
+.object-selector .object-selector-content .filter .filter-icon {
+    display: inline-block;
+    width: 20px;
+    text-align: center;
+    box-sizing: border-box;
+    cursor: pointer;
+}
+
+.object-selector .object-selector-content .filter.filtered .filter-icon {
+    color: #EEC900;
+}
+
+.object-selector .object-selector-content .filter .filter-tag {
+    width: 70px;
+    display: inline-block;
+    text-align: center;
+    padding: 5px 0;
+    background-color: rgba(0, 0, 0, 0.2);
+    border-radius: 3px 0 0 3px;
+    height: 20px;
+    box-sizing: border-box;
+}
+
+.object-selector .object-selector-content .filter input {
+    width: calc(100% - 94px - 50px);
+    font-size: 10px;
+    padding: 3px 5px;
+    border-radius: 0 3px 3px 0;
+    border: none;
+    outline: none;
+    box-sizing: border-box;
+    border: 1px solid rgba(0, 0, 0, 0.3);
+    transition: background-color 0.3s;
+    height: 20px;
+
+}
+
+.object-selector .object-selector-content .list-content {
+    height: calc(100% - 30px);
+    position: absolute;
+    top: 29px;
+    overflow-y: auto;
+    width: 100%;
+    line-height: 0;
+}
+
+.object-selector .object-selector-content .list-content .no-instance {
+    text-align: center;
+    height: 100%;
+}
+
+.object-selector .object-selector-content .list-content .no-instance > div {
+    display: table;
+    width: 100%;
+    height: 100%;
+}
+
+.object-selector .object-selector-content .list-content .no-instance > div > div {
+    display: table-cell;
+    width: 100%;
+    height: 100%;
+    vertical-align: middle;
+}
+
+.object-selector .object-selector-content .list-content > div {
+    line-height: 100%;
+}
+
+.object-selector .object-selector-content .title > div {
+    display: inline-block;
+    padding: 5px 0 5px;
+    background-color: rgba(0, 0, 0, 0.2);
+    margin: 0;
+    font-size: 10px;
+    width: 70px;
+    height: 20px;
+    box-sizing: border-box;
+    border-radius: 3px;
+}
+
+.object-selector .host-list {
+    display: table-cell;
+    width: 40%;
+    border-right: 1px solid rgba(0, 0, 0, 0.3);
+    font-size: 10px;
+}
+
+.object-selector .host-list div.host {
+    padding: 17px 8px 16px;
+    cursor: pointer;
+    border-bottom: 1px solid rgba(0, 0, 0, 0.2);
+}
+
+.object-selector .host-list div.host .host-selected-count {
+    float: right;
+}
+
+.object-selector .host-list div.host:hover {
+    background-color: rgba(0, 0, 0, 0.1);
+}
+
+.object-selector .host-list div.host.active {
+    background-color: rgba(0, 0, 0, 0.3);
+}
+
+.object-selector .host-list div.host.first {
+    border-top: 1px solid rgba(0, 0, 0, 0.2);
+
+}
+
+.object-selector .instance-list {
+    font-size: 10px;
+}
+
+.object-selector .instance-list div.instance {
+    padding: 0;
+    cursor: pointer;
+    border-bottom: 1px solid rgba(0, 0, 0, 0.2);
+    display: table;
+    table-layout: fixed;
+    width: 100%;
+    box-sizing: border-box;
+}
+
+.object-selector .instance-list div.instance > div {
+    display: table-cell;
+    vertical-align: middle;
+}
+
+.object-selector .instance-list div.instance > div.type-icon {
+    width: 40px;
+    height: 40px;
+    text-align: center;
+    box-sizing: border-box;
+    padding: 5px;
+}
+
+.object-selector .instance-list div.instance > div.instance-text-info {
+
+}
+
+.object-selector .instance-list div.instance > div.type-icon .type-icon-wrapper {
+    border-radius: 3px;
+    display: inline-block;
+    width: 30px;
+    height: 30px;
+    text-align: center;
+}
+
+.object-selector .instance-list div.instance > div.type-icon .type-icon-wrapper .object-icon {
+    background-color: transparent;
+    font-size: 18px;
+    padding-top: 7px;
+}
+
+.object-selector .instance-list div.instance > div.type-icon .type-icon-wrapper .object-icon.technology-icons {
+    font-family: "technology-icons";
+}
+
+.object-selector .instance-list div.instance > div.type-icon .type-icon-wrapper .object-icon.FontAwesome {
+    font-family: "FontAwesome";
+}
+
+.object-selector .instance-list div.instance > div.type-icon .type-icon-wrapper .object-icon.text {
+    font-size: 9px;
+    padding-top: 10px;
+    letter-spacing: -0.5px;
+    text-transform: uppercase;
+}
+
+
+.object-selector .instance-list div.instance .instance-name {
+    font-size: 11px;
+}
+
+.object-selector .instance-list div.instance .instance-other {
+    font-size: 8px;
+    padding-top: 4px;
+}
+
+.object-selector .instance-list div.instance .instance-other > span {
+    background-color: rgba(0, 0, 0, 0.2);
+    display: inline-block;
+    padding: 2px 4px;
+    border-radius: 2px;
+}
+
+.object-selector .instance-list div.instance .instance-other .instance-objtype {
+    margin-left: 5px;
+}
+
+.object-selector .instance-list div.instance.first {
+    border-top: 1px solid rgba(0, 0, 0, 0.2);
+}
+
+.object-selector .instance-list div.instance:hover {
+    background-color: rgba(0, 0, 0, 0.1);
+}
+
+.object-selector .instance-list div.instance.selected {
+    background-color: rgba(0, 0, 0, 0.3);
+}
+
+.object-selector .buttons {
+    background-color: rgba(0, 0, 0, 0.1);
+    padding: 10px 10px 8px;
+    text-align: right;
+    font-size: 10px;
+    height: 40px;
+    box-sizing: border-box;
+}
+
+.object-selector .buttons .save-preset-btn {
+    float: left;
+}
+
+
+
+
+
+.object-selector-wrapper .object-selector-content {
+    _display: none;
+}
+
+.object-selector-wrapper .buttons {
+    _display: none;
+}

@@ -1,0 +1,446 @@
+.frame-profile {
+    padding: 20px;
+    font-size: 12px;
+}
+
+.frame-profile .top-group text {
+    font-family: 'Righteous', 'Nanum Gothic', cursive !important;
+}
+
+.frame-profile .sub-title {
+    padding: 10px;
+    border-radius: 3px 3px 0 0;
+    background-color: #333;
+    color: white;
+    display: block;
+    border: 1px solid #333;
+}
+
+.narrow .frame-profile .sub-title {
+    padding: 3px 10px;
+}
+
+.frame-profile div.xlog-data {
+    margin-bottom: 20px;
+}
+
+.frame-profile div.xlog-data > div {
+    white-space: nowrap;
+    display: table;
+    table-layout: fixed;
+    width: 100%;
+}
+
+.frame-profile div.xlog-data span {
+    padding: 7px 10px;
+    box-sizing: border-box;
+    display: table-cell;
+}
+
+.narrow .frame-profile div.xlog-data span {
+    padding: 3px 10px;
+}
+
+.frame-profile div.xlog-data span.label {
+    width: 100px;
+    background-color: #EEE;
+}
+
+.frame-profile div.xlog-data span.data {
+    white-space: nowrap;
+}
+
+.frame-profile div.xlog-data span.data.error {
+    color: #FF030D;
+}
+
+.frame-profile div.xlog-data.wrap span.data {
+    white-space: normal;
+    word-break: break-all;
+}
+
+.frame-profile .frame-xlog-steps {
+    margin: 0 5px 0 20px;
+}
+
+.frame-profile .line {
+    height: 5px;
+    margin: 0;
+    width: 100%;
+}
+
+.frame-xlog-steps .step {
+    padding: 0;
+    white-space: nowrap;
+    text-align: justify;
+    _border: 1px solid #DDD;
+    height: 36px;
+    box-sizing: border-box;
+    margin-bottom: 5px;
+    border-radius: 0;
+    background-color: #eee;
+    position: relative;
+    cursor: pointer;
+}
+
+.narrow .frame-xlog-steps .step {
+    height: 24px;
+}
+
+.frame-xlog-steps .step .step-hover {
+    position: absolute;
+    top: 0;
+    left: -20px;
+    right: 0;
+    bottom: 0;
+    background-color: rgba(0, 255, 255, 0.1);
+    display: none;
+}
+
+.frame-xlog-steps .step:hover .step-hover {
+    display: block;
+}
+
+.frame-xlog-steps .step .step-info {
+    display: inline-block;
+    width: 80px;
+    height: 100%;
+    vertical-align: top;
+    position: relative;
+    background-color: #FEFEFE;
+}
+
+.frame-xlog-steps .step .step-info .index {
+    display: inline-block;
+    padding: 12px 2px 0;
+    width: 20px;
+    box-sizing: border-box;
+    height: 100%;
+    position: absolute;
+    top: 0;
+    left: -20px;
+}
+
+.narrow .frame-xlog-steps .step .step-info .index {
+    padding: 6px 2px 0;
+}
+
+.frame-xlog-steps .step .step-info .step-general-info {
+    font-size: 10px;
+    padding: 0 2px 0 0;
+    white-space: nowrap;
+    display: inline-block;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    width: 100%;
+    box-sizing: border-box;
+    height: 100%;
+}
+
+.frame-xlog-steps .step .step-info .step-general-info .step-name {
+    text-align: right;
+}
+
+.frame-xlog-steps .step .step-info .step-general-info .step-name.link-other-tx {
+    color: #0276FD;
+    cursor: pointer;
+    position: relative;
+    z-index:1;
+}
+
+.frame-xlog-steps .step .step-info .step-general-info .step-name.external-step {
+    color: #0276FD;
+}
+
+.frame-xlog-steps .step .step-info .step-general-info .step-name.dump-step {
+
+    color: #FF8600;
+}
+
+.frame-xlog-steps .step .step-info .step-general-info .step-name.link-other-tx:hover {
+    color: #003F87;
+}
+
+.frame-xlog-steps .step .step-info .step-general-info .step-elapsed {
+    text-align: right;
+}
+
+.frame-xlog-steps .step .step-info .step-general-info .step-elapsed.warning > span {
+    background-color: #FCB514;
+    color: #333;
+}
+
+.frame-xlog-steps .step .step-info .step-general-info .percentage {
+    text-align: right;
+}
+
+.narrow .frame-xlog-steps .step .step-info .step-general-info .percentage {
+    display: none;
+}
+
+.frame-xlog-steps .step .step-info .step-general-info .step-elapsed > span,
+.frame-xlog-steps .step .step-info .step-general-info .percentage > span {
+    padding: 0 2px;
+}
+
+.frame-xlog-steps .step .step-info .step-general-info .percentage.warning > span {
+    background-color: #FCB514;
+}
+
+.frame-xlog-steps .step .span-info {
+    display: inline-block;
+    width: calc(100% - 80px);
+    height: 100%;
+    position: relative;
+}
+
+.frame-xlog-steps .step .span-info .error {
+    position: absolute;
+    top: 6px;
+    right: -30px;
+    background-color: #FF030D;
+    color: white;
+    font-size: 10px;
+    padding: 0 2px;
+}
+
+.frame-xlog-steps .step .span {
+    display: inline-block;
+    height: 100%;
+    background-color: rgba(0, 0, 0, 0.3);
+    position: absolute;
+    top: 0;
+}
+
+.frame-profile .step-type-17 .span-bg-color,
+.frame-profile .step-type-9 .span-bg-color,
+.frame-profile .step-type-3 .span-bg-color {
+    background-color: #28AE7B;
+}
+
+.frame-profile .step-type-16 .span-bg-color,
+.frame-profile .step-type-2 .span-bg-color,
+.frame-profile .step-type-8 .span-bg-color {
+    background-color: #0000C3;
+}
+
+.frame-profile .step-type-10 .span-bg-color,
+.frame-profile .step-type-1 .span-bg-color {
+    background-color: #5B59BA;
+}
+
+.frame-profile .step-type-51 .span-bg-color {
+    background-color: #5B59BA;
+}
+
+.frame-profile .step-type-52 .span-bg-color {
+    background-color: #1a237e;
+}
+
+.frame-profile .step-type-5 .span-bg-color {
+    background-color: #FCD116;
+}
+
+.frame-profile .step-type-15 .span-bg-color,
+.frame-profile .step-type-6 .span-bg-color {
+    background-color: #1a237e;
+}
+
+.frame-profile .step-type-7 .span-bg-color {
+    background-color: #01579b;
+}
+
+.frame-profile .step-type-12 .span-bg-color {
+    background-color: #999;
+}
+
+.frame-profile .step-type-13 .span-bg-color {
+    background-color: #01579b;
+}
+
+.frame-profile .step-type-1 .span-bg-color,
+.frame-profile .step-type-14 .span-bg-color {
+    background-color: #01579b;
+}
+
+.frame-profile .step-type-11 .span-bg-color {
+    background-color: #603311;
+}
+
+.frame-profile .step-type-21 .span-bg-color {
+    background-color: #603311;
+}
+
+.frame-profile .step-type-31 .span-bg-color {
+    background-color: #603311;
+}
+
+.frame-profile .step-type-42 .span-bg-color {
+    background-color: #FCD116;
+}
+
+.frame-profile .step-type-43 .span-bg-color {
+    background-color: #1a237e;
+}
+
+.frame-profile .step-type-99 .span-bg-color {
+    background-color: #28AE7B;
+}
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+.frame-xlog-steps .step .main-value {
+    position: absolute;
+    top: 6px;
+    white-space: nowrap;
+    width: 0;
+    height: 100%;
+    padding-top: 4px;
+    box-sizing: border-box;
+    padding-left: 4px;
+}
+
+.narrow .frame-xlog-steps .step .main-value {
+    top: 0;
+}
+
+.frame-xlog-steps .step .main-value .main-value-text {
+    overflow-x: hidden;
+    text-overflow: ellipsis;
+    overflow-y: hidden;
+    padding: 0 7px 0;
+    top: 0;
+    width: 50%;
+    font-size: 10px;
+    box-sizing: border-box;
+    color: #888;
+    margin-top: 6px;
+}
+
+.frame-xlog-steps .step .main-value .main-value-text.left-side {
+    position: absolute;
+    left: 0;
+    text-align: left;
+}
+
+.frame-xlog-steps .step .main-value .main-value-text.right-side {
+    position: absolute;
+    right: 0;
+    text-align: right;
+}
+
+.frame-xlog-steps.wrap .step {
+    white-space: normal;
+    word-break: break-all;
+    vertical-align: top;
+}
+
+@media screen and (max-width: 800px) {
+    .frame-profile {
+        padding: 10px;
+        font-size: 12px;
+    }
+
+    .frame-profile div.xlog-data {
+        margin-bottom: 10px;
+    }
+}
+
+.frame-profile .tx-nav {
+    /*margin-bottom: 10px;*/
+    margin-bottom: 1px;
+    vertical-align: top;
+}
+
+.frame-profile .tx-link-wrapper {
+    display: inline-block;
+    vertical-align: top;
+}
+
+.frame-profile .tx-link {
+    margin-right: 5px;
+    display: inline-block;
+    _border: 1px solid rgba(0, 0, 0, 0.3);
+    border-radius: 3px;
+    /*background-color: #007FFF;
+    color: white;*/
+}
+
+.frame-profile .tx-link.link-other-tx {
+    color: #0276FD;
+    cursor: pointer;
+}
+
+.frame-profile .tx-link.link-other-tx:hover {
+    color: #003F87;
+}
+
+.frame-profile .tx-link .type {
+    padding: 0;
+    display: inline-block;
+    display: none;
+}
+
+.frame-profile .tx-link .txid {
+    padding: 0 !important;
+    display: inline-block;
+}
+
+.frame-profile .tx-link.current {
+    font-weight: bold;
+}
+
+.frame-profile .tx-link-wrapper .arrow {
+    margin-right: 5px;
+    display: inline-block;
+}
+
+.frame-profile .frame-step-detail-popup {
+    position: absolute;
+    top: 0;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    background-color: rgba(0, 0, 0, 0.6);
+    display: table;
+    width: 100%;
+    height: 100%;
+    z-index: 2;
+}
+
+.frame-profile .frame-step-detail-popup > div {
+    display: table-cell;
+    width: 100%;
+    height: 100%;
+    vertical-align: middle;
+    padding: 0 10px;
+    position: relative;
+    box-sizing: border-box;
+}
+
+.frame-profile .frame-step-detail-popup > div > div {
+    background-color: white;
+    height: 500px;
+    width: 100%;
+
+}
+
+.frame-profile-step-detail pre {
+    font-family: 'Righteous', 'Nanum Gothic', cursive !important;
+    margin: 0;
+}

@@ -13,9 +13,11 @@ import XLogBar from './Paper/XLogBar/XLogBar';
 import EmptyBox from './Paper/EmptyBox/EmptyBox';
 import PaperControl from './Paper/PaperControl/PaperControl';
 import Settings from './Settings/Settings';
-import InstanceInfo from './Menu/InstanceInfo/InstanceInfo';
 import InstanceSelector from './Menu/InstanceSelector/InstanceSelector';
 import XLogFilter from './Paper/XLogFilter/XLogFilter';
+import Logo from './Logo/Logo';
+import ObjectSelector from './ObjectSelector/ObjectSelector';
+import SimpleSelector from './SimpleSelector/SimpleSelector';
 
 export {
     ContentWrapper,
@@ -33,7 +35,9 @@ export {
     EmptyBox,
     PaperControl,
     Settings,
-    InstanceInfo,
     InstanceSelector,
-    XLogFilter
+    XLogFilter,
+    Logo,
+    ObjectSelector,
+    SimpleSelector
 };

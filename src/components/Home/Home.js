@@ -21,49 +21,60 @@ class Home extends Component {
 
     componentDidMount = () => {
         let that = this;
-        var url = 'https://api.github.com/repos/mindplates/scouter-paper/releases/latest';
-        jQuery.get(url).done(function (data) {
-            if (data.tag_name > version) {
 
-                let lines = data.body.split("\n");
-                let text = {
-                    title : lines[0],
-                    category : []
-                };
+        if(this.props.config.others.checkUpdate === "Y") {
+            var url = 'https://api.github.com/repos/mindplates/scouter-paper/releases/latest';
+            jQuery.get(url).done(function (data) {
+                if (data.tag_name > version) {
 
-                let current;
-                for (let i=1; i<lines.length; i++) {
-                    let line = lines[i];
-                    if (!line || line.trim() === "") {
-                        continue;
-                    }
+                    let lines = data.body.split("\n");
+                    let text = {
+                        title: lines[0],
+                        category: []
+                    };
 
-                    if (line[0] === "<") {
-                        text.category.push({
-                            title : line.substring(1, line.length - 2),
-                            lines : []
-                        });
-                        current = text.category[text.category.length - 1];
-                        continue;
-                    } else {
-                        if (line[0] === "-") {
-                            current.lines.push(line.substring(1, line.length - 1));
-                        } else {
-                            current.lines.push(line);
+                    let current;
+                    for (let i = 1; i < lines.length; i++) {
+                        let line = lines[i];
+                        if (!line || line.trim() === "") {
+                            continue;
                         }
 
-                    }
-                }
+                        if (line[0] === "<") {
+                            text.category.push({
+                                title: line.substring(1, line.length - 2),
+                                lines: []
+                            });
+                            current = text.category[text.category.length - 1];
+                            continue;
+                        } else {
+                            if (!current) {
+                                text.category.push({
+                                    title: "MISC",
+                                    lines: []
+                                });
+                                current = text.category[text.category.length - 1];
+                            }
 
-                that.setState({
-                    release : true,
-                    version : data.name,
-                    url : data.html_url,
-                    _text : data.body,
-                    text :text
-                });
-            }
-        });
+                            if (line[0] === "-") {
+                                current.lines.push(line.substring(1, line.length - 1));
+                            } else {
+                                current.lines.push(line);
+                            }
+
+                        }
+                    }
+
+                    that.setState({
+                        release: true,
+                        version: data.name,
+                        url: data.html_url,
+                        _text: data.body,
+                        text: text
+                    });
+                }
+            });
+        }
     };
 
     render() {

@@ -91,6 +91,10 @@ class XLog extends Component {
             return true;
         }
 
+        if (nextProps.filterMap && JSON.stringify(nextProps.filterMap) !== JSON.stringify(this.props.filterMap)) {
+            return true;
+        }
+
         return false;
     }
 
@@ -141,31 +145,48 @@ class XLog extends Component {
             this.clear();
             this.redraw(this.props.filter);
         }
+
+        if (this.props.filterMap && JSON.stringify(prevProps.filterMap) !== JSON.stringify(this.props.filterMap)) {
+            this.clear();
+            this.redraw(this.props.filter);
+        }
     };
 
+    resizeTimer = null;
     graphResize = () => {
-        let box = this.refs.xlogViewer.parentNode.parentNode.parentNode;
-
-        let currentWidth = 0;
-        if (this.props.box.values.showPreview === "Y") {
-            currentWidth = box.offsetWidth - this.graph.margin.left - this.graph.preview.width;
-        } else {
-            currentWidth = box.offsetWidth - this.graph.margin.left - this.graph.margin.right;
+        if (this.resizeTimer) {
+            clearTimeout(this.resizeTimer);
+            this.resizeTimer = null;
         }
 
-        if ((currentWidth !== this.graph.width) || (this.graph.height !== box.offsetHeight - this.graph.margin.top - this.graph.margin.bottom - 27)) {
-            this.graphInit();
-        }
+        this.resizeTimer = setTimeout(() => {
+            let box = this.refs.xlogViewer.parentNode.parentNode.parentNode;
+
+            let currentWidth = 0;
+            if (this.props.box.values.showPreview === "Y") {
+                currentWidth = box.offsetWidth - this.graph.margin.left - this.graph.preview.width;
+            } else {
+                currentWidth = box.offsetWidth - this.graph.margin.left - this.graph.margin.right;
+            }
+
+            if ((currentWidth !== this.graph.width) || (this.graph.height !== box.offsetHeight - this.graph.margin.top - this.graph.margin.bottom - 27)) {
+                this.graphInit();
+            }
+        }, 300);
     };
 
     
 
-    draw = (xlogs, filter) => {
+    draw = async (xlogs, filter) => {
         if (this.refs.xlogViewer && xlogs) {
             let context = d3.select(this.refs.xlogViewer).select("canvas").node().getContext("2d");
             
-            let datas = common.getFilteredData(xlogs, filter);
+            //let datas = common.getFilteredData(xlogs, filter);
+            let datas = await common.getFilteredData0(xlogs, filter, this.props);
             datas.forEach((d, i) => {
+                if (!this.props.filterMap[d.objHash]) {
+                    return;
+                }
                 let x = this.graph.x(d.endTime);
                 let y = this.graph.y(d.elapsed);
 
@@ -505,7 +526,8 @@ class XLog extends Component {
 let mapStateToProps = (state) => {
     return {
         config: state.config,
-        user: state.user
+        user: state.user,
+        filterMap: state.target.filterMap
     };
 };
 

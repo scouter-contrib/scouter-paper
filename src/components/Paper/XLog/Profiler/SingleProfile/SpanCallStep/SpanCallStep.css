@@ -1,0 +1,46 @@
+.spancall-step .main-value {
+    color: #1a237e;
+    padding: 9px 5px 0;
+    font-weight: bold;
+}
+
+.narrow .spancall-step .main-value {
+    padding: 2px 10px;
+}
+
+.spancall-step .main-value .gray {
+    color: #AAAAAA;
+}
+
+.spancall-step .main-value.tag {
+    font-weight: normal;
+    color: #AAAAAA;
+}
+
+.spancall-step .span-content pre {
+    font-family: inherit !important;
+    margin: 0;
+}
+
+.spancall-step .span-content {
+    margin-top: 10px;
+}
+
+.spancall-step .span-content:last-child {
+    margin-bottom: 10px;
+}
+
+.spancall-step .span-content .span-title {
+    padding: 0 5px 0;
+    background-color: #EEE;
+    display: inline-block;
+    margin-left: 5px;
+}
+
+.spancall-step .span-content .span-value {
+    padding: 2px 5px 0;
+}
+
+.spancall-step .main-value.url:before {
+    content: "[CALL] ";
+}

@@ -1,0 +1,242 @@
+.paper-logo-wrapper {
+    text-align: center;
+    padding: 20px 0;
+    background-color: #282828;
+    background-color: #104E8B;
+    background-color: #26466D;
+    position: relative;
+    height: 60px;
+    box-sizing: border-box;
+    background-color: rgba(0,0,0,0.2);
+}
+
+.min .paper-logo-wrapper {
+    padding: 0;
+    height: 60px;
+}
+
+.paper-logo-wrapper div.paper-logo {
+    font-size: 16px;
+    padding: 0;
+    text-align: center;
+    position: relative;
+    box-sizing: border-box;
+    color: white;
+    display: inline-block;
+    cursor: pointer;
+    -webkit-touch-callout: none;
+    -webkit-user-select: none;
+    -moz-user-select: none;
+    -ms-user-select: none;
+    user-select: none;
+    width: 40px;
+    font-family: 'Bungee', sans-serif;
+    top : 2px;
+}
+
+@media screen and (max-width: 800px) {
+    .paper-logo-wrapper div.paper-logo {
+        top : -2px;
+    }
+}
+
+.paper-logo-wrapper div.paper-logo a {
+    color: white;
+    text-decoration: none;
+    display: inline-block;
+}
+
+.paper-logo-wrapper div.paper-logo a:hover {
+    color: #FFCC11;
+}
+
+.paper-logo-wrapper div.paper-logo .logo-icon {
+    text-align: center;
+    width: 100%;
+    box-sizing: border-box;
+    z-index: 2;
+    font-size: 16px;
+    position: relative;
+    top: -10px;
+}
+
+.min .paper-logo-wrapper div.paper-logo .logo-icon {
+    top: 16px;
+}
+
+
+.paper-logo-wrapper div.paper-logo .logo-text-div {
+    width: 100%;
+    text-align: center;
+    height: 0;
+    padding-right: 10px;
+}
+
+.min .paper-logo-wrapper div.paper-logo .logo-text-div {
+    display: none;
+}
+
+.min .paper-logo-wrapper div.paper-logo .logo-icon {
+    display: none;
+}
+
+.paper-logo-wrapper div.paper-logo .logo-text {
+    font-size: 10px;
+    padding: 0;
+    border-radius: 5px;
+    text-decoration: none;
+    position: absolute;
+    left: 0;
+    width: 100%;
+}
+
+.paper-logo-wrapper div.paper-logo .logo-text-1 {
+    top: 0;
+}
+
+.paper-logo-wrapper div.paper-logo .logo-text-2 {
+    top: 10px;
+}
+
+.paper-logo-wrapper div.paper-logo:hover {
+    color: #FFCC11;
+}
+
+.paper-logo-wrapper .side-icon {
+    color: white;
+    position: absolute;
+    top : 0;
+    right : 0;
+    display: inline-block;
+    vertical-align: top;
+    height: 100%;
+}
+
+.paper-logo-wrapper .short-side-icon {
+    display: none;
+    font-size: 16px;
+    padding-top: 20px;
+    cursor: pointer;
+    height: 100%;
+    box-sizing: border-box;
+
+}
+
+.min .paper-logo-wrapper .side-icon {
+    display: block;
+    height: 60px;
+    bottom : 0;
+    top : auto;
+    width: 100%;
+}
+
+.paper-logo-wrapper .side-icon > div {
+    display: table;
+    height: 100%;
+}
+
+.min .paper-logo-wrapper .side-icon > div {
+    display: block;
+    height: auto;
+}
+
+.paper-logo-wrapper .side-icon > div > div {
+    display: table-cell;
+    vertical-align: middle;
+    height: 100%;
+    width: 30px;
+    text-align: center;
+}
+
+.min .paper-logo-wrapper .side-icon > div > div {
+    display: block;
+    width: auto;
+    padding: 0;
+}
+.min .paper-logo-wrapper .side-icon > div > div.pin-wrapper {
+    display: none;
+}
+
+.paper-logo-wrapper .side-icon > div > div.pin-wrapper:hover,
+.paper-logo-wrapper .side-icon > div > div.max-wrapper:hover {
+    background-color: rgba(0,0,0,0.3);
+    color: #333;
+    background-color: #FFCC11;;
+    cursor: pointer;
+}
+
+.paper-logo-wrapper .side-icon > span {
+    display: inline-block;
+    box-sizing: border-box;
+    background-color: rgba(0,0,0,0.3);
+    border-radius: 50%;
+    text-align: center;
+    vertical-align: top;
+}
+
+.paper-logo-wrapper .side-icon span.pin-btn .pinned,
+.paper-logo-wrapper .side-icon span.pin-btn .no-pinned {
+    display: none;
+}
+
+.paper-logo-wrapper .side-icon span.pin-btn.pinned .pinned {
+    display: inline-block;
+}
+
+.paper-logo-wrapper .side-icon span.pin-btn.no-pinned .no-pinned {
+    display: inline-block;
+}
+
+.paper-logo-wrapper .side-icon span.max-btn.min {
+    height: 60px;
+    display: inline-block;
+    padding-top: 24px;
+    box-sizing: border-box;
+}
+
+.paper-logo-wrapper .side-icon span.max-btn.max {
+    font-size: 22px;
+}
+
+.paper-logo-wrapper .side-icon .max-btn.fixed .min {
+    display: none;
+}
+
+.paper-logo-wrapper .side-icon .max-btn.max .min {
+    display: none;
+}
+
+.paper-logo-wrapper .side-icon .max-btn.min .max {
+    display: none;
+}
+
+@media screen and (max-width: 800px) {
+    .min .paper-logo-wrapper .short-side-icon {
+        display: block;
+        padding-top: 13px;
+    }
+
+    .min .paper-logo-wrapper .paper-logo {
+        display: none;
+    }
+
+    .min .paper-logo-wrapper .side-icon {
+        display: none;
+    }
+
+}
+
+@media screen and (max-width: 800px) {
+    .paper-logo-wrapper {
+        height: 45px;
+    }
+
+    .min .paper-logo-wrapper {
+        height: 45px;
+    }
+
+    .paper-logo-wrapper .side-icon > div > div.pin-wrapper {
+        display: none;
+    }
+}
+

@@ -45,6 +45,20 @@
     font-size: 11px;
 }
 
+.xlog-filter .xlog-filter-help-btn {
+    position: absolute;
+    top : 2px;
+    right : 22px;
+    padding: 4px 4px;
+    background: transparent;
+    font-size: 14px;
+    border-radius: 3px;
+}
+
+.xlog-filter .xlog-filter-help-btn:hover {
+    background: rgba(0,0,0,0.1);
+}
+
 .xlog-filter .xlog-filter-close-btn {
     position: absolute;
     top : 2px;

@@ -4,19 +4,31 @@ import {addRequest, setControlVisibility, pushMessage} from '../../../../actions
 import {withRouter} from 'react-router-dom';
 import {connect} from 'react-redux';
 import jQuery from "jquery";
-import {setTxidPropsToUrl, getFilteredData, getHttpProtocol, errorHandler, getWithCredentials, setAuthHeader, getSearchDays, getDivideDays, getParam, getCurrentUser} from '../../../../common/common';
-import SingleProfile from "./SingleProfile/SingleProfile";
+import {
+    setTxidPropsToUrl,
+    getHttpProtocol,
+    errorHandler,
+    getWithCredentials,
+    setAuthHeader,
+    getSearchDays,
+    getDivideDays,
+    getParam,
+    getCurrentUser,
+    getFilteredData0
+} from '../../../../common/common';
+import FrameProfile from "./FrameProfile/FrameProfile";
 import ProfileList from "./ProfileList/ProfileList";
 import _ from "lodash";
 import moment from "moment";
 import copy from 'copy-to-clipboard';
-//import {disableBodyScroll, enableBodyScroll} from 'body-scroll-lock';
+import {IdAbbr} from "../../../../common/idAbbr";
 
 const xlogMaxSelectionCount = 200;
 
 class Profiler extends Component {
 
     txidInit = false;
+
     constructor(props) {
         super(props);
 
@@ -27,19 +39,17 @@ class Profiler extends Component {
         let options = this.getProfilerOptions();
         if (options) {
             options.summary = options.summary === undefined ? true : options.summary;
-            options.indent = options.indent === undefined ? true : options.indent;
+            options.narrow = options.narrow === undefined ? false : options.narrow;
             options.bind = options.bind === undefined ? true : options.bind;
-            options.wrap = options.wrap === undefined ? true : options.wrap;
-            options.gap = options.gap === undefined ? true : options.gap;
+            options.wrap = options.wrap === undefined ? false : options.wrap;
             options.formatter = options.formatter === undefined ? true : options.formatter;
         } else {
             options = {
                 summary: true,
-                indent: true,
+                narrow: false,
                 bind: true,
-                wrap: true,
-                gap: true,
-                formatter : true
+                wrap: false,
+                formatter: true
             }
         }
 
@@ -51,16 +61,15 @@ class Profiler extends Component {
             profile: null,
             steps: null,
             summary: options.summary,
-            indent: options.indent,
+            narrow: options.narrow,
             bind: options.bind,
             wrap: options.wrap,
-            gap: options.gap,
             formatter: options.formatter,
-            listWidth : 40,
-            smallScreen : false,
-            paramTxid : txid ? txid : null,
-            paramTxidDate : txiddate ? txiddate : null,
-            copyBtnText : "COPY URL"
+            listWidth: 40,
+            smallScreen: false,
+            paramTxid: txid ? txid : null,
+            paramTxidDate: txiddate ? txiddate : null,
+            copyBtnText: "COPY URL"
         };
     }
 
@@ -118,7 +127,7 @@ class Profiler extends Component {
             return true;
         }
 
-        if (nextState.indent !== this.state.indent) {
+        if (nextState.narrow !== this.state.narrow) {
             return true;
         }
 
@@ -127,10 +136,6 @@ class Profiler extends Component {
         }
 
         if (nextState.wrap !== this.state.wrap) {
-            return true;
-        }
-
-        if (nextState.gap !== this.state.gap) {
             return true;
         }
 
@@ -155,7 +160,7 @@ class Profiler extends Component {
 
         if (this.state.smallScreen !== smallScreen) {
             this.setState({
-                smallScreen : smallScreen
+                smallScreen: smallScreen
             })
         }
     };
@@ -174,7 +179,7 @@ class Profiler extends Component {
                     let y1 = nextProps.selection.y1;
                     let y2 = nextProps.selection.y2;
                     let filter = nextProps.selection.filter;
-                    this.getList(x1, x2, y1, y2, filter);
+                    this.getList(x1, x2, y1, y2, filter, nextProps.filterMap);
                 }
             } else {
                 if (!this.txidInit) {
@@ -185,7 +190,7 @@ class Profiler extends Component {
                     });
 
                     this.rowClick({
-                        txid : this.state.paramTxid
+                        txid: this.state.paramTxid
                     }, this.state.paramTxidDate);
                 }
 
@@ -224,7 +229,7 @@ class Profiler extends Component {
         return null;
     };
 
-    getList = (x1, x2, y1, y2, filter) => {
+    getList = (x1, x2, y1, y2, filter, filterMap) => {
         let days = getSearchDays(x1, x2);
         let fromTos = getDivideDays(x1, x2);
 
@@ -234,17 +239,17 @@ class Profiler extends Component {
             });
 
             for (let i = 0; i < fromTos.length; i++) {
-                this.getListData(fromTos[i].from, fromTos[i].to , y1, y2, true, filter);
+                this.getListData(fromTos[i].from, fromTos[i].to, y1, y2, true, filter, filterMap);
             }
 
         } else {
-            this.getListData(x1, x2, y1, y2, false, filter);
+            this.getListData(x1, x2, y1, y2, false, filter, filterMap);
         }
     };
 
 
     // search의 경우, 마지막 newXLogs가 allXLogs에 들어 있는 문제 있음
-    getListData = (x1, x2, y1, y2, append, filter) => {
+    getListData = async (x1, x2, y1, y2, append, filter, filterMap) => {
         let that = this;
         let allXLogs = that.props.xlogs;
         let newXLogs = that.props.newXLogs;
@@ -256,7 +261,7 @@ class Profiler extends Component {
                 .filter(x => x1 <= x.endTime * 1 && x.endTime * 1 <= x2 && y1 <= x.elapsed * 1 && x.elapsed * 1 <= y2)
                 .take(xlogMaxSelectionCount).value();
 
-            let last =  xlogMaxSelectionCount - filtered1.length;
+            let last = xlogMaxSelectionCount - filtered1.length;
             let filtered2 = [];
             if (last > 0) {
                 filtered2 = _(newXLogs)
@@ -283,7 +288,11 @@ class Profiler extends Component {
 
         }
 
-        filtered = getFilteredData(filtered, filter);
+        filtered = await getFilteredData0(filtered, filter);
+
+        filtered = filtered.filter((d) => {
+            return filterMap[d.objHash];
+        });
 
         let date = moment(new Date(x1)).format("YYYYMMDD");
 
@@ -347,7 +356,7 @@ class Profiler extends Component {
             txid: null,
             profile: null,
             steps: null,
-            paramTxid : null,
+            paramTxid: null,
             paramTxidDate: null
         });
 
@@ -384,8 +393,7 @@ class Profiler extends Component {
             });
         }
 
-        let tdate = (txiddate ? txiddate : moment(new Date(Number(xlog.endTime))).format("YYYYMMDD"));
-        setTxidPropsToUrl(this.props, tdate, xlog.txid);
+        const tdate = (txiddate ? txiddate : moment(new Date(Number(xlog.endTime))).format("YYYYMMDD"));
 
         // XLOG DATA
         this.props.setControlVisibility("Loading", true);
@@ -399,60 +407,68 @@ class Profiler extends Component {
                 setAuthHeader(xhr, that.props.config, getCurrentUser(that.props.config, that.props.user));
             }
         }).done((msg) => {
-            this.setState({
-                profile: msg.result
-            });
+            if (msg.result) {
+                setTxidPropsToUrl(this.props, tdate, xlog.txid);
+                msg.result.txidAbbr = IdAbbr.abbr(msg.result.txid);
 
-            // Profile Data
-            this.props.addRequest();
-            jQuery.ajax({
-                method: "GET",
-                async: true,
-                url: getHttpProtocol(this.props.config) + '/scouter/v1/profile-data/' + (txiddate ? txiddate : moment(new Date(Number(xlog.endTime))).format("YYYYMMDD")) + "/" + xlog.txid,
-                xhrFields: getWithCredentials(that.props.config),
-                beforeSend: function (xhr) {
-                    setAuthHeader(xhr, that.props.config, getCurrentUser(that.props.config, that.props.user));
-                }
-            }).done((msg) => {
-                const orderedSteps = _.orderBy(msg.result, (e) => Number(e.step.order), ['asc']);
-                this.addIndentPropertyTo(orderedSteps);
-
-                const eos = {
-                    mainValue: "end of service",
-                    additionalValueList: [],
-                    step: {
-                        parent: "-1",
-                        index: orderedSteps.length + 1,
-                        start_time: this.state.profile &&this.state.profile.elapsed,
-                        start_cpu: "0",
-                        message: "end of service",
-                        stepType: "3",
-                        order: orderedSteps.length + 1,
-                        stepTypeName: "MESSAGE"
-                    }
-                };
-                orderedSteps.push(eos);
                 this.setState({
-                    steps: orderedSteps
+                    profile: msg.result
                 });
 
-            }).fail((xhr, textStatus, errorThrown) => {
-                errorHandler(xhr, textStatus, errorThrown, this.props);
-            }).always(() => {
-                this.props.setControlVisibility("Loading", false);
-            });
+                // Profile Data
+                this.props.addRequest();
+                jQuery.ajax({
+                    method: "GET",
+                    async: true,
+                    url: getHttpProtocol(this.props.config) + '/scouter/v1/profile-data/' + (txiddate ? txiddate : moment(new Date(Number(xlog.endTime))).format("YYYYMMDD")) + "/" + xlog.txid,
+                    xhrFields: getWithCredentials(that.props.config),
+                    beforeSend: function (xhr) {
+                        setAuthHeader(xhr, that.props.config, getCurrentUser(that.props.config, that.props.user));
+                    }
+                }).done((msg) => {
+                    const orderedSteps = _.orderBy(msg.result, (e) => Number(e.step.order), ['asc']);
+                    this.addTxidAbbrPropertyTo(orderedSteps);
+
+                    const eos = {
+                        mainValue: "end of service",
+                        additionalValueList: [],
+                        step: {
+                            parent: "-1",
+                            index: orderedSteps.length,
+                            start_time: this.state.profile && this.state.profile.elapsed,
+                            start_cpu: "0",
+                            message: "end of service",
+                            stepType: "3",
+                            order: orderedSteps.length,
+                            stepTypeName: "MESSAGE",
+                            elapsed : undefined
+                        }
+                    };
+                    orderedSteps.push(eos);
+                    this.setState({
+                        steps: orderedSteps
+                    });
+
+                }).fail((xhr, textStatus, errorThrown) => {
+                    errorHandler(xhr, textStatus, errorThrown, this.props);
+                }).always(() => {
+                    this.props.setControlVisibility("Loading", false);
+                });
+            }
+
         }).fail((xhr, textStatus, errorThrown) => {
             errorHandler(xhr, textStatus, errorThrown, this.props);
+            this.props.setControlVisibility("Loading", false);
+        }).always(() => {
             this.props.setControlVisibility("Loading", false);
         });
     };
 
-    addIndentPropertyTo(orderedSteps) {
-        const indentMap = {};
-        orderedSteps.forEach((v) => {
-            const indent = indentMap.hasOwnProperty(v.step.parent) ? indentMap[v.step.parent] + 1 : 0;
-            indentMap[v.step.index] = indent;
-            v.step.indent = indent;
+    addTxidAbbrPropertyTo(steps) {
+        steps.forEach((v) => {
+            if (v.step.txid) {
+                v.step.txidAbbr = IdAbbr.abbr(v.step.txid);
+            }
         });
     }
 
@@ -463,11 +479,11 @@ class Profiler extends Component {
         this.setProfilerOptions("summary", !this.state.summary);
     };
 
-    toggleIndent = () => {
+    toggleNarrow = () => {
         this.setState({
-            indent: !this.state.indent
+            narrow: !this.state.narrow
         });
-        this.setProfilerOptions("indent", !this.state.indent);
+        this.setProfilerOptions("narrow", !this.state.narrow);
     };
 
     toggleBind = () => {
@@ -482,13 +498,6 @@ class Profiler extends Component {
             wrap: !this.state.wrap
         });
         this.setProfilerOptions("wrap", !this.state.wrap);
-    };
-
-    toggleGap = () => {
-        this.setState({
-            gap: !this.state.gap
-        });
-        this.setProfilerOptions("gap", !this.state.gap);
     };
 
     toggleFormatter = () => {
@@ -526,7 +535,7 @@ class Profiler extends Component {
         }
 
         this.setState({
-            listWidth : listWidth
+            listWidth: listWidth
         });
     };
 
@@ -540,12 +549,12 @@ class Profiler extends Component {
         copy(window.location.href);
 
         this.setState({
-            copyBtnText : "COPIED!"
+            copyBtnText: "COPIED!"
         });
 
         setTimeout(() => {
             this.setState({
-                copyBtnText : "COPY URL"
+                copyBtnText: "COPY URL"
             });
         }, 2000);
     };
@@ -557,20 +566,27 @@ class Profiler extends Component {
         if (!this.state.paramTxid) {
             if (this.state.smallScreen) {
                 if (this.state.txid) {
-                    leftStyle = {width : "100%", display : "none"};
-                    rightStyle= {width : "100%", display : "inline-block"};
+                    leftStyle = {width: "100%", display: "none"};
+                    rightStyle = {width: "100%", display: "inline-block"};
                 } else {
-                    leftStyle = {width : "100%", display : "inline-block"};
-                    rightStyle= {width : "100%", display : "none"};
+                    leftStyle = {width: "100%", display: "inline-block"};
+                    rightStyle = {width: "100%", display: "none"};
                 }
             } else {
-                leftStyle = {width : this.state.listWidth + "%", display : this.state.listWidth === 0 ? "none" : "inline-block"};
-                rightStyle = {width : (100 - this.state.listWidth) + "%", display : this.state.listWidth === 100 ? "none" : "inline-block"}
+                leftStyle = {
+                    width: this.state.listWidth + "%",
+                    display: this.state.listWidth === 0 ? "none" : "inline-block"
+                };
+                rightStyle = {
+                    width: (100 - this.state.listWidth) + "%",
+                    display: this.state.listWidth === 100 ? "none" : "inline-block"
+                }
             }
         }
 
         return (
-            <div className={"xlog-profiler " + (this.state.paramTxid ? 'param-mode ' : ' ') + (this.state.show ? ' ' : 'hidden')}>
+            <div
+                className={"xlog-profiler " + (this.state.paramTxid ? 'param-mode ' : ' ') + (this.state.show ? ' ' : 'hidden')}>
                 <div>
                     <div className="size-control-btns">
                         {!this.state.paramTxid && <button onClick={this.changeListWidth.bind(this, "min")}><i className="fa fa-angle-double-left"></i></button>}
@@ -593,25 +609,37 @@ class Profiler extends Component {
                     }
                     <div className="profiler-layout right" style={rightStyle}>
                         <div className="summary">
-                            {(!this.state.paramTxid && this.state.smallScreen) && <div onClick={this.clearTxId.bind(this)} className="profile-list-btn"><i className="fa fa-chevron-circle-left"></i></div>}
-                            {!this.state.txid  && <div className="title">NO PROFILE SELECTED</div>}
-                            {this.state.txid  && <div className="title">DETAIL <span className="selected-info">({this.state.txid ? 'TXID : ' + this.state.txid : 'NO PROFILE SELECTED'})</span>{this.state.txid ? <span className="copy-url-btn" onClick={this.copyUrl}>{this.state.copyBtnText}</span> : null}</div>}
-                            {!this.state.txid && this.state.paramTxid  && <div className="title">DETAIL <span className="selected-info">({this.state.paramTxid ? 'TXID : ' + this.state.paramTxid : 'NO PROFILE SELECTED'})</span>{this.state.paramTxid ? <span className="copy-url-btn" onClick={this.copyUrl}>{this.state.copyBtnText}</span> : null}</div>}
+                            {(!this.state.paramTxid && this.state.smallScreen) &&
+                            <div onClick={this.clearTxId.bind(this)} className="profile-list-btn"><i className="fa fa-chevron-circle-left"></i></div>}
+                            {!this.state.txid && <div className="title">NO PROFILE SELECTED</div>}
+                            {this.state.txid && <div className="title">DETAIL <span className="selected-info">({this.state.txid ? 'TXID : ' + this.state.txid : 'NO PROFILE SELECTED'})</span>{this.state.txid ? <span className="copy-url-btn" onClick={this.copyUrl}>{this.state.copyBtnText}</span> : null}</div>}
+                            {!this.state.txid && this.state.paramTxid && <div className="title">DETAIL <span className="selected-info">({this.state.paramTxid ? 'TXID : ' + this.state.paramTxid : 'NO PROFILE SELECTED'})</span>{this.state.paramTxid ? <span className="copy-url-btn" onClick={this.copyUrl}>{this.state.copyBtnText}</span> : null}</div>}
                             <div className="profile-steps-control noselect">
                                 <div className={"profile-control-btn " + (this.state.summary ? 'active' : '')} onClick={this.toggleSummary}>{this.state.summary ? <i className="fa fa-check-circle"></i> : <i className="fa fa-circle-o"></i>} SUMMARY</div>
-                                <div className={"profile-control-btn " + (this.state.indent ? 'active' : '')} onClick={this.toggleIndent}>{this.state.indent ? <i className="fa fa-check-circle"></i> : <i className="fa fa-circle-o"></i>} INDENT</div>
+                                <div className={"profile-control-btn " + (this.state.narrow ? 'active' : '')} onClick={this.toggleNarrow}>{this.state.narrow ? <i className="fa fa-check-circle"></i> : <i className="fa fa-circle-o"></i>} NARROW</div>
                                 <div className={"profile-control-btn " + (this.state.bind ? 'active' : '')} onClick={this.toggleBind}>{this.state.bind ? <i className="fa fa-check-circle"></i> : <i className="fa fa-circle-o"></i>} BIND</div>
                                 <div className={"profile-control-btn " + (this.state.wrap ? 'active' : '')} onClick={this.toggleWrap}>{this.state.wrap ? <i className="fa fa-check-circle"></i> : <i className="fa fa-circle-o"></i>} WRAP</div>
-                                <div className={"profile-control-btn " + (this.state.gap ? 'active' : '')} onClick={this.toggleGap}>{this.state.gap ? <i className="fa fa-check-circle"></i> : <i className="fa fa-circle-o"></i>} GAP</div>
                                 <div className={"profile-control-btn " + (this.state.formatter ? 'active' : '')} onClick={this.toggleFormatter}>{this.state.formatter ? <i className="fa fa-check-circle"></i> : <i className="fa fa-circle-o"></i>} FORMATTER</div>
                             </div>
                             <div className="close-btn" onClick={this.close}></div>
                         </div>
-                        <div className={"profile-steps"}>
+                        <div className={"profile-steps " + (this.state.narrow ? 'narrow' : '')}>
                             <div className="profile-steps-content scrollbar">
-                                {(this.state.paramTxid || this.state.txid) && <SingleProfile rowClick={this.rowClick} txid={this.state.txid} profile={this.state.profile} steps={this.state.steps} summary={this.state.summary} indent={this.state.indent} bind={this.state.bind} wrap={this.state.wrap} gap={this.state.gap} formatter={this.state.formatter}/>}
-                                {(!this.state.paramTxid && !this.state.txid) && <div className="no-profile"><div>NO PROFILE SELECTED</div></div>}
-                                </div>
+                                {(this.state.paramTxid || this.state.txid) &&
+                                <FrameProfile rowClick={this.rowClick} txid={this.state.txid}
+                                               profile={this.state.profile} steps={this.state.steps}
+                                               summary={this.state.summary} narrow={this.state.narrow}
+                                               bind={this.state.bind} wrap={this.state.wrap}
+                                               formatter={this.state.formatter}
+                                               toggleFormatter={this.toggleFormatter}
+                                               toggleBind={this.toggleBind}
+                                               toggleWrap={this.toggleWrap}
+                                               listWidth={this.state.listWidth} />
+                                }
+                                {(!this.state.paramTxid && !this.state.txid) && <div className="no-profile">
+                                    <div>NO PROFILE SELECTED</div>
+                                </div>}
+                            </div>
                         </div>
                     </div>
                 </div>
@@ -624,7 +652,8 @@ let mapStateToProps = (state) => {
     return {
         objects: state.target.objects,
         config: state.config,
-        user: state.user
+        user: state.user,
+        filterMap: state.target.filterMap
     };
 };
 

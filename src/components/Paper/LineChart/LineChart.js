@@ -64,59 +64,11 @@ class LineChart extends Component {
         /*if (this.props.visible && this.props.countersHistoryTimestamp !== nextProps.countersHistoryTimestamp) {
             return true;
         }*/
+
         return !!this.props.visible;
     }
 
-    loadHistoryCounter(countersHistory, counterKey, longTerm) {
-        let decimalPoint = this.props.config.decimalPoint;
-        let pow = 1;
 
-        if (decimalPoint > 0) {
-            pow = Math.pow(10, decimalPoint);
-        }
-
-        let counters = this.state.counters;
-        counters[counterKey] = [];
-        const timeKeyRow = {};
-        for (let objHash in countersHistory[counterKey]) {
-
-            let timeList = countersHistory[counterKey][objHash].timeList;
-            let valueList = countersHistory[counterKey][objHash].valueList;
-            let unit = countersHistory[counterKey][objHash].unit;
-
-            for (let j = 0; j < timeList.length; j++) {
-                let row = {};
-                let timeUnit = 2000;
-                if (longTerm) {
-                    timeUnit = 1000 * 60 * 5;
-                }
-                row.time = parseInt(timeList[j] / timeUnit, 10) * timeUnit;
-                row.data = {};
-                row.data[objHash] = {
-                    objHash: objHash,
-                    value: Math.round(valueList[j] * pow) / pow,
-                    unit: unit
-                };
-
-                if (!timeKeyRow[row.time]) {
-                    timeKeyRow[row.time] = row;
-                } else {
-                    timeKeyRow[row.time].data[objHash] = {
-                        objHash: objHash,
-                        value: Math.round(valueList[j] * pow) / pow,
-                        unit: unit
-                    };
-                }
-            }
-        }
-
-        for (const timeKey in timeKeyRow) {
-            counters[counterKey].push(timeKeyRow[timeKey]);
-        }
-        counters[counterKey].sort((a, b) => a.time - b.time);
-
-        return counters;
-    }
 
     componentWillReceiveProps(nextProps) {
         let counters = Object.assign({}, this.state.counters);
@@ -218,12 +170,57 @@ class LineChart extends Component {
 
         }
 
+    }
 
-        if (this.props.layoutChangeTime !== nextProps.layoutChangeTime) {
-            this.graphResize();
-            this.draw();
+    loadHistoryCounter(countersHistory, counterKey, longTerm) {
+        let decimalPoint = this.props.config.decimalPoint;
+        let pow = 1;
+
+        if (decimalPoint > 0) {
+            pow = Math.pow(10, decimalPoint);
         }
 
+        let counters = this.state.counters;
+        counters[counterKey] = [];
+        const timeKeyRow = {};
+        for (let objHash in countersHistory[counterKey]) {
+
+            let timeList = countersHistory[counterKey][objHash].timeList;
+            let valueList = countersHistory[counterKey][objHash].valueList;
+            let unit = countersHistory[counterKey][objHash].unit;
+
+            for (let j = 0; j < timeList.length; j++) {
+                let row = {};
+                let timeUnit = 2000;
+                if (longTerm) {
+                    timeUnit = 1000 * 60 * 5;
+                }
+                row.time = parseInt(timeList[j] / timeUnit, 10) * timeUnit;
+                row.data = {};
+                row.data[objHash] = {
+                    objHash: objHash,
+                    value: Math.round(valueList[j] * pow) / pow,
+                    unit: unit
+                };
+
+                if (!timeKeyRow[row.time]) {
+                    timeKeyRow[row.time] = row;
+                } else {
+                    timeKeyRow[row.time].data[objHash] = {
+                        objHash: objHash,
+                        value: Math.round(valueList[j] * pow) / pow,
+                        unit: unit
+                    };
+                }
+            }
+        }
+
+        for (const timeKey in timeKeyRow) {
+            counters[counterKey].push(timeKeyRow[timeKey]);
+        }
+        counters[counterKey].sort((a, b) => a.time - b.time);
+
+        return counters;
     }
 
     setMaxY = (counters, option) => {
@@ -304,9 +301,17 @@ class LineChart extends Component {
     }
 
     componentDidUpdate = (prevProps, prevState) => {
-        this.graphResize();
-        this.draw();
-        this.removeObjLine(prevProps.objects, this.props.objects);
+
+        if (prevProps.layoutChangeTime !== this.props.layoutChangeTime) {
+            if (this.graphResize()) {
+                this.draw();
+            }
+        } else {
+            this.graphResize();
+            this.draw();
+            this.removeObjLine(prevProps.objects, this.props.objects);
+        }
+
     };
 
     moveTooltip = () => {
@@ -452,7 +457,12 @@ class LineChart extends Component {
                 })
             }
 
-            area.data([that.state.counters[counterKey]]).attr("d", valueArea).style("fill", color).style("opacity", this.props.config.graph.fillOpacity);
+
+            if (!this.props.filterMap[obj.objHash]) {
+                area.data([that.state.counters[counterKey]]).attr("d", valueArea).style("fill", color).style("opacity", 0);
+            } else {
+                area.data([that.state.counters[counterKey]]).attr("d", valueArea).style("fill", color).style("opacity", this.props.config.graph.fillOpacity);
+            }
         }
 
 
@@ -506,55 +516,75 @@ class LineChart extends Component {
             }
         });
 
-        path.data([that.state.counters[counterKey]]).attr("d", valueLine).style("stroke-width", this.props.config.graph.width).style("opacity", this.props.config.graph.opacity);
+        if (!this.props.filterMap[obj.objHash]) {
+            path.data([that.state.counters[counterKey]]).attr("d", valueLine).style("stroke-width", this.props.config.graph.width).style("opacity", 0);
+        } else {
+            path.data([that.state.counters[counterKey]]).attr("d", valueLine).style("stroke-width", this.props.config.graph.width).style("opacity", this.props.config.graph.opacity);
+        }
     };
 
+    drawTimer = null;
 
     draw = () => {
 
         let that = this;
 
-        if (this.refs.lineChart && this.graph.svg) {
+        if (this.drawTimer) {
+            clearTimeout(this.drawTimer);
+            this.drawTimer = null;
+        }
 
-            this.graphAxis(this.graph.width, this.graph.height, false);
-            if (this.props.objects) {
-                let instanceMetricCount = {};
+        this.drawTimer = setTimeout(() => {
+            if (this.refs.lineChart && this.graph.svg) {
 
-                for (let counterKey in this.state.counters) {
-                    let thisOption = that.props.box.option.filter((d) => {return d.counterKey === counterKey})[0];
+                this.graphAxis(this.graph.width, this.graph.height, false);
+                if (this.props.objects) {
+                    let instanceMetricCount = {};
 
-                    if (!thisOption) {
-                        for (let i = 0; i < this.props.objects.length; i++) {
-                            this.removeObjectLine(this.props.objects[i], counterKey);
-                        }
-                    } else {
-                        for (let i = 0; i < this.props.objects.length; i++) {
-                            const obj = that.props.objects[i];
-                            if (!instanceMetricCount[obj.objHash]) {
-                                instanceMetricCount[obj.objHash] = 0;
+                    for (let counterKey in this.state.counters) {
+                        let thisOption = that.props.box.option.filter((d) => {return d.counterKey === counterKey})[0];
+
+                        if (!thisOption) {
+                            for (let i = 0; i < this.props.objects.length; i++) {
+                                this.removeObjectLine(this.props.objects[i], counterKey);
                             }
-                            let color;
-                            if (this.props.config.graph.color === "metric") {
-                                color = InstanceColor.getMetricColor(thisOption.counterKey, this.props.config.colorType);
-                            } else {
-                                color = InstanceColor.getInstanceColors(this.props.config.colorType)[obj.objHash][(instanceMetricCount[obj.objHash]++) % 5];
+                        } else {
+                            for (let i = 0; i < this.props.objects.length; i++) {
+                                const obj = that.props.objects[i];
+
+                                if (obj.objFamily === thisOption.familyName) {
+                                    if (!instanceMetricCount[obj.objHash]) {
+                                        instanceMetricCount[obj.objHash] = 0;
+                                    }
+                                    let color;
+                                    if (this.props.config.graph.color === "metric") {
+                                        color = InstanceColor.getMetricColor(thisOption.counterKey, this.props.config.colorType);
+                                    } else {
+                                        color = InstanceColor.getInstanceColors(this.props.config.colorType)[obj.objHash][(instanceMetricCount[obj.objHash]++) % 5];
+                                    }
+                                    this.drawObjectLine(obj, thisOption, counterKey, color);
+                                }
                             }
-                            this.drawObjectLine(obj, thisOption, counterKey, color);
                         }
                     }
                 }
             }
-        }
 
-        this.moveTooltip();
+            this.moveTooltip();
+        }, 200);
+
     };
 
 
     graphResize = () => {
+        let resized = false;
         let box = this.refs.lineChart.parentNode.parentNode.parentNode.parentNode;
         if ((box.offsetWidth - this.graph.margin.left - this.graph.margin.right !== this.graph.width) || (this.graph.height !== box.offsetHeight - this.graph.margin.top - this.graph.margin.bottom - 27)) {
+            resized = true;
             this.graphInit();
         }
+
+        return resized;
     };
 
     mouseOverObject = (obj, thisOption, color) => {
@@ -564,8 +594,15 @@ class LineChart extends Component {
         let circleKey = "circle-" + obj.objHash + "_" + this.replaceName(thisOption.counterKey);
         let circle = that.graph.focus.select("circle." + circleKey);
         if (circle.size() < 1) {
-            that.graph.focus.append("circle").attr("class", circleKey).attr("r", r).attr("stroke", color);
+            circle = that.graph.focus.append("circle").attr("class", circleKey).attr("r", r).attr("stroke", color);
         }
+
+        if (this.props.filterMap[obj.objHash]) {
+            circle.style("opacity", 1);
+        } else {
+            circle.style("opacity", 0);
+        }
+
     };
 
     mouseMoveObject = (obj, thisOption, counterKey, dataIndex, color, tooltip) => {
@@ -575,14 +612,16 @@ class LineChart extends Component {
         let unit = that.state.counters[counterKey][dataIndex].data[obj.objHash] ? that.state.counters[counterKey][dataIndex].data[obj.objHash].unit : "";
 
         if (that.state.counters[counterKey][dataIndex].time) {
-            tooltip.lines.push({
-                instanceName: obj.objName,
-                circleKey: circleKey,
-                metricName: thisOption.title,
-                value: obj.objHash && that.state.counters[counterKey][dataIndex].data[obj.objHash] ? that.state.counters[counterKey][dataIndex].data[obj.objHash].value : null,
-                displayValue: obj.objHash && that.state.counters[counterKey][dataIndex].data[obj.objHash] ? numeral(that.state.counters[counterKey][dataIndex].data[obj.objHash].value).format(this.props.config.numberFormat) + " " + unit : null,
-                color: color
-            });
+            if (this.props.filterMap[obj.objHash]) {
+                tooltip.lines.push({
+                    instanceName: obj.objName,
+                    circleKey: circleKey,
+                    metricName: thisOption.title,
+                    value: obj.objHash && that.state.counters[counterKey][dataIndex].data[obj.objHash] ? that.state.counters[counterKey][dataIndex].data[obj.objHash].value : null,
+                    displayValue: obj.objHash && that.state.counters[counterKey][dataIndex].data[obj.objHash] ? numeral(that.state.counters[counterKey][dataIndex].data[obj.objHash].value).format(this.props.config.numberFormat) + " " + unit : null,
+                    color: color
+                });
+            }
         } else {
             that.graph.focus.select("circle." + circleKey).style("display", "none");
         }
@@ -713,6 +752,7 @@ class LineChart extends Component {
                 for (let i = 0; i < that.props.objects.length; i++) {
                     const obj = that.props.objects[i];
                     if (thisOption.familyName === obj.objFamily) {
+
                         if (!instanceMetricCount[obj.objHash]) {
                             instanceMetricCount[obj.objHash] = 0;
                         }
@@ -799,7 +839,8 @@ class LineChart extends Component {
 let mapStateToProps = (state) => {
     return {
         objects: state.target.objects,
-        config: state.config
+        config: state.config,
+        filterMap: state.target.filterMap
     };
 };
 

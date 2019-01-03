@@ -1,0 +1,249 @@
+.frame-profile-step-detail {
+    position: relative;
+}
+
+.frame-profile-step-detail .title {
+    padding: 8px;
+    background-color: #333;
+    color: white;
+    height: 36px;
+    box-sizing: border-box;
+}
+
+.frame-profile-step-detail .title > span {
+    display: inline-block;
+    padding: 4px;
+}
+
+.frame-profile-step-detail .frame-step-detail-content {
+    height: calc(100% - 36px - 58px);
+    overflow-y: auto;
+    width: 100%;
+}
+
+.frame-profile-step-detail .frame-step-detail-content .frame-row {
+    border-bottom: 1px dashed rgba(0,0,0,0.2);
+    padding: 5px 0;
+    margin: 0 10px;
+    width: calc(100% - 20px);
+    box-sizing: border-box;
+}
+
+.frame-profile-step-detail .frame-step-detail-content .frame-row:last-child {
+    border-bottom: none;
+}
+
+.frame-profile-step-detail .index {
+    background-color: rgba(0,0,0,0.6);
+    border-radius: 3px;
+}
+
+.frame-profile-step-detail .close-btn {
+    position: absolute;
+    top : 7px;
+    right : 5px;
+    display: inline-block !important;
+}
+
+.frame-profile-step-detail .sub-detail-title {
+    text-transform: uppercase;
+    padding: 5px 0 0;
+    margin-top: 0;
+    font-size: 10px;
+    position: relative;
+}
+
+.frame-profile-step-detail .sub-detail-title .sql-btns {
+    position: absolute;
+    top : 6px;
+    right : 0;
+}
+
+.frame-profile-step-detail .sub-detail-title .sql-btns > div {
+    display: inline-block;
+    -webkit-box-sizing: border-box;
+    box-sizing: border-box;
+    padding: 2px 4px;
+    cursor: pointer;
+    margin-left: 3px;
+    border-radius: 3px;
+    color: #333;
+    font-size: 8px;
+    margin-bottom: 5px;
+    background-color: rgba(0,0,0,0.1);
+}
+
+.frame-profile-step-detail .sub-detail-title .sql-btns > div .icon {
+    margin-right: 2px;
+}
+
+.frame-profile-step-detail .sub-detail-title .sql-btns > div .active {
+    display: none;
+}
+
+.frame-profile-step-detail .sub-detail-title .sql-btns > div.active .active {
+    display: inline-block;
+}
+
+.frame-profile-step-detail .sub-detail-title .sql-btns > div.active .no-active {
+    display: none;
+}
+
+.frame-profile-step-detail .sub-detail-title .sql-btns > div:hover {
+    background-color: rgba(0,0,0,0.2);
+}
+
+.frame-profile-step-detail .sub-detail-title .sql-btns > div.active {
+    background-color: #FFE600;
+    color: black;
+}
+
+.frame-profile-step-detail .sub-detail-title > span {
+    display: inline-block;
+    padding: 4px;
+    background-color: #333;
+    color: white;
+    background-color: #EEE;
+    color: #333;
+    border-radius: 2px;
+}
+
+.frame-profile-step-detail .main-value {
+    width: 100%;
+    word-break: break-all;
+    padding: 5px;
+    box-sizing: border-box;
+    position: relative;
+}
+
+.frame-profile-step-detail .main-value .gab-from-start {
+    margin-right: 5px;
+}
+
+.frame-profile-step-detail .main-value.error {
+    color: #FF030D;
+}
+
+.frame-profile-step-detail .main-value.dump {
+    padding: 5px 10px;
+}
+
+.frame-profile-step-detail .main-value .value {
+    margin-left: 5px;
+}
+
+.frame-profile-step-detail .main-value .text {
+    display: inline-block;
+}
+
+.frame-profile-step-detail .tags {
+    width: 100%;
+    word-break: break-all;
+    padding: 5px 5px;
+    box-sizing: border-box;
+    margin-top: 5px;
+}
+
+.frame-profile-step-detail .tags > div {
+    display: table;
+    table-layout: fixed;
+    width: 100%;
+}
+
+.frame-profile-step-detail .tags > div > div {
+    display: table-row;
+}
+
+.frame-profile-step-detail .tags > div > div > div {
+    display: table-cell;
+    word-break: break-all;
+    padding: 8px 10px;
+    border-bottom: 1px solid rgba(0,0,0,0.2);
+}
+
+.frame-profile-step-detail .tags > div > div:first-child > div {
+    border-top: 1px solid rgba(0,0,0,0.2);
+}
+
+.frame-profile-step-detail .tags > div > div > div.tag-key {
+    width: 200px;
+    border-right: 1px solid rgba(0,0,0,0.2);
+    background-color: rgba(0,0,0,0.05);
+}
+
+.frame-profile-step-detail .detail-nav {
+    display: table;
+    width: 100%;
+    table-layout: fixed;
+    background-color: rgba(0,0,0,0.1);
+    height: 58px;
+}
+
+.frame-profile-step-detail .detail-nav > div {
+    display: table-cell;
+    text-align: center;
+    padding: 10px;
+}
+
+.frame-profile-step-detail .detail-nav > div .span {
+    padding: 6px 8px;
+    display: inline-block;
+    color: white;
+    border-radius: 2px;
+}
+
+.frame-profile-step-detail .detail-nav > div.next .span,
+.frame-profile-step-detail .detail-nav > div.prev .span {
+    cursor: pointer;
+}
+
+.frame-profile-step-detail .detail-nav .nav-name {
+    font-size: 10px;
+    margin-bottom: 2px;
+}
+
+.frame-profile-step-detail .detail-nav .nav-name span {
+    text-transform: uppercase;
+}
+
+
+
+
+
+
+
+.frame-profile-step-detail .sql-statement {
+    line-height: 140%;
+    color: #0000C3;
+    white-space: nowrap;
+    overflow-x: auto;
+    width: 100%;
+
+}
+
+.frame-profile-step-detail .sql-statement .prefix {
+    color: darkgreen;
+}
+
+.frame-profile-step-detail .sql-statement .param {
+    color: #207ce5;
+}
+
+.frame-profile-step-detail .sql-statement.formatter {
+    white-space: pre;
+}
+
+.frame-profile-step-detail .sql-statement.wrap {
+    white-space: normal;
+    word-break: break-all;
+}
+
+.frame-profile-step-detail .sql-statement.wrap.formatter {
+    white-space: pre-wrap;
+    word-break: break-all;
+}
+
+.frame-profile-step-detail .sql-param {
+
+}
+

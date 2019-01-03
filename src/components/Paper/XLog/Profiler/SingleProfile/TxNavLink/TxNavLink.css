@@ -2,6 +2,10 @@
     padding: 10px 5px 0;
 }
 
+.narrow .tx-nav-link-wrapper {
+    padding: 3px 5px 0;
+}
+
 .tx-nav-link-wrapper span {
     padding: 2px 4px;
     display: inline-block;

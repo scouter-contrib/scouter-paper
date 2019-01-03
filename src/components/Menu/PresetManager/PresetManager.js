@@ -5,7 +5,7 @@ import {connect} from 'react-redux';
 import {withRouter} from 'react-router-dom';
 import 'url-search-params-polyfill';
 import jQuery from "jquery";
-import {errorHandler, setAuthHeader, getWithCredentials, getHttpProtocol, updateQueryStringParameter, getCurrentUser, getCurrentDefaultServer} from '../../../common/common';
+import {errorHandler, setAuthHeader, getWithCredentials, getHttpProtocol, getCurrentUser} from '../../../common/common';
 import InnerLoading from "../../InnerLoading/InnerLoading";
 import IconImage from "../../IconImage/IconImage";
 
@@ -26,6 +26,10 @@ class PresetManager extends Component {
         if (!this.props.visible && nextProps.visible) {
             this.loadPresets(nextProps.config, nextProps.user);
         }
+    }
+
+    componentDidMount() {
+        this.loadPresets(this.props.config, this.props.user);
     }
 
     savePreset = (presets) => {
@@ -101,7 +105,7 @@ class PresetManager extends Component {
     };
 
     cancelClick = () => {
-        this.props.togglePresetManagerVisible();
+        this.props.closeSelectorPopup();
     };
 
     deleteClick = () => {
@@ -142,7 +146,10 @@ class PresetManager extends Component {
                 let preset = this.state.presets[i];
 
                 if (preset.no === this.state.selectedPresetNo) {
-                    this.props.togglePresetManagerVisible();
+                    this.props.applyPreset(preset);
+                    this.props.closeSelectorPopup();
+                    /*
+                    this.props.togglePresetManager();
 
                     const server = getCurrentDefaultServer(this.props.config);
                     let newUrl = updateQueryStringParameter(window.location.href, "objects", preset.objects);
@@ -151,6 +158,7 @@ class PresetManager extends Component {
                     newUrl = updateQueryStringParameter(newUrl, "authentification", server.authentification);
                     window.location.href = newUrl;
                     window.history.go(0);
+                    */
 
                     break;
                 }
@@ -211,65 +219,71 @@ class PresetManager extends Component {
         });
     };
 
+    showSelector = () => {
+        this.props.toggleSelectorVisible();
+    };
+
     render() {
         return (
-            <div className={"preset-manager-bg " + (this.props.visible ? "" : "hidden")} onClick={this.props.togglePresetManagerVisible}>
-                <div className={"preset-manager-fixed-bg"}></div>
-                <div className="preset-manager popup-div" onClick={(e) => e.stopPropagation()}>
-                    <div className="title">
-                        <div>PRESETS</div>
+            <div className="preset-manager-bg"  onClick={this.cancelClick}>
+                <div>
+                    <div className="selector-type-btns" onClick={(e) => e.stopPropagation()}>
+                        <div onClick={this.showSelector}>SERVER NAVIGATOR</div>
+                        <div  className="selected">PRESET MANAGER</div>
                     </div>
-                    <div className="content-ilst scrollbar">
-                        {(this.state.presets && this.state.presets.length > 0) &&
-                        <ul>
-                            {this.state.presets.map((d, i) => {
-                                let objectLength = 0;
+                    <div className="preset-manager popup-div" onClick={(e) => e.stopPropagation()}>
+                        <div className="title">
+                            <div>PRESETS</div>
+                        </div>
+                        <div className="content-ilst scrollbar">
+                            {(this.state.presets && this.state.presets.length > 0) &&
+                            <ul>
+                                {this.state.presets.map((d, i) => {
+                                    let objectLength = 0;
 
-                                if (d.objects) {
-                                    objectLength = d.objects.length;
-                                } else {
-                                    if (d.instances) {
-                                        objectLength = d.instances.length;
+                                    if (d.objects) {
+                                        objectLength = d.objects.length;
+                                    } else {
+                                        if (d.instances) {
+                                            objectLength = d.instances.length;
+                                        }
+                                        if (d.hosts) {
+                                            objectLength += d.hosts.length;
+                                        }
                                     }
-                                    if (d.hosts) {
-                                        objectLength += d.hosts.length;
-                                    }
-                                }
 
-                                return (<li key={i} className={d.no === this.state.selectedPresetNo ? 'selected' : ''} onClick={this.presetClick.bind(this, d.no)}>
-                                    <div>
-                                        <div className="index">
-                                            <span className="no">{d.no}</span>
-                                        </div>
+                                    return (<li key={i} className={d.no === this.state.selectedPresetNo ? 'selected' : ''} onClick={this.presetClick.bind(this, d.no)}>
                                         <div>
                                             <div>
-                                                {(d.no !== this.state.selectedEditNo) && <span className="name">{d.name}</span>}
-                                                {(d.no === this.state.selectedEditNo) && <span className="name edit"><input type="text" value={this.state.editText} onChange={this.onTextChange.bind(this )} /></span>}
-                                                {(d.no !== this.state.selectedEditNo) && <span className="edit-btn" onClick={this.editClick.bind(this, d.no, d.name)}>EDIT</span>}
-                                                {(d.no === this.state.selectedEditNo) && <span className="done-btn" onClick={this.updateClick.bind(this, d.no)}>DONE</span>}
-                                            </div>
-                                            <div className="summary-info">
-                                                <span>{objectLength} OBJECTS</span>
-                                                <div className="icon-list">
-                                                    {d.iconMap && Object.keys(d.iconMap).map((icon, i) => {
-                                                        return <div className="icon-item" key={i}><IconImage icon={icon}/></div>
-                                                    })}
+                                                <div>
+                                                    {(d.no !== this.state.selectedEditNo) && <span className="name">{d.name}</span>}
+                                                    {(d.no === this.state.selectedEditNo) && <span className="name edit"><input type="text" value={this.state.editText} onChange={this.onTextChange.bind(this )} /></span>}
+                                                    {(d.no !== this.state.selectedEditNo) && <span className="edit-btn" onClick={this.editClick.bind(this, d.no, d.name)}>EDIT</span>}
+                                                    {(d.no === this.state.selectedEditNo) && <span className="done-btn" onClick={this.updateClick.bind(this, d.no)}>DONE</span>}
+                                                </div>
+                                                <div className="summary-info">
+                                                    <span>{objectLength} OBJECTS</span>
+                                                    <div className="icon-list">
+                                                        {d.iconMap && Object.keys(d.iconMap).map((icon, i) => {
+                                                            return <div className="icon-item" key={i}><IconImage icon={icon}/></div>
+                                                        })}
+                                                    </div>
                                                 </div>
                                             </div>
                                         </div>
-                                    </div>
-                                </li>)
-                            })}
-                        </ul>
-                        }
-                        {(!this.state.presets || this.state.presets.length < 1) && <div className="empty-content">NO PRESET</div>}
+                                    </li>)
+                                })}
+                            </ul>
+                            }
+                            {(!this.state.presets || this.state.presets.length < 1) && <div className="empty-content">NO PRESET</div>}
+                        </div>
+                        <div className="buttons">
+                            <button className="delete-btn" onClick={this.deleteClick}>DELETE</button>
+                            <button className="cancel-btn" onClick={this.cancelClick}>CANCEL</button>
+                            <button className="load-btn" onClick={this.loadClick}>LOAD</button>
+                        </div>
+                        <InnerLoading visible={this.state.loading}></InnerLoading>
                     </div>
-                    <div className="buttons">
-                        <button className="delete-btn" onClick={this.deleteClick}>DELETE</button>
-                        <button className="cancel-btn" onClick={this.cancelClick}>CANCEL</button>
-                        <button className="load-btn" onClick={this.loadClick}>LOAD</button>
-                    </div>
-                    <InnerLoading visible={this.state.loading}></InnerLoading>
                 </div>
             </div>
         );
