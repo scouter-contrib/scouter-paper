@@ -816,11 +816,11 @@ class Controller extends Component {
                 {this.props.control.Controller === "min" &&
                 <div>
                     <div className="controller-min-info">
-                        <div className="controller-min-info-row">
+                        <div className="controller-min-info-row obj-selector" onClick={this.toggleSelectorVisible}>
                             <div className="short-label"><span>OBJ</span></div>
                             {this.props.objects.length > 0 &&
-                            <div className="selector-open-btn short-value" onClick={this.toggleSelectorVisible}>{Object.keys(this.props.filterMap).length} / {this.props.objects.length}</div>}
-                            {this.props.objects.length <= 0 && <div onClick={this.toggleSelectorVisible} className="selector-open-btn short-value">-</div>}
+                            <div className="selector-open-btn short-value">{Object.keys(this.props.filterMap).length} / {this.props.objects.length}</div>}
+                            {this.props.objects.length <= 0 && <div className="selector-open-btn short-value">-</div>}
                         </div>
                         <div className="controller-min-info-row paper-only">
                             {this.props.range.realTime && <div className="realtime-short-label"><span>RT</span></div>}

@@ -38,7 +38,8 @@
 }
 
 .controller-wrapper .controller-min-info .controller-min-info-row {
-    margin-top: 20px;
+    margin-top: 10px;
+    padding-top: 10px;
 }
 
 .controller-wrapper .controller-min-info .short-label {
@@ -57,8 +58,13 @@
     margin-top: 5px;
 }
 
-.controller-wrapper .controller-min-info .selector-open-btn:hover {
+.controller-wrapper .controller-min-info .obj-selector:hover {
     background-color: #FFCC11;
+    cursor: pointer;
+}
+
+.controller-wrapper .controller-min-info .obj-selector:hover .selector-open-btn {
+
     cursor: pointer;
     color: #333;
 }
