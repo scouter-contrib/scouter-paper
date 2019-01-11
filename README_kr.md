@@ -19,16 +19,16 @@
 
 ## 빌드하기
 build를 위해서 먼저 npm이 설치되어 있어야합니다. 
- 1. clone https://github.com/mindplates/scouter-paper.git
+ 1. clone https://github.com/scouter-contrib/scouter-paper.git
  2. npm install
  3. npm run build
     
 ## 다운로드
 아래 페이지에서 최신 버전을 다운로드 할 수 있습니다.
-- [Release](https://github.com/mindplates/scouter-paper/releases/)
+- [Release](https://github.com/scouter-contrib/scouter-paper/releases/)
  
 ## 가이드
-- [소개 페이지](https://mindplates.github.io/scouter-paper/)
+- [소개 페이지](https://scouter-contrib.github.io/scouter-paper/)
 - [사용자 가이드](./build/help/manual.html)
  
 ## 주요 화면
