@@ -46,6 +46,7 @@
     "raf": "3.4.0",
     "react": "^16.7.0",
     "react-color": "^2.13.8",
+    "react-confirm-alert": "^2.3.0",
     "react-datepicker": "^1.8.0",
     "react-dev-utils": "^4.2.3",
     "react-dnd": "^2.5.4",

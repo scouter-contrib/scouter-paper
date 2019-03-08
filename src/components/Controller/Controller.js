@@ -1,5 +1,8 @@
 import React, {Component} from 'react';
 import './Controller.css';
+
+import { confirmAlert } from 'react-confirm-alert'; // Import
+import 'react-confirm-alert/src/react-confirm-alert.css' // Import css
 import {setControllerState} from '../../actions';
 import {connect} from 'react-redux';
 import {withRouter} from 'react-router-dom';
@@ -13,6 +16,9 @@ import TopologyMinControl from "../TopologyMinControl/TopologyMinControl";
 import * as PaperIcons from '../../common/PaperIcons'
 import LayoutManager from "../Menu/LayoutManager/LayoutManager";
 import PresetManager from "../Menu/PresetManager/PresetManager";
+
+
+
 import {getDefaultServerConfig, getDefaultServerConfigIndex, setServerTimeGap, setRangePropsToUrl, getHttpProtocol, errorHandler, getWithCredentials, setAuthHeader, getCurrentUser, setData} from '../../common/common';
 import {
     addRequest,
@@ -727,7 +733,21 @@ class Controller extends Component {
     };
 
     clearLayout = () => {
-        this.props.setBoxesLayouts([], {});
+        confirmAlert({
+            customUI: ({ onClose }) => {
+                return (
+                    <div className='control-confirm-ui'>
+                        <h1><i className='fa fa-info-circle'/> Paper Config</h1>
+                        <p>Are you sure you want to clear the current screen of chart setting?</p>
+                        <button onClick={() => {
+                            this.props.setBoxesLayouts([], {})
+                            onClose()
+                        }}>Yes</button>
+                        <button onClick={onClose}>No</button>
+                    </div>
+                )
+            }
+        })
         /*
         this.setState({
             boxes: [],
