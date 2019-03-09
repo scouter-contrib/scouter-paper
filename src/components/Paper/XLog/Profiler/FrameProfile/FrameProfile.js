@@ -8,6 +8,7 @@ import numeral from "numeral";
 import moment from "moment";
 import {profileMetas} from "./meta"
 import {IdAbbr} from "../../../../../common/idAbbr";
+import ProfileRatioBar from './ProfileRatioBar';
 
 class FrameProfile extends Component {
 
@@ -450,7 +451,15 @@ class FrameProfile extends Component {
                         </div>
                     })}
                 </div>
-                <div className="sub-title">PROFILE STEP</div>
+                {
+                    this.props.profile && 
+                    <ProfileRatioBar cpu={this.props.profile.cpu} 
+                        sql={this.props.profile.sqlTime} 
+                        api={this.props.profile.apicallTime} 
+                        elapsed={this.props.profile.elapsed}/>
+                }
+                
+                
                 {/*<div className={"xlog-steps " + (this.props.wrap ? 'wrap' : '') + (this.props.narrow ? 'narrow' : '')}>*/}
                 <div className={"frame-graph " + (this.props.narrow ? 'narrow' : '')}>
                     <div ref="frameAxis" className="frame-axis"></div>

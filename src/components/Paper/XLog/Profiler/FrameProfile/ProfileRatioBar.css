@@ -1,0 +1,51 @@
+.ratio-bar {
+  display: table;
+}
+.ratio-bar .ratio-header {
+  display: table-cell;
+  padding: 10px;
+  border-radius: 3px;
+  background-color: #333;
+  color: white;
+  border: 1px solid #333;
+}
+.ratio-bar .ratio-header > div {
+  width: 81px;
+  height: 100%;
+}
+.ratio-bar .ratio-body {
+  display: table-cell;
+  width: 100%;
+  height: 100%;
+  height: 34px;
+  vertical-align: top;
+}
+
+.ratio-bar .ratio-body > div {
+  display: table;
+  width: 100%;
+  height: 100%;
+}
+
+.ratio-bar .ratio {
+  display: table-cell;
+  height: 100%;
+  border: 1px solid #333;
+}
+
+.ratio-bar .cpu {
+  background-color: rgb(111, 169, 67);
+}
+
+.ratio-bar .sql {
+  background-color: rgb(113, 74, 209);
+}
+
+.ratio-bar .api {
+  background-color: rgb(87, 207, 243);
+}
+
+.ratio-bar .other {
+  background-color: rgb(254, 250, 84);
+  width: 100%;
+}
