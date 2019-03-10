@@ -192,7 +192,7 @@ class ProfileList extends Component {
 
     getHeader = () => {
         return layout.map((meta, j) => {
-            return <span key={j} data-name={meta.name}>{meta.name}</span>
+            return <span key={j}>{meta.name}</span>
         });
     };
 
