@@ -1,6 +1,63 @@
 .ratio-bar {
   display: table;
 }
+
+.legend-row {
+  display: table-row;
+}
+
+.ratio-bar .ratio-legend {
+  display: table-cell;
+  margin-left: 100px;
+}
+
+.ratio-bar .legend-header {
+  display: table-cell;
+}
+
+.ratio-bar .legend-header > div {
+  width: 78px;
+  height: 100%;
+}
+
+.ratio-bar .ratio-legend > div {
+  display: table;
+  height: 100%;
+}
+
+.ratio-bar .legend {
+  display: table-cell;
+  padding-left: 10px;
+}
+
+.ratio-bar .legend::before {
+  display: inline-block;
+  content: " ";
+  width: 10px;
+  height: 10px;
+  border: 1px solid #333;
+}
+
+.ratio-bar .legend.cpu::before {
+  background-color: rgb(111, 169, 67);
+}
+
+.ratio-bar .legend.sql::before {
+  background-color: rgb(113, 74, 209);
+}
+
+.ratio-bar .legend.api::before {
+  background-color: rgb(87, 207, 243);
+}
+
+.ratio-bar .legend.other::before {
+  background-color: rgb(254, 250, 84);
+}
+
+.ratio-row {
+  display: table-row;
+}
+
 .ratio-bar .ratio-header {
   display: table-cell;
   padding: 10px;
@@ -8,9 +65,10 @@
   background-color: #333;
   color: white;
   border: 1px solid #333;
+  font-size: 11px;
 }
 .ratio-bar .ratio-header > div {
-  width: 81px;
+  width: 78px;
   height: 100%;
 }
 .ratio-bar .ratio-body {
@@ -25,27 +83,40 @@
   display: table;
   width: 100%;
   height: 100%;
+  border: 1px solid #333;
 }
 
 .ratio-bar .ratio {
   display: table-cell;
   height: 100%;
-  border: 1px solid #333;
+  border-right: 1px solid #333;
+  padding: 10px 0;
+  color: rgb(254,234, 51);
+  overflow: hidden;
+  text-overflow: clip;
+  white-space: nowrap;
+  text-align: center;
+  max-width: 0;
 }
 
-.ratio-bar .cpu {
+.ratio-bar .ratio:last-child {
+  border-right: none;
+}
+
+.ratio-bar .ratio.cpu {
   background-color: rgb(111, 169, 67);
 }
 
-.ratio-bar .sql {
+.ratio-bar .ratio.sql {
   background-color: rgb(113, 74, 209);
 }
 
-.ratio-bar .api {
+.ratio-bar .ratio.api {
   background-color: rgb(87, 207, 243);
 }
 
-.ratio-bar .other {
+.ratio-bar .ratio.other {
   background-color: rgb(254, 250, 84);
+  color: red;
   width: 100%;
 }
