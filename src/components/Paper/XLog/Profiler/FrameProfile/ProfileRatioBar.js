@@ -48,12 +48,10 @@ export default class ProfileRatioBar extends Component {
                         <div></div>
                     </div>
                     <div className="ratio-legend">
-                        <div>
-                            <div className="legend cpu">CPU</div>
-                            <div className="legend sql">SQL</div>
-                            <div className="legend api">API</div>
-                            <div className="legend other">OTHER</div>
-                        </div>
+                        <span className="legend cpu">CPU</span>
+                        <span className="legend sql">SQL</span>
+                        <span className="legend api">API</span>
+                        <span className="legend other">OTHER</span>
                     </div>
                 </div>
                 <div className="ratio-row">

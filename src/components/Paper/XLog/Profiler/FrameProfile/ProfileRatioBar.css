@@ -8,7 +8,6 @@
 
 .ratio-bar .ratio-legend {
   display: table-cell;
-  margin-left: 100px;
 }
 
 .ratio-bar .legend-header {
@@ -20,13 +19,7 @@
   height: 100%;
 }
 
-.ratio-bar .ratio-legend > div {
-  display: table;
-  height: 100%;
-}
-
 .ratio-bar .legend {
-  display: table-cell;
   padding-left: 10px;
 }
 
@@ -36,6 +29,7 @@
   width: 10px;
   height: 10px;
   border: 1px solid #333;
+  margin-right: 3px;
 }
 
 .ratio-bar .legend.cpu::before {
