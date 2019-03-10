@@ -192,7 +192,7 @@ class ProfileList extends Component {
 
     getHeader = () => {
         return layout.map((meta, j) => {
-            return <span key={j}>{meta.name}</span>
+            return <span key={j} data-name={meta.name}>{meta.name}</span>
         });
     };
 
@@ -200,7 +200,7 @@ class ProfileList extends Component {
     render() {
         return (
             <div className="xlog-profile-list">
-                <div className="row header">{this.getHeader()}</div>
+                <div className="row header fixed">{this.getHeader()}</div>
                 {this.props.xlogs && this.props.xlogs.map((xlog, i) => {
                     let rowClass = (xlog.error ? 'error' : '');
                     const xtype = xlogTypes[xlog.xlogType];
