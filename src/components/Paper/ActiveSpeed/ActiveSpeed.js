@@ -34,7 +34,7 @@ class ActiveSpeed extends Component {
     stopProgation = (e) => {
         e.stopPropagation();
     };
-    onClickActiveProfile = (obj) => {
+    onClickActiveSpeed = (obj) => {
         this.props.setActiveServiceList({
             objHash : obj.objHash,
             objName : obj.objName
@@ -97,7 +97,7 @@ class ActiveSpeed extends Component {
 
                     let showCnt = this.props.box.values["showCnt"];
 
-                    return <div className={"row " + (singleLine ? "single-line" : "")} key={i} style={{cursor : 'pointer'}} onClick={()=> this.onClickActiveProfile(d) } >
+                    return <div className={"row " + (singleLine ? "single-line" : "")} key={i} style={{cursor : 'pointer'}} onClick={()=> this.onClickActiveSpeed(d) } >
                         <div className="instance-info-div" style={{width : width}} title={d.objName}>
                             <div className="instance-name">{showCnt && <div className="bar-info"><span className="separator">[</span> <span className="long" title="LONG">{long}</span> <span className="medium" title="MEDIUM">{medium}</span> <span className="short" title="SHORT">{short}</span><span className="separtor"> ]</span></div>}{d.objName}</div>
                         </div>

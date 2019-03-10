@@ -90,7 +90,7 @@ class ActiveServiceList extends Component {
                 <div className="row header">{this.getHeader()}</div>
                 {this.props.active && this.props.active.map((_th, i) => {
 
-                    return <div onClick={this.props.rowClick.bind(this, _th, null)} key={i} className={"row"}>{this.getRow(_th, i)}</div>;
+                    return <div onClick={() => this.props.rowClick(_th)} key={i} className={"row"}>{this.getRow(_th, i)}</div>;
                 })}
             </div>
         );

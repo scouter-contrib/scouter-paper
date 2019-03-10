@@ -6,6 +6,9 @@ import {connect} from 'react-redux';
 import jQuery from "jquery";
 import {getCurrentUser, getHttpProtocol, getWithCredentials, setAuthHeader} from '../../../../../common/common';
 import ActiveServiceList from "./ActiveServiceList";
+import ActiveServiceStack from "./ActiveServiceStack";
+import moment from 'moment'
+import _ from 'lodash'
 // import {getParam} from '../../../../common/common';
 class ActiveService extends Component {
 
@@ -50,6 +53,11 @@ class ActiveService extends Component {
                 objHash : null,
                 objName : null,
                 list : []
+            },
+            stackTrace : {
+                objHash : null,
+                objName : null,
+                map: {}
             }
         };
     }
@@ -91,6 +99,9 @@ class ActiveService extends Component {
         if ( this.state.activeThread.list !== nextState.activeThread.list){
             return true;
         }
+        if ( this.state.stackTrace !== nextState.stackTrace){
+            return true;
+        }
         return false;
     }
     close=()=>{
@@ -100,7 +111,13 @@ class ActiveService extends Component {
                 objHash : null,
                 objName : null,
                 list : []
-            }
+            } ,
+            stackTrace : {
+                objHash : null,
+                objName : null,
+                map : []
+            },
+            listWidth : 100
         })
     };
 
@@ -133,8 +150,35 @@ class ActiveService extends Component {
             this.props.setControlVisibility("Loading", false);
         });
     }
-    rowClick = (xlog, txiddate) => {
+    rowClick = (activeThread) => {
+        this.props.setControlVisibility("Loading", true);
+        this.props.addRequest();
+        const {config,user} = this.props
+        const _url = `${getHttpProtocol(config)}/scouter/v1/activeService/thread/${activeThread.threadId}/ofObject/${activeThread.objHash}`;
+        jQuery.ajax({
+            method: "GET",
+            async: true,
+            dataType: 'text',
+            url: _url,
+            xhrFields: getWithCredentials(config),
+            beforeSend: function (xhr) {
+                setAuthHeader(xhr,config, getCurrentUser(config, user));
+            }
+        }).done((msg) => {
+            // console.log('=========>',_value)
+            console.log('get=======>',JSON.parse(msg).result)
+            this.setState({
+                stackTrace : {
+                    objHash : activeThread.objHash,
+                    objName : activeThread.objName,
+                    map: JSON.parse(msg).result
+                },
+                listWidth : 40
+            })
 
+        }).always(() => {
+            this.props.setControlVisibility("Loading", false);
+        });
     };
 
     updateDimensions = () => {
@@ -159,6 +203,10 @@ class ActiveService extends Component {
 
         if (e === "max") {
             listWidth = 100;
+        }
+
+        if (e === "middle") {
+            listWidth = 40;
         }
 
         if (e === "small") {
@@ -216,13 +264,13 @@ class ActiveService extends Component {
                         {/*{!this.state.paramTxid && <button onClick={()=>this.changeListWidth("small")}><i className="fa fa-angle-left"></i></button>}*/}
                         {/*{!this.state.paramTxid && <button onClick={()=>this.changeListWidth("big")}><i className="fa fa-angle-right"></i></button>}*/}
                         {/*{!this.state.paramTxid && <button onClick={()=>this.changeListWidth("max")}><i className="fa fa-angle-double-right"></i></button>}*/}
-                        <button onClick={()=>this.getActiveServiceList(activeThread)}> <i className="fa fa-repeat"/></button>
+                        <button onClick={()=>this.getActiveServiceList(activeThread)}> <i className="fa fa-refresh"/></button>
                         <div className="close-btn" onClick={this.close}></div>
                     </div>
 
                     <div className="profiler-layout left" style={leftStyle}>
                         <div className="summary">
-                            <div className="title">Active Service ({activeThread.objName})</div>
+                            <div className="title">Active Service ({activeThread.objName}) {moment(new Date()).format('YYYY.MM.DD HH:mm:ss')}</div>
                             <div className="list-summary">Counter = { activeThread.list.length } </div>
                             <div className="close-btn" onClick={()=>this.close()}></div>
                         </div>
@@ -232,9 +280,8 @@ class ActiveService extends Component {
                     </div>
 
                     <div className="profiler-layout right" style={rightStyle}>
-                        <div className="summary">
-                        </div>
                         <div className={"profile-steps " + (this.state.narrow ? 'narrow' : '')}>
+                            <ActiveServiceStack stack={this.state.stackTrace} />
                         </div>
                     </div>
                 </div>
