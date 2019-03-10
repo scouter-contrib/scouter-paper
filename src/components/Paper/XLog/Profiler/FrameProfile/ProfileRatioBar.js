@@ -21,6 +21,17 @@ export default class ProfileRatioBar extends Component {
         };
     }
 
+    init = (props) => {
+        const {cpu, sql, api, elapsed} = props;
+        const other = (elapsed - cpu - sql - api) > 0 ? (elapsed - cpu - sql - api) : 0;
+
+        this.setState({cpu, sql, api, other});
+        this.setState({'cpuPercent': calcPercent(cpu, elapsed), 
+            'sqlPercent': calcPercent(sql, elapsed), 
+            'apiPercent': calcPercent(api, elapsed), 
+            'otherPercent': calcPercent(other, elapsed)});
+    }
+
     ratioStyle = (percent) => {
         if (percent < 0.3) {
             return {display: 'none'};
@@ -29,15 +40,12 @@ export default class ProfileRatioBar extends Component {
         return {width: `${percent}%`};
     }
 
-    componentDidMount() {
-        const {cpu, sql, api, elapsed} = this.props;
-        const other = (elapsed - cpu - sql - api) > 0 ? (elapsed - cpu - sql - api) : 0;
+    componentWillReceiveProps(nextProps) {
+        this.init(nextProps);
+    }
 
-        this.setState({cpu, sql, api, other});
-        this.setState({'cpuPercent': calcPercent(cpu, elapsed), 
-            'sqlPercent': calcPercent(sql, elapsed), 
-            'apiPercent': calcPercent(api, elapsed), 
-            'otherPercent': calcPercent(other, elapsed)});
+    componentDidMount() {
+        this.init(this.props);
     }
 
     render() {
