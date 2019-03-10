@@ -35,6 +35,8 @@ export const SET_MENU = 'SET_MENU';
 export const SET_TOPOLOGY_OPTION = 'SET_TOPOLOGY_OPTION';
 export const SET_ALERT = 'SET_ALERT';
 export const SET_BREAKPOINT = 'SET_BREAKPOINT';
+export const SET_ACTIVE_SERVICE = 'SET_ACTIVE_SERVICE';
+
 
 export function setBoxes(boxes) {
     return {
@@ -322,4 +324,9 @@ export function setBreakpoint(breakpoint) {
     };
 }
 
-
+export function setActiveServiceList(object){
+    return {
+        type : SET_ACTIVE_SERVICE,
+        object : object
+    }
+}
