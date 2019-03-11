@@ -111,35 +111,35 @@ class Controller extends Component {
     };
     getConfigServerName = (props) =>{
         const serverAddress = buildHttpProtocol(props.config);
-        const mapper = []
+        const mapper = [];
         if(serverAddress){
             const _promise = serverAddress.map(_get => {
                    mapper.push({
                        idx : _get.key,
                        addr : _get.addr
-                   })
+                   });
                    return jQuery.ajax({
                         method: "GET",
-                        url: _get.addr + '/scouter/v1/info/server',
+                        url: `${_get.addr}/scouter/v1/info/server`,
                         xhrFields: _get.authentification === "cookie",
                         beforeSend: function (xhr) {
-                            const _tokenInfo = props.user[_get.addr]
+                            const _tokenInfo = props.user[_get.addr];
                             if (_get.authentication === "bearer" && _tokenInfo) {
                                 xhr.setRequestHeader('Authorization', ['bearer ', _tokenInfo.token].join(''));
                             }
                         }
-                    })
+                    });
                 }
-            )
-            Promise.all(_promise).then((_value)=> {
-                let _conf = _.clone(props.config)
-                _value.forEach((_value,idx) =>{
-                    _conf.servers[idx].name  = [_value.result[0].name,'(',mapper[idx].addr,')'].join('')
-                })
+            );
+            Promise.all(_promise).then((_serverInfo)=> {
+                let _conf = _.clone(props.config);
+                _serverInfo.forEach((_res,idx) =>{
+                    _conf.servers[idx].name  = `${_res.result[0].name} (${mapper[idx].addr})`;
+                });
                 props.setConfig(_conf);
-            })
+            });
         }
-    }
+    };
 
     onChangeScouterServer = (inx) => {
         let config = JSON.parse(JSON.stringify(this.props.config));
@@ -375,7 +375,6 @@ class Controller extends Component {
     setTargetFromUrl = (props) => {
 
         let that = this;
-        console.log('fs ----------------------->',props)
         if (!this.init) {
             this.props.addRequest();
             jQuery.ajax({
