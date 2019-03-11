@@ -272,19 +272,15 @@ class ActiveService extends Component {
                 <div className={"xlog-profiler " + (this.state.paramTxid ? 'param-mode ' : ' ') }>
                 <div>
                     <div className="size-control-btns">
-                        {this.state.stackTrace.show && <button onClick={()=>this.changeListWidth("small")}><i className="fa fa-angle-double-left"></i></button>}
-                        {this.state.stackTrace.show && <button onClick={()=>this.changeListWidth("big")}><i className="fa fa-angle-double-right"></i></button>}
                         {this.state.stackTrace.show && <button onClick={()=>this.rowClick(stackTrace)}><i className="fa fa-refresh"></i></button>}
-                        {/*{!this.state.paramTxid && <button onClick={()=>this.changeListWidth("big")}><i className="fa fa-angle-right"></i></button>}*/}
-                        {/*{!this.state.paramTxid && <button onClick={()=>this.changeListWidth("max")}><i className="fa fa-angle-double-right"></i></button>}*/}
                         <button onClick={()=>this.getActiveServiceList(activeThread)}> <i className={this.state.stackTrace.show ? "fa fa-rotate-left": "fa fa-refresh"} /></button>
                         <div className="close-btn" onClick={this.close}></div>
                     </div>
 
                     <div className="profiler-layout left" style={leftStyle}>
                         <div className="summary">
-                            <div className="title">Active Service ({activeThread.objName}) {moment(new Date()).format('YYYY.MM.DD HH:mm:ss')}</div>
-                            <div className="list-summary">Counter = { activeThread.list.length } </div>
+                            <div className="title">Active Service ({activeThread.objName})</div>
+                            <div className="list-summary">Retrieve time: {moment(new Date()).format('YYYY.MM.DD HH:mm:ss')} , Counter = { activeThread.list.length }  </div>
                             <div className="close-btn" onClick={()=>this.close()}></div>
                         </div>
                         <div className="profile-list scrollbar">
