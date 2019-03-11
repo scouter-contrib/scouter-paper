@@ -160,7 +160,7 @@ class ActiveService extends Component {
         }).always(() => {
             this.props.setControlVisibility("Loading", false);
         });
-    }
+    };
     rowClick = (activeThread) => {
         this.props.setControlVisibility("Loading", true);
         this.props.addRequest();
@@ -204,41 +204,6 @@ class ActiveService extends Component {
                 smallScreen: smallScreen
             })
         }
-    };
-    changeListWidth = (e) => {
-        let listWidth = this.state.listWidth;
-
-        if (e === "min") {
-            listWidth = 0;
-        }
-
-        if (e === "max") {
-            listWidth = 100;
-        }
-
-        if (e === "middle") {
-            listWidth = 40;
-        }
-
-        if (e === "small") {
-            listWidth -= 20;
-
-            if (listWidth < 0) {
-                listWidth = 0;
-            }
-        }
-
-        if (e === "big") {
-            listWidth += 20;
-
-            if (listWidth > 100) {
-                listWidth = 100;
-            }
-        }
-
-        this.setState({
-            listWidth: listWidth
-        });
     };
 
     render() {
