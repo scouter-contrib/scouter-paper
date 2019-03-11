@@ -49,6 +49,10 @@
     table-layout: fixed;
 }
 
+.active-speed-wrapper .active-speed-content .row:hover {
+    background : antiquewhite
+}
+
 .active-speed-wrapper .active-speed-content .row.single-line {
     display: block;
 }

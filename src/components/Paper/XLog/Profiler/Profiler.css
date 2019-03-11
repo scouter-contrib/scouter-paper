@@ -153,6 +153,11 @@
     height: 30px;
     position: relative;
 }
+.xlog-profiler .size-control-btns .active-control-btns {
+    position: absolute;
+    top : 5px;
+    right : 30px;
+}
 
 .xlog-profiler .size-control-btns .close-btn {
     position: absolute;
@@ -161,6 +166,19 @@
 }
 
 .xlog-profiler .size-control-btns > button {
+    background-color: rgba(0, 0, 0, 0.3);
+    width: 20px;
+    height: 20px;
+    border-radius: 50%;
+    color: white;
+    padding: 0;
+    margin: 0 2px 0 0;
+    font-size: 12px;
+    text-align: center;
+    position: relative;
+}
+
+.xlog-profiler .size-control-btns .active-control-btns > button {
     background-color: rgba(0, 0, 0, 0.3);
     width: 20px;
     height: 20px;
@@ -325,3 +343,4 @@
     }
 
 }
+
