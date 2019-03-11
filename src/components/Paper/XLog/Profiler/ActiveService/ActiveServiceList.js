@@ -59,9 +59,9 @@ class ActiveServiceList extends Component {
         } else if( elap <= 3000 ){
             return 'blue'
         } else if( elap >= 3000 && elap <= 7000){
-            return 'yellow'
+            return '#bda800'
         } else if( elap > 7000 ){
-            return 'red'
+            return '#8b0000'
         }
     }
 

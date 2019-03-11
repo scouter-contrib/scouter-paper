@@ -8,7 +8,7 @@ import {getCurrentUser, getHttpProtocol, getWithCredentials, setAuthHeader} from
 import ActiveServiceList from "./ActiveServiceList";
 import ActiveServiceStack from "./ActiveServiceStack";
 import moment from 'moment'
-import _ from 'lodash'
+
 // import {getParam} from '../../../../common/common';
 class ActiveService extends Component {
 
@@ -57,7 +57,9 @@ class ActiveService extends Component {
             stackTrace : {
                 objHash : null,
                 objName : null,
-                map: {}
+                threadId : null,
+                map: {},
+                show : false
             }
         };
     }
@@ -115,7 +117,9 @@ class ActiveService extends Component {
             stackTrace : {
                 objHash : null,
                 objName : null,
-                map : []
+                threadId : null,
+                show : false,
+                map : {}
             },
             listWidth : 100
         })
@@ -143,6 +147,13 @@ class ActiveService extends Component {
                    objHash : activeObj.objHash,
                    objName : activeObj.objName,
                    list: JSON.parse(msg).result
+               },
+               listWidth : 100,
+               stackTrace : {
+                    objHash : null,
+                    objName : null,
+                    show : false,
+                    map : {}
                }
             })
 
@@ -165,15 +176,16 @@ class ActiveService extends Component {
                 setAuthHeader(xhr,config, getCurrentUser(config, user));
             }
         }).done((msg) => {
-            // console.log('=========>',_value)
-            console.log('get=======>',JSON.parse(msg).result)
+            console.log('result = ',JSON.parse(msg).result)
             this.setState({
                 stackTrace : {
                     objHash : activeThread.objHash,
                     objName : activeThread.objName,
-                    map: JSON.parse(msg).result
+                    map: JSON.parse(msg).result,
+                    threadId : activeThread.threadId,
+                    show : true
                 },
-                listWidth : 40
+                listWidth : 0
             })
 
         }).always(() => {
@@ -254,17 +266,18 @@ class ActiveService extends Component {
             }
         }
         // txid={this.state.txid}
-        const {activeThread} = this.state
+        const {activeThread,stackTrace} = this.state
         return (
             <div className={"active-thread-list " + (this.state.show ? ' ' : 'hidden')} >
                 <div className={"xlog-profiler " + (this.state.paramTxid ? 'param-mode ' : ' ') }>
                 <div>
                     <div className="size-control-btns">
-                        {/*{!this.state.paramTxid && <button onClick={()=>this.changeListWidth("min")}><i className="fa fa-angle-double-left"></i></button>}*/}
-                        {/*{!this.state.paramTxid && <button onClick={()=>this.changeListWidth("small")}><i className="fa fa-angle-left"></i></button>}*/}
+                        {this.state.stackTrace.show && <button onClick={()=>this.changeListWidth("small")}><i className="fa fa-angle-double-left"></i></button>}
+                        {this.state.stackTrace.show && <button onClick={()=>this.changeListWidth("big")}><i className="fa fa-angle-double-right"></i></button>}
+                        {this.state.stackTrace.show && <button onClick={()=>this.rowClick(stackTrace)}><i className="fa fa-refresh"></i></button>}
                         {/*{!this.state.paramTxid && <button onClick={()=>this.changeListWidth("big")}><i className="fa fa-angle-right"></i></button>}*/}
                         {/*{!this.state.paramTxid && <button onClick={()=>this.changeListWidth("max")}><i className="fa fa-angle-double-right"></i></button>}*/}
-                        <button onClick={()=>this.getActiveServiceList(activeThread)}> <i className="fa fa-refresh"/></button>
+                        <button onClick={()=>this.getActiveServiceList(activeThread)}> <i className={this.state.stackTrace.show ? "fa fa-rotate-left": "fa fa-refresh"} /></button>
                         <div className="close-btn" onClick={this.close}></div>
                     </div>
 
@@ -275,12 +288,12 @@ class ActiveService extends Component {
                             <div className="close-btn" onClick={()=>this.close()}></div>
                         </div>
                         <div className="profile-list scrollbar">
-                            <ActiveServiceList active={activeThread.list} rowClick={this.rowClick}/>
+                            <ActiveServiceList active={activeThread.list} rowClick={this.rowClick} />
                         </div>
                     </div>
 
                     <div className="profiler-layout right" style={rightStyle}>
-                        <div className={"profile-steps " + (this.state.narrow ? 'narrow' : '')}>
+                        <div style={{height: "calc(100% - 2px)",overflowY:"auto"}}>
                             <ActiveServiceStack stack={this.state.stackTrace} />
                         </div>
                     </div>

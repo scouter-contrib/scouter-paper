@@ -3,8 +3,9 @@ import './ActiveServiceStack.css';
 import {connect} from 'react-redux';
 import {withRouter} from 'react-router-dom';
 import numeral from "numeral";
-import * as d3 from "d3";
-
+import SyntaxHighlighter from 'react-syntax-highlighter';
+import {docco} from 'react-syntax-highlighter/dist/esm/styles/hljs';
+import moment from 'moment'
 const meta = [
 
     {
@@ -43,7 +44,7 @@ const meta = [
         type:"string"
     },
     {
-        key: "serviceTxid",
+        key: "txidName",
         name: "Service Txid",
         type:"string"
     },
@@ -103,31 +104,49 @@ class ActiveServiceStack extends Component {
         } else if( elap <= 3000 ){
             return 'blue'
         } else if( elap >= 3000 && elap <= 7000){
-            return 'yellow'
+            return '#bda800'
         } else if( elap > 7000 ){
-            return 'red'
+            return '#8b0000'
         }
     }
     render() {
         const {map} = this.props.stack;
         return (
             <div className='stack-trace'>
-                <div className={"sub-title"}>GENERAL INFO</div>
+                {/*<div className={"sub-title"}>StackTrace INFO</div>*/}
                 <div className={"xlog-data"}>
-                {
-                    meta.map((meta, j) => {
-                        return(
-                        <div key={j}>
-                            <span className="label">{meta.name}</span>
-                            <span className="data" style={{color : this.getColor(meta.key,map[meta.key]) }}>
-                                {meta.type === "ms" && `${numeral(+map[meta.key]).format(this.props.config.numberFormat)} ms`}
-                                {meta.type === "number" && `${numeral(map[meta.key]).format(this.props.config.numberFormat)}`}
-                                {meta.type === "string" && `${map[meta.key]}`}
-                            </span>
+                    <div className={"sub-title"}>
+                        <span className="label">Key</span>
+                        <span className="data">Value</span>
+                    </div>
+                    <div>
+                        <span className="label">Retrieve time</span>
+                        <span className="data">{moment(new Date()).format('YYYY.MM.DD HH:mm:ss')}</span>
+                    </div>
+                    {
+                        meta.map((meta, j) => {
+                            return(
+                            <div key={j}>
+                                <span className="label">{meta.name}</span>
+                                <span className="data" style={{color : this.getColor(meta.key,map[meta.key]) }}>
+                                    {meta.type === "ms" && `${numeral(+map[meta.key]).format(this.props.config.numberFormat)} ms`}
+                                    {meta.type === "number" && `${numeral(map[meta.key]).format(this.props.config.numberFormat)}`}
+                                    {meta.type === "string" && `${map[meta.key]}`}
+                                </span>
                             </div>
-                        );
-                    })
-                }
+                            );
+                        })
+                    }
+                    {
+                        map['stackTrace'] &&
+                        <div className={"stack-trace-content"}>
+                            <SyntaxHighlighter
+                                language='java'
+                                useInlineStyles={false}
+                                style={docco}>{map['stackTrace']}
+                            </SyntaxHighlighter>
+                        </div>
+                    }
                 </div>
             </div>
         );
