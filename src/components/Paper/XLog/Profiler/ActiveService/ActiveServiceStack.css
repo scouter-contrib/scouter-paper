@@ -18,6 +18,10 @@
   display: block;
   border: 1px solid #333;
 }
+.stack-trace div.xlog-data .summary {
+  background-color: #666 !important;
+  margin-bottom: 5px;
+}
 .stack-trace div.xlog-data .stack-trace-content {
   margin-top: 20px;
   border-radius: 3px 3px 0 0;

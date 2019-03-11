@@ -265,22 +265,21 @@ class ActiveService extends Component {
             }
         }
         // txid={this.state.txid}
-        const {activeThread,stackTrace} = this.state;
+        const {activeThread} = this.state;
         return (
             <div className={"active-thread-list " + (this.state.show ? ' ' : 'hidden')} >
                 <div className={"xlog-profiler " + (this.state.paramTxid ? 'param-mode ' : ' ') }>
                 <div>
                     <div className="size-control-btns">
-                        <div className="active-control-btns">
-                        {this.state.stackTrace.show && <button onClick={()=>this.rowClick(stackTrace)}><i className="fa fa-refresh"></i></button>}
-                        <button onClick={()=>this.getActiveServiceList(activeThread)}> <i className={this.state.stackTrace.show ? "fa fa-rotate-left": "fa fa-refresh"} /></button>
-                        </div>
                         <div className="close-btn" onClick={this.close}></div>
                     </div>
-
                     <div className="profiler-layout left" style={leftStyle}>
                         <div className="summary">
-                            <div className="title">Active Service ({activeThread.objName})</div>
+                            <div className="title">Active Service ({activeThread.objName})
+                                <div className="active-control-btns">
+                                    <button onClick={()=>this.getActiveServiceList(activeThread)}> <i className={"fa fa-refresh"} /></button>
+                                </div>
+                            </div>
                             <div className="list-summary">RETRIEVE TIME: {moment(new Date()).format('YYYY.MM.DD HH:mm:ss')} , { activeThread.list.length } ROWS </div>
                             <div className="close-btn" onClick={()=>this.close()}></div>
                         </div>

@@ -115,13 +115,13 @@ class ActiveServiceStack extends Component {
             <div className='stack-trace'>
                 {/*<div className={"sub-title"}>StackTrace INFO</div>*/}
                 <div className={"xlog-data"}>
+                    <div className={"summary"}>
+                        <div className={"title"}> Active StackTrace(Thread ID {this.props.stack.threadId} , {this.props.stack.objName})</div>
+                        <div className={"list-summary"}>RETRIEVE TIME: {moment(new Date()).format('YYYY.MM.DD HH:mm:ss')}</div>
+                    </div>
                     <div className={"sub-title"}>
                         <span className="label">Key</span>
                         <span className="data">Value</span>
-                    </div>
-                    <div>
-                        <span className="label">Retrieve time</span>
-                        <span className="data">{moment(new Date()).format('YYYY.MM.DD HH:mm:ss')}</span>
                     </div>
                     {
                         meta.map((meta, j) => {
