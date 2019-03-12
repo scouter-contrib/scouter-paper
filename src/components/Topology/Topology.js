@@ -568,7 +568,7 @@ class Topology extends Component {
                             objName: d.fromObjName,
                             objCategory: d.fromObjCategory ? d.fromObjCategory : "",
                             objTypeFamily: d.fromObjTypeFamily ? d.fromObjTypeFamily : "",
-                            objCountersCpu: d.fromObjCountersCpu ? 70 : ""
+                            objCountersCpu: d.fromObjCountersCpu ? d.fromObjCountersCpu.value : ""
                         }
                     }).concat(_.map(topology, (d) => {
                         return {
@@ -1025,8 +1025,8 @@ class Topology extends Component {
         // 노드
         this.node = this.nodeGroup.selectAll(".node").data(nodes);
         this.node.exit().remove();
-        this.node = this.node.enter().append("circle").merge(this.node).attr("class", "node").attr("r", this.r).style("stroke-width", "4px")
-            .attr('class', (d) => 'cpu-' + that.getCountersCpuInfo(d.objCountersCpu).state)
+        this.node = this.node.enter().append("circle").merge(this.node).attr("r", this.r).style("stroke-width", "4px")
+            .attr('class', (d) => 'node cpu-' + that.getCountersCpuInfo(d.objCountersCpu).state)
             .style("fill", (d) => that.getCountersCpuInfo(d.objCountersCpu).color)
             .style("stroke", (d) => that.getCatgegoryInfo(d.objCategory).color);
 
