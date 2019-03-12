@@ -1,9 +1,21 @@
 import React, {Component} from 'react';
 import './Controller.css';
 
-import { confirmAlert } from 'react-confirm-alert'; // Import
-import 'react-confirm-alert/src/react-confirm-alert.css' // Import css
-import {setControllerState} from '../../actions';
+import {
+    addFilteredObject,
+    addRequest,
+    clearAllMessage,
+    pushMessage,
+    removeFilteredObject,
+    setBoxes,
+    setBoxesLayouts,
+    setConfig,
+    setControllerState,
+    setControlVisibility,
+    setFilterMap,
+    setLayouts,
+    setTarget
+} from '../../actions';
 import {connect} from 'react-redux';
 import {withRouter} from 'react-router-dom';
 import Logo from "../Logo/Logo";
@@ -18,22 +30,18 @@ import LayoutManager from "../Menu/LayoutManager/LayoutManager";
 import PresetManager from "../Menu/PresetManager/PresetManager";
 
 
-
-import {getDefaultServerConfig, getDefaultServerConfigIndex, setServerTimeGap, setRangePropsToUrl, getHttpProtocol, errorHandler, getWithCredentials, setAuthHeader, getCurrentUser, setData} from '../../common/common';
 import {
-    addRequest,
-    pushMessage,
-    setTarget,
-    clearAllMessage,
-    setControlVisibility,
-    setConfig,
-    setFilterMap,
-    addFilteredObject,
-    removeFilteredObject,
-    setBoxes,
-    setLayouts,
-    setBoxesLayouts
-} from '../../actions';
+    errorHandler,
+    getCurrentUser,
+    getDefaultServerConfig,
+    getDefaultServerConfigIndex,
+    getHttpProtocol,
+    getWithCredentials,
+    setAuthHeader,
+    setData,
+    setRangePropsToUrl,
+    setServerTimeGap
+} from '../../common/common';
 import jQuery from "jquery";
 import PaperControl from "../Paper/PaperControl/PaperControl";
 
@@ -733,21 +741,7 @@ class Controller extends Component {
     };
 
     clearLayout = () => {
-        confirmAlert({
-            customUI: ({ onClose }) => {
-                return (
-                    <div className='control-confirm-ui'>
-                        <h1><i className='fa fa-info-circle'/> Paper Config</h1>
-                        <p>Are you sure you want to clear the current screen of chart setting?</p>
-                        <button onClick={() => {
-                            this.props.setBoxesLayouts([], {})
-                            onClose()
-                        }}>Yes</button>
-                        <button onClick={onClose}>No</button>
-                    </div>
-                )
-            }
-        })
+        this.props.setBoxesLayouts([], {})
         /*
         this.setState({
             boxes: [],

@@ -3,6 +3,10 @@ import './PaperControl.css';
 import * as Options from './Options';
 import {Draggable} from 'react-drag-and-drop'
 import {connect} from 'react-redux';
+import {confirmAlert} from 'react-confirm-alert'; // Import
+import 'react-confirm-alert/src/react-confirm-alert.css'
+import Overlay from "../../Overlay/Overlay";
+import Confirm from "../../Confirm/Confirm"; // Import css
 
 class PaperControl extends Component {
 
@@ -19,7 +23,10 @@ class PaperControl extends Component {
         }
 
         this.state = {
-            currentGroup: null
+            currentGroup: null,
+            confirm : {
+                show : false
+            }
         }
     }
 
@@ -34,12 +41,59 @@ class PaperControl extends Component {
             });
         }
     };
-
+    onClickClearConfirm = ()=>{
+        this.setState({
+            confirm : {
+                show : true
+            }
+        });
+    };
+    onClickConfirm = () =>{
+        const options = {
+            buttons:[
+                {
+                    label: 'Yes',
+                    onClick: () => {
+                        this.props.clearLayout();
+                        this.setState({
+                            confirm : {
+                                show : false
+                            }
+                        });
+                    }
+                },
+                {
+                    label: 'No',
+                    onClick: () => {
+                        this.setState({
+                            confirm : {
+                                show : false
+                            }
+                        });
+                    }
+                }
+            ],
+            style : {
+                width : "400px"
+            },
+            messages : {
+                title : "Paper Config",
+                content : "Are you sure you want to clear the current screen of paper setting?"
+            }
+        };
+        return (
+            <Overlay visible={this.state.confirm.show}>
+                <Confirm buttons={options.buttons} style={options.style} messages={options.messages}/>
+            </Overlay>
+        );
+    };
     render() {
 
         return (
             <div className={"papers-controls noselect " + (this.touch ? 'touch' : '')}>
-
+                {
+                    this.state.confirm.show && this.onClickConfirm()
+                }
                 <div className="control-item first">
                     <div className="row desc">
                         <div className="step"><span>1</span></div>
@@ -142,15 +196,14 @@ class PaperControl extends Component {
                     </div>
                     <div className="row control">
                         <div>
-                            <div className="paper-control paper-control-btn" onClick={this.props.clearLayout}>
+                            <div className="paper-control paper-control-btn" onClick={()=>this.onClickClearConfirm()}>
                                 <i className="fa fa-trash-o" aria-hidden="true"></i><span className="paper-control-text">CLEAR ALL PAPER</span>
                             </div>
                         </div>
                     </div>
                 </div>
             </div>
-        );
-    }
+        );}
 }
 
 let mapStateToProps = (state) => {
