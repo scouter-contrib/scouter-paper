@@ -741,7 +741,7 @@ class Controller extends Component {
     };
 
     clearLayout = () => {
-        this.props.setBoxesLayouts([], {})
+        this.props.setBoxesLayouts([], {});
         /*
         this.setState({
             boxes: [],

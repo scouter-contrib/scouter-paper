@@ -3,8 +3,6 @@ import './PaperControl.css';
 import * as Options from './Options';
 import {Draggable} from 'react-drag-and-drop'
 import {connect} from 'react-redux';
-import {confirmAlert} from 'react-confirm-alert'; // Import
-import 'react-confirm-alert/src/react-confirm-alert.css'
 import Overlay from "../../Overlay/Overlay";
 import Confirm from "../../Confirm/Confirm"; // Import css
 
