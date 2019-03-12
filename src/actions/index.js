@@ -35,6 +35,31 @@ export const SET_MENU = 'SET_MENU';
 export const SET_TOPOLOGY_OPTION = 'SET_TOPOLOGY_OPTION';
 export const SET_ALERT = 'SET_ALERT';
 export const SET_BREAKPOINT = 'SET_BREAKPOINT';
+export const SET_TEMPLATE_NAME = 'SET_TEMPLATE_NAME';
+export const SET_PRESET_NAME = 'SET_PRESET_NAME';
+export const SET_LAYOUT_NAME = 'SET_LAYOUT_NAME';
+
+export function setTemplateName(preset, layout) {
+    return {
+        type: SET_TEMPLATE_NAME,
+        preset: preset,
+        layout: layout
+    }
+}
+
+export function setPresetName(preset) {
+    return {
+        type: SET_PRESET_NAME,
+        preset: preset
+    };
+}
+
+export function setLayoutName(layout) {
+    return {
+        type: SET_LAYOUT_NAME,
+        layout: layout
+    };
+}
 
 export function setBoxes(boxes) {
     return {

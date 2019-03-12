@@ -3,7 +3,7 @@ import "./Paper.css";
 import "./Resizable.css";
 import {connect} from "react-redux";
 import {withRouter} from "react-router-dom";
-import {addRequest, pushMessage, setBoxes, setBoxesLayouts, setLayoutChangeTime, setControlVisibility, setLayouts, setRangeDateHoursMinutesValue, setRealTime, setTemplate, setBreakpoint} from "../../actions";
+import {addRequest, pushMessage, setBoxes, setBoxesLayouts, setLayoutChangeTime, setControlVisibility, setLayouts, setRangeDateHoursMinutesValue, setRealTime, setTemplate, setBreakpoint, setTemplateName} from "../../actions";
 import {Responsive, WidthProvider} from "react-grid-layout";
 import {Box, BoxConfig, XLogFilter} from "../../components";
 import jQuery from "jquery";
@@ -48,6 +48,10 @@ class Paper extends Component {
         let layouts = getData("layouts");
         let boxes = getData("boxes");
 
+        let templateName = getData("templateName");
+        if(templateName){
+            this.props.setTemplateName(templateName.preset, templateName.layout);
+        }
         // xs와 xxs를 제거하면서, 기존에 저장된 데이터 warning 로그가 생성되어, 있는 경우 삭제
         if (layouts && (layouts.xs || layouts.xxs || layouts.sm)) {
             delete layouts.sm;
@@ -1436,7 +1440,8 @@ let mapDispatchToProps = (dispatch) => {
         setLayouts: (layouts) => dispatch(setLayouts(layouts)),
         setBoxesLayouts: (boxes, layouts) => dispatch(setBoxesLayouts(boxes, layouts)),
         setLayoutChangeTime: () => dispatch(setLayoutChangeTime()),
-        setBreakpoint: (breakpoint) => dispatch(setBreakpoint(breakpoint))
+        setBreakpoint: (breakpoint) => dispatch(setBreakpoint(breakpoint)),
+        setTemplateName: (preset, layout) => dispatch(setTemplateName(preset, layout))
     };
 };
 

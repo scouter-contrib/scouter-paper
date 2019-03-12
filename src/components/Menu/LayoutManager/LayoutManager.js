@@ -1,6 +1,6 @@
 import React, {Component} from 'react';
 import './LayoutManager.css';
-import {setTemplate, setControlVisibility, pushMessage} from '../../../actions';
+import {setTemplate, setControlVisibility, pushMessage, setLayoutName} from '../../../actions';
 import {connect} from 'react-redux';
 import {withRouter} from 'react-router-dom';
 import {getData, setData} from '../../../common/common';
@@ -219,6 +219,8 @@ class LayoutManager extends Component {
             let template = this.state.templates[i];
 
             if (template.no === no) {
+                this.props.setLayoutName(template.name);
+                setData("templateName", Object.assign({}, getData("templateName"), {layout: template.name}));
                 setData("boxes", template.boxes);
                 setData("layouts", template.layouts);
 
@@ -364,7 +366,8 @@ let mapDispatchToProps = (dispatch) => {
     return {
         setTemplate: (boxes, layouts) => dispatch(setTemplate(boxes, layouts)),
         setControlVisibility: (name, value) => dispatch(setControlVisibility(name, value)),
-        pushMessage: (category, title, content) => dispatch(pushMessage(category, title, content))
+        pushMessage: (category, title, content) => dispatch(pushMessage(category, title, content)),
+        setLayoutName: (layout) => dispatch(setLayoutName(layout))
     };
 };
 

@@ -1,4 +1,4 @@
-import {SET_MENU, SET_BOXES_LAYOUTS, SET_LAYOUTS, SET_BOXES, SET_LAYOUT_CHANGETIME, SET_SUPPORTED, ADD_REQUEST, SET_CONFIG, SET_USER_ID, SET_USER_DATA, SET_TARGET, PUSH_MESSAGE, SET_CONTROL_VISIBILITY, CLEAR_ALL_MESSAGE, SET_BG_COLOR, SET_SELECTION, SET_TEMPLATE, SET_REAL_TIME, SET_RANGE_DATE, SET_RANGE_HOURS, SET_RANGE_MINUTES, SET_RANGE_VALUE, SET_REAL_TIME_VALUE, SET_RANGE_DATE_HOURS_MINUTES, SET_REAL_TIME_RANGE_STEP_VALUE, SET_RANGE_DATE_HOURS_MINUTES_VALUE, SET_RANGE_ALL, SET_COUNTER_INFO, SET_CONTROLLER_STATE, SET_CONTROLLER_PIN, SET_FILTER_MAP, ADD_FILTERED_OBJECT, REMOVE_FILTERED_OBJECT, SET_SEARCH_CONDITION, SET_TOPOLOGY_OPTION, SET_ALERT, SET_BREAKPOINT} from '../actions';
+import {SET_MENU, SET_BOXES_LAYOUTS, SET_LAYOUTS, SET_BOXES, SET_LAYOUT_CHANGETIME, SET_SUPPORTED, ADD_REQUEST, SET_CONFIG, SET_USER_ID, SET_USER_DATA, SET_TARGET, PUSH_MESSAGE, SET_CONTROL_VISIBILITY, CLEAR_ALL_MESSAGE, SET_BG_COLOR, SET_SELECTION, SET_TEMPLATE, SET_REAL_TIME, SET_RANGE_DATE, SET_RANGE_HOURS, SET_RANGE_MINUTES, SET_RANGE_VALUE, SET_REAL_TIME_VALUE, SET_RANGE_DATE_HOURS_MINUTES, SET_REAL_TIME_RANGE_STEP_VALUE, SET_RANGE_DATE_HOURS_MINUTES_VALUE, SET_RANGE_ALL, SET_COUNTER_INFO, SET_CONTROLLER_STATE, SET_CONTROLLER_PIN, SET_FILTER_MAP, ADD_FILTERED_OBJECT, REMOVE_FILTERED_OBJECT, SET_SEARCH_CONDITION, SET_TOPOLOGY_OPTION, SET_ALERT, SET_BREAKPOINT, SET_TEMPLATE_NAME, SET_PRESET_NAME, SET_LAYOUT_NAME} from '../actions';
 import {combineReducers} from 'redux';
 import moment from 'moment';
 const configState = {
@@ -402,7 +402,9 @@ const template = (state = templateState, action) => {
     switch (action.type) {
 
         case SET_TEMPLATE:
-            return Object.assign({}, state, {boxes : action.boxes, layouts: action.layouts});
+            return Object.assign({}, state, {name: action.name, boxes : action.boxes, layouts: action.layouts});
+        case "SET_TEMPLATE_NAME":
+            return Object.assign({}, state, {name: action.name});
         default:
             return state;
     }
@@ -563,6 +565,31 @@ const alert = (state = alertState, action) => {
     }
 };
 
+
+const templateNameState = {
+    preset: null,
+    layout: null
+};
+
+const templateName = (state = templateNameState, action) => {
+    switch (action.type) {
+        case SET_TEMPLATE_NAME:
+            return {
+                preset: action.preset,
+                layout: action.layout
+            }
+        case SET_PRESET_NAME:
+            return {
+                preset: action.preset,
+                layout: null
+            }
+        case SET_LAYOUT_NAME:
+            return Object.assign({}, state, {layout: action.layout});
+        default:
+            return state;
+    }
+};
+
 const scouterApp = combineReducers({
     supported,
     target,
@@ -578,7 +605,8 @@ const scouterApp = combineReducers({
     searchCondition,
     paper,
     topologyOption,
-    alert
+    alert,
+    templateName
 });
 
 export default scouterApp;

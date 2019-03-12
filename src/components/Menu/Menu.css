@@ -113,6 +113,27 @@
     transition: border-bottom-color, color 0.3s;
 }
 
+.menu .right-panel {
+    display: block;
+    float: right;
+    height: 56px;
+}
+
+.menu .right-panel .template-name {
+    display: inline-block;
+    padding: 0 4px 0 4px;
+}
+
+.template-name .preset{
+    font-size: 14px;
+    padding: 8px 0 0 0;
+}
+
+.template-name .layout {
+    font-size: 10px;
+    padding: 4px 0 0 0;
+}
+
 .menu-instance-selector {
     display: inline-block;
     padding-top: 10px;
