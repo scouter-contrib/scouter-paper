@@ -402,7 +402,7 @@ const template = (state = templateState, action) => {
     switch (action.type) {
 
         case SET_TEMPLATE:
-            return Object.assign({}, state, {name: action.name, boxes : action.boxes, layouts: action.layouts});
+            return Object.assign({}, state, {boxes : action.boxes, layouts: action.layouts});
         default:
             return state;
     }
