@@ -50,7 +50,7 @@ class PaperControl extends Component {
         const options = {
             buttons:[
                 {
-                    label: 'Yes',
+                    label: 'Clear',
                     onClick: () => {
                         this.props.clearLayout();
                         this.setState({
@@ -61,7 +61,7 @@ class PaperControl extends Component {
                     }
                 },
                 {
-                    label: 'No',
+                    label: 'Cancel',
                     onClick: () => {
                         this.setState({
                             confirm : {
