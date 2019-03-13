@@ -114,9 +114,14 @@ class ActiveServiceStack extends Component {
         return (
             <div className='stack-trace'>
                 {/*<div className={"sub-title"}>StackTrace INFO</div>*/}
-                <div className={"xlog-data"}>
+                <div className={"stack-trace-data"}>
                     <div className={"summary"}>
-                        <div className={"title"}> Active StackTrace(Thread ID {this.props.stack.threadId} , {this.props.stack.objName})</div>
+                        <div className={"title"}> Active StackTrace(Thread ID {this.props.stack.threadId} , {this.props.stack.objName})
+                            <div className="restore-control-btns">
+                                <button onClick={()=>this.props.refresh()}> <i className="fa fa-refresh"/></button>
+                                <button onClick={()=>this.props.restore()}> <i className="fa fa-rotate-left"/></button>
+                            </div>
+                        </div>
                         <div className={"list-summary"}>RETRIEVE TIME: {moment(new Date()).format('YYYY.MM.DD HH:mm:ss')}</div>
                     </div>
                     <div className={"sub-title"}>

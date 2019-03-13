@@ -1,6 +1,6 @@
 import React, {Component} from 'react';
 import '../Profiler.css';
-import {addRequest, pushMessage, setControlVisibility} from '../../../../../actions';
+import {addRequest, setControlVisibility} from '../../../../../actions';
 import {withRouter} from 'react-router-dom';
 import {connect} from 'react-redux';
 import jQuery from "jquery";
@@ -14,10 +14,6 @@ class ActiveService extends Component {
 
     constructor(props) {
         super(props);
-
-        // URL로부터 TXID와 날짜를 세팅
-        // let txid = getParam(this.props, "txid");
-        // let txiddate = getParam(this.props, "txiddate");
 
         let options = null;
         if (options) {
@@ -81,9 +77,9 @@ class ActiveService extends Component {
 
     componentWillReceiveProps(nextProps) {
         if( !this.props.activeObject && nextProps.activeObject ){
-            this.getActiveServiceList(nextProps.activeObject)
+            this.getActiveServiceList(nextProps.activeObject);
         }else if( this.props.activeObject && nextProps.activeObject !== this.props.activeObject){
-            this.getActiveServiceList(nextProps.activeObject)
+            this.getActiveServiceList(nextProps.activeObject);
         }
 
     }
@@ -125,7 +121,7 @@ class ActiveService extends Component {
         });
     };
 
-    getActiveServiceList= (activeObj) =>{
+    getActiveServiceList= (activeObj = this.state.activeThread) =>{
         // activeObj.objHash
         this.props.setControlVisibility("Loading", true);
         this.props.addRequest();
@@ -152,16 +148,17 @@ class ActiveService extends Component {
                stackTrace : {
                     objHash : null,
                     objName : null,
+                    threadId : null,
                     show : false,
                     map : {}
                }
-            })
+            });
 
         }).always(() => {
             this.props.setControlVisibility("Loading", false);
         });
     };
-    rowClick = (activeThread) => {
+    rowClick = (activeThread = this.state.stackTrace ) => {
         this.props.setControlVisibility("Loading", true);
         this.props.addRequest();
         const {config,user} = this.props
@@ -202,7 +199,7 @@ class ActiveService extends Component {
         if (this.state.smallScreen !== smallScreen) {
             this.setState({
                 smallScreen: smallScreen
-            })
+            });
         }
     };
 
@@ -242,7 +239,7 @@ class ActiveService extends Component {
                         <div className="summary">
                             <div className="title">Active Service ({activeThread.objName})
                                 <div className="active-control-btns">
-                                    <button onClick={()=>this.getActiveServiceList(activeThread)}> <i className={"fa fa-refresh"} /></button>
+                                    <button onClick={()=>this.getActiveServiceList()}> <i className={"fa fa-refresh"} /></button>
                                 </div>
                             </div>
                             <div className="list-summary">RETRIEVE TIME: {moment(new Date()).format('YYYY.MM.DD HH:mm:ss')} , { activeThread.list.length } ROWS </div>
@@ -255,7 +252,7 @@ class ActiveService extends Component {
 
                     <div className="profiler-layout right" style={rightStyle}>
                         <div style={{height: "calc(100% - 2px)",overflowY:"auto"}}>
-                            <ActiveServiceStack stack={this.state.stackTrace} />
+                            <ActiveServiceStack stack={this.state.stackTrace} refresh={this.rowClick} restore={this.getActiveServiceList} />
                         </div>
                     </div>
                 </div>
@@ -278,7 +275,6 @@ let mapStateToProps = (state) => {
 let mapDispatchToProps = (dispatch) => {
     return {
         addRequest: () => dispatch(addRequest()),
-        pushMessage: (category, title, content) => dispatch(pushMessage(category, title, content)),
         setControlVisibility: (name, value) => dispatch(setControlVisibility(name, value)),
     };
 };
