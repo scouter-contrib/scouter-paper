@@ -67,6 +67,22 @@ export function getHttpProtocol(config) {
     }
 }
 
+export function buildHttpProtocol(config) {
+    if (config.servers && config.servers.length > 0) {
+        let idx = 0;
+        return config.servers
+                     .map(_server => {
+                         return {
+                             addr: [_server.protocol, "://", _server.address, ":", _server.port].join(''),
+                             authentification: _server.authentification,
+                             key : idx++
+                         }
+                     })
+    } else {
+        return null;
+    }
+}
+
 export function getCurrentDefaultServer(config) {
     if (config.servers && config.servers.length > 0) {
         let server = config.servers.filter((server) => server.default);
