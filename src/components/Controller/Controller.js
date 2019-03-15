@@ -1,6 +1,21 @@
 import React, {Component} from 'react';
 import './Controller.css';
-import {setControllerState} from '../../actions';
+
+import {
+    addFilteredObject,
+    addRequest,
+    clearAllMessage,
+    pushMessage,
+    removeFilteredObject,
+    setBoxes,
+    setBoxesLayouts,
+    setConfig,
+    setControllerState,
+    setControlVisibility,
+    setFilterMap,
+    setLayouts,
+    setTarget
+} from '../../actions';
 import {connect} from 'react-redux';
 import {withRouter} from 'react-router-dom';
 import Logo from "../Logo/Logo";
@@ -13,21 +28,20 @@ import TopologyMinControl from "../TopologyMinControl/TopologyMinControl";
 import * as PaperIcons from '../../common/PaperIcons'
 import LayoutManager from "../Menu/LayoutManager/LayoutManager";
 import PresetManager from "../Menu/PresetManager/PresetManager";
-import {getDefaultServerConfig, getDefaultServerConfigIndex, setServerTimeGap, setRangePropsToUrl, getHttpProtocol, errorHandler, getWithCredentials, setAuthHeader, getCurrentUser, setData} from '../../common/common';
+
+
 import {
-    addRequest,
-    pushMessage,
-    setTarget,
-    clearAllMessage,
-    setControlVisibility,
-    setConfig,
-    setFilterMap,
-    addFilteredObject,
-    removeFilteredObject,
-    setBoxes,
-    setLayouts,
-    setBoxesLayouts
-} from '../../actions';
+    errorHandler,
+    getCurrentUser,
+    getDefaultServerConfig,
+    getDefaultServerConfigIndex,
+    getHttpProtocol,
+    getWithCredentials,
+    setAuthHeader,
+    setData,
+    setRangePropsToUrl,
+    setServerTimeGap
+} from '../../common/common';
 import jQuery from "jquery";
 import PaperControl from "../Paper/PaperControl/PaperControl";
 
