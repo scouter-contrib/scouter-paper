@@ -883,7 +883,6 @@ class Controller extends Component {
                                             }
 
                                             let iconInfo = PaperIcons.getObjectIcon(icon);
-
                                             return (
                                                 <li key={i} className={this.props.filterMap[object.objHash] ? "filtered" : ""} onClick={this.toggleFilteredObject.bind(this, object.objHash)}>
                                                     <div className="row">
@@ -894,8 +893,8 @@ class Controller extends Component {
                                                             </div>
                                                         </div>
                                                         <div className="instance-text-info">
-                                                            <div className="instance-name">{object.objName}</div>
-                                                            <div className="instance-other"><span>{object.address}</span><span className="instance-objtype">{displayName}</span></div>
+                                                            <div className={`instance-name ${object.alive ? 'alive': 'down'}`}>{object.objName}</div>
+                                                            <div className={`instance-other ${object.alive ? 'alive' : 'down'}`}><span>{object.address}</span><span className="instance-objtype">{displayName}</span></div>
                                                         </div>
                                                     </div>
                                                 </li>)

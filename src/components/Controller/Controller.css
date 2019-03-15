@@ -367,6 +367,13 @@
     box-sizing: border-box;
     padding: 2px;
 }
+.controller-wrapper .object-filter-list ul li .row > div.instance-text-info .instance-name.down {
+    color : #8a8a8a;
+}
+.controller-wrapper .object-filter-list ul li .row > div.instance-text-info .instance-other.down {
+    color : #8a8a8a;
+}
+
 
 .controller-wrapper .object-filter-list ul li.empty-object {
     text-align: center;
