@@ -200,7 +200,7 @@ class ProfileList extends Component {
     render() {
         return (
             <div className="xlog-profile-list">
-                <div className="row header">{this.getHeader()}</div>
+                <div className="row header fixed">{this.getHeader()}</div>
                 {this.props.xlogs && this.props.xlogs.map((xlog, i) => {
                     let rowClass = (xlog.error ? 'error' : '');
                     const xtype = xlogTypes[xlog.xlogType];
