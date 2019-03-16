@@ -293,6 +293,10 @@ class Profiler extends Component {
         filtered = filtered.filter((d) => {
             return filterMap[d.objHash];
         });
+        //- 필터링 되어 비어있는 영역의 xlog 부터 카운팅이 0 인경우 조회 하지 않고 리턴
+        if( filtered.length === 0 ){
+            return;
+        }
 
         let date = moment(new Date(x1)).format("YYYYMMDD");
 
