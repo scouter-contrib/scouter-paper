@@ -1,12 +1,12 @@
 import React, {Component} from 'react';
-import '../Profiler.css';
-import {addRequest, setControlVisibility} from '../../../../../actions';
+import './ActiveService.css';
+import {addRequest, setControlVisibility} from '../../../actions/index';
 import {withRouter} from 'react-router-dom';
 import {connect} from 'react-redux';
 import jQuery from "jquery";
-import {getCurrentUser, getHttpProtocol, getWithCredentials, setAuthHeader} from '../../../../../common/common';
-import ActiveServiceList from "./ActiveServiceList";
-import ActiveServiceStack from "./ActiveServiceStack";
+import {getCurrentUser, getHttpProtocol, getWithCredentials, setAuthHeader} from '../../../common/common';
+import ActiveServiceList from "./ActiveServiceList/ActiveServiceList";
+import ActiveServiceStack from "./ActiveServiceStack/ActiveServiceStack";
 import moment from 'moment'
 
 // import {getParam} from '../../../../common/common';
@@ -126,7 +126,7 @@ class ActiveService extends Component {
         this.props.setControlVisibility("Loading", true);
         this.props.addRequest();
         const {config,user} = this.props
-        const _url = [getHttpProtocol(config),'scouter/v1/activeService/ofObject',activeObj.objHash].join('/')
+        const _url = `${getHttpProtocol(config)}/scouter/v1/activeService/ofObject/${activeObj.objHash}`;
         jQuery.ajax({
             method: "GET",
             async: true,
@@ -181,7 +181,7 @@ class ActiveService extends Component {
                     threadId : activeThread.threadId,
                     show : true
                 },
-                listWidth : 0
+                listWidth : 40
             });
 
         }).always(() => {
@@ -202,7 +202,37 @@ class ActiveService extends Component {
             });
         }
     };
+    changeListWidth = (e) => {
+        let listWidth = this.state.listWidth;
 
+        if (e === "min") {
+            listWidth = 0;
+        }
+
+        if (e === "max") {
+            listWidth = 100;
+        }
+
+        if (e === "small") {
+            listWidth -= 20;
+
+            if (listWidth < 0) {
+                listWidth = 0;
+            }
+        }
+
+        if (e === "big") {
+            listWidth += 20;
+
+            if (listWidth > 100) {
+                listWidth = 100;
+            }
+        }
+
+        this.setState({
+            listWidth: listWidth
+        });
+    };
     render() {
         let leftStyle = {};
         let rightStyle = {};
@@ -226,16 +256,19 @@ class ActiveService extends Component {
                 }
             }
         }
-        // txid={this.state.txid}
         const {activeThread} = this.state;
         return (
             <div className={"active-thread-list " + (this.state.show ? ' ' : 'hidden')} >
-                <div className={"xlog-profiler " + (this.state.paramTxid ? 'param-mode ' : ' ') }>
+                <div className="active-service">
                 <div>
                     <div className="size-control-btns">
+                        <button onClick={()=>this.changeListWidth("min")}><i className="fa fa-angle-double-left"></i></button>
+                        <button onClick={()=>this.changeListWidth("small")}><i className="fa fa-angle-left"></i></button>
+                        <button onClick={()=>this.changeListWidth("big")}><i className="fa fa-angle-right"></i></button>
+                        <button onClick={()=>this.changeListWidth("max")}><i className="fa fa-angle-double-right"></i></button>
                         <div className="close-btn" onClick={this.close}></div>
                     </div>
-                    <div className="profiler-layout left" style={leftStyle}>
+                    <div className="active-layout left" style={leftStyle}>
                         <div className="summary">
                             <div className="title">Active Service ({activeThread.objName})
                                 <div className="active-control-btns">
@@ -243,15 +276,17 @@ class ActiveService extends Component {
                                 </div>
                             </div>
                             <div className="list-summary">RETRIEVE TIME: {moment(new Date()).format('YYYY.MM.DD HH:mm:ss')} , { activeThread.list.length } ROWS </div>
-                            <div className="close-btn" onClick={()=>this.close()}></div>
                         </div>
-                        <div className="profile-list scrollbar">
+                        <div className="active-list scrollbar">
                             <ActiveServiceList active={activeThread.list} rowClick={this.rowClick} />
                         </div>
                     </div>
-
-                    <div className="profiler-layout right" style={rightStyle}>
-                        <div style={{height: "calc(100% - 2px)",overflowY:"auto"}}>
+                    <div className="active-layout right" style={rightStyle}>
+                        <div className="summary">
+                            <div className="title">Stack Trace(Thread ID {this.state.stackTrace.threadId} , {this.state.stackTrace.objName}</div>
+                            <div className="list-summary">RETRIEVE TIME: {moment(new Date()).format('YYYY.MM.DD HH:mm:ss')}</div>
+                        </div>
+                        <div className="stack-trace scrollbar" >
                             <ActiveServiceStack stack={this.state.stackTrace} refresh={this.rowClick} restore={this.getActiveServiceList} />
                         </div>
                     </div>

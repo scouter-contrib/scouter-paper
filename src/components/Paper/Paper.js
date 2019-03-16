@@ -10,7 +10,7 @@ import jQuery from "jquery";
 import * as common from "../../common/common";
 import {errorHandler, getCurrentUser, getData, getDivideDays, getHttpProtocol, getSearchDays, getWithCredentials, setAuthHeader, setData} from "../../common/common";
 import Profiler from "./XLog/Profiler/Profiler";
-import ActiveService from "./XLog/Profiler/ActiveService/ActiveService";
+import ActiveService from "./ActiveService/ActiveService";
 import ServerDate from "../../common/ServerDate";
 import moment from "moment";
 import OldVersion from "../OldVersion/OldVersion";

@@ -119,33 +119,6 @@
     padding: 15px 15px 7px;
 }
 
-.xlog-profiler .profiler-layout .summary .title .active-control-btns{
-    padding: 5px;
-    display: inline;
-    position: relative;
-}
-.xlog-profiler .profiler-layout .summary .title .active-control-btns > button {
-    background-color: rgba(0, 0, 0, 0.3);
-    width: 20px;
-    height: 20px;
-    border-radius: 50%;
-    color: white;
-    padding: 0;
-    margin: 0 2px 0 0;
-    font-size: 12px;
-    text-align: center;
-    position: relative;
-}
-
-
-.xlog-profiler .profiler-layout .summary .title .active-control-btns > button:last-child {
-    margin-right: 0;
-}
-
-.xlog-profiler .profiler-layout .summary .title .active-control-btns > button:hover {
-    background-color: rgba(0, 0, 0, 0.9);
-}
-
 .xlog-profiler .profiler-layout .summary .title .selected-info {
     font-size: 10px;
 }
@@ -314,7 +287,6 @@
         padding: 15px 0 7px;
         margin-left: 40px;
     }
-
 
     .xlog-profiler.param-mode .profiler-layout.right .summary .title {
         padding: 15px 10px 7px;

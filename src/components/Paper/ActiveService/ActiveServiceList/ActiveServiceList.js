@@ -1,15 +1,15 @@
 import React, {Component} from 'react';
-import '../ProfileList/ProfileList.css';
+import './ActiveServiceList.css';
 import {connect} from 'react-redux';
 import {withRouter} from 'react-router-dom';
 import numeral from "numeral";
 
 const layout = [
 
-    {
-        key: "objName",
-        name: "OBJECT NAME"
-    },
+    // {
+    //     key: "objName",
+    //     name: "OBJECT NAME"
+    // },
     {
         key: "serviceName",
         name: "SERVICE"
@@ -86,7 +86,7 @@ class ActiveServiceList extends Component {
     };
     render() {
         return (
-            <div className="xlog-profile-list">
+            <div className="active-service-list">
                 <div className="row header">{this.getHeader()}</div>
                 {this.props.active && this.props.active.map((_th, i) => {
 

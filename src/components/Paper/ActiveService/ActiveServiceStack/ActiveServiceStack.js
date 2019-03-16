@@ -5,7 +5,7 @@ import {withRouter} from 'react-router-dom';
 import numeral from "numeral";
 import SyntaxHighlighter from 'react-syntax-highlighter';
 import {docco} from 'react-syntax-highlighter/dist/esm/styles/hljs';
-import moment from 'moment'
+
 const meta = [
 
     {
@@ -112,22 +112,12 @@ class ActiveServiceStack extends Component {
     render() {
         const {map} = this.props.stack;
         return (
-            <div className='stack-trace'>
-                {/*<div className={"sub-title"}>StackTrace INFO</div>*/}
-                <div className={"stack-trace-data"}>
-                    <div className={"summary"}>
-                        <div className={"title"}> Active StackTrace(Thread ID {this.props.stack.threadId} , {this.props.stack.objName})
-                            <div className="restore-control-btns">
-                                <button onClick={()=>this.props.refresh()}> <i className="fa fa-refresh"/></button>
-                                <button onClick={()=>this.props.restore()}> <i className="fa fa-rotate-left"/></button>
-                            </div>
-                        </div>
-                        <div className={"list-summary"}>RETRIEVE TIME: {moment(new Date()).format('YYYY.MM.DD HH:mm:ss')}</div>
-                    </div>
+                <div className={"stack-content"}>
                     <div className={"sub-title"}>
                         <span className="label">Key</span>
                         <span className="data">Value</span>
-                    </div>
+                    </div >
+                    <div className={"stack-frame"}>
                     {
                         meta.map((meta, j) => {
                             return(
@@ -141,7 +131,12 @@ class ActiveServiceStack extends Component {
                             </div>
                             );
                         })
+
                     }
+                    </div>
+                    <div className={"sub-title"}>
+                        <div>Stack Info</div>
+                    </div>
                     {
                         map['stackTrace'] &&
                         <div className={"stack-trace-content"}>
@@ -152,7 +147,6 @@ class ActiveServiceStack extends Component {
                             </SyntaxHighlighter>
                         </div>
                     }
-                </div>
             </div>
         );
     }
