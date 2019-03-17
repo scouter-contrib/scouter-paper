@@ -6,23 +6,22 @@ class InnerLoading extends Component {
     shouldComponentUpdate(nextProps, nextState) {
         return this.props.visible !== nextProps.visible;
     }
-
     componentDidUpdate(prevProps, prevState) {
 
         if (this.props.visible) {
-            this.refs.loading.style.display = "table";
-            this.refs.loading.style.opacity = "1";
+            this.refs.innerLoading.style.display = "table";
+            this.refs.innerLoading.style.opacity = "1";
         } else {
-            this.refs.loading.style.opacity = "0";
+            this.refs.innerLoading.style.opacity = "0";
             setTimeout(() => {
-                this.refs.loading.style.display = "none";
+                this.refs.innerLoading.style.display = "none";
             }, 500);
         }
     }
 
     render() {
         return (
-            <div className="loading" ref="loading">
+            <div className="innerLoading" ref="innerLoading">
                 <div>
                     <div className="spinner">
                         <div className="cube1"></div>

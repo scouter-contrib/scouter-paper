@@ -102,6 +102,21 @@ class Topology extends Component {
         }
     };
 
+    objCountersCpuInfo = {
+        IN_DANGER : {
+            state : 'IN-DANGER',
+            color : '#fc2527',
+        },
+        WARNING : {
+            state : 'WARNING',
+            color : '#ffd259'
+        },
+        DEFAULT : {
+            state : 'DEFAULT',
+            color : '#ffffff'
+        }
+    };
+
 
     componentDidMount() {
         if (!this.polling) {
@@ -429,6 +444,7 @@ class Topology extends Component {
                                 d.fromObjTypeFamily = null;
                                 d.fromObjCategory = typeInfo["category"];
                             }
+                            d.fromObjCountersCpu = _.find(d.fromObjCounters, {name: 'Cpu'});
 
                             if (that.instances[Number(d.toObjHash)] && that.instances[Number(d.toObjHash)].objType) {
                                 d.toObjType = that.instances[d.toObjHash].objType;
@@ -442,6 +458,7 @@ class Topology extends Component {
                                 d.toObjTypeFamily = null;
                                 d.toObjCategory = typeInfo["category"];
                             }
+                            d.toObjCountersCpu = _.find(d.toObjCounters, {name: 'Cpu'});
 
                             if (!objToTypeMap[d.fromObjHash]) objToTypeMap[d.fromObjHash] = {};
                             if (!objToTypeMap[d.toObjHash]) objToTypeMap[d.fromObjHash] = {};
@@ -458,10 +475,12 @@ class Topology extends Component {
                                     fromObjName: d.fromObjTypeName,
                                     fromObjTypeFamily: d.fromObjTypeFamily,
                                     fromObjCategory: d.fromObjCategory,
+                                    fromObjCountersCpu: d.fromObjCountersCpu,
                                     toObjHash: d.toObjType,
                                     toObjName: d.toObjTypeName,
                                     toObjTypeFamily: d.toObjTypeFamily,
                                     toObjCategory: d.toObjCategory,
+                                    toObjCountersCpu : d.toObjCountersCpu,
                                     count: Number(d.count),
                                     errorCount: Number(d.errorCount),
                                     period: Number(d.period),
@@ -480,6 +499,7 @@ class Topology extends Component {
                                 d.fromObjTypeFamily = null;
                                 d.fromObjCategory = typeInfo["category"];
                             }
+                            d.fromObjCountersCpu = _.find(d.fromObjCounters, {name: 'Cpu'});
 
                             if (that.instances[Number(d.toObjHash)] && that.instances[Number(d.toObjHash)].objType) {
                                 d.toObjCategory = that.instances[d.toObjHash].objFamily;
@@ -490,6 +510,7 @@ class Topology extends Component {
                                 d.toObjTypeFamily = null;
                                 d.toObjCategory = typeInfo["category"];
                             }
+                            d.toObjCountersCpu = _.find(d.toObjCounters, {name: 'Cpu'});
 
                             objectTypeTopologyMap[d.fromObjHash + "_" + d.toObjHash] = {
                                 group: false,
@@ -497,10 +518,12 @@ class Topology extends Component {
                                 fromObjName: d.fromObjName,
                                 fromObjTypeFamily: d.fromObjTypeFamily,
                                 fromObjCategory: d.fromObjCategory,
+                                fromObjCountersCpu: d.fromObjCountersCpu,
                                 toObjHash: d.toObjHash,
                                 toObjName: d.toObjName,
                                 toObjTypeFamily: d.toObjTypeFamily,
                                 toObjCategory: d.toObjCategory,
+                                toObjCountersCpu : d.toObjCountersCpu,
                                 count: Number(d.count),
                                 errorCount: Number(d.errorCount),
                                 period: Number(d.period),
@@ -544,14 +567,16 @@ class Topology extends Component {
                             id: d.fromObjHash,
                             objName: d.fromObjName,
                             objCategory: d.fromObjCategory ? d.fromObjCategory : "",
-                            objTypeFamily: d.fromObjTypeFamily ? d.fromObjTypeFamily : ""
+                            objTypeFamily: d.fromObjTypeFamily ? d.fromObjTypeFamily : "",
+                            objCountersCpu: d.fromObjCountersCpu ? d.fromObjCountersCpu.value : ""
                         }
                     }).concat(_.map(topology, (d) => {
                         return {
                             id: d.toObjHash,
                             objName: d.toObjName,
                             objCategory: d.toObjCategory ? d.toObjCategory : "",
-                            objTypeFamily: d.toObjTypeFamily ? d.toObjTypeFamily : ""
+                            objTypeFamily: d.toObjTypeFamily ? d.toObjTypeFamily : "",
+                            objCountersCpu : d.toObjCountersCpu ? d.toObjCountersCpu.value : ""
                         }
                     })), (d) => {
                         return d.id;
@@ -675,6 +700,7 @@ class Topology extends Component {
                 nodeMap[node.id].node.objCategory = node.objCategory;
                 nodeMap[node.id].node.objName = node.objName;
                 nodeMap[node.id].node.objTypeFamily = node.objTypeFamily;
+                nodeMap[node.id].node.objCountersCpu = node.objCountersCpu;
                 nodeMap[node.id].node.instanceCount = node.instanceCount;
             } else {
                 nodeMap[node.id] = {
@@ -732,6 +758,15 @@ class Topology extends Component {
         } else {
             return this.objCategoryInfo["NEO_DEFAULT"];
         }
+    };
+
+    getCountersCpuInfo = (cpu) => {
+        cpu = Number(cpu);
+
+        if(cpu >= 90) return this.objCountersCpuInfo['IN_DANGER'];
+        else if(cpu >= 70) return this.objCountersCpuInfo['WARNING'];
+
+        return this.objCountersCpuInfo['DEFAULT'];
     };
 
     makeEdge = (d) => {
@@ -990,9 +1025,10 @@ class Topology extends Component {
         // 노드
         this.node = this.nodeGroup.selectAll(".node").data(nodes);
         this.node.exit().remove();
-        this.node = this.node.enter().append("circle").merge(this.node).attr("class", "node").attr("r", this.r).style("stroke-width", "4px").style("fill", "white").style("stroke", function (d) {
-            return that.getCatgegoryInfo(d.objCategory).color;
-        });
+        this.node = this.node.enter().append("circle").merge(this.node).attr("r", this.r).style("stroke-width", "4px")
+            .attr('class', (d) => 'node cpu-' + that.getCountersCpuInfo(d.objCountersCpu).state)
+            .style("fill", (d) => that.getCountersCpuInfo(d.objCountersCpu).color)
+            .style("stroke", (d) => that.getCatgegoryInfo(d.objCategory).color);
 
         this.node.call(d3.drag().on("start", this.dragstarted).on("drag", this.dragged).on("end", this.dragended));
         this.node.on("mouseover",that.hover);

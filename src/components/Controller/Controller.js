@@ -1,6 +1,21 @@
 import React, {Component} from 'react';
 import './Controller.css';
-import {setControllerState} from '../../actions';
+
+import {
+    addFilteredObject,
+    addRequest,
+    clearAllMessage,
+    pushMessage,
+    removeFilteredObject,
+    setBoxes,
+    setBoxesLayouts,
+    setConfig,
+    setControllerState,
+    setControlVisibility,
+    setFilterMap,
+    setLayouts,
+    setTarget
+} from '../../actions';
 import {connect} from 'react-redux';
 import {withRouter} from 'react-router-dom';
 import Logo from "../Logo/Logo";
@@ -13,21 +28,8 @@ import TopologyMinControl from "../TopologyMinControl/TopologyMinControl";
 import * as PaperIcons from '../../common/PaperIcons'
 import LayoutManager from "../Menu/LayoutManager/LayoutManager";
 import PresetManager from "../Menu/PresetManager/PresetManager";
-import {getDefaultServerConfig, getDefaultServerConfigIndex, setServerTimeGap, setRangePropsToUrl, getHttpProtocol, errorHandler, getWithCredentials, setAuthHeader, getCurrentUser, setData} from '../../common/common';
-import {
-    addRequest,
-    pushMessage,
-    setTarget,
-    clearAllMessage,
-    setControlVisibility,
-    setConfig,
-    setFilterMap,
-    addFilteredObject,
-    removeFilteredObject,
-    setBoxes,
-    setLayouts,
-    setBoxesLayouts
-} from '../../actions';
+import * as _ from 'lodash';
+import { buildHttpProtocol, getDefaultServerConfig, getDefaultServerConfigIndex, setServerTimeGap, setRangePropsToUrl, getHttpProtocol, errorHandler, getWithCredentials, setAuthHeader, getCurrentUser, setData} from '../../common/common';
 import jQuery from "jquery";
 import PaperControl from "../Paper/PaperControl/PaperControl";
 
@@ -60,6 +62,7 @@ class Controller extends Component {
                 this.setTargetFromUrl(this.props);
             }
         }
+        this.getConfigServerName(this.props)
     }
 
     componentWillReceiveProps(nextProps) {
@@ -105,6 +108,37 @@ class Controller extends Component {
             preset: !this.state.preset,
             selector : !this.state.preset ? false : this.state.preset
         });
+    };
+    getConfigServerName = (props) =>{
+        const serverAddress = buildHttpProtocol(props.config);
+        const mapper = [];
+        if(serverAddress){
+            const _promise = serverAddress.map(_get => {
+                   mapper.push({
+                       idx : _get.key,
+                       addr : _get.addr
+                   });
+                   return jQuery.ajax({
+                        method: "GET",
+                        url: `${_get.addr}/scouter/v1/info/server`,
+                        xhrFields: _get.authentification === "cookie",
+                        beforeSend: function (xhr) {
+                            const _tokenInfo = props.user[_get.addr];
+                            if (_get.authentication === "bearer" && _tokenInfo) {
+                                xhr.setRequestHeader('Authorization', ['bearer ', _tokenInfo.token].join(''));
+                            }
+                        }
+                    });
+                }
+            );
+            Promise.all(_promise).then((_serverInfo)=> {
+                let _conf = _.clone(props.config);
+                _serverInfo.forEach((_res,idx) =>{
+                    _conf.servers[idx].name  = `${_res.result[0].name} (${mapper[idx].addr})`;
+                });
+                props.setConfig(_conf);
+            });
+        }
     };
 
     onChangeScouterServer = (inx) => {
@@ -341,7 +375,6 @@ class Controller extends Component {
     setTargetFromUrl = (props) => {
 
         let that = this;
-
         if (!this.init) {
             this.props.addRequest();
             jQuery.ajax({
@@ -357,7 +390,6 @@ class Controller extends Component {
                 if (msg && msg.result) {
                     that.init = true;
                     let servers = msg.result;
-
                     if (servers.length > 0) {
                         if (!servers[0].version) {
                             props.pushMessage("error", "Not Supported", "Paper 2.0 is available only on Scout Server 2.0 and later.");
@@ -365,10 +397,10 @@ class Controller extends Component {
                             return;
                         }
                     }
-
                     //현재 멀티서버와 연결된 scouter webapp은 지원하지 않으므로 일단 단일 서버로 가정하고 마지막 서버 시간과 맞춘다.
                     servers.forEach((server) => {
                         setServerTimeGap(Number(server.serverTime) - new Date().valueOf());
+
                     });
 
                     // GET INSTANCES INFO FROM URL IF EXISTS
@@ -468,7 +500,6 @@ class Controller extends Component {
     };
 
     getServers = (config) => {
-
         let that = this;
         this.props.addRequest();
 
@@ -483,6 +514,7 @@ class Controller extends Component {
         }).done((msg) => {
 
             let servers = msg.result;
+
             let activeServerId = null;
             if (servers.length > 0) {
                 if (!servers[0].version) {

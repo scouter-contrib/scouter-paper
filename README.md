@@ -19,17 +19,17 @@ SCOUTER PAPER is a dashboard software that utilizes the SCOUTER WEB API, an open
 
 ## How to build
 For build, npm must be installed first. 
- 1. clone https://github.com/mindplates/scouter-paper.git
+ 1. clone https://github.com/scouter-contrib/scouter-paper.git
  2. npm install
  3. npm run build
     
 ## Download
 You can download the latest version from the page below.
-- [Release](https://github.com/mindplates/scouter-paper/releases/)
+- [Release](https://github.com/scouter-contrib/scouter-paper/releases/)
  
 ## Guides
-- [Home Page](https://mindplates.github.io/scouter-paper/)
-- [User Guide](https://translate.google.co.kr/translate?sl=ko&tl=en&js=y&prev=_t&hl=ko&ie=UTF-8&u=https%3A%2F%2Fmindplates.github.io%2Fscouter-paper%2Fmanual.html&edit-text=&act=url)
+- [Home Page](https://scouter-contrib.github.io/scouter-paper/)
+- [User Guide](https://translate.google.co.kr/translate?sl=ko&tl=en&js=y&prev=_t&hl=ko&ie=UTF-8&u=https%3A%2F%2Fscouter-contrib.github.io%2Fscouter-paper%2Fmanual.html&edit-text=&act=url)
  
 ## Screenshots
 - HOME
