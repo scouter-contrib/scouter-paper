@@ -906,7 +906,7 @@ class Controller extends Component {
                             </div>
                         </div>
                     </div>
-                    <div className="control-item paper-only">
+                    <div className="control-item paper-only" style={{zIndex:1}}>
                         <div className="row desc">
                             <div className="step"><span>3</span></div>
                             <div className="row-message">SEARCH</div>
