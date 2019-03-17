@@ -275,7 +275,7 @@ class ActiveService extends Component {
                                     <button onClick={()=>this.getActiveServiceList()}> <i className={"fa fa-refresh"} /></button>
                                 </div>
                             </div>
-                            <div className="list-summary">RETRIEVE TIME: {moment(new Date()).format('YYYY.MM.DD HH:mm:ss')} , { activeThread.list.length } ROWS </div>
+                            <div className="list-summary">RETRIEVE TIME : {moment(new Date()).format('YYYY.MM.DD HH:mm:ss')} , { activeThread.list.length } ROWS </div>
                         </div>
                         <div className="active-list scrollbar">
                             <ActiveServiceList active={activeThread.list} rowClick={this.rowClick} />
@@ -283,8 +283,8 @@ class ActiveService extends Component {
                     </div>
                     <div className="active-layout right" style={rightStyle}>
                         <div className="summary">
-                            <div className="title">Stack Trace(Thread ID {this.state.stackTrace.threadId} , {this.state.stackTrace.objName}</div>
-                            <div className="list-summary">RETRIEVE TIME: {moment(new Date()).format('YYYY.MM.DD HH:mm:ss')}</div>
+                            <div className="title">Stack Trace (Thread ID {this.state.stackTrace.threadId} , {this.state.stackTrace.objName}</div>
+                            <div className="list-summary">RETRIEVE TIME : {moment(new Date()).format('YYYY.MM.DD HH:mm:ss')}</div>
                         </div>
                         <div className="stack-trace scrollbar" >
                             <ActiveServiceStack stack={this.state.stackTrace} refresh={this.rowClick} restore={this.getActiveServiceList} />
