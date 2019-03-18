@@ -60,6 +60,14 @@ class Controller extends Component {
                 this.setTargetFromUrl(this.props);
             }
         }
+        if (localStorage.getItem("selectedObjects")) {
+            let selectedObjects = JSON.parse(localStorage.getItem("selectedObjects"));
+            if (selectedObjects.objects) {
+                this.applyPreset(selectedObjects);
+            } else {
+                this.setObjects();
+            }
+        }
     }
 
     componentWillReceiveProps(nextProps) {
@@ -141,17 +149,20 @@ class Controller extends Component {
             objects.push(this.state.selectedObjects[hash]);
         }
 
-        if (objects.length < 1) {
+        if (objects.length < 1 && !localStorage.getItem("selectedObjects")) {
             this.props.pushMessage("info", "NO MONITORING TARGET", "At least one object must be selected");
             this.props.setControlVisibility("Message", true);
-        } else {
-            objects.sort((a, b) => a.objName < b.objName ? -1 : 1);
-            AgentColor.setInstances(objects, this.props.config.colorType);
-            this.props.setTarget(objects);
-            this.props.setControlVisibility("TargetSelector", false);
-            setRangePropsToUrl(this.props, undefined, objects);
-            this.closeSelectorPopup();
+        } else if (objects.length < 1) {
+            objects = JSON.parse(localStorage.getItem("selectedObjects"))
         }
+
+        objects.sort((a, b) => a.objName < b.objName ? -1 : 1);
+        AgentColor.setInstances(objects, this.props.config.colorType);
+        this.props.setTarget(objects);
+        this.props.setControlVisibility("TargetSelector", false);
+        setRangePropsToUrl(this.props, undefined, objects);
+        localStorage.setItem("selectedObjects", JSON.stringify(objects));
+        this.closeSelectorPopup();
     };
 
     instanceClick = (instance) => {
