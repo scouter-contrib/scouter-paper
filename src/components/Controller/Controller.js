@@ -119,6 +119,8 @@ class Controller extends Component {
                             objects: _filterObjects,
                             selectedObjects: _selectedObjectsMap
                         });
+                        AgentColor.setInstances(_selectedObjects, this.props.config.colorType);
+                        this.props.setTarget(_selectedObjects);
                     }else{
                         this.setState({
                             objects: _filterObjects
