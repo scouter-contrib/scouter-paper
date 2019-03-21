@@ -518,12 +518,12 @@ let topologyOptionState = {
     tpsToLineSpeed : true,
     speedLevel : "fast",
     redLine : false,
-    highlight : false,
+    highlight : true,
     distance : 300,
     zoom : false,
-    pin : false,
+    pin : true,
     lastUpdateTime : null,
-    grouping : false,
+    grouping : true,
     nodeCount : 0,
     linkCount : 0
 };
