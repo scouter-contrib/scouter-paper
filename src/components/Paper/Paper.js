@@ -10,6 +10,7 @@ import jQuery from "jquery";
 import * as common from "../../common/common";
 import {errorHandler, getCurrentUser, getData, getDivideDays, getHttpProtocol, getSearchDays, getWithCredentials, setAuthHeader, setData} from "../../common/common";
 import Profiler from "./XLog/Profiler/Profiler";
+import ActiveService from "./ActiveService/ActiveService";
 import ServerDate from "../../common/ServerDate";
 import moment from "moment";
 import OldVersion from "../OldVersion/OldVersion";
@@ -1392,8 +1393,9 @@ class Paper extends Component {
                         </div>
                     </div>
                     }
-                    <Profiler selection={this.props.selection} newXLogs={this.state.data.newXLogs} xlogs={this.state.data.xlogs} startTime={this.state.data.startTime} realtime={this.props.range.realTime}/>
-                    <div className="loading" ref="loading">
+                   <Profiler selection={this.props.selection} newXLogs={this.state.data.newXLogs} xlogs={this.state.data.xlogs} startTime={this.state.data.startTime} realtime={this.props.range.realTime}/>
+                   <ActiveService realtime={this.props.range.realTime} />
+                   <div className="loading" ref="loading">
                         <div>
                             <div className="spinner">
                                 <div className="cube1"></div>
