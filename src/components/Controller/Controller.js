@@ -119,8 +119,6 @@ class Controller extends Component {
                             objects: _filterObjects,
                             selectedObjects: _selectedObjectsMap
                         });
-                        AgentColor.setInstances(_selectedObjects, this.props.config.colorType);
-                        this.props.setTarget(_selectedObjects);
                     }else{
                         this.setState({
                             objects: _filterObjects
@@ -130,11 +128,19 @@ class Controller extends Component {
             });
         } catch(error){
           console.error(error);
-        };
+        }
 
 
     }
-
+    isObjectAlive = (object) =>{
+        const {selectedObjects} = this.state;
+        const key = object.objHash;
+        if(selectedObjects && selectedObjects.hasOwnProperty(key) ){
+            return selectedObjects[key].alive;
+        }else{
+            return false;
+        }
+    };
 
     toggleSelectorVisible = () => {
         this.setState({
@@ -943,8 +949,8 @@ class Controller extends Component {
                                                             </div>
                                                         </div>
                                                         <div className="instance-text-info">
-                                                            <div className={`instance-name ${object.alive ? 'alive': 'down'}`}>{object.objName}</div>
-                                                            <div className={`instance-other ${object.alive ? 'alive' : 'down'}`}><span>{object.address}</span><span className="instance-objtype">{displayName}</span></div>
+                                                            <div className={`instance-name ${this.isObjectAlive(object) ? 'alive': 'down'}`}>{object.objName}</div>
+                                                            <div className={`instance-other ${this.isObjectAlive(object) ? 'alive' : 'down'}`}><span>{object.address}</span><span className="instance-objtype">{displayName}</span></div>
                                                         </div>
                                                     </div>
                                                 </li>)
