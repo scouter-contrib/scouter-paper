@@ -40,7 +40,7 @@ class Controller extends Component {
             servers: [],
             activeServerId: null,
             objects: [],
-            selectedObjects: {},
+            selectedObjects: JSON.parse(localStorage.getItem("selectedObjects")) || {},
             filter: "",
             loading : false,
             selector: false,
@@ -149,11 +149,9 @@ class Controller extends Component {
             objects.push(this.state.selectedObjects[hash]);
         }
 
-        if (objects.length < 1 && !localStorage.getItem("selectedObjects")) {
+        if (objects.length < 1) {
             this.props.pushMessage("info", "NO MONITORING TARGET", "At least one object must be selected");
             this.props.setControlVisibility("Message", true);
-        } else if (objects.length < 1) {
-            objects = JSON.parse(localStorage.getItem("selectedObjects"))
         }
 
         objects.sort((a, b) => a.objName < b.objName ? -1 : 1);
