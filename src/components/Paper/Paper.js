@@ -49,11 +49,13 @@ class Paper extends Component {
         let layouts = getData("layouts");
         let boxes = getData("boxes");
 
-        // xs와 xxs를 제거하면서, 기존에 저장된 데이터 warning 로그가 생성되어, 있는 경우 삭제
-        if (layouts && (layouts.xs || layouts.xxs || layouts.sm)) {
-            delete layouts.sm;
-            delete layouts.xs;
-            delete layouts.xxs;
+        // xs와 xxs를 제거하면서, 기존에 저장된 데이터 warning 로그가 생성되어, lg, md 이외의 정보 삭제
+        if (layouts) {
+            for (let breakpoint in layouts) {
+                if (!(breakpoint === "md" || breakpoint === "lg")) {
+                    delete layouts[breakpoint];
+                }
+            }
         }
 
         if (!(layouts)) {

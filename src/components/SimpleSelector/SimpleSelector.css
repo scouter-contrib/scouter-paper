@@ -3,6 +3,14 @@
     position: relative;
 }
 
+.simple-selector-wrapper .simple-selector-bg {
+    position: fixed;
+    top : 0;
+    left : 0;
+    right : 0;
+    bottom : 0;
+}
+
 .simple-selector-wrapper .up,
 .simple-selector-wrapper .down {
     display: none;
