@@ -224,22 +224,22 @@ class LayoutManager extends Component {
 
                 this.props.setTemplate(template.boxes, template.layouts);
 
-                let search = '?objects=' + this.props.objects.map((d) => {
+                let search = new URLSearchParams();
+                search.set('objects', this.props.objects.map((d) => {
                     return d.objHash
-                });
+                }));
+                search.set('layout', template.name);
 
                 if (!(this.props.history.location.pathname === "/paper" && this.props.history.location.search === search)) {
                     this.props.history.push({
                         pathname: '/paper',
-                        search: search
+                        search: "?" + search.toString()
                     });
                 }
 
                 break;
             }
         }
-
-
     };
 
     templateClick = (no) => {
