@@ -791,30 +791,90 @@ class Controller extends Component {
     addPaper = () => {
         let boxes = this.props.boxes;
         let key = this.getUniqueKey();
+        let nextX = 0;
+        let nextY = 0;
 
-        let maxY = 0;
-        let height = 0;
-        for (let i = 0; i < boxes.length; i++) {
-            if (maxY < boxes[i].layout.y) {
-                maxY = boxes[i].layout.y;
-                height = boxes[i].layout.h;
+        try {
+
+            let rooms = [];
+            for (let i = 0; i < boxes.length; i++) {
+                let layout = boxes[i].layout;
+                if (!rooms[layout.y]) {
+                    rooms[layout.y] = [false, false, false, false, false, false, false, false, false, false, false, false];
+                }
+
+                for (let i = layout.y; i < layout.y + layout.h; i++) {
+                    for (let j = layout.x; j < layout.x + layout.w; j++) {
+                        if (!rooms[i]) {
+                            rooms[i] = [false, false, false, false, false, false, false, false, false, false, false, false];
+                        }
+                        rooms[i][j] = true;
+                    }
+                }
             }
+
+            let find = false;
+            for (let i = 0; i < rooms.length; i++) {
+                let room = rooms[i];
+                if (room) {
+                    let cnt = 0;
+                    let startX = -1;
+                    for (let j = 0; j < room.length; j++) {
+                        if (room[j]) {
+                            startX = -1;
+                            cnt = 0;
+                        } else {
+                            if (startX < 0) {
+                                startX = j;
+                            }
+                            cnt++;
+                        }
+                    }
+
+                    if (cnt > 5) {
+                        let result = true;
+                        for (let j = 1; j < 4; j++) {
+                            if (room[i + j]) {
+                                for (let k = startX; k < startX + 6; k++) {
+                                    if (room[i + j][k]) {
+                                        result = false;
+                                    }
+                                }
+                            }
+                        }
+
+                        if (result) {
+                            nextY = i;
+                            nextX = startX;
+                            find = true;
+                            break;
+                        }
+                    }
+                }
+            }
+
+            if (!find) {
+                if (rooms.length < 1) {
+                    nextX = 0;
+                    nextY = 0;
+                } else {
+                    nextY = rooms.length;
+                    nextX = 0;
+                }
+            }
+        } catch (e) {
+            nextX = 0;
+            nextY = 0;
         }
 
         boxes.push({
             key: key,
             title: "NO TITLE ",
-            layout: {w: 6, h: 4, x: 0, y: (maxY + height), minW: 1, minH: 3, i: key}
+            layout: {w: 6, h: 4, x: nextX, y: nextY, minW: 1, minH: 3, i: key}
         });
 
 
         this.props.setBoxes(boxes);
-        /*
-        this.setState({
-            boxes: boxes
-        });
-        */
-
         setData("boxes", boxes);
 
         return key;
