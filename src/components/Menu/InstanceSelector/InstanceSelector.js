@@ -173,7 +173,9 @@ class InstanceSelector extends Component {
                                         <span className="filter-tag">OBJECT</span><span className="filter-separator"></span><span className="filter-icon" onClick={this.props.clearFilter}><i className="fa fa-filter" aria-hidden="true"></i></span><input type="search" onChange={this.onFilterChange.bind(this)} value={this.props.filter}/><span className="check-btn" onClick={this.props.selectAll}>ALL</span>
                                     </div>
                                     <div className="icon-type-map">
-                                        {(this.props.objects && this.props.objects.length > 0) && (Object.keys(iconMap).map((icon, i) => {
+                                        {(this.props.objects && this.props.objects.length > 0) && (Object.keys(iconMap).sort((a, b) => {
+                                            return iconMap[b] - iconMap[a];
+                                        }).map((icon, i) => {
                                             return <span className={iconMap[icon] === selectedIconMap[icon] ? "selected" : ""} key={i} onClick={this.quickSelectByTypeClick.bind(this, icon)}>{icon} {iconMap[icon]}</span>
                                         }))}
                                     </div>
@@ -215,6 +217,7 @@ class InstanceSelector extends Component {
                                                         <div className="instance-text-info">
                                                             <div className={`instance-name ${instance.alive ? 'alive' : 'down'}`} >{instance.objName}</div>
                                                             <div className={`instance-other ${instance.alive ? 'alive' : 'down'}`} ><span>{instance.address}</span><span className="instance-objtype">{displayName}</span></div>
+                                                            {!instance.alive && <div className="broken-instance-label">INACTIVE</div>}
                                                         </div>
                                                     </div>
                                                 </div>)

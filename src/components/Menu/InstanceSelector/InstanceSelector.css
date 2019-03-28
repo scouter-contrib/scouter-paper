@@ -107,14 +107,12 @@
     table-layout: fixed;
 }
 
-
 .instance-selector .instance-selector-content > div {
     display: table-cell;
     vertical-align: top;
     line-height: 100%;
     height: 100%;
 }
-
 
 .instance-selector .instance-selector-content > div > div {
     height: 100%;
@@ -240,7 +238,7 @@
     overflow-y: auto;
     width: 100%;
     line-height: 0;
-    background-color: rgba(0,0,0,0.2);
+    background-color: rgba(0, 0, 0, 0.2);
 }
 
 .instance-selector .instance-selector-content .instance-list .list-content {
@@ -277,9 +275,6 @@
     font-size: 12px;
 }
 
-
-
-
 .instance-selector .host-list div.host {
     cursor: pointer;
     border-bottom: 1px solid rgba(0, 0, 0, 0.3);
@@ -307,7 +302,6 @@
 .instance-selector .instance-list {
     font-size: 10px;
 }
-
 
 @media only screen and (max-width: 800px) {
 
@@ -352,7 +346,6 @@
 
 }
 
-
 .instance-selector .instance-list div.instance {
     padding: 0;
     cursor: pointer;
@@ -384,7 +377,18 @@
 }
 
 .instance-selector .instance-list div.instance div.instance-text-info {
+    position: relative;
+}
 
+.instance-selector .instance-list div.instance div.instance-text-info .broken-instance-label {
+    background-color: #E3170D;
+    color: white;
+    display: inline-block;
+    padding: 2px 4px;
+    position: absolute;
+    top : 13px;
+    right : 6px;
+    border-radius: 2px;
 }
 
 .instance-selector .instance-list div.instance div.type-icon .type-icon-wrapper {
@@ -420,16 +424,19 @@
     font-size: 11px;
 }
 
-.instance-selector .instance-list div.instance .instance-name.down{
-    color : #4e4e54;
+.instance-selector .instance-list div.instance .instance-name.down {
+    color: #AAA;
 }
+
 .instance-selector .instance-list div.instance .instance-other {
     font-size: 8px;
     padding-top: 4px;
 }
+
 .instance-selector .instance-list div.instance .instance-other.down {
-    color : #8a8a8a;
+    color: #8a8a8a;
 }
+
 .instance-selector .instance-list div.instance .instance-other > span {
     background-color: rgba(0, 0, 0, 0.2);
     display: inline-block;

@@ -199,11 +199,6 @@ class ObjectSelector extends Component {
                                 objects = msg.result;
 
                                 if (objects && objects.length > 0) {
-                                    objects = objects
-                                        .filter(instance => {
-                                            return (instance.objName.match(new RegExp("/", "g")) || []).length < 3;
-                                        });
-
                                     objects.forEach((instance) => {
                                         urlObjectHashes.forEach((objHash) => {
                                             if (objHash === Number(instance.objHash)) {

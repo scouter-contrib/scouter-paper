@@ -1,23 +1,9 @@
-import React, {Component} from 'react';
-import './Controller.css';
+import React, {Component} from "react";
+import "./Controller.css";
 
-import {
-    addFilteredObject,
-    addRequest,
-    clearAllMessage,
-    pushMessage,
-    removeFilteredObject,
-    setBoxes,
-    setBoxesLayouts,
-    setConfig,
-    setControllerState,
-    setControlVisibility,
-    setFilterMap,
-    setLayouts,
-    setTarget
-} from '../../actions';
-import {connect} from 'react-redux';
-import {withRouter} from 'react-router-dom';
+import {addFilteredObject, addRequest, clearAllMessage, pushMessage, removeFilteredObject, setBoxes, setBoxesLayouts, setConfig, setControllerState, setControlVisibility, setFilterMap, setLayouts, setTarget} from "../../actions";
+import {connect} from "react-redux";
+import {withRouter} from "react-router-dom";
 import Logo from "../Logo/Logo";
 import SimpleSelector from "../SimpleSelector/SimpleSelector";
 import InstanceSelector from "../Menu/InstanceSelector/InstanceSelector";
@@ -25,11 +11,11 @@ import AgentColor from "../../common/InstanceColor";
 import RangeControl from "../Paper/RangeControl/RangeControl";
 import TopologyControl from "../TopologyControl/TopologyControl";
 import TopologyMinControl from "../TopologyMinControl/TopologyMinControl";
-import * as PaperIcons from '../../common/PaperIcons'
+import * as PaperIcons from "../../common/PaperIcons";
 import LayoutManager from "../Menu/LayoutManager/LayoutManager";
 import PresetManager from "../Menu/PresetManager/PresetManager";
-import * as _ from 'lodash';
-import { buildHttpProtocol, getDefaultServerConfig, getDefaultServerConfigIndex, setServerTimeGap, setRangePropsToUrl, getHttpProtocol, errorHandler, getWithCredentials, setAuthHeader, getCurrentUser, setData} from '../../common/common';
+import * as _ from "lodash";
+import {buildHttpProtocol, errorHandler, getCurrentUser, getDefaultServerConfig, getDefaultServerConfigIndex, getHttpProtocol, getWithCredentials, setAuthHeader, setData, setRangePropsToUrl, setServerTimeGap} from "../../common/common";
 import jQuery from "jquery";
 import PaperControl from "../Paper/PaperControl/PaperControl";
 
@@ -44,11 +30,11 @@ class Controller extends Component {
             objects: [],
             selectedObjects: {},
             filter: "",
-            loading : false,
+            loading: false,
             selector: false,
-            preset : false,
-            filterOpened : false,
-            currentTab : "CONTROL"
+            preset: false,
+            filterOpened: false,
+            currentTab: "CONTROL"
         };
     }
 
@@ -76,7 +62,7 @@ class Controller extends Component {
 
         if (nextProps.menu !== "/paper" && this.state.currentTab === "CONFIGURATION") {
             this.setState({
-                currentTab : "CONTROL"
+                currentTab: "CONTROL"
             });
         }
     }
@@ -90,10 +76,11 @@ class Controller extends Component {
 
         }
     }
+
     setObjectUpdate() {
         const _urlObjectHashs = [new URLSearchParams(this.props.location.search).get('objects'),
-                                 new URLSearchParams(this.props.location.search).get('instances')]
-                                 .filter(_urlObjHashs => _urlObjHashs ? true : false );
+            new URLSearchParams(this.props.location.search).get('instances')]
+            .filter(_urlObjHashs => _urlObjHashs ? true : false);
         try {
             const [_objectHashs] = _urlObjectHashs;
             const that = this.props;
@@ -105,42 +92,41 @@ class Controller extends Component {
                 beforeSend: function (xhr) {
                     setAuthHeader(xhr, that.config, getCurrentUser(that.config, that.user));
                 }
-            }).done((msg) =>{
+            }).done((msg) => {
                 const objects = msg.result;
-                if(objects){
-                    const _filterObjects = objects.filter(instance => (instance.objName.match(new RegExp("/", "g")) || []).length < 3);
+                if (objects) {
                     if (_objectHashs) {
-                        const _selectorObjHashs   = _objectHashs.split(",").map(d => Number(d));
-                        const _selectedObjects    = _filterObjects.filter(_obj=> {
-                                                                return _selectorObjHashs.filter(_select => _select === Number(_obj.objHash)).length > 0;
-                                                   }).sort((a, b) => a.objName < b.objName ? -1 : 1);
-                        const _selectedObjectsMap = _selectedObjects.reduce((obj,item)=>{
+                        const _selectorObjHashs = _objectHashs.split(",").map(d => Number(d));
+                        const _selectedObjects = objects.filter(_obj => {
+                            return _selectorObjHashs.filter(_select => _select === Number(_obj.objHash)).length > 0;
+                        }).sort((a, b) => a.objName < b.objName ? -1 : 1);
+                        const _selectedObjectsMap = _selectedObjects.reduce((obj, item) => {
                             obj[item.objHash] = item;
                             return obj;
-                        },{});
+                        }, {});
                         this.setState({
-                            objects: _filterObjects,
+                            objects: objects,
                             selectedObjects: _selectedObjectsMap
                         });
-                    }else{
+                    } else {
                         this.setState({
-                            objects: _filterObjects
+                            objects: objects
                         });
                     }
                 }
             });
-        } catch(error){
-          console.error(error);
+        } catch (error) {
+            console.error(error);
         }
 
-
     }
-    isObjectAlive = (object) =>{
+
+    isObjectAlive = (object) => {
         const {selectedObjects} = this.state;
         const key = object.objHash;
-        if(selectedObjects && selectedObjects.hasOwnProperty(key) ){
+        if (selectedObjects && selectedObjects.hasOwnProperty(key)) {
             return selectedObjects[key].alive;
-        }else{
+        } else {
             return false;
         }
     };
@@ -148,33 +134,33 @@ class Controller extends Component {
     toggleSelectorVisible = () => {
         this.setState({
             selector: !this.state.selector,
-            preset : !this.state.selector ? false : this.state.selector
+            preset: !this.state.selector ? false : this.state.selector
         });
     };
 
     closeSelectorPopup = () => {
         this.setState({
             selector: false,
-            preset : false
+            preset: false
         });
     };
 
     togglePresetManager = () => {
         this.setState({
             preset: !this.state.preset,
-            selector : !this.state.preset ? false : this.state.preset
+            selector: !this.state.preset ? false : this.state.preset
         });
     };
-    getConfigServerName = (props) =>{
+    getConfigServerName = (props) => {
         const serverAddress = buildHttpProtocol(props.config);
         const mapper = [];
-        if(serverAddress){
+        if (serverAddress) {
             const _promise = serverAddress.map(_get => {
-                   mapper.push({
-                       idx : _get.key,
-                       addr : _get.addr
-                   });
-                   return jQuery.ajax({
+                    mapper.push({
+                        idx: _get.key,
+                        addr: _get.addr
+                    });
+                    return jQuery.ajax({
                         method: "GET",
                         url: `${_get.addr}/scouter/v1/info/server`,
                         xhrFields: _get.authentification === "cookie",
@@ -187,10 +173,10 @@ class Controller extends Component {
                     });
                 }
             );
-            Promise.all(_promise).then((_serverInfo)=> {
+            Promise.all(_promise).then((_serverInfo) => {
                 let _conf = _.clone(props.config);
-                _serverInfo.forEach((_res,idx) =>{
-                    _conf.servers[idx].name  = `${_res.result[0].name} (${mapper[idx].addr})`;
+                _serverInfo.forEach((_res, idx) => {
+                    _conf.servers[idx].name = `${_res.result[0].name} (${mapper[idx].addr})`;
                 });
                 props.setConfig(_conf);
             });
@@ -366,10 +352,6 @@ class Controller extends Component {
                             objects = msg.result;
 
                             if (objects && objects.length > 0) {
-                                objects = objects
-                                    .filter(instance => {
-                                        return (instance.objName.match(new RegExp("/", "g")) || []).length < 3;
-                                    });
 
                                 objects.forEach((instance) => {
                                     urlObjectHashes.forEach((objHash) => {
@@ -461,7 +443,7 @@ class Controller extends Component {
 
                     // GET INSTANCES INFO FROM URL IF EXISTS
                     let objectsParam = new URLSearchParams(this.props.location.search).get('objects');
-                    if(!objectsParam) {
+                    if (!objectsParam) {
                         objectsParam = new URLSearchParams(this.props.location.search).get('instances');
                     }
                     let urlObjectHashes = null;
@@ -494,10 +476,6 @@ class Controller extends Component {
                                 objects = msg.result;
 
                                 if (objects && objects.length > 0) {
-                                    objects = objects
-                                        .filter(instance => {
-                                            return (instance.objName.match(new RegExp("/", "g")) || []).length < 3;
-                                        });
 
                                     objects.forEach((instance) => {
                                         urlObjectHashes.forEach((objHash) => {
@@ -560,7 +538,7 @@ class Controller extends Component {
         this.props.addRequest();
 
         this.setState({
-            loading : true
+            loading: true
         });
 
         jQuery.ajax({
@@ -598,7 +576,7 @@ class Controller extends Component {
             errorHandler(xhr, textStatus, errorThrown, that.props);
         }).always(() => {
             this.setState({
-                loading : false
+                loading: false
             });
         });
 
@@ -722,7 +700,7 @@ class Controller extends Component {
 
     changeCurrentTab = (tab) => {
         this.setState({
-            currentTab : tab
+            currentTab: tab
         });
     };
 
@@ -766,7 +744,7 @@ class Controller extends Component {
                             config: option.config,
                             counterKey: option.name,
                             title: option.displayName,
-                            familyName : option.familyName
+                            familyName: option.familyName
                         });
                     }
                 }
@@ -795,11 +773,6 @@ class Controller extends Component {
             }
         });
 
-        /*
-        this.setState({
-            boxes: boxes
-        });
-        */
         this.props.setBoxes(boxes);
 
         setData("boxes", boxes);
@@ -816,13 +789,6 @@ class Controller extends Component {
 
     clearLayout = () => {
         this.props.setBoxesLayouts([], {});
-        /*
-        this.setState({
-            boxes: [],
-            layouts: {},
-            layoutChangeTime: (new Date()).getTime()
-        });
-        */
     };
 
     getUniqueKey() {
@@ -1035,13 +1001,13 @@ class Controller extends Component {
                                                 <li key={i} className={this.props.filterMap[object.objHash] ? "filtered" : ""} onClick={this.toggleFilteredObject.bind(this, object.objHash)}>
                                                     <div className="row">
                                                         <div className="type-icon">
-                                                            <div className="type-icon-wrapper" style={{color : iconInfo.color, backgroundColor : iconInfo.bgColor}}>
+                                                            <div className="type-icon-wrapper" style={{color: iconInfo.color, backgroundColor: iconInfo.bgColor}}>
                                                                 {iconInfo.fontFamily === "text" && <div className={"object-icon " + iconInfo.fontFamily}>{iconInfo.text}</div>}
                                                                 {iconInfo.fontFamily !== "text" && <div className={"object-icon " + iconInfo.fontFamily + " " + iconInfo.text}></div>}
                                                             </div>
                                                         </div>
                                                         <div className="instance-text-info">
-                                                            <div className={`instance-name ${this.isObjectAlive(object) ? 'alive': 'down'}`}>{object.objName}</div>
+                                                            <div className={`instance-name ${this.isObjectAlive(object) ? 'alive' : 'down'}`}>{object.objName}</div>
                                                             <div className={`instance-other ${this.isObjectAlive(object) ? 'alive' : 'down'}`}><span>{object.address}</span><span className="instance-objtype">{displayName}</span></div>
                                                         </div>
                                                     </div>
@@ -1053,7 +1019,7 @@ class Controller extends Component {
                             </div>
                         </div>
                     </div>
-                    <div className="control-item paper-only" style={{zIndex:1}}>
+                    <div className="control-item paper-only" style={{zIndex: 1}}>
                         <div className="row desc">
                             <div className="step"><span>3</span></div>
                             <div className="row-message">SEARCH</div>
@@ -1070,7 +1036,9 @@ class Controller extends Component {
                     <div className="control-item paper-only">
                         <div className="row desc">
                             <div className="step"><span>4</span></div>
-                            <div className="row-message">CHANGE LAYOUT <div className="breakpoints" data-tip="CURRENT PAPER LAYER"><span className={"breakpoint " + (this.props.control.breakpoint === "lg" ? "selected" : "")}>Large</span><span className={"breakpoint " + (this.props.control.breakpoint === "md" ? "selected" : "")}>Small</span></div></div>
+                            <div className="row-message">CHANGE LAYOUT
+                                <div className="breakpoints" data-tip="CURRENT PAPER LAYER"><span className={"breakpoint " + (this.props.control.breakpoint === "lg" ? "selected" : "")}>Large</span><span className={"breakpoint " + (this.props.control.breakpoint === "md" ? "selected" : "")}>Small</span></div>
+                            </div>
                         </div>
                         <div className="row control">
                             <div>
@@ -1093,9 +1061,9 @@ class Controller extends Component {
                 </div>
                 }
                 {this.state.currentTab === "CONFIGURATION" &&
-                    <div>
-                        <PaperControl addPaper={this.addPaper} addPaperAndAddMetric={this.addPaperAndAddMetric} clearLayout={this.clearLayout} fixedControl={this.state.fixedControl} toggleRangeControl={this.toggleRangeControl} realtime={this.props.range.realTime} alert={this.state.alert} clearAllAlert={this.clearAllAlert} clearOneAlert={this.clearOneAlert} setRewind={this.setRewind} showAlert={this.state.showAlert} toggleShowAlert={this.toggleShowAlert} />
-                    </div>
+                <div>
+                    <PaperControl addPaper={this.addPaper} addPaperAndAddMetric={this.addPaperAndAddMetric} clearLayout={this.clearLayout} fixedControl={this.state.fixedControl} toggleRangeControl={this.toggleRangeControl} realtime={this.props.range.realTime} alert={this.state.alert} clearAllAlert={this.clearAllAlert} clearOneAlert={this.clearOneAlert} setRewind={this.setRewind} showAlert={this.state.showAlert} toggleShowAlert={this.toggleShowAlert}/>
+                </div>
                 }
                 {this.state.selector &&
                 <InstanceSelector onFilterChange={this.onFilterChange}
@@ -1114,7 +1082,7 @@ class Controller extends Component {
                                   visible={this.state.selector}
                                   toggleSelectorVisible={this.toggleSelectorVisible}
                                   togglePresetManager={this.togglePresetManager}
-                                  closeSelectorPopup={this.closeSelectorPopup} />
+                                  closeSelectorPopup={this.closeSelectorPopup}/>
                 }
 
                 {this.state.preset &&
@@ -1141,9 +1109,9 @@ let mapStateToProps = (state) => {
         config: state.config,
         user: state.user,
         range: state.range,
-        boxes : state.paper.boxes,
-        layouts : state.paper.layouts,
-        layoutChangeTime : state.paper.layoutChangeTime,
+        boxes: state.paper.boxes,
+        layouts: state.paper.layouts,
+        layoutChangeTime: state.paper.layoutChangeTime,
         topologyOption: state.topologyOption
     };
 };
