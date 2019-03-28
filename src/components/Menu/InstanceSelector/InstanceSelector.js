@@ -201,6 +201,7 @@ class InstanceSelector extends Component {
                                                 displayName = objType.displayName;
                                             }
 
+
                                             let iconInfo = PaperIcons.getObjectIcon(icon);
                                             return (
                                                 <div key={i} className={"instance " + (i === 0 ? 'first ' : ' ') + (!(!(this.props.selectedObjects && this.props.selectedObjects[instance.objHash])) ? "selected" : " ")} onClick={this.instanceClick.bind(this, instance)}>
@@ -212,8 +213,8 @@ class InstanceSelector extends Component {
                                                             </div>
                                                         </div>
                                                         <div className="instance-text-info">
-                                                            <div className="instance-name">{instance.objName}</div>
-                                                            <div className="instance-other"><span>{instance.address}</span><span className="instance-objtype">{displayName}</span></div>
+                                                            <div className={`instance-name ${instance.alive ? 'alive' : 'down'}`} >{instance.objName}</div>
+                                                            <div className={`instance-other ${instance.alive ? 'alive' : 'down'}`} ><span>{instance.address}</span><span className="instance-objtype">{displayName}</span></div>
                                                         </div>
                                                     </div>
                                                 </div>)

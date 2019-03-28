@@ -420,11 +420,16 @@
     font-size: 11px;
 }
 
+.instance-selector .instance-list div.instance .instance-name.down{
+    color : #4e4e54;
+}
 .instance-selector .instance-list div.instance .instance-other {
     font-size: 8px;
     padding-top: 4px;
 }
-
+.instance-selector .instance-list div.instance .instance-other.down {
+    color : #8a8a8a;
+}
 .instance-selector .instance-list div.instance .instance-other > span {
     background-color: rgba(0, 0, 0, 0.2);
     display: inline-block;

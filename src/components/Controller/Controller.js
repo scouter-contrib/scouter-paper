@@ -86,8 +86,64 @@ class Controller extends Component {
             if (!this.state.servers || this.state.servers.length < 1) {
                 this.getServers(this.props.config);
             }
+            this.setObjectUpdate();
+
         }
     }
+    setObjectUpdate() {
+        const _urlObjectHashs = [new URLSearchParams(this.props.location.search).get('objects'),
+                                 new URLSearchParams(this.props.location.search).get('instances')]
+                                 .filter(_urlObjHashs => _urlObjHashs ? true : false );
+        try {
+            const [_objectHashs] = _urlObjectHashs;
+            const that = this.props;
+            jQuery.ajax({
+                method: "GET",
+                async: false,
+                url: `${getHttpProtocol(this.props.config)}/scouter/v1/object?serverId=${this.state.activeServerId}`,
+                xhrFields: getWithCredentials(this.props.config),
+                beforeSend: function (xhr) {
+                    setAuthHeader(xhr, that.config, getCurrentUser(that.config, that.user));
+                }
+            }).done((msg) =>{
+                const objects = msg.result;
+                if(objects){
+                    const _filterObjects = objects.filter(instance => (instance.objName.match(new RegExp("/", "g")) || []).length < 3);
+                    if (_objectHashs) {
+                        const _selectorObjHashs   = _objectHashs.split(",").map(d => Number(d));
+                        const _selectedObjects    = _filterObjects.filter(_obj=> {
+                                                                return _selectorObjHashs.filter(_select => _select === Number(_obj.objHash)).length > 0;
+                                                   }).sort((a, b) => a.objName < b.objName ? -1 : 1);
+                        const _selectedObjectsMap = _selectedObjects.reduce((obj,item)=>{
+                            obj[item.objHash] = item;
+                            return obj;
+                        },{});
+                        this.setState({
+                            objects: _filterObjects,
+                            selectedObjects: _selectedObjectsMap
+                        });
+                    }else{
+                        this.setState({
+                            objects: _filterObjects
+                        });
+                    }
+                }
+            });
+        } catch(error){
+          console.error(error);
+        }
+
+
+    }
+    isObjectAlive = (object) =>{
+        const {selectedObjects} = this.state;
+        const key = object.objHash;
+        if(selectedObjects && selectedObjects.hasOwnProperty(key) ){
+            return selectedObjects[key].alive;
+        }else{
+            return false;
+        }
+    };
 
     toggleSelectorVisible = () => {
         this.setState({
@@ -975,7 +1031,6 @@ class Controller extends Component {
                                             }
 
                                             let iconInfo = PaperIcons.getObjectIcon(icon);
-
                                             return (
                                                 <li key={i} className={this.props.filterMap[object.objHash] ? "filtered" : ""} onClick={this.toggleFilteredObject.bind(this, object.objHash)}>
                                                     <div className="row">
@@ -986,8 +1041,8 @@ class Controller extends Component {
                                                             </div>
                                                         </div>
                                                         <div className="instance-text-info">
-                                                            <div className="instance-name">{object.objName}</div>
-                                                            <div className="instance-other"><span>{object.address}</span><span className="instance-objtype">{displayName}</span></div>
+                                                            <div className={`instance-name ${this.isObjectAlive(object) ? 'alive': 'down'}`}>{object.objName}</div>
+                                                            <div className={`instance-other ${this.isObjectAlive(object) ? 'alive' : 'down'}`}><span>{object.address}</span><span className="instance-objtype">{displayName}</span></div>
                                                         </div>
                                                     </div>
                                                 </li>)
