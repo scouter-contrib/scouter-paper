@@ -55,27 +55,67 @@ export function getHttpProtocol(config) {
     return config.protocol + "://" + config.address + ":" + config.port;
 }
 
-export function errorHandler(xhr, textStatus, errorThrown, props) {
+export function errorHandler(xhr, textStatus, errorThrown, props, name, isSave) {
 
-    if (xhr.readyState === 4) {
-        if (xhr.responseJSON) {
-            if (xhr.responseJSON.resultCode === "401") {
-                props.pushMessage("unauthorized", "ERROR - " + xhr.responseJSON.resultCode, xhr.responseJSON.message);
-                props.setControlVisibility("Message", true);
-            } else {
-                props.pushMessage("error", "ERROR - " + xhr.responseJSON.resultCode, xhr.responseJSON.message);
-                props.setControlVisibility("Message", true);
+    // Save to LocalStorage or Not
+    if (isSave) {
+        saveErrorLog(name, xhr);
+    } else {
+
+        if (xhr.readyState === 4) {
+            if (xhr.responseJSON) {
+                if (xhr.responseJSON.resultCode === "401") {
+                    props.pushMessage("unauthorized", "ERROR - " + xhr.responseJSON.resultCode, xhr.responseJSON.message);
+                    props.setControlVisibility("Message", true);
+                } else {
+                    props.pushMessage("error", "ERROR - "+ xhr.responseJSON.resultCode, xhr.responseJSON.message);
+                    props.setControlVisibility("Message", true);
+                }
             }
         }
+        else if (xhr.readyState === 0) {
+            props.pushMessage("error", "ERROR", "CAN'T CONNECT TO SERVER");
+            props.setControlVisibility("Message", true);
+        }
+        else {
+            props.pushMessage("error", "ERROR - " + xhr.responseJSON.resultCode, xhr.responseJSON.message);
+            props.setControlVisibility("Message", true);
+        }
     }
-    else if (xhr.readyState === 0) {
-        props.pushMessage("error", "ERROR", "CAN'T CONNECT TO SERVER");
-        props.setControlVisibility("Message", true);
+}
+
+// Save to LocalStorage only 20
+export function saveErrorLog(name, xhr) {
+
+    var resultCode;
+    var resultMsg;
+
+    // check dataType
+    if(name == 'getXLog') {
+        xhr = JSON.parse(xhr.responseText);
+        resultCode = xhr.resultCode
+        resultMsg = xhr.message;
+    }else{
+        resultCode = xhr.responseJSON.resultCode
+        resultMsg = xhr.responseJSON.message;
     }
-    else {
-        props.pushMessage("error", "ERROR - " + xhr.responseJSON.resultCode, xhr.responseJSON.message);
-        props.setControlVisibility("Message", true);
+
+    var errorLog = [{name:name, code:resultCode, msg:resultMsg}];
+    console.error(errorLog);
+
+    var savedLog = getData("errorLog");
+    var finalLog = errorLog;
+
+    if(savedLog != undefined) {
+
+        if(Object.keys(savedLog).length >= 20) {
+            savedLog.splice(0,1);
+        }
+
+        finalLog = savedLog.concat(errorLog);
     }
+
+    setData("errorLog", finalLog);
 }
 
 export function getWithCredentials(config) {

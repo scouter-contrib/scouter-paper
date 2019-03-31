@@ -147,10 +147,13 @@ class Paper extends Component {
                 beforeSend: function (xhr) {
                     setAuthHeader(xhr, that.props.config, that.props.user);
                 }
+
             }).done((msg) => {
                 this.tick(msg);
             }).fail((xhr, textStatus, errorThrown) => {
-                errorHandler(xhr, textStatus, errorThrown, this.props);
+
+
+                errorHandler(xhr, textStatus, errorThrown, this.props, "getXLog", true);
             });
         }
     };
@@ -170,6 +173,7 @@ class Paper extends Component {
                 beforeSend: function (xhr) {
                     setAuthHeader(xhr, that.props.config, that.props.user);
                 }
+
             }).done((msg) => {
                 this.setState({
                     visitor: {
@@ -177,8 +181,10 @@ class Paper extends Component {
                         visitor: msg.result
                     }
                 });
+
             }).fail((xhr, textStatus, errorThrown) => {
-                errorHandler(xhr, textStatus, errorThrown, this.props);
+                errorHandler(xhr, textStatus, errorThrown, this.props, "getVisitor", true);
+
             });
         }
     };
@@ -242,6 +248,7 @@ class Paper extends Component {
                         beforeSend: function (xhr) {
                             setAuthHeader(xhr, that.props.config, that.props.user);
                         }
+
                     }).done((msg) => {
                         this.counterHistoriesLoaded[counterKey] = true;
 
@@ -265,7 +272,7 @@ class Paper extends Component {
 
                     }).fail((xhr, textStatus, errorThrown) => {
                         this.counterHistoriesLoaded[counterKey] = true;
-                        errorHandler(xhr, textStatus, errorThrown, this.props);
+                        errorHandler(xhr, textStatus, errorThrown, this.props, "getCounter", true);
                     });
                 }
             }
@@ -307,8 +314,10 @@ class Paper extends Component {
                             data: map
                         }
                     });
+
+
                 }).fail((xhr, textStatus, errorThrown) => {
-                    errorHandler(xhr, textStatus, errorThrown, this.props);
+                    errorHandler(xhr, textStatus, errorThrown, this.props, "counterReady", true);
                 });
             }
         }
