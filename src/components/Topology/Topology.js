@@ -260,7 +260,7 @@ class Topology extends Component {
                 servers: [],
                 objects: []
             });
-            errorHandler(xhr, textStatus, errorThrown, that.props);
+            errorHandler(xhr, textStatus, errorThrown, that.props, "getAllInstanceInfo", true);
         }).always(() => {
             this.setState({
                 loading: false
@@ -295,7 +295,7 @@ class Topology extends Component {
                 }
             }
         }).fail((xhr, textStatus, errorThrown) => {
-            errorHandler(xhr, textStatus, errorThrown, that.props);
+            errorHandler(xhr, textStatus, errorThrown, that.props, "getInstanceList", true);
         });
     };
 
@@ -590,7 +590,7 @@ class Topology extends Component {
                 }
 
             }).fail((xhr, textStatus, errorThrown) => {
-                errorHandler(xhr, textStatus, errorThrown, this.props);
+                errorHandler(xhr, textStatus, errorThrown, this.props, "getTopology", true);
             });
         } else {
             this.nodes= [];

@@ -219,7 +219,7 @@ class ObjectSelector extends Component {
                                     })
                                 }
                             }).fail(function (xhr, textStatus, errorThrown) {
-                                errorHandler(xhr, textStatus, errorThrown, that.props);
+                                errorHandler(xhr, textStatus, errorThrown, that.props, "setTargetFromUrl_1", true);
                             });
                         });
 
@@ -255,7 +255,7 @@ class ObjectSelector extends Component {
                 }
 
             }).fail((xhr, textStatus, errorThrown) => {
-                errorHandler(xhr, textStatus, errorThrown, that.props);
+                errorHandler(xhr, textStatus, errorThrown, that.props, "setTargetFromUrl_2", true);
             });
         }
     };
@@ -300,7 +300,7 @@ class ObjectSelector extends Component {
                 selectedObjects: {},
                 filter: ""
             });
-            errorHandler(xhr, textStatus, errorThrown, that.props);
+            errorHandler(xhr, textStatus, errorThrown, that.props, "getServers", true);
         }).always(() => {
             this.setState({
                 loading : false
@@ -350,7 +350,7 @@ class ObjectSelector extends Component {
                 }
             }
         }).fail((xhr, textStatus, errorThrown) => {
-            errorHandler(xhr, textStatus, errorThrown, that.props);
+            errorHandler(xhr, textStatus, errorThrown, that.props, "onServerClick", true);
         });
     };
 
@@ -460,11 +460,11 @@ class ObjectSelector extends Component {
                         });
                     }
                 }).fail((xhr, textStatus, errorThrown) => {
-                    errorHandler(xhr, textStatus, errorThrown, this.props);
+                    errorHandler(xhr, textStatus, errorThrown, this.props, "savePreset_1", true);
                 });
             }
         }).fail((xhr, textStatus, errorThrown) => {
-            errorHandler(xhr, textStatus, errorThrown, this.props);
+            errorHandler(xhr, textStatus, errorThrown, this.props, "savePreset_2", true);
         });
     };
 

@@ -93,7 +93,7 @@ class Paper extends Component {
                     }
                 }
             }).fail((xhr, textStatus, errorThrown) => {
-                errorHandler(xhr, textStatus, errorThrown, this.props);
+                errorHandler(xhr, textStatus, errorThrown, this.props, "layout", true);
             });
         }
 
@@ -475,7 +475,7 @@ class Paper extends Component {
                         }
                     });
                 }).fail((xhr, textStatus, errorThrown) => {
-                    errorHandler(xhr, textStatus, errorThrown, this.props);
+                    errorHandler(xhr, textStatus, errorThrown, this.props, "getRealTimeCounter", true);
                 });
             } else {
                 let now = (new ServerDate()).getTime();
@@ -722,7 +722,7 @@ class Paper extends Component {
                 });
 
             }).fail((xhr, textStatus, errorThrown) => {
-                errorHandler(xhr, textStatus, errorThrown, this.props);
+                errorHandler(xhr, textStatus, errorThrown, this.props, "getXLog", true);
             });
         }
     };
@@ -895,7 +895,7 @@ class Paper extends Component {
                 }
 
             }).fail((xhr, textStatus, errorThrown) => {
-                errorHandler(xhr, textStatus, errorThrown, this.props);
+                errorHandler(xhr, textStatus, errorThrown, this.props, "getXLogHistoryData", true);
             });
         }
     };
@@ -931,7 +931,7 @@ class Paper extends Component {
                         }
                     });
                 }).fail((xhr, textStatus, errorThrown) => {
-                    errorHandler(xhr, textStatus, errorThrown, props);
+                    errorHandler(xhr, textStatus, errorThrown, props, "getVisitor", true);
                 });
             } else {
                 let time = (new ServerDate()).getTime();
@@ -1048,7 +1048,7 @@ class Paper extends Component {
 
             this.setLoading(false);
         }).fail((xhr, textStatus, errorThrown) => {
-            errorHandler(xhr, textStatus, errorThrown, this.props);
+            errorHandler(xhr, textStatus, errorThrown, this.props, "getCounterHistoryData", true);
         });
     };
 

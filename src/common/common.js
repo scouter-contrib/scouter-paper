@@ -80,35 +80,86 @@ export function getCurrentDefaultServer(config) {
     }
 }
 
-export function errorHandler(xhr, textStatus, errorThrown, props) {
+export function errorHandler(xhr, textStatus, errorThrown, props, name, isSave) {
 
     if (xhr.readyState === 4) {
         if (xhr.responseJSON) {
             if (xhr.responseJSON.resultCode === "401") {
-                props.pushMessage("unauthorized", "ERROR - " + xhr.responseJSON.resultCode, xhr.responseJSON.message);
+
+                if (isSave) {
+                    saveErrorLog(name, xhr.responseJSON.resultCode, xhr.responseJSON.message);
+                } else {
+                    props.pushMessage("unauthorized", "ERROR - " + xhr.responseJSON.resultCode, xhr.responseJSON.message);
+                    props.setControlVisibility("Message", true);
+                }
+
+            } else {
+                if (isSave) {
+                    saveErrorLog(name, xhr.responseJSON.resultCode, xhr.responseJSON.message);
+                } else {
+                    props.pushMessage("error", "ERROR - "+ xhr.responseJSON.resultCode, xhr.responseJSON.message);
+                    props.setControlVisibility("Message", true);
+                }
+            }
+        } else if (xhr.responseText) {
+            if (isSave) {
+                saveErrorLog(name, xhr.statusText, xhr.responseText);
+            } else {
+                props.pushMessage("error", "ERROR - " + xhr.statusText, xhr.responseText);
                 props.setControlVisibility("Message", true);
+            }
+        }
+    }
+    else if (xhr.readyState === 0) {
+
+        if (isSave) {
+            saveErrorLog(name, "ERROR", "CAN'T CONNECT TO SERVER");
+        } else {
+            props.pushMessage("error", "ERROR", "CAN'T CONNECT TO SERVER");
+            props.setControlVisibility("Message", true);
+        }
+    }
+    else {
+        if (xhr.responseJSON) {
+
+            if (isSave) {
+                saveErrorLog(name, xhr.responseJSON.resultCode, xhr.responseJSON.message);
             } else {
                 props.pushMessage("error", "ERROR - " + xhr.responseJSON.resultCode, xhr.responseJSON.message);
                 props.setControlVisibility("Message", true);
             }
+
         } else if (xhr.responseText) {
-            props.pushMessage("error", "ERROR - " + xhr.statusText, xhr.responseText);
-            props.setControlVisibility("Message", true);
+
+            if (isSave) {
+                saveErrorLog(name, xhr.statusText, xhr.responseText);
+            } else {
+                props.pushMessage("error", "ERROR - " + xhr.responseJSON.resultCode, xhr.responseJSON.message);
+                props.setControlVisibility("Message", true);
+            }
         }
     }
-    else if (xhr.readyState === 0) {
-        props.pushMessage("error", "ERROR", "CAN'T CONNECT TO SERVER");
-        props.setControlVisibility("Message", true);
-    }
-    else {
-        if (xhr.responseJSON) {
-            props.pushMessage("error", "ERROR - " + xhr.responseJSON.resultCode, xhr.responseJSON.message);
-            props.setControlVisibility("Message", true);
-        } else if (xhr.responseText) {
-            props.pushMessage("error", "ERROR - " + xhr.responseJSON.resultCode, xhr.responseJSON.message);
-            props.setControlVisibility("Message", true);
+}
+
+// Save to LocalStorage only 20
+export function saveErrorLog(name, resultCode, resultMsg) {
+
+    let errorLog = [{name:name, code:resultCode, msg:resultMsg}];
+    console.error(errorLog);
+
+    let savedLog = getData("errorLog");
+    let finalLog = errorLog;
+
+    if(savedLog !== null) {
+
+        if(Object.keys(savedLog).length >= 20) {
+            savedLog.splice(0,1);
         }
+
+        finalLog = savedLog.concat(errorLog);
     }
+
+    setData("errorLog", finalLog);
 }
 
 export function getWithCredentials(config) {
