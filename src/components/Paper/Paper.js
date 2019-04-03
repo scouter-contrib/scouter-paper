@@ -244,7 +244,8 @@ class Paper extends Component {
         if (JSON.stringify(prevCounterKeyMap) !== JSON.stringify(counterKeyMap)) {
             if (this.props.range.realTime) {
                 let now = (new ServerDate()).getTime();
-                let ten = 1000 * 60 * 10;
+                //let ten = 1000 * 60 * 10;
+                let ten = (this.props.config.preload === "Y") ? 1000 * 60 * 10 : 1000;
                 this.getCounterHistory(this.props.objects, now - ten, now, false);
                 this.getLatestData(true, this.props.objects);
             } else {
@@ -276,7 +277,8 @@ class Paper extends Component {
         if (JSON.stringify(this.props.objects) !== JSON.stringify(nextProps.objects)) {
             if (this.props.range.realTime) {
                 let now = (new ServerDate()).getTime();
-                let ten = 1000 * 60 * 10;
+                //let ten = 1000 * 60 * 10;
+                let ten = (this.props.config.preload === "Y") ? 1000 * 60 * 10 : 1000;
                 this.getCounterHistory(nextProps.objects, now - ten, now, false);
                 this.getLatestData(true, nextProps.objects);
             } else {
@@ -315,7 +317,8 @@ class Paper extends Component {
                 this.dataRefreshTimer = null;
 
                 let now = (new ServerDate()).getTime();
-                let ten = 1000 * 60 * 10;
+                //let ten = 1000 * 60 * 10;
+                let ten = (this.props.config.preload === "Y") ? 1000 * 60 * 10 : 1000;
                 this.getCounterHistory(this.props.objects, now - ten, now, false);
                 this.getLatestData(true, this.props.objects);
             } else {
@@ -335,7 +338,8 @@ class Paper extends Component {
 
         if (this.props.objects && this.props.objects.length > 0) {
             let now = (new ServerDate()).getTime();
-            let ten = 1000 * 60 * 10;
+            //let ten = 1000 * 60 * 10;
+            let ten = (this.props.config.preload === "Y") ? 1000 * 60 * 10 : 1000;
             this.getCounterHistory(this.props.objects, now - ten, now, false);
             if (this.props.range.realTime) {
                 this.getLatestData(false, this.props.objects);
@@ -479,73 +483,118 @@ class Paper extends Component {
                 });
             } else {
                 let now = (new ServerDate()).getTime();
-                let ten = 1000 * 60 * 10;
+                //let ten = 1000 * 60 * 10;
+                let ten = (this.props.config.preload === "Y") ? 1000 * 60 * 10 : 1000;
                 this.getCounterHistory(this.props.objects, now - ten, now, false);
             }
         }
     };
 
-
+    // load all data
     getCounterHistory = (objects, from, to, longTerm) => {
+        this.getPaperCounterHistory(objects, from, to, longTerm, null, null);
+    };
+
+    // load specific box data
+    getSingleCounterHistory = (counterKey, familyName) => {
+        let now = (new ServerDate()).getTime();
+        let ten = 1000 * 60 * 10;
+        let longTerm = false;
+        let objects = this.props.objects;
+        this.getPaperCounterHistory(objects, now - ten, now, longTerm, counterKey, familyName);
+    };
+
+    getPaperCounterHistory = (objects, from, to, longTerm, counterKey, familyName) => {
 
         if (objects && objects.length > 0) {
-            let counterKeyMap = {};
-            let counterHistoryKeyMap = {};
 
-            for (let i = 0; i < this.props.boxes.length; i++) {
-                let option = this.props.boxes[i].option;
+            if (counterKey !== null && familyName !== null) {
 
-                if (option && option.length > 0) {
-                    for (let j = 0; j < option.length; j++) {
-                        let innerOption = option[j];
-                        if (innerOption.type === "counter") {
-                            counterKeyMap[innerOption.counterKey] = true;
-                            counterHistoryKeyMap[innerOption.counterKey] = {
-                                key: innerOption.counterKey,
-                                familyName: innerOption.familyName
-                            };
-                        }
-                    }
-                }
-            }
-
-            let counterKeys = [];
-            for (let attr in counterKeyMap) {
-                counterKeys.push(attr);
-            }
-
-            let counterHistoryKeys = [];
-            for (let attr in counterHistoryKeyMap) {
-                counterHistoryKeys.push(counterHistoryKeyMap[attr]);
-            }
-
-            if (counterKeys.length < 1) {
-                return false;
-            }
-
-            for (let i = 0; i < counterHistoryKeys.length; i++) {
-                let counterKey = counterHistoryKeys[i].key;
-                let familyName = counterHistoryKeys[i].familyName;
                 let now = (new Date()).getTime();
                 let startTime = from;
                 let endTime = to;
                 let url;
+
                 if (longTerm) {
 
-                    url = getHttpProtocol(this.props.config) + '/scouter/v1/counter/stat/' + encodeURI(counterKey) + '?objHashes=' + JSON.stringify(objects.filter((d) => {
-                            return d.objFamily === familyName;
-                        }).map((obj) => {
+                    url = getHttpProtocol(this.props.config) + '/scouter/v1/counter/stat/' + encodeURI(counterKey) + '?objHashes='+ JSON.stringify(objects.filter((d) => {
+                                    return d.objFamily === familyName;
+                    }).map((obj) => {
                             return Number(obj.objHash);
-                        })) + "&startYmd=" + moment(startTime).format("YYYYMMDD") + "&endYmd=" + moment(endTime).format("YYYYMMDD");
-                    this.getCounterHistoryData(url, counterKey, from, to, now, false);
-
+                    }))+"&startYmd=" + moment(startTime).format("YYYYMMDD") + "&endYmd=" + moment(endTime).format("YYYYMMDD");
+                        this.getCounterHistoryData(url, counterKey, from, to, now, false);
                 } else {
                     url = getHttpProtocol(this.props.config) + '/scouter/v1/counter/' + encodeURI(counterKey) + '?objHashes=' + JSON.stringify(objects.filter((d) => {
-                            return d.objFamily === familyName;
-                        }).map((obj) => {
+                                    return d.objFamily === familyName;
+                    }).map((obj) => {
                             return Number(obj.objHash);
-                        })) + "&startTimeMillis=" + startTime + "&endTimeMillis=" + endTime;
-                    this.getCounterHistoryData(url, counterKey, from, to, now, false);
+                    })) +"&startTimeMillis=" + startTime + "&endTimeMillis="  + endTime;
+                        this.getCounterHistoryData(url, counterKey, from, to, now, false);
+                }
+
+            } else {
+
+                let counterKeyMap = {};
+                let counterHistoryKeyMap = {};
+
+                for (let i = 0; i < this.props.boxes.length; i++) {
+                    let option = this.props.boxes[i].option;
+
+                    if (option && option.length > 0) {
+                        for (let j = 0; j < option.length; j++) {
+                            let innerOption = option[j];
+                            if (innerOption.type === "counter") {
+                                counterKeyMap[innerOption.counterKey] = true;
+                                counterHistoryKeyMap[innerOption.counterKey] = {
+                                    key: innerOption.counterKey,
+                                    familyName: innerOption.familyName
+                                };
+                            }
+                        }
+                    }
+                }
+
+                let counterKeys = [];
+                for (let attr in counterKeyMap) {
+                    counterKeys.push(attr);
+                }
+
+                let counterHistoryKeys = [];
+                for (let attr in counterHistoryKeyMap) {
+                    counterHistoryKeys.push(counterHistoryKeyMap[attr]);
+                }
+
+                if (counterKeys.length < 1) {
+                    return false;
+                }
+
+                for (let i = 0; i < counterHistoryKeys.length; i++) {
+                    let counterKey = counterHistoryKeys[i].key;
+                    let familyName = counterHistoryKeys[i].familyName;
+                    let now = (new Date()).getTime();
+                    let startTime = from;
+                    let endTime = to;
+                    let url;
+                    if (longTerm) {
+
+                        url = getHttpProtocol(this.props.config)
+                                + '/scouter/v1/counter/stat/' + encodeURI(counterKey) + '?objHashes='+ JSON.stringify(objects.filter((d) => {
+                                    return d.objFamily === familyName;
+                        }).map((obj) => {
+                                return Number(obj.objHash);
+                        })) +"&startYmd=" + moment(startTime).format("YYYYMMDD")
+                            + "&endYmd=" + moment(endTime).format("YYYYMMDD");
+                            this.getCounterHistoryData(url, counterKey, from, to, now, false);
+
+                    } else {
+                        url = getHttpProtocol(this.props.config) + '/scouter/v1/counter/' + encodeURI(counterKey) + '?objHashes=' + JSON.stringify(objects.filter((d) => {
+                                return d.objFamily === familyName;
+                    }).map((obj) => {
+                            return Number(obj.objHash);
+                    })) +"&startTimeMillis=" + startTime + "&endTimeMillis="
+                        + endTime;
+                        this.getCounterHistoryData(url, counterKey, from, to, now, false);
+                    }
                 }
             }
         }
@@ -606,6 +655,7 @@ class Paper extends Component {
         })
     };
 
+    // XLOG 가져오기
     getXLog = (clear, objects) => {
         let that = this;
         if (objects && objects.length > 0) {
@@ -1124,6 +1174,16 @@ class Paper extends Component {
         setData("boxes", boxes);
     };
 
+    // specific box data load
+    reloadData = (key) => {
+        let boxes = this.props.boxes;
+        boxes.forEach((box, i) => {
+            if (box.key === key) {
+                this.getSingleCounterHistory(box.option[0].counterKey, box.option[0].familyName);
+                return false;
+           }
+         });
+    };
 
     setOption = (key, option) => {
 
@@ -1372,6 +1432,7 @@ class Paper extends Component {
                                 <div className="box-layout" key={box.key} data-grid={box.layout}>
                                     <button className="box-control box-layout-remove-btn last" onClick={this.removePaper.bind(null, box.key)}><i className="fa fa-times-circle-o" aria-hidden="true"></i></button>
                                     {box.option && <button className="box-control box-layout-config-btn" onClick={this.toggleConfig.bind(null, box.key)}><i className="fa fa-cog" aria-hidden="true"></i></button>}
+                                    {box.option && box.option.type !== "xlog" && box.option && <button className="box-control box-layout-config-btn" onClick={this.reloadData.bind(null, box.key)}><i className="fa fa-refresh" aria-hidden="true"></i></button>}
                                     {box.option && (box.option.length > 1 || box.option.config ) && box.option.type === "xlog" && <button className={"box-control filter-btn " + (filterInfo && filterInfo.data && filterInfo.data.filtering ? "filtered" : "")} onClick={this.toggleFilter.bind(null, box.key)}><i className="fa fa-filter" aria-hidden="true"></i></button>}
                                     {box.config && <BoxConfig box={box} setOptionValues={this.setOptionValues} setOptionClose={this.setOptionClose} removeMetrics={this.removeMetrics}/>}
                                     {filterInfo && filterInfo.show && <XLogFilter box={box} filterInfo={filterInfo ? filterInfo.data : {filtering: false}} setXlogFilter={this.setXlogFilter} closeFilter={this.closeFilter}/>}

@@ -444,6 +444,7 @@ export async function getFilteredData0(xlogs, filter, props) {
     let data = [];
     let temp = [];
 
+    // 서버에서 가져온 데이터를 필터로 정제...
     xlogs.forEach(async xlog => {
         if(dicts.size > Dictionary.bulkSize) {
             await Dictionary.record(dicts, props, moment(new Date(Number(data[data.length].endTime))).format("YYYYMMDD"));
@@ -482,6 +483,7 @@ export async function getFilteredData0(xlogs, filter, props) {
     return data;
 }
 
+// 서버에서 가져온 데이터와 필터 값과의 비교하는 함수
 export function getFilteredData (xlogs, filter) {
     let datas = xlogs;
 
@@ -545,6 +547,62 @@ export function getFilteredData (xlogs, filter) {
                     : d.userAgent === String(hash(filter.userAgent));
             });
         }
+
+        // filter - text
+        if (filter.text1) {
+            datas = datas.filter((d) => d.text1 === filter.text1);
+        }
+
+        if (filter.text2) {
+            datas = datas.filter((d) => d.text2 === filter.text2);
+        }
+
+        if (filter.text3) {
+            datas = datas.filter((d) => d.text3 === filter.text3);
+        }
+
+        if (filter.text4) {
+            datas = datas.filter((d) => d.text4 === filter.text4);
+        }
+
+        if (filter.text5) {
+            datas = datas.filter((d) => d.text5 === filter.text5);
+        }
+
+        // filter - profile count
+        if (filter.profileCountFrom) {
+            datas = datas.filter((d) => Number(d.profileCount) >= filter.profileCountFrom);
+        }
+
+        // filter - profile count
+        if (filter.profileCountFrom && filter.profileCountTo) {
+            datas = datas.filter((d) => (Number(d.profileCount) >= filter.profileCountFrom && Number(d.profileCount) <= filter.profileCountTo));
+        }
+
+        // filter - start Hms
+        if (filter.startHmsFrom && filter.startHmsTo) {
+            let dm = dateMillis(filter.startHmsFrom, filter.startHmsTo);
+            if(dm !== null) {
+                   datas = datas.filter((d) => (((Number(d.endTime) - Number(d.elapsed)) >= dm[0]) && ((Number(d.endTime) - Number(d.elapsed)) <= dm[1])));
+            }
+        }
+
+        switch (filter.hasDump) {
+
+            case "Y" : {
+                datas = datas.filter((d) => d.hasDump === "1");
+                break;
+            }
+
+            case "N" : {
+                datas = datas.filter((d) => d.hasDump === "0");
+                break;
+            }
+
+            default : {
+                break;
+            }
+        }
         
         switch (filter.type) {
             case "ERROR" : {
@@ -565,10 +623,30 @@ export function getFilteredData (xlogs, filter) {
             default : {
                 break;
             }
-        }            
+        }
+
     }
 
     return datas;
+}
+
+// from date string to millisecond
+export function dateMillis(startHmsFrom, startHmsTo) {
+
+    let dateObj = new Date();
+    let month = dateObj.getMonth();
+    let day = dateObj.getDate();
+    let year = dateObj.getFullYear();
+
+    let startFromTokens = startHmsFrom.split(":");
+    let startToTokens = startHmsTo.split(":");
+
+    let startFrom = (new Date(year, month, day, Number(startFromTokens[0]), Number(startFromTokens[1]), Number(startFromTokens[0]))).getTime();
+    let startTo = (new Date(year, month, day, Number(startToTokens[0]), Number(startToTokens[1]), Number(startToTokens[0]))).getTime();
+
+    if(isNaN(startFrom) || isNaN(startTo))
+        return null;
+    return startFrom + ":" + startTo;
 }
 
 export function updateQueryStringParameter(uri, key, value) {

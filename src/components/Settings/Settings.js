@@ -565,6 +565,17 @@ class Settings extends Component {
                                     <input type="number" required min={60} step={60} readOnly={!this.state.edit} onChange={this.onChangeRange.bind(this, "longHistoryStep")} value={this.state.config.range.longHistoryStep} placeholder="MINUTES" />
                                 </div>
                             </div>
+                            <div className="row">
+                                <div className="label">
+                                    <div>DATA PRELOAD</div>
+                                </div>
+                                <div className="input">
+                                    <select value={this.state.config.preload} onChange={this.onChange.bind(this, "preload")} disabled={!this.state.edit}>
+                                        <option value="Y">Y</option>
+                                        <option value="N">N</option>
+                                    </select>
+                                </div>
+                            </div>
                         </div>
                         <div className="category first">
                             <div>ALERT</div>
