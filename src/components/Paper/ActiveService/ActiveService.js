@@ -48,6 +48,7 @@ class ActiveService extends Component {
     componentDidMount() {
         window.addEventListener("resize", this.updateDimensions);
         window.addEventListener("keydown", this.keyDown.bind(this));
+        this.updateDimensions();
     }
 
     componentWillUnmount() {
@@ -189,7 +190,7 @@ class ActiveService extends Component {
             <div className={"active-thread-list " + (this.state.show ? ' ' : 'hidden')}>
                 <div className="active-service">
                     <div>
-                        <SplitterLayout percentage={true} primaryMinSize={20} secondaryMinSize={20} secondaryInitialSize={60}>
+                        <SplitterLayout percentage={true} primaryMinSize={20} secondaryMinSize={20} secondaryInitialSize={60} vertical={this.state.smallScreen}>
                             <div className="active-layout left">
                                 <div className="summary">
                                     <div className="active-control-btns">
