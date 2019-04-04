@@ -60,6 +60,7 @@
     "react-motion": "^0.5.2",
     "react-redux": "^5.1.1",
     "react-router-dom": "^4.2.2",
+    "react-splitter-layout": "^4.0.0",
     "react-syntax-highlighter": "^10.2.0",
     "react-time-format": "0.0.5",
     "react-timeago": "^3.4.3",

@@ -9,6 +9,11 @@
     cursor: pointer;
 }
 
+.active-service-list > div.row.selected {
+    background-color: #26466d;
+    color: white;
+}
+
 .active-service-list > div.row.async {
     color: #AAAAAA;
 }
@@ -54,6 +59,18 @@
     white-space: nowrap;
     padding: 10px;
     border-bottom: 1px solid #CCC;
+}
+
+.active-service-list > div > span.short {
+
+}
+
+.active-service-list > div > span.medium {
+    color: #EE7600;
+}
+
+.active-service-list > div > span.long {
+    color: #FF5721;
 }
 
 .active-service-list > div.header > span {

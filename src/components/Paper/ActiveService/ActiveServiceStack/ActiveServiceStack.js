@@ -98,17 +98,17 @@ class ActiveServiceStack extends Component {
         this.fullTimeFormat = this.props.config.dateFormat + " " + this.props.config.timeFormat;
     }
 
-    getColor = (key, elap) =>{
+    getClassName = (key, elap) =>{
         if( key !== 'elapsed') {
-            return ''
+            return '';
         } else if( elap <= 3000 ){
-            return 'blue'
+            return 'short';
         } else if( elap >= 3000 && elap <= 7000){
-            return '#bda800'
+            return 'medium';
         } else if( elap > 7000 ){
-            return '#8b0000'
+            return 'long';
         }
-    }
+    };
     render() {
         const {map} = this.props.stack;
         return (
@@ -123,7 +123,7 @@ class ActiveServiceStack extends Component {
                             return(
                             <div key={j}>
                                 <span className="label">{meta.name}</span>
-                                <span className="data" style={{color : this.getColor(meta.key,map[meta.key]) }}>
+                                <span className={"data " + this.getClassName(meta.key,map[meta.key])}>
                                     {meta.type === "ms" && `${numeral(+map[meta.key]).format(this.props.config.numberFormat)} ms`}
                                     {meta.type === "number" && `${numeral(map[meta.key]).format(this.props.config.numberFormat)}`}
                                     {meta.type === "string" && `${map[meta.key]}`}
@@ -142,7 +142,7 @@ class ActiveServiceStack extends Component {
                         <div className={"stack-trace-content"}>
                             <SyntaxHighlighter
                                 language='java'
-                                useInlineStyles={false}
+                                useInlineStyles={true}
                                 style={docco}>{map['stackTrace']}
                             </SyntaxHighlighter>
                         </div>

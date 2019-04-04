@@ -8,29 +8,13 @@ import {getCurrentUser, getHttpProtocol, getWithCredentials, setAuthHeader} from
 import ActiveServiceList from "./ActiveServiceList/ActiveServiceList";
 import ActiveServiceStack from "./ActiveServiceStack/ActiveServiceStack";
 import moment from 'moment'
+import SplitterLayout from 'react-splitter-layout';
+import 'react-splitter-layout/lib/index.css';
 
-// import {getParam} from '../../../../common/common';
 class ActiveService extends Component {
 
     constructor(props) {
         super(props);
-
-        let options = null;
-        if (options) {
-            options.summary = options.summary === undefined ? true : options.summary;
-            options.narrow = options.narrow === undefined ? false : options.narrow;
-            options.bind = options.bind === undefined ? true : options.bind;
-            options.wrap = options.wrap === undefined ? false : options.wrap;
-            options.formatter = options.formatter === undefined ? true : options.formatter;
-        } else {
-            options = {
-                summary: true,
-                narrow: false,
-                bind: true,
-                wrap: false,
-                formatter: true
-            }
-        }
 
         this.state = {
             show: false,
@@ -38,34 +22,30 @@ class ActiveService extends Component {
             txid: null,
             profile: null,
             steps: null,
-            summary: options.summary,
-            narrow: options.narrow,
-            bind: options.bind,
-            wrap: options.wrap,
-            formatter: options.formatter,
-            listWidth: 100,
             smallScreen: false,
-            activeThread : {
-                objHash : null,
-                objName : null,
-                list : []
+            activeThread: {
+                objHash: null,
+                objName: null,
+                list: []
             },
-            stackTrace : {
-                objHash : null,
-                objName : null,
-                threadId : null,
+            stackTrace: {
+                objHash: null,
+                objName: null,
+                threadId: null,
                 map: {},
-                show : false
-            }
+                show: false
+            },
+            selectedRowIndex : null
         };
     }
+
     keyDown = (event) => {
         if (event.keyCode === 27) {
             this.close();
         }
     };
+
     componentDidMount() {
-        // super.componentDidMount()
         window.addEventListener("resize", this.updateDimensions);
         window.addEventListener("keydown", this.keyDown.bind(this));
     }
@@ -76,56 +56,55 @@ class ActiveService extends Component {
     }
 
     componentWillReceiveProps(nextProps) {
-        if( !this.props.activeObject && nextProps.activeObject ){
+        if (!this.props.activeObject && nextProps.activeObject) {
             this.getActiveServiceList(nextProps.activeObject);
-        }else if( this.props.activeObject && nextProps.activeObject !== this.props.activeObject){
+        } else if (this.props.activeObject && nextProps.activeObject !== this.props.activeObject) {
             this.getActiveServiceList(nextProps.activeObject);
         }
 
     }
+
     shouldComponentUpdate(nextProps, nextState) {
-        // console.log(nextProps.activeObject,this.props.activeObject )
-        if (this.state.listWidth !== nextState.listWidth) {
-            return true;
-        }
         if (this.state.smallScreen !== nextState.smallScreen) {
             return true;
         }
         if (nextState.show !== this.state.show) {
             return true;
         }
-        if ( this.state.activeThread.list !== nextState.activeThread.list){
+
+        if (this.state.activeThread.list !== nextState.activeThread.list) {
             return true;
         }
-        if ( this.state.stackTrace !== nextState.stackTrace){
+
+        if (this.state.stackTrace !== nextState.stackTrace) {
             return true;
         }
         return false;
     }
-    close=()=>{
+
+    close = () => {
         this.setState({
-            show:false,
-            activeThread : {
-                objHash : null,
-                objName : null,
-                list : []
-            } ,
-            stackTrace : {
-                objHash : null,
-                objName : null,
-                threadId : null,
-                show : false,
-                map : {}
+            show: false,
+            activeThread: {
+                objHash: null,
+                objName: null,
+                list: []
             },
-            listWidth : 100
+            stackTrace: {
+                objHash: null,
+                objName: null,
+                threadId: null,
+                show: false,
+                map: {}
+            },
+            selectedRowIndex : null
         });
     };
 
-    getActiveServiceList= (activeObj = this.state.activeThread) =>{
-        // activeObj.objHash
+    getActiveServiceList = (activeObj = this.state.activeThread) => {
         this.props.setControlVisibility("Loading", true);
         this.props.addRequest();
-        const {config,user} = this.props
+        const {config, user} = this.props;
         const _url = `${getHttpProtocol(config)}/scouter/v1/activeService/ofObject/${activeObj.objHash}`;
         jQuery.ajax({
             method: "GET",
@@ -134,34 +113,34 @@ class ActiveService extends Component {
             url: _url,
             xhrFields: getWithCredentials(config),
             beforeSend: function (xhr) {
-                setAuthHeader(xhr,config, getCurrentUser(config, user));
+                setAuthHeader(xhr, config, getCurrentUser(config, user));
             }
         }).done((msg) => {
             this.setState({
-               show:true,
-               activeThread : {
-                   objHash : activeObj.objHash,
-                   objName : activeObj.objName,
-                   list: JSON.parse(msg).result
-               },
-               listWidth : 100,
-               stackTrace : {
-                    objHash : null,
-                    objName : null,
-                    threadId : null,
-                    show : false,
-                    map : {}
-               }
+                show: true,
+                activeThread: {
+                    objHash: activeObj.objHash,
+                    objName: activeObj.objName,
+                    list: JSON.parse(msg).result
+                },
+                stackTrace: {
+                    objHash: null,
+                    objName: null,
+                    threadId: null,
+                    show: false,
+                    map: {}
+                },
+                selectedRowIndex : null
             });
 
         }).always(() => {
             this.props.setControlVisibility("Loading", false);
         });
     };
-    rowClick = (activeThread = this.state.stackTrace ) => {
+    rowClick = (activeThread = this.state.stackTrace, i) => {
         this.props.setControlVisibility("Loading", true);
         this.props.addRequest();
-        const {config,user} = this.props
+        const {config, user} = this.props;
         const _url = `${getHttpProtocol(config)}/scouter/v1/activeService/thread/${activeThread.threadId}/ofObject/${activeThread.objHash}`;
         jQuery.ajax({
             method: "GET",
@@ -170,18 +149,18 @@ class ActiveService extends Component {
             url: _url,
             xhrFields: getWithCredentials(config),
             beforeSend: function (xhr) {
-                setAuthHeader(xhr,config, getCurrentUser(config, user));
+                setAuthHeader(xhr, config, getCurrentUser(config, user));
             }
         }).done((msg) => {
             this.setState({
-                stackTrace : {
-                    objHash : activeThread.objHash,
-                    objName : activeThread.objName,
+                stackTrace: {
+                    objHash: activeThread.objHash,
+                    objName: activeThread.objName,
                     map: JSON.parse(msg).result,
-                    threadId : activeThread.threadId,
-                    show : true
+                    threadId: activeThread.threadId,
+                    show: true
                 },
-                listWidth : 40
+                selectedRowIndex : i
             });
 
         }).always(() => {
@@ -202,95 +181,44 @@ class ActiveService extends Component {
             });
         }
     };
-    changeListWidth = (e) => {
-        let listWidth = this.state.listWidth;
 
-        if (e === "min") {
-            listWidth = 0;
-        }
-
-        if (e === "max") {
-            listWidth = 100;
-        }
-
-        if (e === "small") {
-            listWidth -= 20;
-
-            if (listWidth < 0) {
-                listWidth = 0;
-            }
-        }
-
-        if (e === "big") {
-            listWidth += 20;
-
-            if (listWidth > 100) {
-                listWidth = 100;
-            }
-        }
-
-        this.setState({
-            listWidth: listWidth
-        });
-    };
     render() {
-        let leftStyle = {};
-        let rightStyle = {};
-        if (!this.state.paramTxid) {
-            if (this.state.smallScreen) {
-                if (this.state.txid) {
-                    leftStyle = {width: "100%", display: "none"};
-                    rightStyle = {width: "100%", display: "inline-block"};
-                } else {
-                    leftStyle = {width: "100%", display: "inline-block"};
-                    rightStyle = {width: "100%", display: "none"};
-                }
-            } else {
-                leftStyle = {
-                    width: this.state.listWidth + "%",
-                    display: this.state.listWidth === 0 ? "none" : "inline-block"
-                };
-                rightStyle = {
-                    width: (100 - this.state.listWidth) + "%",
-                    display: this.state.listWidth === 100 ? "none" : "inline-block"
-                }
-            }
-        }
         const {activeThread} = this.state;
+
         return (
-            <div className={"active-thread-list " + (this.state.show ? ' ' : 'hidden')} >
+            <div className={"active-thread-list " + (this.state.show ? ' ' : 'hidden')}>
                 <div className="active-service">
-                <div>
-                    <div className="size-control-btns">
-                        <button onClick={()=>this.changeListWidth("min")}><i className="fa fa-angle-double-left"></i></button>
-                        <button onClick={()=>this.changeListWidth("small")}><i className="fa fa-angle-left"></i></button>
-                        <button onClick={()=>this.changeListWidth("big")}><i className="fa fa-angle-right"></i></button>
-                        <button onClick={()=>this.changeListWidth("max")}><i className="fa fa-angle-double-right"></i></button>
-                        <div className="close-btn" onClick={this.close}></div>
-                    </div>
-                    <div className="active-layout left" style={leftStyle}>
-                        <div className="summary">
-                            <div className="title">Active Service ({activeThread.objName})
-                                <div className="active-control-btns">
-                                    <button onClick={()=>this.getActiveServiceList()}> <i className={"fa fa-refresh"} /></button>
+                    <div>
+                        <SplitterLayout percentage={true} primaryMinSize={20} secondaryMinSize={20} secondaryInitialSize={60}>
+                            <div className="active-layout left">
+                                <div className="summary">
+                                    <div className="active-control-btns">
+                                        <button onClick={() => this.getActiveServiceList()}><i
+                                            className={"fa fa-refresh"}/></button>
+                                    </div>
+                                    <div className="title">ACTIVE SERVICE LIST</div>
+                                    <div className="list-summary">{activeThread.objName}</div>
+                                    <div className="list-summary">{moment(new Date()).format('YYYY.MM.DD HH:mm:ss')}, {activeThread.list.length} ROWS</div>
+                                </div>
+                                <div className="active-list scrollbar">
+                                    <ActiveServiceList active={activeThread.list} rowClick={this.rowClick} selectedRowIndex={this.state.selectedRowIndex}/>
                                 </div>
                             </div>
-                            <div className="list-summary">RETRIEVE TIME : {moment(new Date()).format('YYYY.MM.DD HH:mm:ss')} , { activeThread.list.length } ROWS </div>
-                        </div>
-                        <div className="active-list scrollbar">
-                            <ActiveServiceList active={activeThread.list} rowClick={this.rowClick} />
-                        </div>
+                            <div className="active-layout">
+                                <div className="summary">
+                                    <div className="close-btn" onClick={this.close}></div>
+                                    <div className="title">STACK TRACE</div>
+                                    {(this.state.stackTrace && this.state.stackTrace.threadId) && <div className="list-summary">Thread ID {this.state.stackTrace.threadId}, {this.state.stackTrace.objName}</div>}
+                                    {(this.state.stackTrace && this.state.stackTrace.threadId) && <div className="list-summary">{moment(new Date()).format('YYYY.MM.DD HH:mm:ss')}</div>}
+                                    {!(this.state.stackTrace && this.state.stackTrace.threadId) && <div className="list-summary">NO SERVICE SELECTED</div>}
+                                        </div>
+                                <div className="stack-trace scrollbar">
+                                    {(this.state.stackTrace && this.state.stackTrace.threadId) && <ActiveServiceStack stack={this.state.stackTrace} refresh={this.rowClick} restore={this.getActiveServiceList}/>}
+                                    {!(this.state.stackTrace && this.state.stackTrace.threadId) && <div className="no-profile"><div>NO SERVICE SELECTED</div></div>}
+                                </div>
+                            </div>
+                        </SplitterLayout>
                     </div>
-                    <div className="active-layout right" style={rightStyle}>
-                        <div className="summary">
-                            <div className="title">Stack Trace (Thread ID {this.state.stackTrace.threadId} , {this.state.stackTrace.objName}</div>
-                            <div className="list-summary">RETRIEVE TIME : {moment(new Date()).format('YYYY.MM.DD HH:mm:ss')}</div>
-                        </div>
-                        <div className="stack-trace scrollbar" >
-                            <ActiveServiceStack stack={this.state.stackTrace} refresh={this.rowClick} restore={this.getActiveServiceList} />
-                        </div>
-                    </div>
-                </div>
                 </div>
             </div>
         );
@@ -300,7 +228,7 @@ class ActiveService extends Component {
 let mapStateToProps = (state) => {
     return {
         objects: state.target.objects,
-        activeObject : state.target.activeObject,
+        activeObject: state.target.activeObject,
         config: state.config,
         user: state.user,
         filterMap: state.target.filterMap

@@ -53,17 +53,17 @@ class ActiveServiceList extends Component {
         this.fullTimeFormat = this.props.config.dateFormat + " " + this.props.config.timeFormat;
     }
 
-    getColor = (key, elap) =>{
+    getClassName = (key, elap) =>{
         if( key !== 'elapsed') {
-            return ''
+            return '';
         } else if( elap <= 3000 ){
-            return 'blue'
+            return 'short';
         } else if( elap >= 3000 && elap <= 7000){
-            return '#bda800'
+            return 'medium';
         } else if( elap > 7000 ){
-            return '#8b0000'
+            return 'long';
         }
-    }
+    };
 
     getRow = (row, i) => {
         return layout.map((meta, j) => {
@@ -71,7 +71,7 @@ class ActiveServiceList extends Component {
             if (meta.type === "number") {
                 return <span className={className} key={j} >{numeral(row[meta.key]).format(this.props.config.numberFormat)}</span>
             } else if (meta.type === "ms") {
-                return <span className={className} key={j} style={{color : this.getColor(className,row[meta.key]) }}>
+                return <span className={className + " " + this.getClassName(className,row[meta.key])} key={j}>
                         {numeral(row[meta.key]).format(this.props.config.numberFormat)} ms
                      </span>
             } else {
@@ -89,8 +89,7 @@ class ActiveServiceList extends Component {
             <div className="active-service-list">
                 <div className="row header">{this.getHeader()}</div>
                 {this.props.active && this.props.active.map((_th, i) => {
-
-                    return <div onClick={() => this.props.rowClick(_th)} key={i} className={"row"}>{this.getRow(_th, i)}</div>;
+                    return <div onClick={() => this.props.rowClick(_th, i)} key={i} className={"row " + (this.props.selectedRowIndex === i ? "selected" : "")}>{this.getRow(_th, i)}</div>;
                 })}
             </div>
         );
