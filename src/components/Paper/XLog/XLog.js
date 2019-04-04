@@ -488,6 +488,7 @@ class XLog extends Component {
         this.setState({
             elapsed: yValue
         });
+        this.updateURLSearchParams('xlogElapsedTime', yValue);
     };
 
     axisDown = () => {
@@ -496,15 +497,25 @@ class XLog extends Component {
         this.setState({
             elapsed: yValue
         });
+        this.updateURLSearchParams('xlogElapsedTime', yValue);
     };
 
-    stopProgation = (e) => {
+    updateURLSearchParams = (name, value) => {
+        let search = new URLSearchParams(this.props.location.search);
+        search.set(name, value);
+        this.props.history.replace({
+            pathname: this.props.location.pathname,
+            search: "?" + search.toString()
+        });
+    };
+
+    stopPropagation = (e) => {
         e.stopPropagation();
     };
 
     render() {
         return (
-            <div className="xlog-viewer" ref="xlogViewer" onTouchStart={this.stopProgation} onMouseDown={this.stopProgation}>
+            <div className="xlog-viewer" ref="xlogViewer" onTouchStart={this.stopPropagation} onMouseDown={this.stopPropagation}>
                 {(this.props.longTerm) && <div className="no-longterm-support"><div><div>LONGTERM NOT SUPPORTED</div></div></div>}
                 {(this.props.xlogNotSupportedInRange) && <div className="no-longterm-support"><div><div>XLOG NOT SUPPORTED in this range</div></div></div>}
                 {this.props.xlogHistoryDoing &&
@@ -515,8 +526,8 @@ class XLog extends Component {
                     </div>
                 </div>
                 }
-                <div className="axis-button axis-up noselect" onClick={this.axisUp} onMouseDown={this.stopProgation}>+</div>
-                <div className="axis-button axis-down noselect" onClick={this.axisDown} onMouseDown={this.stopProgation}>-</div>
+                <div className="axis-button axis-up noselect" onClick={this.axisUp} onMouseDown={this.stopPropagation}>+</div>
+                <div className="axis-button axis-down noselect" onClick={this.axisDown} onMouseDown={this.stopPropagation}>-</div>
                 {this.props.box.values.showPreview === "Y" &&
                 <XLogPreviewer secondStepTimestamp={this.props.data.secondStepTimestamp} secondStepXlogs={this.props.data.secondStepXlogs} width={this.graph.preview.width} margin={this.graph.margin} maxElapsed={this.state.elapsed}/>
                 }
