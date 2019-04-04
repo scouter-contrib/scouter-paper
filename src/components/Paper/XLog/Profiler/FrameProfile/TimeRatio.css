@@ -1,0 +1,109 @@
+.ratio-bar {
+  display: table;
+  margin: 10px 0 20px;
+  width: 100%;
+}
+
+.narrow .ratio-bar {
+  margin: 5px 0 20px;
+}
+
+.legend-row {
+  display: table-row;
+}
+
+.ratio-bar .ratio-legend {
+  display: table-cell;
+}
+
+.ratio-bar .legend {
+  padding-left: 10px;
+}
+
+.ratio-bar .legend::before {
+  display: inline-block;
+  content: " ";
+  width: 10px;
+  height: 10px;
+  /* border: 1px solid #333; */
+  margin-right: 3px;
+}
+
+.ratio-bar .legend .time {
+  font-size: 11px;
+}
+
+.ratio-bar .legend.cpu::before {
+  background-color: #8b104e;
+}
+
+.ratio-bar .legend.sql::before {
+  background-color: #104e8b;
+}
+
+.ratio-bar .legend.api::before {
+  background-color: #4e8b10;
+}
+
+.ratio-bar .legend.other::before {
+  background-color: #473C8B;
+}
+
+.ratio-row {
+  display: table-row;
+}
+
+.ratio-bar .ratio-body {
+  display: table-cell;
+  width: 100%;
+  height: 100%;
+  height: 34px;
+  vertical-align: top;
+}
+
+.narrow .ratio-bar .ratio-body {
+  height: 20px;
+}
+
+.ratio-bar .ratio-body > div {
+  display: table;
+  width: 100%;
+  height: 100%;
+}
+
+.ratio-bar .ratio {
+  display: table-cell;
+  height: 100%;
+  padding: 10px 0;
+  color: rgb(254,234, 51);
+  overflow: hidden;
+  text-overflow: clip;
+  white-space: nowrap;
+  text-align: center;
+  max-width: 0;
+}
+
+.narrow .ratio-bar .ratio {
+  padding: 3px 0;
+}
+
+.ratio-bar .ratio:last-child {
+  border-right: none;
+}
+
+.ratio-bar .ratio.cpu {
+  background-color: #8b104e;
+}
+
+.ratio-bar .ratio.sql {
+  background-color: #104e8b;
+}
+
+.ratio-bar .ratio.api {
+  background-color: #4e8b10;
+}
+
+.ratio-bar .ratio.other {
+  background-color: #473C8B;
+  width: 100%;
+}

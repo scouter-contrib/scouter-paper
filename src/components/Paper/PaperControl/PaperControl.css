@@ -18,6 +18,29 @@
     border-radius: 2px;
 }
 
+.papers-controls .paper-control-btn.half {
+    display: inline-block;
+    width: 50%;
+    box-sizing: border-box;
+}
+
+.papers-controls .paper-control-btn.warning {
+    background-color: #E3170D;
+    color: white;
+}
+
+.papers-controls .paper-control-btn.warning:hover {
+    background-color: #FC1501;
+}
+
+.papers-controls .paper-control-btn.half:first-child {
+    border-radius: 2px 0 0 2px;
+}
+
+.papers-controls .paper-control-btn.half:last-child {
+    border-radius: 0 2px 2px 0;
+}
+
 .papers-controls .paper-control .paper-control-text {
     margin-left: 5px;
 }
