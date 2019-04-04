@@ -36,7 +36,6 @@
 
 .xlog-profile-list > div.header.row {
     background-color: #F2F2F2;
-
 }
 
 .xlog-profile-list > div:first-child > span {
@@ -45,6 +44,12 @@
 
 .xlog-profile-list > div.header:first-child > span {
     border-top: none;
+}
+
+.xlog-profile-list > div.header.row.fixed > span {
+    position: sticky;
+    top: 0;
+    background-color: #F2F2F2;
 }
 
 .xlog-profile-list > div > span {

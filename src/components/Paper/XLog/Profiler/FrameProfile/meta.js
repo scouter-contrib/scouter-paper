@@ -3,7 +3,7 @@ export const profileMetas = [
         key: "txidAbbr",
         name: "TXID(Abbr)",
         type: "string",
-        show: true
+        show: false
     },
     {
         key: "txid",
@@ -15,67 +15,67 @@ export const profileMetas = [
         key: "service",
         name: "Service",
         type: "string",
-        show: true
+        show: true //okay
     },
     {
         key: "ipAddr",
         name: "IP",
         type: "string",
-        show: true
+        show: true //okay
     },
     {
         key: "elapsed",
         name: "Elapsed",
         type: "ms",
-        show: true
+        show: false
     },
     {
         key: "endTime",
         name: "End Time",
         type: "datetime",
-        show: true
+        show: true //okay
     },
     {
         key: "apicallCount",
         name: "API Call",
         type: "number",
-        show: true
+        show: false
     },
     {
         key: "apicallTime",
         name: "API Time",
         type: "ms",
-        show: true
+        show: false
     },
     {
         key: "sqlCount",
         name: "SQL Count",
         type: "number",
-        show: true
+        show: false
     },
     {
         key: "sqlTime",
         name: "SQL Time",
         type: "ms",
-        show: true
+        show: false
     },
     {
         key: "cpu",
         name: "CPU",
         type: "ms",
-        show: true
+        show: false
     },
     {
         key: "allocatedMemory",
         name: "Memory",
         type: "bytes",
-        show: true
+        show: false
     },
     {
         key: "error",
         name: "Error",
         type: "string",
-        show: true
+        show: true //okay
     },
 
     {
