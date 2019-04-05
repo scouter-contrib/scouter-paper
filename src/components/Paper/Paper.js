@@ -244,7 +244,6 @@ class Paper extends Component {
         if (JSON.stringify(prevCounterKeyMap) !== JSON.stringify(counterKeyMap)) {
             if (this.props.range.realTime) {
                 let now = (new ServerDate()).getTime();
-                //let ten = 1000 * 60 * 10;
                 let ten = (this.props.config.preload === "Y") ? 1000 * 60 * 10 : 1000;
                 this.getCounterHistory(this.props.objects, now - ten, now, false);
                 this.getLatestData(true, this.props.objects);
@@ -277,7 +276,6 @@ class Paper extends Component {
         if (JSON.stringify(this.props.objects) !== JSON.stringify(nextProps.objects)) {
             if (this.props.range.realTime) {
                 let now = (new ServerDate()).getTime();
-                //let ten = 1000 * 60 * 10;
                 let ten = (this.props.config.preload === "Y") ? 1000 * 60 * 10 : 1000;
                 this.getCounterHistory(nextProps.objects, now - ten, now, false);
                 this.getLatestData(true, nextProps.objects);
@@ -317,7 +315,6 @@ class Paper extends Component {
                 this.dataRefreshTimer = null;
 
                 let now = (new ServerDate()).getTime();
-                //let ten = 1000 * 60 * 10;
                 let ten = (this.props.config.preload === "Y") ? 1000 * 60 * 10 : 1000;
                 this.getCounterHistory(this.props.objects, now - ten, now, false);
                 this.getLatestData(true, this.props.objects);
@@ -338,7 +335,6 @@ class Paper extends Component {
 
         if (this.props.objects && this.props.objects.length > 0) {
             let now = (new ServerDate()).getTime();
-            //let ten = 1000 * 60 * 10;
             let ten = (this.props.config.preload === "Y") ? 1000 * 60 * 10 : 1000;
             this.getCounterHistory(this.props.objects, now - ten, now, false);
             if (this.props.range.realTime) {
@@ -483,7 +479,6 @@ class Paper extends Component {
                 });
             } else {
                 let now = (new ServerDate()).getTime();
-                //let ten = 1000 * 60 * 10;
                 let ten = (this.props.config.preload === "Y") ? 1000 * 60 * 10 : 1000;
                 this.getCounterHistory(this.props.objects, now - ten, now, false);
             }
@@ -492,111 +487,100 @@ class Paper extends Component {
 
     // load all data
     getCounterHistory = (objects, from, to, longTerm) => {
-        this.getPaperCounterHistory(objects, from, to, longTerm, null, null);
+        this.getPaperCounterHistory(objects, from, to, longTerm, null);
     };
 
     // load specific box data
-    getSingleCounterHistory = (counterKey, familyName) => {
+    getSingleCounterHistory = (box) => {
         let now = (new ServerDate()).getTime();
         let ten = 1000 * 60 * 10;
         let longTerm = false;
         let objects = this.props.objects;
-        this.getPaperCounterHistory(objects, now - ten, now, longTerm, counterKey, familyName);
+        this.getPaperCounterHistory(objects, now - ten, now, longTerm, box);
     };
 
-    getPaperCounterHistory = (objects, from, to, longTerm, counterKey, familyName) => {
+    tempBox = "";
+
+    getPaperCounterHistory = (objects, from, to, longTerm, box) => {
 
         if (objects && objects.length > 0) {
 
-            if (counterKey !== null && familyName !== null) {
+            let counterKeyMap = {};
+            let counterHistoryKeyMap = {};
 
+            for (let i = 0; i < this.props.boxes.length; i++) {
+                let option = this.props.boxes[i].option;
+
+                if (option && option.length > 0) {
+                    for (let j = 0; j < option.length; j++) {
+                        let innerOption = option[j];
+                        if (innerOption.type === "counter") {
+                            counterKeyMap[innerOption.counterKey] = true;
+                            counterHistoryKeyMap[innerOption.counterKey] = {
+                                key: innerOption.counterKey,
+                                familyName: innerOption.familyName
+                            };
+                        }
+                    }
+                }
+            }
+
+            let counterKeys = [];
+            for (let attr in counterKeyMap) {
+                counterKeys.push(attr);
+            }
+
+            let counterHistoryKeys = [];
+            for (let attr in counterHistoryKeyMap) {
+                counterHistoryKeys.push(counterHistoryKeyMap[attr]);
+            }
+
+            if (counterKeys.length < 1) {
+                return false;
+            }
+
+            for (let i = 0; i < counterHistoryKeys.length; i++) {
+                let counterKey = counterHistoryKeys[i].key;
+                let familyName = counterHistoryKeys[i].familyName;
                 let now = (new Date()).getTime();
-                let startTime = from;
+                let startTime = (this.props.config.preload === "Y") ? from : this.mountTime;
                 let endTime = to;
                 let url;
 
-                if (longTerm) {
-
-                    url = getHttpProtocol(this.props.config) + '/scouter/v1/counter/stat/' + encodeURI(counterKey) + '?objHashes='+ JSON.stringify(objects.filter((d) => {
-                                    return d.objFamily === familyName;
-                    }).map((obj) => {
-                            return Number(obj.objHash);
-                    }))+"&startYmd=" + moment(startTime).format("YYYYMMDD") + "&endYmd=" + moment(endTime).format("YYYYMMDD");
-                        this.getCounterHistoryData(url, counterKey, from, to, now, false);
-                } else {
-                    url = getHttpProtocol(this.props.config) + '/scouter/v1/counter/' + encodeURI(counterKey) + '?objHashes=' + JSON.stringify(objects.filter((d) => {
-                                    return d.objFamily === familyName;
-                    }).map((obj) => {
-                            return Number(obj.objHash);
-                    })) +"&startTimeMillis=" + startTime + "&endTimeMillis="  + endTime;
-                        this.getCounterHistoryData(url, counterKey, from, to, now, false);
-                }
-
-            } else {
-
-                let counterKeyMap = {};
-                let counterHistoryKeyMap = {};
-
-                for (let i = 0; i < this.props.boxes.length; i++) {
-                    let option = this.props.boxes[i].option;
-
-                    if (option && option.length > 0) {
-                        for (let j = 0; j < option.length; j++) {
-                            let innerOption = option[j];
-                            if (innerOption.type === "counter") {
-                                counterKeyMap[innerOption.counterKey] = true;
-                                counterHistoryKeyMap[innerOption.counterKey] = {
-                                    key: innerOption.counterKey,
-                                    familyName: innerOption.familyName
-                                };
-                            }
+                // specific box
+                if(box !== null) {
+                    for (let j = 0; j < box.option.length; j++) {
+                        let counterKey2 = box.option[j].counterKey;
+                        if(counterKey === counterKey2 || (this.tempBox !== undefined && (this.tempBox).indexOf(counterKey) >= 0)) {
+                            if((this.tempBox).indexOf(counterKey) === -1) this.tempBox += counterKey+":";
+                            startTime = from;
+                            break;
                         }
                     }
                 }
 
-                let counterKeys = [];
-                for (let attr in counterKeyMap) {
-                    counterKeys.push(attr);
-                }
+                if (longTerm) {
 
-                let counterHistoryKeys = [];
-                for (let attr in counterHistoryKeyMap) {
-                    counterHistoryKeys.push(counterHistoryKeyMap[attr]);
-                }
-
-                if (counterKeys.length < 1) {
-                    return false;
-                }
-
-                for (let i = 0; i < counterHistoryKeys.length; i++) {
-                    let counterKey = counterHistoryKeys[i].key;
-                    let familyName = counterHistoryKeys[i].familyName;
-                    let now = (new Date()).getTime();
-                    let startTime = from;
-                    let endTime = to;
-                    let url;
-                    if (longTerm) {
-
-                        url = getHttpProtocol(this.props.config)
-                                + '/scouter/v1/counter/stat/' + encodeURI(counterKey) + '?objHashes='+ JSON.stringify(objects.filter((d) => {
-                                    return d.objFamily === familyName;
-                        }).map((obj) => {
-                                return Number(obj.objHash);
-                        })) +"&startYmd=" + moment(startTime).format("YYYYMMDD")
-                            + "&endYmd=" + moment(endTime).format("YYYYMMDD");
-                            this.getCounterHistoryData(url, counterKey, from, to, now, false);
-
-                    } else {
-                        url = getHttpProtocol(this.props.config) + '/scouter/v1/counter/' + encodeURI(counterKey) + '?objHashes=' + JSON.stringify(objects.filter((d) => {
+                    url = getHttpProtocol(this.props.config)
+                            + '/scouter/v1/counter/stat/' + encodeURI(counterKey) + '?objHashes='+ JSON.stringify(objects.filter((d) => {
                                 return d.objFamily === familyName;
                     }).map((obj) => {
                             return Number(obj.objHash);
-                    })) +"&startTimeMillis=" + startTime + "&endTimeMillis="
-                        + endTime;
-                        this.getCounterHistoryData(url, counterKey, from, to, now, false);
-                    }
+                    })) +"&startYmd=" + moment(startTime).format("YYYYMMDD")
+                        + "&endYmd=" + moment(endTime).format("YYYYMMDD");
+                    this.getCounterHistoryData(url, counterKey, from, to, now, false, false);
+
+                } else {
+                    url = getHttpProtocol(this.props.config) + '/scouter/v1/counter/' + encodeURI(counterKey) + '?objHashes=' + JSON.stringify(objects.filter((d) => {
+                            return d.objFamily === familyName;
+                }).map((obj) => {
+                        return Number(obj.objHash);
+                })) +"&startTimeMillis=" + startTime + "&endTimeMillis="
+                    + endTime;
+                    this.getCounterHistoryData(url, counterKey, from, to, now, false, false);
                 }
             }
+
         }
     };
 
@@ -655,7 +639,6 @@ class Paper extends Component {
         })
     };
 
-    // XLOG 가져오기
     getXLog = (clear, objects) => {
         let that = this;
         if (objects && objects.length > 0) {
@@ -921,7 +904,6 @@ class Paper extends Component {
                 data.newXLogs = xlogs;
 
 
-
                 if (hasMore) {
                     this.setState({
                         data: data,
@@ -998,8 +980,8 @@ class Paper extends Component {
     };
 
 
-    getCounterHistoryData = (url, counterKey, from, to, now, append) => {
-        this.setLoading(true);
+    getCounterHistoryData = (url, counterKey, from, to, now, append, gb) => {
+        //this.setLoading(true);
         let that = this;
         this.props.addRequest();
         jQuery.ajax({
@@ -1017,11 +999,13 @@ class Paper extends Component {
             let countersHistory = this.state.countersHistory.data ? Object.assign({}, this.state.countersHistory.data) : {};
 
             let counterHistory;
+
             if (msg.result) {
                 for (let i = 0; i < msg.result.length; i++) {
                     let counter = msg.result[i];
                     counterHistory = countersHistory[counterKey] ? countersHistory[counterKey] : {};
                     if (counter.valueList.length > 0) {
+
                         if (append) {
                             if (counterHistory[counter.objHash]) {
                                 counterHistory[counter.objHash].timeList = counterHistory[counter.objHash].timeList.concat(counter.timeList);
@@ -1042,12 +1026,16 @@ class Paper extends Component {
                             counterHistory[counter.objHash].unit = counter.unit;
                             countersHistory[counterKey] = counterHistory;
                         }
+
+
                     }
                 }
             }
 
             for (let key in countersHistory) {
+
                 for (let objHash in countersHistory[key]) {
+
                     let smallInx = -1;
                     let temp = [];
                     for (let i = 0; i < countersHistory[key][objHash].timeList.length; i++) {
@@ -1082,7 +1070,9 @@ class Paper extends Component {
 
                     countersHistory[key][objHash].timeList = temp.map((d) => d.time);
                     countersHistory[key][objHash].valueList = temp.map((d) => d.value);
+
                 }
+
             }
 
             this.setState({
@@ -1094,9 +1084,10 @@ class Paper extends Component {
                 }
             });
 
+
             this.counterHistoriesLoaded[counterKey] = true;
 
-            this.setLoading(false);
+            //this.setLoading(false);
         }).fail((xhr, textStatus, errorThrown) => {
             errorHandler(xhr, textStatus, errorThrown, this.props, "getCounterHistoryData", true);
         });
@@ -1179,10 +1170,10 @@ class Paper extends Component {
         let boxes = this.props.boxes;
         boxes.forEach((box, i) => {
             if (box.key === key) {
-                this.getSingleCounterHistory(box.option[0].counterKey, box.option[0].familyName);
+                this.getSingleCounterHistory(box);
                 return false;
            }
-         });
+        });
     };
 
     setOption = (key, option) => {
