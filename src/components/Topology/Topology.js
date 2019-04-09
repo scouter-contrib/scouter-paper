@@ -778,7 +778,7 @@ class Topology extends Component {
         return 0.4;
     };
 
-    linkTypeHover = (d, o) => {
+    linkTypeHover = (d, o)=> {
         if (d.id === o.source.id || d.id === o.target.id) {
             return 1;
         } else {
