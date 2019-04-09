@@ -206,11 +206,11 @@ class XLogFilter extends Component {
                             <div className="xlog-filter-content-row xlog-filter-elapsed">
                                 <div className="xlog-filter-content-row-label">PROFILE COUNTER</div>
                                 <div className="xlog-filter-content-row-control">
-                                    <input type="number" onChange={this.onChangeCondition.bind(this, "profileCountFrom")} value={this.state.profileCountFrom}/>
+                                    <input type="number" onChange={this.onChangeCondition.bind(this, "profileCountFrom")} value={this.state.profileCountFrom} min="0"/>
                                 </div>
                                 <div className="xlog-filter-content-row-text">~</div>
                                 <div className="xlog-filter-content-row-control">
-                                    <input type="number" onChange={this.onChangeCondition.bind(this, "profileCountTo")} value={this.state.profileCountTo}/>
+                                    <input type="number" onChange={this.onChangeCondition.bind(this, "profileCountTo")} value={this.state.profileCountTo} min="1"/>
                                 </div>
                             </div>
                             <div className="xlog-filter-content-row xlog-filter-elapsed">

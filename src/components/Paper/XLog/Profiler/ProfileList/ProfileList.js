@@ -170,16 +170,29 @@ class ProfileList extends Component {
 
     sortTemp = null;
     // data sorting
-    onSort(event, sortKey) {
+    onSort(event, type, sortKey) {
 
         const data = this.props.xlogs;
 
-        if (this.sortTemp !== sortKey) {
-            data.sort((a, b) => a[sortKey].localeCompare(b[sortKey]));
-            this.sortTemp = sortKey;
+        if (type === "number" || type === "ms" || type === "kbytes") {
+
+            if (this.sortTemp !== sortKey) {
+                data.sort((a, b) => a[sortKey].localeCompare(b[sortKey], 'en-US', { numeric: true, sensitivity: 'base' }));
+                this.sortTemp = sortKey;
+            }else{
+                data.sort((a, b) => b[sortKey].localeCompare(a[sortKey], 'en-US', { numeric: true, sensitivity: 'base' }));
+                this.sortTemp = null;
+            }
+
         }else{
-            data.sort((a, b) => b[sortKey].localeCompare(a[sortKey]));
-            this.sortTemp = null;
+
+            if (this.sortTemp !== sortKey) {
+                data.sort((a, b) => a[sortKey].localeCompare(b[sortKey]));
+                this.sortTemp = sortKey;
+            }else{
+                data.sort((a, b) => b[sortKey].localeCompare(a[sortKey]));
+                this.sortTemp = null;
+            }
         }
 
         this.setState({data});
@@ -207,7 +220,7 @@ class ProfileList extends Component {
 
     getHeader = () => {
         return layout.map((meta, j) => {
-            return <span key={j} onClick={e => this.onSort(e, meta.key)}>{meta.name}</span>
+            return <span key={j} onClick={e => this.onSort(e, meta.type, meta.key)}>{meta.name}</span>
         });
     };
 
