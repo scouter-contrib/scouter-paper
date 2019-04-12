@@ -568,7 +568,7 @@ class Paper extends Component {
                             return Number(obj.objHash);
                     })) +"&startYmd=" + moment(startTime).format("YYYYMMDD")
                         + "&endYmd=" + moment(endTime).format("YYYYMMDD");
-                    this.getCounterHistoryData(url, counterKey, from, to, now, false, false);
+                    this.getCounterHistoryData(url, counterKey, from, to, now, false);
 
                 } else {
                     url = getHttpProtocol(this.props.config) + '/scouter/v1/counter/' + encodeURI(counterKey) + '?objHashes=' + JSON.stringify(objects.filter((d) => {
@@ -577,7 +577,7 @@ class Paper extends Component {
                         return Number(obj.objHash);
                 })) +"&startTimeMillis=" + startTime + "&endTimeMillis="
                     + endTime;
-                    this.getCounterHistoryData(url, counterKey, from, to, now, false, false);
+                    this.getCounterHistoryData(url, counterKey, from, to, now, false);
                 }
             }
 
@@ -980,8 +980,8 @@ class Paper extends Component {
     };
 
 
-    getCounterHistoryData = (url, counterKey, from, to, now, append, gb) => {
-        //this.setLoading(true);
+    getCounterHistoryData = (url, counterKey, from, to, now, append) => {
+        this.setLoading(true);
         let that = this;
         this.props.addRequest();
         jQuery.ajax({
@@ -1087,7 +1087,7 @@ class Paper extends Component {
 
             this.counterHistoriesLoaded[counterKey] = true;
 
-            //this.setLoading(false);
+            this.setLoading(false);
         }).fail((xhr, textStatus, errorThrown) => {
             errorHandler(xhr, textStatus, errorThrown, this.props, "getCounterHistoryData", true);
         });
