@@ -148,6 +148,7 @@ class PresetManager extends Component {
                 if (preset.no === this.state.selectedPresetNo) {
                     this.props.applyPreset(preset);
                     this.props.closeSelectorPopup();
+                    localStorage.setItem("selectedObjects", JSON.stringify(preset));
                     /*
                     this.props.togglePresetManager();
 
