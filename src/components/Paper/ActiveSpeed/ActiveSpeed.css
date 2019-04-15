@@ -49,6 +49,10 @@
     table-layout: fixed;
 }
 
+.active-speed-wrapper .active-speed-content .row:hover {
+    background : antiquewhite
+}
+
 .active-speed-wrapper .active-speed-content .row.single-line {
     display: block;
 }
@@ -98,7 +102,7 @@
     height: 20px;
     width: 10px;
     _border: 1px solid rgba(0,0,0,0.2);
-    background-color: #EEE;
+    background-color: rgba(0,0,0,0.1);
     margin-right: 2px;
     box-sizing: border-box;
     transition: background-color 5s;
