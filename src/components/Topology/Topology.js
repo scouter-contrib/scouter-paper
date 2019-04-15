@@ -901,6 +901,18 @@ class Topology extends Component {
         }
     };
 
+    memorize = (d)=> {
+        localStorage.setItem(d.id+"-x", d.x);
+        localStorage.setItem(d.id+"-y", d.y);
+    };
+
+    getX = (d)=> {
+        return Number(localStorage.getItem(d.id+"-x"));
+    };
+
+    getY = (d)=> {
+        return Number(localStorage.getItem(d.id+"-y"));
+    };
     update = (pin, tpsToLineSpeed, speedLevel) => {
         let that = this;
 
@@ -1076,11 +1088,16 @@ class Topology extends Component {
         if (pin) {
             this.node.each((d) => {
                 d.fixed = true;
-                d.fx = d.x;
-                d.fy = d.y;
+                d.fx = this.getX(d);
+                d.fy = this.getY(d);
             });
-        }
+        } else {
+            this.node.each((d) => {
+                d.x = this.getX(d);
+                d.y = this.getY(d);
+            })
 
+        }
         this.preNodeCount = nodes.length;
     };
 
@@ -1107,6 +1124,7 @@ class Topology extends Component {
         let that = this;
         // 노드 위치
         this.node.attr("cx", function (d) {
+            that.memorize(d);
             return d.x;
 
         }).attr("cy", function (d) {
