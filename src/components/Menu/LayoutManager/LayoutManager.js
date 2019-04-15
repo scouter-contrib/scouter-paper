@@ -61,7 +61,7 @@ class LayoutManager extends Component {
                 });
             }
         }).fail((xhr, textStatus, errorThrown) => {
-            errorHandler(xhr, textStatus, errorThrown, this.props);
+            errorHandler(xhr, textStatus, errorThrown, this.props, "saveTemplate", true);
         });
     };
 
@@ -132,7 +132,7 @@ class LayoutManager extends Component {
                 }
             }
         }).fail((xhr, textStatus, errorThrown) => {
-            errorHandler(xhr, textStatus, errorThrown, this.props);
+            errorHandler(xhr, textStatus, errorThrown, this.props, "loadTemplates", true);
         });
     };
 

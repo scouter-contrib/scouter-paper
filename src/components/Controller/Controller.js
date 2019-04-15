@@ -288,7 +288,7 @@ class Controller extends Component {
                 }
             }
         }).fail((xhr, textStatus, errorThrown) => {
-            errorHandler(xhr, textStatus, errorThrown, that.props);
+            errorHandler(xhr, textStatus, errorThrown, that.props, "onServerClick", true);
         });
     };
 
@@ -368,7 +368,7 @@ class Controller extends Component {
                                 })
                             }
                         }).fail(function (xhr, textStatus, errorThrown) {
-                            errorHandler(xhr, textStatus, errorThrown, that.props);
+                            errorHandler(xhr, textStatus, errorThrown, that.props, "applyPreset_1", true);
                         });
                     });
 
@@ -404,7 +404,7 @@ class Controller extends Component {
             }
 
         }).fail((xhr, textStatus, errorThrown) => {
-            errorHandler(xhr, textStatus, errorThrown, that.props);
+            errorHandler(xhr, textStatus, errorThrown, that.props, "applyPreset_2", true);
         });
 
 
@@ -492,7 +492,7 @@ class Controller extends Component {
                                     })
                                 }
                             }).fail(function (xhr, textStatus, errorThrown) {
-                                errorHandler(xhr, textStatus, errorThrown, that.props);
+                                errorHandler(xhr, textStatus, errorThrown, that.props, "setTargetFromUrl_1", true);
                             });
                         });
 
@@ -528,7 +528,7 @@ class Controller extends Component {
                 }
 
             }).fail((xhr, textStatus, errorThrown) => {
-                errorHandler(xhr, textStatus, errorThrown, that.props);
+                errorHandler(xhr, textStatus, errorThrown, that.props, "setTargetFromUrl_2", true);
             });
         }
     };
@@ -573,7 +573,7 @@ class Controller extends Component {
                 selectedObjects: {},
                 filter: ""
             });
-            errorHandler(xhr, textStatus, errorThrown, that.props);
+            errorHandler(xhr, textStatus, errorThrown, that.props, "getServers", true);
         }).always(() => {
             this.setState({
                 loading: false

@@ -346,7 +346,7 @@ class Profiler extends Component {
             }
 
         }).fail((xhr, textStatus, errorThrown) => {
-            errorHandler(xhr, textStatus, errorThrown, this.props);
+            errorHandler(xhr, textStatus, errorThrown, this.props, "getListData", true);
         }).always(() => {
             this.props.setControlVisibility("Loading", false);
         });
@@ -454,14 +454,14 @@ class Profiler extends Component {
                     });
 
                 }).fail((xhr, textStatus, errorThrown) => {
-                    errorHandler(xhr, textStatus, errorThrown, this.props);
+                    errorHandler(xhr, textStatus, errorThrown, this.props, "rowClick_1", true);
                 }).always(() => {
                     this.props.setControlVisibility("Loading", false);
                 });
             }
 
         }).fail((xhr, textStatus, errorThrown) => {
-            errorHandler(xhr, textStatus, errorThrown, this.props);
+            errorHandler(xhr, textStatus, errorThrown, this.props, "rowClick_2", true);
             this.props.setControlVisibility("Loading", false);
         }).always(() => {
             this.props.setControlVisibility("Loading", false);

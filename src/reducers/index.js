@@ -12,6 +12,7 @@ const configState = {
         }
     ],
     interval: 2000,
+    preload: "N",
     alertInterval : 60,
     numberFormat: "0,0.0",
     decimalPoint: 1,
