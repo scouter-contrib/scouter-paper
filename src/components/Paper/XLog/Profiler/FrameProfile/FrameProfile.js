@@ -42,7 +42,7 @@ class FrameProfile extends Component {
 
     componentWillReceiveProps(nextProps) {
         this.init(nextProps);
-        if (nextProps.listWidth !== this.props.listWidth) {
+        if (nextProps.rightWidth !== this.props.rightWidth) {
             this.resize();
         }
     }

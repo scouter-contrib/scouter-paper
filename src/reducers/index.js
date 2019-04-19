@@ -147,6 +147,7 @@ const configState = {
         }
     },
     fonts : [
+        {val : "NanumSquare",name : "NanumSquare", generic: "sans-serif", type : "display"},
         {val : "Bungee",name : "Bungee", generic: "cursive", type : "display"},
         {val : "Righteous",name : "Righteous", generic : "cursive", type : "display"},
         {val : "Mina",name : "Mina", generic : "sans-serif", type : "sans-serif"},
@@ -158,11 +159,11 @@ const configState = {
         {val : "Kavivanar",name : "Kavivanar", generic : "cursive", type : "Handwriting"},
         {val : "Handlee",name : "Handlee", generic : "cursive", type : "Handwriting"}],
     fontSetting : {
-        basic : "Righteous",
+        basic : "NanumSquare",
         menu : "Bungee",
         axis : "Bungee",
-        tooltip : "Righteous",
-        profiler : "Righteous"
+        tooltip : "NanumSquare",
+        profiler : "NanumSquare"
     },
     others : {
         checkUpdate : "Y",

@@ -194,12 +194,12 @@ class ActiveService extends Component {
                             <div className="active-layout left">
                                 <div className="summary">
                                     <div className="active-control-btns">
-                                        <button onClick={() => this.getActiveServiceList()}><i
-                                            className={"fa fa-refresh"}/></button>
+                                        <button onClick={() => this.getActiveServiceList()}><i className={"fa fa-refresh"}/></button>
                                     </div>
                                     <div className="title">ACTIVE SERVICE LIST</div>
                                     <div className="list-summary">{activeThread.objName}</div>
                                     <div className="list-summary">{moment(new Date()).format('YYYY.MM.DD HH:mm:ss')}, {activeThread.list.length} ROWS</div>
+                                    {this.state.smallScreen && <div className="close-btn" onClick={this.close}></div>}
                                 </div>
                                 <div className="active-list scrollbar">
                                     <ActiveServiceList active={activeThread.list} rowClick={this.rowClick} selectedRowIndex={this.state.selectedRowIndex}/>
@@ -207,7 +207,7 @@ class ActiveService extends Component {
                             </div>
                             <div className="active-layout">
                                 <div className="summary">
-                                    <div className="close-btn" onClick={this.close}></div>
+                                    {!this.state.smallScreen && <div className="close-btn" onClick={this.close}></div>}
                                     <div className="title">STACK TRACE</div>
                                     {(this.state.stackTrace && this.state.stackTrace.threadId) && <div className="list-summary">Thread ID {this.state.stackTrace.threadId}, {this.state.stackTrace.objName}</div>}
                                     {(this.state.stackTrace && this.state.stackTrace.threadId) && <div className="list-summary">{moment(new Date()).format('YYYY.MM.DD HH:mm:ss')}</div>}

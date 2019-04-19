@@ -311,6 +311,10 @@ class App extends Component {
         if (str) {
             config = JSON.parse(str);
             config = mergeDeep(this.props.config, config); //for added config's properties on later versions.
+
+            if (config.fonts && config.fonts.filter(d => d.val === "NanumSquare").length < 1) {
+                config.fonts.push({val : "NanumSquare",name : "NanumSquare", generic: "sans-serif", type : "display"});
+            }
             localStorage.setItem("config", JSON.stringify(config));
         } else {
             config = this.props.config;

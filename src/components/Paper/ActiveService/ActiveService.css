@@ -1,6 +1,6 @@
 .active-service {
     position: fixed;
-    background-color: rgba(0, 0, 0, 0.3);
+    background-color: rgba(0, 0, 0, 0.6);
     color: #333;
     top: 0;
     left: 0;
@@ -60,7 +60,7 @@
 
 .active-service .active-layout .summary .close-btn {
     position: absolute;
-    top: 20px;
+    top: 7px;
     right: 5px;
 }
 
@@ -137,7 +137,6 @@
     display: table;
     font-size: 18px;
 }
-
 
 .active-service .active-layout .stack-trace .no-profile > div {
     text-align: center;
@@ -231,3 +230,12 @@
 .active-service .splitter-layout .layout-pane.layout-pane-primary {
     overflow-x: hidden;
 }
+
+.active-service .splitter-layout > .layout-splitter {
+    background-color: #FFE600;
+}
+
+.active-service .splitter-layout > .layout-splitter:hover {
+    background-color: #EEC900;
+}
+
