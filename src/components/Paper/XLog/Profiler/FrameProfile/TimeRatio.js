@@ -3,7 +3,7 @@ import './TimeRatio.css';
 
 const calcPercent = (part, total) => {
     return (part / total * 100).toFixed(1);
-}
+};
 
 export default class TimeRatio extends Component {
 
@@ -31,7 +31,7 @@ export default class TimeRatio extends Component {
             'sqlPercent': calcPercent(sql, elapsed), 
             'apiPercent': calcPercent(api, elapsed), 
             'otherPercent': calcPercent(other, elapsed)});
-    }
+    };
 
     ratioStyle = (percent) => {
         if (percent < 0.3) {
@@ -39,7 +39,7 @@ export default class TimeRatio extends Component {
         }
         
         return {width: `${percent}%`};
-    }
+    };
 
     componentWillReceiveProps(nextProps) {
         this.init(nextProps);
@@ -51,7 +51,7 @@ export default class TimeRatio extends Component {
 
     render() {
         return (
-            <div>
+            <div className="time-ratio">
                 <div className="sub-title">TIME RATIO</div>
                 <div className="ratio-bar">
                     <div className="legend-row">

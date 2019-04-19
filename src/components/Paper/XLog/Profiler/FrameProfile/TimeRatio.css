@@ -1,26 +1,33 @@
-.ratio-bar {
+.time-ratio {
+  background-color: #EEE;
+  padding-bottom: 20px;
+  margin-bottom: 20px;
+}
+
+.time-ratio .ratio-bar {
   display: table;
-  margin: 10px 0 20px;
+  margin: 10px 0 0;
   width: 100%;
 }
 
-.narrow .ratio-bar {
-  margin: 5px 0 20px;
+.time-ratio .narrow .ratio-bar {
+  margin: 5px 0 20px;;
 }
 
-.legend-row {
+.time-ratio .legend-row {
   display: table-row;
 }
 
-.ratio-bar .ratio-legend {
+.time-ratio .ratio-bar .ratio-legend {
   display: table-cell;
+  padding-bottom: 10px;
 }
 
-.ratio-bar .legend {
+.time-ratio .ratio-bar .legend {
   padding-left: 10px;
 }
 
-.ratio-bar .legend::before {
+.time-ratio .ratio-bar .legend::before {
   display: inline-block;
   content: " ";
   width: 10px;
@@ -29,49 +36,50 @@
   margin-right: 3px;
 }
 
-.ratio-bar .legend .time {
+.time-ratio .ratio-bar .legend .time {
   font-size: 11px;
 }
 
-.ratio-bar .legend.cpu::before {
+.time-ratio .ratio-bar .legend.cpu::before {
   background-color: #8b104e;
 }
 
-.ratio-bar .legend.sql::before {
+.time-ratio .ratio-bar .legend.sql::before {
   background-color: #104e8b;
 }
 
-.ratio-bar .legend.api::before {
+.time-ratio .ratio-bar .legend.api::before {
   background-color: #4e8b10;
 }
 
-.ratio-bar .legend.other::before {
+.time-ratio .ratio-bar .legend.other::before {
   background-color: #473C8B;
 }
 
-.ratio-row {
+.time-ratio .ratio-row {
   display: table-row;
 }
 
-.ratio-bar .ratio-body {
+.time-ratio .ratio-bar .ratio-body {
   display: table-cell;
   width: 100%;
-  height: 100%;
   height: 34px;
   vertical-align: top;
+  padding: 0 20px;
+  box-sizing: border-box;
 }
 
-.narrow .ratio-bar .ratio-body {
+.time-ratio .narrow .ratio-bar .ratio-body {
   height: 20px;
 }
 
-.ratio-bar .ratio-body > div {
+.time-ratio .ratio-bar .ratio-body > div {
   display: table;
   width: 100%;
   height: 100%;
 }
 
-.ratio-bar .ratio {
+.time-ratio .ratio-bar .ratio {
   display: table-cell;
   height: 100%;
   padding: 10px 0;
@@ -83,27 +91,27 @@
   max-width: 0;
 }
 
-.narrow .ratio-bar .ratio {
+.time-ratio .narrow .ratio-bar .ratio {
   padding: 3px 0;
 }
 
-.ratio-bar .ratio:last-child {
+.time-ratio .ratio-bar .ratio:last-child {
   border-right: none;
 }
 
-.ratio-bar .ratio.cpu {
+.time-ratio .ratio-bar .ratio.cpu {
   background-color: #8b104e;
 }
 
-.ratio-bar .ratio.sql {
+.time-ratio .ratio-bar .ratio.sql {
   background-color: #104e8b;
 }
 
-.ratio-bar .ratio.api {
+.time-ratio .ratio-bar .ratio.api {
   background-color: #4e8b10;
 }
 
-.ratio-bar .ratio.other {
+.time-ratio .ratio-bar .ratio.other {
   background-color: #473C8B;
   width: 100%;
 }

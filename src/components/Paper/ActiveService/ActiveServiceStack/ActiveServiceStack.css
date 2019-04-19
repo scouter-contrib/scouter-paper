@@ -110,6 +110,5 @@
 }
 
 .stack-content div.stack-trace-content pre code {
-    font-family: 'Righteous', 'Nanum Gothic', cursive !important;
     line-height: 120%;
 }
