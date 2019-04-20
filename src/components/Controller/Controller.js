@@ -162,35 +162,51 @@ class Controller extends Component {
             selector: !this.state.preset ? false : this.state.preset
         });
     };
+
     getConfigServerName = (props) => {
-        const serverAddress = buildHttpProtocol(props.config);
-        const mapper = [];
-        if (serverAddress) {
-            const _promise = serverAddress.map(_get => {
-                    mapper.push({
-                        idx: _get.key,
-                        addr: _get.addr
-                    });
-                    return jQuery.ajax({
-                        method: "GET",
-                        url: `${_get.addr}/scouter/v1/info/server`,
-                        xhrFields: _get.authentification === "cookie",
-                        beforeSend: function (xhr) {
-                            const _tokenInfo = props.user[_get.addr];
-                            if (_get.authentication === "bearer" && _tokenInfo) {
-                                xhr.setRequestHeader('Authorization', ['bearer ', _tokenInfo.token].join(''));
-                            }
+        let allServerList = buildHttpProtocol(props.config);
+        let allCount = allServerList.length;
+        let doneCount = 0;
+        let serverNameMap = {};
+
+        if (allServerList) {
+            allServerList.forEach((server) => {
+                jQuery.ajax({
+                    method: "GET",
+                    async: true,
+                    url: `${server.addr}/scouter/v1/info/server`,
+                    xhrFields: server.authentification === "cookie",
+                    timeout: 3000,
+                    beforeSend: function (xhr) {
+                        const _tokenInfo = props.user[server.addr];
+                        if (server.authentication === "bearer" && _tokenInfo) {
+                            xhr.setRequestHeader('Authorization', ['bearer ', _tokenInfo.token].join(''));
                         }
-                    });
-                }
-            );
-            Promise.all(_promise).then((_serverInfo) => {
-                let _conf = _.clone(props.config);
-                _serverInfo.forEach((_res, idx) => {
-                    _conf.servers[idx].name = `${_res.result[0].name} (${mapper[idx].addr})`;
+                    }
+                }).done((msg) => {
+                    doneCount++;
+
+                    if (msg.result && msg.result.length > 0) {
+                        serverNameMap[server.key] = msg.result[0].name;
+                    } else {
+                        serverNameMap[server.key] = "";
+                    }
+                }).fail(() => {
+                    doneCount++;
+                    serverNameMap[server.key] = "FAILED TO GET NAME";
+                }).always(() => {
+                    if (doneCount >= allCount) {
+                        let _conf = _.clone(props.config);
+                        _conf.servers.forEach((server, idx) => {
+                            if (serverNameMap[idx]) {
+                                server.name = `${serverNameMap[idx]} (${server.name})`;
+                            }
+                        });
+                        props.setConfig(_conf);
+                    }
                 });
-                props.setConfig(_conf);
-            });
+
+            })
         }
     };
 
