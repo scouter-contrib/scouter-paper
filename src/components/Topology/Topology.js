@@ -1,23 +1,12 @@
 import React, {Component} from "react";
 import "./Topology.css";
 import {connect} from "react-redux";
-import {withRouter} from 'react-router-dom';
-import logo from '../../img/scouter.png';
-import logoBlack from '../../img/scouter_black.png';
-import {
-    addRequest,
-    pushMessage,
-    setControlVisibility,
-    setTopologyOption
-} from "../../actions";
+import {withRouter} from "react-router-dom";
+import logo from "../../img/scouter.png";
+import logoBlack from "../../img/scouter_black.png";
+import {addRequest, pushMessage, setControlVisibility, setTopologyOption} from "../../actions";
 import jQuery from "jquery";
-import {
-    errorHandler,
-    getHttpProtocol,
-    getWithCredentials,
-    setAuthHeader,
-    getCurrentUser
-} from "../../common/common";
+import {errorHandler, getCurrentUser, getHttpProtocol, getWithCredentials, setAuthHeader} from "../../common/common";
 import * as d3 from "d3";
 import _ from "lodash";
 import numeral from "numeral";
@@ -28,9 +17,9 @@ class Topology extends Component {
     serverCnt = 0;
     doneServerCnt = 0;
 
-    nodes= [];
-    topology=[];
-    links =[];
+    nodes = [];
+    topology = [];
+    links = [];
     linked = {};
 
     preNodeCount = 0;
@@ -103,17 +92,17 @@ class Topology extends Component {
     };
 
     objCountersCpuInfo = {
-        IN_DANGER : {
-            state : 'IN-DANGER',
-            color : '#fc2527',
+        IN_DANGER: {
+            state: 'IN-DANGER',
+            color: '#fc2527',
         },
-        WARNING : {
-            state : 'WARNING',
-            color : '#ffd259'
+        WARNING: {
+            state: 'WARNING',
+            color: '#ffd259'
         },
-        DEFAULT : {
-            state : 'DEFAULT',
-            color : '#ffffff'
+        DEFAULT: {
+            state: 'DEFAULT',
+            color: '#ffffff'
         }
     };
 
@@ -137,21 +126,7 @@ class Topology extends Component {
         }
     }
 
-    componentDidUpdate(prevProps, prevState) {
-        /*if (this.topology && this.topology.length > 0) {
-            this.update();
-        }
-        */
-    }
-
-
     componentWillReceiveProps(nextProps) {
-        /*if (!this.polling) {
-            this.polling = setInterval(() => {
-                this.getTopology(nextProps.config, nextProps.filterMap, nextProps.user);
-            }, this.interval);
-        }
-        */
 
         if (JSON.stringify(this.props.config) !== JSON.stringify(nextProps.config)) {
             this.getAllInstanceInfo(nextProps.config);
@@ -202,12 +177,14 @@ class Topology extends Component {
                     d.fixed = true;
                     d.fx = d.x;
                     d.fy = d.y;
-                })
+                });
+
+                this.memorizeAll(this.node);
             }
         }
 
         if (this.props.topologyOption.redLine !== nextProps.topologyOption.redLine) {
-            this.edgeFlowPath.attr("class", function(d) {
+            this.edgeFlowPath.attr("class", function (d) {
                 if (nextProps.topologyOption.redLine) {
                     if (d.errorCount > 0) {
                         return 'edge-flow-path error';
@@ -480,7 +457,7 @@ class Topology extends Component {
                                     toObjName: d.toObjTypeName,
                                     toObjTypeFamily: d.toObjTypeFamily,
                                     toObjCategory: d.toObjCategory,
-                                    toObjCountersCpu : d.toObjCountersCpu,
+                                    toObjCountersCpu: d.toObjCountersCpu,
                                     count: Number(d.count),
                                     errorCount: Number(d.errorCount),
                                     period: Number(d.period),
@@ -523,7 +500,7 @@ class Topology extends Component {
                                 toObjName: d.toObjName,
                                 toObjTypeFamily: d.toObjTypeFamily,
                                 toObjCategory: d.toObjCategory,
-                                toObjCountersCpu : d.toObjCountersCpu,
+                                toObjCountersCpu: d.toObjCountersCpu,
                                 count: Number(d.count),
                                 errorCount: Number(d.errorCount),
                                 period: Number(d.period),
@@ -576,7 +553,7 @@ class Topology extends Component {
                             objName: d.toObjName,
                             objCategory: d.toObjCategory ? d.toObjCategory : "",
                             objTypeFamily: d.toObjTypeFamily ? d.toObjTypeFamily : "",
-                            objCountersCpu : d.toObjCountersCpu ? d.toObjCountersCpu.value : ""
+                            objCountersCpu: d.toObjCountersCpu ? d.toObjCountersCpu.value : ""
                         }
                     })), (d) => {
                         return d.id;
@@ -599,16 +576,16 @@ class Topology extends Component {
                     this.linked = linked;
 
                     /*this.setState({
-                        list: msg.result
-                    });*/
+                     list: msg.result
+                     });*/
 
                     this.setState({
                         lastUpdateTime: (new Date()).getTime()
                     });
 
                     this.props.setTopologyOption({
-                        nodeCount : this.nodes.length,
-                        linkCount : this.links.length
+                        nodeCount: this.nodes.length,
+                        linkCount: this.links.length
                     });
 
                     this.update(this.props.topologyOption.pin, this.props.topologyOption.tpsToLineSpeed, this.props.topologyOption.speedLevel);
@@ -618,20 +595,19 @@ class Topology extends Component {
                 errorHandler(xhr, textStatus, errorThrown, this.props, "getTopology", true);
             });
         } else {
-            this.nodes= [];
-            this.topology=[];
-            this.links =[];
+            this.nodes = [];
+            this.topology = [];
+            this.links = [];
             this.linked = {};
 
             this.props.setTopologyOption({
-                nodeCount : 0,
-                linkCount : 0
+                nodeCount: 0,
+                linkCount: 0
             });
 
             this.update(this.props.topologyOption.pin);
         }
     };
-
 
 
     mergeLink = (currentLinks, newLinks) => {
@@ -647,8 +623,8 @@ class Topology extends Component {
             }
 
             linkMap[id] = {
-                update : false,
-                link : link
+                update: false,
+                link: link
             };
         });
 
@@ -663,8 +639,8 @@ class Topology extends Component {
                 linkMap[id].link.totalElapsed = link.totalElapsed;
             } else {
                 linkMap[id] = {
-                    update : true,
-                    link : link
+                    update: true,
+                    link: link
                 };
             }
         });
@@ -689,8 +665,8 @@ class Topology extends Component {
 
         currentNodes.forEach((node) => {
             nodeMap[node.id] = {
-                update : false,
-                node : node
+                update: false,
+                node: node
             };
         });
 
@@ -704,8 +680,8 @@ class Topology extends Component {
                 nodeMap[node.id].node.instanceCount = node.instanceCount;
             } else {
                 nodeMap[node.id] = {
-                    update : true,
-                    node : node
+                    update: true,
+                    node: node
                 };
             }
         });
@@ -749,6 +725,9 @@ class Topology extends Component {
                 d.fx = null;
                 d.fy = null;
             }
+        } else {
+            //this.memorizeNode(d); // 성능은 1개씩 저장하는 것이 맞지만, 구 버전 클라이언트에서 이미 PIN되어 있는데 저장 정보가 없다면, PIN 토글 전까지 노드 한개 정보만 변경되고, 나머지는 떠다니게 되므로, 하위 호환성 측면에서 전체를 저장
+            this.memorizeAll(this.node);
         }
     };
 
@@ -763,8 +742,8 @@ class Topology extends Component {
     getCountersCpuInfo = (cpu) => {
         cpu = Number(cpu);
 
-        if(cpu >= 90) return this.objCountersCpuInfo['IN_DANGER'];
-        else if(cpu >= 70) return this.objCountersCpuInfo['WARNING'];
+        if (cpu >= 90) return this.objCountersCpuInfo['IN_DANGER'];
+        else if (cpu >= 70) return this.objCountersCpuInfo['WARNING'];
 
         return this.objCountersCpuInfo['DEFAULT'];
     };
@@ -781,7 +760,7 @@ class Topology extends Component {
         let dry = dr;
         let xRotation = 0;
         let largeArc = 0;
-        if(d.sweep === undefined) {
+        if (d.sweep === undefined) {
             d.sweep = true;
         }
         let sweep = d.sweep ? 1 : 0;
@@ -801,7 +780,7 @@ class Topology extends Component {
         this.svg.attr("transform", d3.event.transform);
     };
 
-    nodeTypeHover = (d, o)=> {
+    nodeTypeHover = (d, o) => {
         if (o.id === d.id) {
             return 1.0;
         }
@@ -813,7 +792,7 @@ class Topology extends Component {
         return 0.4;
     };
 
-    linkTypeHover = (d, o)=> {
+    linkTypeHover = (d, o) => {
         if (d.id === o.source.id || d.id === o.target.id) {
             return 1;
         } else {
@@ -901,18 +880,60 @@ class Topology extends Component {
         }
     };
 
-    memorize = (d)=> {
-        localStorage.setItem(d.id+"-x", d.x);
-        localStorage.setItem(d.id+"-y", d.y);
+    memorizeAll = (nodes) => {
+        let storageTopologyPosition = localStorage.getItem("topologyPosition");
+        let topologyPosition = {};
+
+        if (storageTopologyPosition) {
+            topologyPosition = JSON.parse(storageTopologyPosition);
+        }
+
+        nodes.each((d) => {
+            topologyPosition[d.id] = {
+                x: d.x,
+                y: d.y
+            }
+        });
+
+        localStorage.setItem("topologyPosition", JSON.stringify(topologyPosition));
     };
 
-    getX = (d)=> {
-        return Number(localStorage.getItem(d.id+"-x"));
+    memorizeNode = (node) => {
+        let storageTopologyPosition = localStorage.getItem("topologyPosition");
+        let topologyPosition = {};
+
+        if (storageTopologyPosition) {
+            topologyPosition = JSON.parse(storageTopologyPosition);
+        }
+
+        topologyPosition[node.id] = {
+            x: node.x,
+            y: node.y
+        };
+
+        localStorage.setItem("topologyPosition", JSON.stringify(topologyPosition));
+
     };
 
-    getY = (d)=> {
-        return Number(localStorage.getItem(d.id+"-y"));
+    getNodePosition = () => {
+        let storageTopologyPosition = localStorage.getItem("topologyPosition");
+        let topologyPosition = {};
+
+        if (storageTopologyPosition) {
+            topologyPosition = JSON.parse(storageTopologyPosition);
+        }
+
+        return topologyPosition;
     };
+
+    getX = (d) => {
+        return Number(localStorage.getItem(d.id + "-x"));
+    };
+
+    getY = (d) => {
+        return Number(localStorage.getItem(d.id + "-y"));
+    };
+
     update = (pin, tpsToLineSpeed, speedLevel) => {
         let that = this;
 
@@ -924,7 +945,8 @@ class Topology extends Component {
         let links = this.links;
 
         if (!this.svg) {
-            this.svg = d3.select(this.refs.topologyChart).append("svg").attr("width", this.width).attr("height", this.height).append("g");;
+            this.svg = d3.select(this.refs.topologyChart).append("svg").attr("width", this.width).attr("height", this.height).append("g");
+            ;
 
             this.edgePathGroup = this.svg.append("g").attr("class", "edge-path-group");
             this.edgeTextGroup = this.svg.append("g").attr("class", "edge-text-group");
@@ -1043,7 +1065,7 @@ class Topology extends Component {
             .style("stroke", (d) => that.getCatgegoryInfo(d.objCategory).color);
 
         this.node.call(d3.drag().on("start", this.dragstarted).on("drag", this.dragged).on("end", this.dragended));
-        this.node.on("mouseover",that.hover);
+        this.node.on("mouseover", that.hover);
         this.node.on("mouseout", that.leave);
 
         // 노드 라벨
@@ -1069,7 +1091,7 @@ class Topology extends Component {
         }).text(function (d) {
             return that.getCatgegoryInfo(d.objCategory).text;
         }).call(d3.drag().on("start", this.dragstarted).on("drag", this.dragged).on("end", this.dragended));
-        this.nodeIcon.on("mouseover",that.hover);
+        this.nodeIcon.on("mouseover", that.hover);
         this.nodeIcon.on("mouseout", that.leave);
 
         this.simulation.nodes(nodes).on("tick", this.ticked);
@@ -1086,17 +1108,21 @@ class Topology extends Component {
         }
 
         if (pin) {
+            let topologyPosition = this.getNodePosition();
             this.node.each((d) => {
-                d.fixed = true;
-                d.fx = this.getX(d);
-                d.fy = this.getY(d);
-            });
-        } else {
-            this.node.each((d) => {
-                d.x = this.getX(d);
-                d.y = this.getY(d);
-            })
 
+                let pos = topologyPosition[d.id];
+                if (pos) {
+                    d.fixed = true;
+                    d.fx = topologyPosition[d.id].x;
+                    d.fy = topologyPosition[d.id].y;
+                } else {
+                    d.fixed = true;
+                    d.fx = null;
+                    d.fy = null;
+                }
+
+            });
         }
         this.preNodeCount = nodes.length;
     };
@@ -1109,10 +1135,10 @@ class Topology extends Component {
     };
 
     calcEdgeTextDy = (d) => {
-        if(d.sweep === undefined) {
+        if (d.sweep === undefined) {
             d.sweep = true;
         }
-        if(!d.sweep) {
+        if (!d.sweep) {
             return 15;
         } else {
             return -10;
@@ -1124,7 +1150,6 @@ class Topology extends Component {
         let that = this;
         // 노드 위치
         this.node.attr("cx", function (d) {
-            that.memorize(d);
             return d.x;
 
         }).attr("cy", function (d) {
@@ -1197,7 +1222,7 @@ let mapStateToProps = (state) => {
         template: state.template,
         range: state.range,
         counterInfo: state.counterInfo,
-        supported : state.supported,
+        supported: state.supported,
         filterMap: state.target.filterMap,
         topologyOption: state.topologyOption
     };
