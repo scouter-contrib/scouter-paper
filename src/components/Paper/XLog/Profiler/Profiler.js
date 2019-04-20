@@ -318,8 +318,9 @@ class Profiler extends Component {
             let list = msg.result;
 
             if (list && list.length > 0) {
-
+                
                 let objectMap = {};
+                let xlogSet = new Set();
                 for (let i = 0; i < this.props.objects.length; i++) {
                     objectMap[this.props.objects[i].objHash] = this.props.objects[i].objName;
                 }
@@ -335,6 +336,9 @@ class Profiler extends Component {
                 }
 
                 if (xlogs && xlogs.length > 0) {
+                    //혹시 중복들어올지 모르니 제거
+                    xlogs.forEach(data => xlogSet.add(data));
+                    Object.assign(xlogs, xlogSet);
                     this.setState({
                         show: true,
                         xlogs: xlogs,
