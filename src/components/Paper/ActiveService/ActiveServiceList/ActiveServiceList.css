@@ -1,0 +1,90 @@
+.active-service-list {
+    width: 100%;
+    display: table;
+    text-align: left;
+}
+
+.active-service-list > div.row {
+    display: table-row;
+    cursor: pointer;
+}
+
+.active-service-list > div.row.selected {
+    background-color: #26466d;
+    color: white;
+}
+
+.active-service-list > div.row.async {
+    color: #AAAAAA;
+}
+
+.active-service-list > div.row.error {
+    color: #FF030D;
+}
+
+.active-service-list > div.row.error.async {
+    color: #FF8787;
+}
+
+.active-service-list > div.row.active {
+    background-color: #26466d;
+    color: white;
+}
+
+.active-service-list > div.row.error.active {
+    color: #FF82AB;
+}
+
+.active-service-list > div:hover {
+    background-color: rgba(0, 0, 0, 0.1);
+}
+
+.active-service-list > div.header.row {
+    background-color: #F2F2F2;
+
+}
+
+.active-service-list > div:first-child > span {
+    border-top: 1px solid #CCC;
+}
+
+.active-service-list > div.header:first-child > span {
+    border-top: none;
+}
+
+.active-service-list > div > span {
+    display: table-cell;
+    line-height: 100%;
+    vertical-align: middle;
+    white-space: nowrap;
+    padding: 10px;
+    border-bottom: 1px solid #CCC;
+}
+
+.active-service-list > div > span.short {
+
+}
+
+.active-service-list > div > span.medium {
+    color: #EE7600;
+}
+
+.active-service-list > div > span.long {
+    color: #FF5721;
+}
+
+.active-service-list > div.header > span {
+    border-bottom: none;
+}
+
+.active-service-list > div > span.apicallCount,
+.active-service-list > div > span.apicallTime,
+.active-service-list > div > span.elapsed,
+.active-service-list > div > span.cpu,
+.active-service-list > div > span.queuingTime,
+.active-service-list > div > span.sqlCount,
+.active-service-list > div > span.sqlTime,
+.active-service-list > div > span.allocatedMemory,
+.active-service-list > div > span.hasDump {
+    text-align: right;
+}

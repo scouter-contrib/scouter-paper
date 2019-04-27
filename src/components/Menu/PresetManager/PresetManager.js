@@ -62,7 +62,7 @@ class PresetManager extends Component {
                 });
             }
         }).fail((xhr, textStatus, errorThrown) => {
-            errorHandler(xhr, textStatus, errorThrown, this.props);
+            errorHandler(xhr, textStatus, errorThrown, this.props, "savePreset", true);
         }).always(() => {
             this.setState({
                 loading : false
@@ -97,7 +97,7 @@ class PresetManager extends Component {
                 }
             }
         }).fail((xhr, textStatus, errorThrown) => {
-            errorHandler(xhr, textStatus, errorThrown, this.props);
+            errorHandler(xhr, textStatus, errorThrown, this.props, "loadPresets", true);
         }).always(() => {
             this.setState({
                 loading : false
@@ -151,6 +151,7 @@ class PresetManager extends Component {
                     this.props.setPresetName(preset.name);
                     this.props.applyPreset(preset);
                     this.props.closeSelectorPopup();
+                    localStorage.setItem("selectedObjects", JSON.stringify(preset));
                     /*
                     this.props.togglePresetManager();
 

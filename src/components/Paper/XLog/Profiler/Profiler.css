@@ -1,6 +1,6 @@
 .xlog-profiler {
     position: fixed;
-    background-color: rgba(0, 0, 0, 0.3);
+    background-color: rgba(0, 0, 0, 0.6);
     color: #333;
     top: 0;
     left: 0;
@@ -70,33 +70,15 @@
 }
 
 .xlog-profiler .profiler-layout {
-    height: calc(100% - 30px);
+    height: 100%;
     box-sizing: border-box;
-    display: inline-block;
     padding: 0;
-    float: left;
-    -webkit-transition: width 0.3s; /* Safari */
-    transition: width 0.3s;
-}
-
-.xlog-profiler .left {
-    width: 40%;
-    border-right: 4px solid #207ce5;
-    _border-right: 4px solid white;
-    border-right: 1px solid #333;
-    border-radius: 2px 0 0 0;
 }
 
 .xlog-profiler .right .close-btn,
 .xlog-profiler .left .close-btn {
-    display: none;
-}
 
-.xlog-profiler .right {
-    width: 60%;
-    border-radius: 0 2px 0 0;
 }
-
 
 .xlog-profiler.param-mode .right {
     width: 100%;
@@ -127,7 +109,7 @@
     font-size: 8px;
     margin-left: 5px;
     padding: 3px 4px;
-    background-color: rgba(0,0,0,0.2);
+    background-color: rgba(0, 0, 0, 0.2);
     border-radius: 2px;
     cursor: pointer;
 }
@@ -143,42 +125,6 @@
 
 .xlog-profiler .profiler-layout.right .summary .list-summary {
     display: inline-block;
-}
-
-.xlog-profiler .size-control-btns {
-    background-color: #333;
-    padding: 5px 8px;
-    width: 100%;
-    box-sizing: border-box;
-    height: 30px;
-    position: relative;
-}
-
-.xlog-profiler .size-control-btns .close-btn {
-    position: absolute;
-    top : 5px;
-    right : 5px;
-}
-
-.xlog-profiler .size-control-btns > button {
-    background-color: rgba(0, 0, 0, 0.3);
-    width: 20px;
-    height: 20px;
-    border-radius: 50%;
-    color: white;
-    padding: 0;
-    margin: 0 2px 0 0;
-    font-size: 12px;
-    text-align: center;
-    position: relative;
-}
-
-.xlog-profiler .size-control-btns > button:last-child {
-    margin-right: 0;
-}
-
-.xlog-profiler .size-control-btns > button:hover {
-    background-color: rgba(0, 0, 0, 0.5);
 }
 
 .xlog-profiler .profiler-layout.right .summary {
@@ -226,13 +172,12 @@
 }
 
 .xlog-profiler .profile-steps-control .profile-control-btn:hover {
-    background-color: rgba(0,0,0,0.2);
+    background-color: rgba(0, 0, 0, 0.2);
 }
 
 .xlog-profiler .profile-steps-control .profile-control-btn.active:hover {
     background-color: #EEC900;
 }
-
 
 .xlog-profiler .profile-steps-content {
     overflow-y: scroll;
@@ -325,3 +270,12 @@
     }
 
 }
+
+.xlog-profiler .splitter-layout > .layout-splitter {
+    background-color: #FFE600;
+}
+
+.xlog-profiler .splitter-layout > .layout-splitter:hover {
+    background-color: #EEC900;
+}
+

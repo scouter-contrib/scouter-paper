@@ -2,6 +2,7 @@ import React, {Component} from 'react';
 import './ActiveSpeed.css';
 import {connect} from 'react-redux';
 import {withRouter} from 'react-router-dom';
+import {setActiveServiceList} from "../../../actions";
 
 class ActiveSpeed extends Component {
 
@@ -33,12 +34,15 @@ class ActiveSpeed extends Component {
     stopProgation = (e) => {
         e.stopPropagation();
     };
-
+    onClickActiveSpeed = (obj) => {
+        this.props.setActiveServiceList({
+            objHash : obj.objHash,
+            objName : obj.objName
+        })
+    }
     render() {
-
         let maxValue = this.props.box.values["maxValue"];
         let singleLine = this.props.box.values["singleLine"];
-
         return (
             <div className="active-speed-wrapper">
                 <div className="active-speed-content">
@@ -93,7 +97,7 @@ class ActiveSpeed extends Component {
 
                     let showCnt = this.props.box.values["showCnt"];
 
-                    return <div className={"row " + (singleLine ? "single-line" : "")} key={i}>
+                    return <div className={"row " + (singleLine ? "single-line" : "")} key={i} style={{cursor : 'pointer'}} onClick={()=> this.onClickActiveSpeed(d) } >
                         <div className="instance-info-div" style={{width : width}} title={d.objName}>
                             <div className="instance-name">{showCnt && <div className="bar-info"><span className="separator">[</span> <span className="long" title="LONG">{long}</span> <span className="medium" title="MEDIUM">{medium}</span> <span className="short" title="SHORT">{short}</span><span className="separtor"> ]</span></div>}{d.objName}</div>
                         </div>
@@ -119,6 +123,10 @@ let mapStateToProps = (state) => {
     };
 };
 
-
-ActiveSpeed = connect(mapStateToProps, undefined)(ActiveSpeed);
+let mapDispatchToProps = (dispatch) => {
+    return {
+        setActiveServiceList: (objectSel) => dispatch(setActiveServiceList(objectSel))
+    };
+};
+ActiveSpeed = connect(mapStateToProps, mapDispatchToProps)(ActiveSpeed);
 export default withRouter(ActiveSpeed);

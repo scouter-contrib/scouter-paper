@@ -22,12 +22,15 @@ import _ from "lodash";
 import moment from "moment";
 import copy from 'copy-to-clipboard';
 import {IdAbbr} from "../../../../common/idAbbr";
+import SplitterLayout from 'react-splitter-layout';
+import 'react-splitter-layout/lib/index.css';
 
 const xlogMaxSelectionCount = 200;
 
 class Profiler extends Component {
 
     txidInit = false;
+    layoutChangeTimer = null;
 
     constructor(props) {
         super(props);
@@ -65,11 +68,11 @@ class Profiler extends Component {
             bind: options.bind,
             wrap: options.wrap,
             formatter: options.formatter,
-            listWidth: 40,
             smallScreen: false,
             paramTxid: txid ? txid : null,
             paramTxidDate: txiddate ? txiddate : null,
-            copyBtnText: "COPY URL"
+            copyBtnText: "COPY URL",
+            rightWidth : 60
         };
     }
 
@@ -92,10 +95,6 @@ class Profiler extends Component {
     shouldComponentUpdate(nextProps, nextState) {
 
         if (JSON.stringify(nextProps.selection) !== JSON.stringify(this.props.selection)) {
-            return true;
-        }
-
-        if (this.state.listWidth !== nextState.listWidth) {
             return true;
         }
 
@@ -144,6 +143,10 @@ class Profiler extends Component {
         }
 
         if (nextState.copyBtnText !== this.state.copyBtnText) {
+            return true;
+        }
+
+        if (nextState.rightWidth !== this.state.rightWidth) {
             return true;
         }
 
@@ -293,6 +296,10 @@ class Profiler extends Component {
         filtered = filtered.filter((d) => {
             return filterMap[d.objHash];
         });
+        //- 필터링 되어 비어있는 영역의 xlog 부터 카운팅이 0 인경우 조회 하지 않고 리턴
+        if( filtered.length === 0 ){
+            return;
+        }
 
         let date = moment(new Date(x1)).format("YYYYMMDD");
 
@@ -342,7 +349,7 @@ class Profiler extends Component {
             }
 
         }).fail((xhr, textStatus, errorThrown) => {
-            errorHandler(xhr, textStatus, errorThrown, this.props);
+            errorHandler(xhr, textStatus, errorThrown, this.props, "getListData", true);
         }).always(() => {
             this.props.setControlVisibility("Loading", false);
         });
@@ -450,14 +457,14 @@ class Profiler extends Component {
                     });
 
                 }).fail((xhr, textStatus, errorThrown) => {
-                    errorHandler(xhr, textStatus, errorThrown, this.props);
+                    errorHandler(xhr, textStatus, errorThrown, this.props, "rowClick_1", true);
                 }).always(() => {
                     this.props.setControlVisibility("Loading", false);
                 });
             }
 
         }).fail((xhr, textStatus, errorThrown) => {
-            errorHandler(xhr, textStatus, errorThrown, this.props);
+            errorHandler(xhr, textStatus, errorThrown, this.props, "rowClick_2", true);
             this.props.setControlVisibility("Loading", false);
         }).always(() => {
             this.props.setControlVisibility("Loading", false);
@@ -507,38 +514,6 @@ class Profiler extends Component {
         this.setProfilerOptions("formatter", !this.state.formatter);
     };
 
-    changeListWidth = (e) => {
-        let listWidth = this.state.listWidth;
-
-        if (e === "min") {
-            listWidth = 0;
-        }
-
-        if (e === "max") {
-            listWidth = 100;
-        }
-
-        if (e === "small") {
-            listWidth -= 20;
-
-            if (listWidth < 0) {
-                listWidth = 0;
-            }
-        }
-
-        if (e === "big") {
-            listWidth += 20;
-
-            if (listWidth > 100) {
-                listWidth = 100;
-            }
-        }
-
-        this.setState({
-            listWidth: listWidth
-        });
-    };
-
     clearTxId = () => {
         this.setState({
             txid: null
@@ -559,89 +534,75 @@ class Profiler extends Component {
         }, 2000);
     };
 
-    render() {
+    onSecondaryPaneSizeChange = (d) => {
 
-        let leftStyle = {};
-        let rightStyle = {};
-        if (!this.state.paramTxid) {
-            if (this.state.smallScreen) {
-                if (this.state.txid) {
-                    leftStyle = {width: "100%", display: "none"};
-                    rightStyle = {width: "100%", display: "inline-block"};
-                } else {
-                    leftStyle = {width: "100%", display: "inline-block"};
-                    rightStyle = {width: "100%", display: "none"};
-                }
-            } else {
-                leftStyle = {
-                    width: this.state.listWidth + "%",
-                    display: this.state.listWidth === 0 ? "none" : "inline-block"
-                };
-                rightStyle = {
-                    width: (100 - this.state.listWidth) + "%",
-                    display: this.state.listWidth === 100 ? "none" : "inline-block"
-                }
-            }
+        if (this.layoutChangeTimer) {
+            clearTimeout(this.layoutChangeTimer);
+            this.layoutChangeTimer = null;
         }
+
+        this.layoutChangeTimer = setTimeout(() => {
+            this.setState({
+                rightWidth : d
+            });
+        }, 1000);
+    };
+
+    render() {
 
         return (
             <div
                 className={"xlog-profiler " + (this.state.paramTxid ? 'param-mode ' : ' ') + (this.state.show ? ' ' : 'hidden')}>
                 <div>
-                    <div className="size-control-btns">
-                        {!this.state.paramTxid && <button onClick={this.changeListWidth.bind(this, "min")}><i className="fa fa-angle-double-left"></i></button>}
-                        {!this.state.paramTxid && <button onClick={this.changeListWidth.bind(this, "small")}><i className="fa fa-angle-left"></i></button>}
-                        {!this.state.paramTxid && <button onClick={this.changeListWidth.bind(this, "big")}><i className="fa fa-angle-right"></i></button>}
-                        {!this.state.paramTxid && <button onClick={this.changeListWidth.bind(this, "max")}><i className="fa fa-angle-double-right"></i></button>}
-                        <div className="close-btn" onClick={this.close}></div>
-                    </div>
-                    {!this.state.paramTxid &&
-                    <div className="profiler-layout left" style={leftStyle}>
-                        <div className="summary">
-                            <div className="title">PROFILER</div>
-                            <div className="list-summary">{this.state.xlogs.length} ROWS</div>
-                            <div className="close-btn" onClick={this.close}></div>
-                        </div>
-                        <div className="profile-list scrollbar">
-                            <ProfileList txid={this.state.txid} xlogs={this.state.xlogs} rowClick={this.rowClick}/>
-                        </div>
-                    </div>
-                    }
-                    <div className="profiler-layout right" style={rightStyle}>
-                        <div className="summary">
-                            {(!this.state.paramTxid && this.state.smallScreen) &&
-                            <div onClick={this.clearTxId.bind(this)} className="profile-list-btn"><i className="fa fa-chevron-circle-left"></i></div>}
-                            {!this.state.txid && <div className="title">NO PROFILE SELECTED</div>}
-                            {this.state.txid && <div className="title">DETAIL <span className="selected-info">({this.state.txid ? 'TXID : ' + this.state.txid : 'NO PROFILE SELECTED'})</span>{this.state.txid ? <span className="copy-url-btn" onClick={this.copyUrl}>{this.state.copyBtnText}</span> : null}</div>}
-                            {!this.state.txid && this.state.paramTxid && <div className="title">DETAIL <span className="selected-info">({this.state.paramTxid ? 'TXID : ' + this.state.paramTxid : 'NO PROFILE SELECTED'})</span>{this.state.paramTxid ? <span className="copy-url-btn" onClick={this.copyUrl}>{this.state.copyBtnText}</span> : null}</div>}
-                            <div className="profile-steps-control noselect">
-                                <div className={"profile-control-btn " + (this.state.summary ? 'active' : '')} onClick={this.toggleSummary}>{this.state.summary ? <i className="fa fa-check-circle"></i> : <i className="fa fa-circle-o"></i>} SUMMARY</div>
-                                <div className={"profile-control-btn " + (this.state.narrow ? 'active' : '')} onClick={this.toggleNarrow}>{this.state.narrow ? <i className="fa fa-check-circle"></i> : <i className="fa fa-circle-o"></i>} NARROW</div>
-                                <div className={"profile-control-btn " + (this.state.bind ? 'active' : '')} onClick={this.toggleBind}>{this.state.bind ? <i className="fa fa-check-circle"></i> : <i className="fa fa-circle-o"></i>} BIND</div>
-                                <div className={"profile-control-btn " + (this.state.wrap ? 'active' : '')} onClick={this.toggleWrap}>{this.state.wrap ? <i className="fa fa-check-circle"></i> : <i className="fa fa-circle-o"></i>} WRAP</div>
-                                <div className={"profile-control-btn " + (this.state.formatter ? 'active' : '')} onClick={this.toggleFormatter}>{this.state.formatter ? <i className="fa fa-check-circle"></i> : <i className="fa fa-circle-o"></i>} FORMATTER</div>
+                    <SplitterLayout percentage={true} primaryMinSize={20} secondaryMinSize={20} secondaryInitialSize={60} vertical={this.state.smallScreen} onSecondaryPaneSizeChange={this.onSecondaryPaneSizeChange}>
+                        {!this.state.paramTxid &&
+                        <div className="profiler-layout left">
+                            <div className="summary">
+                                <div className="title">PROFILER</div>
+                                <div className="list-summary">{this.state.xlogs.length} ROWS</div>
+                                {this.state.smallScreen && <div className="close-btn" onClick={this.close}></div>}
                             </div>
-                            <div className="close-btn" onClick={this.close}></div>
-                        </div>
-                        <div className={"profile-steps " + (this.state.narrow ? 'narrow' : '')}>
-                            <div className="profile-steps-content scrollbar">
-                                {(this.state.paramTxid || this.state.txid) &&
-                                <FrameProfile rowClick={this.rowClick} txid={this.state.txid}
-                                               profile={this.state.profile} steps={this.state.steps}
-                                               summary={this.state.summary} narrow={this.state.narrow}
-                                               bind={this.state.bind} wrap={this.state.wrap}
-                                               formatter={this.state.formatter}
-                                               toggleFormatter={this.toggleFormatter}
-                                               toggleBind={this.toggleBind}
-                                               toggleWrap={this.toggleWrap}
-                                               listWidth={this.state.listWidth} />
-                                }
-                                {(!this.state.paramTxid && !this.state.txid) && <div className="no-profile">
-                                    <div>NO PROFILE SELECTED</div>
-                                </div>}
+                            <div className="profile-list scrollbar">
+                                <ProfileList txid={this.state.txid} xlogs={this.state.xlogs} rowClick={this.rowClick}/>
                             </div>
                         </div>
-                    </div>
+                        }
+                        <div className="profiler-layout right">
+                            <div className="summary">
+                                {(!this.state.paramTxid && this.state.smallScreen) &&
+                                <div onClick={this.clearTxId.bind(this)} className="profile-list-btn"><i className="fa fa-chevron-circle-left"></i></div>}
+                                {!this.state.txid && <div className="title">NO PROFILE SELECTED</div>}
+                                {this.state.txid && <div className="title">DETAIL <span className="selected-info">({this.state.txid ? 'TXID : ' + this.state.txid : 'NO PROFILE SELECTED'})</span>{this.state.txid ? <span className="copy-url-btn" onClick={this.copyUrl}>{this.state.copyBtnText}</span> : null}</div>}
+                                {!this.state.txid && this.state.paramTxid && <div className="title">DETAIL <span className="selected-info">({this.state.paramTxid ? 'TXID : ' + this.state.paramTxid : 'NO PROFILE SELECTED'})</span>{this.state.paramTxid ? <span className="copy-url-btn" onClick={this.copyUrl}>{this.state.copyBtnText}</span> : null}</div>}
+                                <div className="profile-steps-control noselect">
+                                    <div className={"profile-control-btn " + (this.state.summary ? 'active' : '')} onClick={this.toggleSummary}>{this.state.summary ? <i className="fa fa-check-circle"></i> : <i className="fa fa-circle-o"></i>} SUMMARY</div>
+                                    <div className={"profile-control-btn " + (this.state.narrow ? 'active' : '')} onClick={this.toggleNarrow}>{this.state.narrow ? <i className="fa fa-check-circle"></i> : <i className="fa fa-circle-o"></i>} NARROW</div>
+                                    <div className={"profile-control-btn " + (this.state.bind ? 'active' : '')} onClick={this.toggleBind}>{this.state.bind ? <i className="fa fa-check-circle"></i> : <i className="fa fa-circle-o"></i>} BIND</div>
+                                    <div className={"profile-control-btn " + (this.state.wrap ? 'active' : '')} onClick={this.toggleWrap}>{this.state.wrap ? <i className="fa fa-check-circle"></i> : <i className="fa fa-circle-o"></i>} WRAP</div>
+                                    <div className={"profile-control-btn " + (this.state.formatter ? 'active' : '')} onClick={this.toggleFormatter}>{this.state.formatter ? <i className="fa fa-check-circle"></i> : <i className="fa fa-circle-o"></i>} FORMATTER</div>
+                                </div>
+                                {!this.state.smallScreen && <div className="close-btn" onClick={this.close}></div>}
+                            </div>
+                            <div className={"profile-steps " + (this.state.narrow ? 'narrow' : '')}>
+                                <div className="profile-steps-content scrollbar">
+                                    {(this.state.paramTxid || this.state.txid) &&
+                                    <FrameProfile rowClick={this.rowClick} txid={this.state.txid}
+                                                  profile={this.state.profile} steps={this.state.steps}
+                                                  summary={this.state.summary} narrow={this.state.narrow}
+                                                  bind={this.state.bind} wrap={this.state.wrap}
+                                                  formatter={this.state.formatter}
+                                                  toggleFormatter={this.toggleFormatter}
+                                                  toggleBind={this.toggleBind}
+                                                  toggleWrap={this.toggleWrap}
+                                                  rightWidth={this.state.rightWidth} />
+                                    }
+                                    {(!this.state.paramTxid && !this.state.txid) && <div className="no-profile">
+                                        <div>NO PROFILE SELECTED</div>
+                                    </div>}
+                                </div>
+                            </div>
+                        </div>
+                    </SplitterLayout>
                 </div>
             </div>
         );

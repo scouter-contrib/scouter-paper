@@ -160,17 +160,19 @@ class XLog extends Component {
         }
 
         this.resizeTimer = setTimeout(() => {
-            let box = this.refs.xlogViewer.parentNode.parentNode.parentNode;
+            if (this.refs.xlogViewer) {
+                let box = this.refs.xlogViewer.parentNode.parentNode.parentNode;
 
-            let currentWidth = 0;
-            if (this.props.box.values.showPreview === "Y") {
-                currentWidth = box.offsetWidth - this.graph.margin.left - this.graph.preview.width;
-            } else {
-                currentWidth = box.offsetWidth - this.graph.margin.left - this.graph.margin.right;
-            }
+                let currentWidth = 0;
+                if (this.props.box.values.showPreview === "Y") {
+                    currentWidth = box.offsetWidth - this.graph.margin.left - this.graph.preview.width;
+                } else {
+                    currentWidth = box.offsetWidth - this.graph.margin.left - this.graph.margin.right;
+                }
 
-            if ((currentWidth !== this.graph.width) || (this.graph.height !== box.offsetHeight - this.graph.margin.top - this.graph.margin.bottom - 27)) {
-                this.graphInit();
+                if ((currentWidth !== this.graph.width) || (this.graph.height !== box.offsetHeight - this.graph.margin.top - this.graph.margin.bottom - 27)) {
+                    this.graphInit();
+                }
             }
         }, 300);
     };
@@ -486,6 +488,7 @@ class XLog extends Component {
         this.setState({
             elapsed: yValue
         });
+        this.updateURLSearchParams('xlogElapsedTime', yValue);
     };
 
     axisDown = () => {
@@ -494,15 +497,25 @@ class XLog extends Component {
         this.setState({
             elapsed: yValue
         });
+        this.updateURLSearchParams('xlogElapsedTime', yValue);
     };
 
-    stopProgation = (e) => {
+    updateURLSearchParams = (name, value) => {
+        let search = new URLSearchParams(this.props.location.search);
+        search.set(name, value);
+        this.props.history.replace({
+            pathname: this.props.location.pathname,
+            search: "?" + search.toString()
+        });
+    };
+
+    stopPropagation = (e) => {
         e.stopPropagation();
     };
 
     render() {
         return (
-            <div className="xlog-viewer" ref="xlogViewer" onTouchStart={this.stopProgation} onMouseDown={this.stopProgation}>
+            <div className="xlog-viewer" ref="xlogViewer" onTouchStart={this.stopPropagation} onMouseDown={this.stopPropagation}>
                 {(this.props.longTerm) && <div className="no-longterm-support"><div><div>LONGTERM NOT SUPPORTED</div></div></div>}
                 {(this.props.xlogNotSupportedInRange) && <div className="no-longterm-support"><div><div>XLOG NOT SUPPORTED in this range</div></div></div>}
                 {this.props.xlogHistoryDoing &&
@@ -513,8 +526,8 @@ class XLog extends Component {
                     </div>
                 </div>
                 }
-                <div className="axis-button axis-up noselect" onClick={this.axisUp} onMouseDown={this.stopProgation}>+</div>
-                <div className="axis-button axis-down noselect" onClick={this.axisDown} onMouseDown={this.stopProgation}>-</div>
+                <div className="axis-button axis-up noselect" onClick={this.axisUp} onMouseDown={this.stopPropagation}>+</div>
+                <div className="axis-button axis-down noselect" onClick={this.axisDown} onMouseDown={this.stopPropagation}>-</div>
                 {this.props.box.values.showPreview === "Y" &&
                 <XLogPreviewer secondStepTimestamp={this.props.data.secondStepTimestamp} secondStepXlogs={this.props.data.secondStepXlogs} width={this.graph.preview.width} margin={this.graph.margin} maxElapsed={this.state.elapsed}/>
                 }
