@@ -1141,6 +1141,7 @@ let mapStateToProps = (state) => {
         layouts: state.paper.layouts,
         layoutChangeTime: state.paper.layoutChangeTime,
         topologyOption: state.topologyOption
+        presetName: state.presetName
     };
 };
 

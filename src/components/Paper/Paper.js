@@ -3,7 +3,7 @@ import "./Paper.css";
 import "./Resizable.css";
 import {connect} from "react-redux";
 import {withRouter} from "react-router-dom";
-import {addRequest, pushMessage, setBoxes, setBoxesLayouts, setLayoutChangeTime, setControlVisibility, setLayouts, setRangeDateHoursMinutesValue, setRealTime, setTemplate, setBreakpoint} from "../../actions";
+import {addRequest, pushMessage, setBoxes, setBoxesLayouts, setLayoutChangeTime, setControlVisibility, setLayouts, setRangeDateHoursMinutesValue, setRealTime, setTemplate, setBreakpoint, setTemplateName} from "../../actions";
 import {Responsive, WidthProvider} from "react-grid-layout";
 import {Box, BoxConfig, XLogFilter} from "../../components";
 import jQuery from "jquery";
@@ -48,7 +48,7 @@ class Paper extends Component {
 
         let layouts = getData("layouts");
         let boxes = getData("boxes");
-
+      
         // xs와 xxs를 제거하면서, 기존에 저장된 데이터 warning 로그가 생성되어, lg, md 이외의 정보 삭제
         if (layouts) {
             for (let breakpoint in layouts) {
@@ -1492,7 +1492,8 @@ let mapDispatchToProps = (dispatch) => {
         setLayouts: (layouts) => dispatch(setLayouts(layouts)),
         setBoxesLayouts: (boxes, layouts) => dispatch(setBoxesLayouts(boxes, layouts)),
         setLayoutChangeTime: () => dispatch(setLayoutChangeTime()),
-        setBreakpoint: (breakpoint) => dispatch(setBreakpoint(breakpoint))
+        setBreakpoint: (breakpoint) => dispatch(setBreakpoint(breakpoint)),
+        setTemplateName: (preset, layout) => dispatch(setTemplateName(preset, layout))
     };
 };
 

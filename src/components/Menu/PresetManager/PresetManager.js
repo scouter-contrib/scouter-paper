@@ -1,6 +1,7 @@
 import React, {Component} from 'react';
 import './PresetManager.css';
-import {setControlVisibility, pushMessage} from '../../../actions';
+import {getData, setData} from '../../../common/common';
+import {setControlVisibility, pushMessage, setPresetName} from '../../../actions';
 import {connect} from 'react-redux';
 import {withRouter} from 'react-router-dom';
 import 'url-search-params-polyfill';
@@ -146,6 +147,8 @@ class PresetManager extends Component {
                 let preset = this.state.presets[i];
 
                 if (preset.no === this.state.selectedPresetNo) {
+                    setData("templateName", Object.assign({}, getData("templateName"), {preset: preset.name}));
+                    this.props.setPresetName(preset.name);
                     this.props.applyPreset(preset);
                     this.props.closeSelectorPopup();
                     localStorage.setItem("selectedObjects", JSON.stringify(preset));
@@ -304,6 +307,10 @@ let mapDispatchToProps = (dispatch) => {
     return {
         setControlVisibility: (name, value) => dispatch(setControlVisibility(name, value)),
         pushMessage: (category, title, content) => dispatch(pushMessage(category, title, content)),
+        setPresetName: (preset) => {
+            localStorage.setItem("preset", JSON.stringify(preset));
+            return dispatch(setPresetName(preset));
+        }
     };
 };
 
