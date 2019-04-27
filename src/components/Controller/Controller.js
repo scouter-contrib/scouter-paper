@@ -1140,7 +1140,7 @@ let mapStateToProps = (state) => {
         boxes: state.paper.boxes,
         layouts: state.paper.layouts,
         layoutChangeTime: state.paper.layoutChangeTime,
-        topologyOption: state.topologyOption
+        topologyOption: state.topologyOption,
         presetName: state.presetName
     };
 };
