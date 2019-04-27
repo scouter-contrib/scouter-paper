@@ -27,7 +27,7 @@ export const profileMetas = [
         key: "elapsed",
         name: "Elapsed",
         type: "ms",
-        show: false
+        show: true
     },
     {
         key: "endTime",

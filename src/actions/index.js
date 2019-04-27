@@ -12,6 +12,8 @@ export const SET_SELECTION = 'SET_SELECTION';
 export const SET_TEMPLATE = 'SET_TEMPLATE';
 export const SET_REAL_TIME = 'SET_REAL_TIME';
 export const SET_REAL_TIME_VALUE = 'SET_REAL_TIME_VALUE';
+export const SET_FROM_PAST = 'SET_FROM_PAST';
+
 export const SET_RANGE_DATE = 'SET_RANGE_DATE';
 export const SET_RANGE_HOURS = 'SET_RANGE_HOURS';
 export const SET_RANGE_MINUTES = 'SET_RANGE_MINUTES';
@@ -191,6 +193,13 @@ export function setRealTimeValue(realTime, longTerm, value) {
         realTime : realTime,
         longTerm : longTerm,
         value : value
+    };
+}
+
+export function setFromPast(fromPast) {
+    return {
+        type: SET_FROM_PAST,
+        fromPast : fromPast
     };
 }
 
