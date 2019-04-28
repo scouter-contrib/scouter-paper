@@ -50,6 +50,10 @@ class TopologyControl extends Component {
     };
 
     changeDistance = (dir) => {
+        if (this.props.topologyOption.pin) {
+            return;
+        }
+
         let distance = this.props.topologyOption.distance;
         if (dir === "plus") {
             distance += 30;
@@ -139,11 +143,11 @@ class TopologyControl extends Component {
                             </div>
                         </div>
                         <div className="group">
-                            <div className="action-btn" onClick={this.changeDistance.bind(this, "minus")}>
+                            <div className={"action-btn " + (this.props.topologyOption.pin ? "disabled" : "")} onClick={this.changeDistance.bind(this, "minus")}>
                                 <span className="icon"><i className="fa fa-compress" aria-hidden="true"></i></span>
                                 <span className="text">DISTANCE-</span>
                             </div>
-                            <div className="action-btn" onClick={this.changeDistance.bind(this, "plus")}>
+                            <div className={"action-btn " + (this.props.topologyOption.pin ? "disabled" : "")} onClick={this.changeDistance.bind(this, "plus")}>
                                 <span className="icon"><i className="fa fa-expand" aria-hidden="true"></i></span>
                                 <span className="text">DISTANCE+</span>
                             </div>

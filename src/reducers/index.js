@@ -522,11 +522,11 @@ const supported = (state = supportedState, action) => {
 let topologyOptionState = {
     tpsToLineSpeed : true,
     speedLevel : "fast",
-    redLine : false,
+    redLine : true,
     highlight : true,
     distance : 300,
     zoom : false,
-    pin : true,
+    pin : false,
     lastUpdateTime : null,
     grouping : true,
     nodeCount : 0,
