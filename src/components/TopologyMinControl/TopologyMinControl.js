@@ -117,12 +117,12 @@ class TopologyMinControl extends Component {
                     </div>
                 </div>
                 <div className="row" data-tip="DISTANCE +">
-                    <div onClick={this.changeDistance.bind(this, "plus")} className="control-btn action-btn">
+                    <div onClick={this.changeDistance.bind(this, "plus")} className={"control-btn action-btn " + (this.props.topologyOption.pin ? "disabled" : "")}>
                         <div className="text"><span>+</span></div>
                     </div>
                 </div>
                 <div className="row" data-tip="DISTANCE -">
-                    <div onClick={this.changeDistance.bind(this, "minus")} className="control-btn action-btn">
+                    <div onClick={this.changeDistance.bind(this, "minus")} className={"control-btn action-btn " + (this.props.topologyOption.pin ? "disabled" : "")}>
                         <div className="text"><span>-</span></div>
                     </div>
                 </div>

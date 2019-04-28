@@ -46,6 +46,11 @@
     color: #333;
 }
 
+.topology-min-control .row .action-btn.disabled .text > span {
+    background-color: #AAA;
+    color: #777;
+}
+
 .topology-min-control .row .check-btn.selected .text > span {
     background-color: #FFCC11;
     color: #333;
