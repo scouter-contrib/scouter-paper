@@ -18,7 +18,6 @@ import OldVersion from "../OldVersion/OldVersion";
 const ResponsiveReactGridLayout = WidthProvider(Responsive);
 
 class Paper extends Component {
-    mountTime = null;
     dataRefreshTimer = null;
     xlogHistoryRequestTime = null;
     mounted = false;
@@ -42,7 +41,6 @@ class Paper extends Component {
 
     constructor(props) {
         super(props);
-        this.mountTime = (new Date()).getTime();
         this.counterHistoriesLoaded = {};
         this.counterReady = false;
 
@@ -546,7 +544,7 @@ class Paper extends Component {
                 let counterKey = counterHistoryKeys[i].key;
                 let familyName = counterHistoryKeys[i].familyName;
                 let now = (new Date()).getTime();
-                let startTime = (this.props.config.preload === "Y") ? from : this.mountTime;
+                let startTime = from;
                 let endTime = to;
                 let url;
 
