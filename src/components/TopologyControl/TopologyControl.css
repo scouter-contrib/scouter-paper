@@ -79,10 +79,19 @@
     margin-right: 5px;
 }
 
+.topology-option-control .controller .action-btn.disabled {
+    background-color: #AAA;
+    color: #777;
+}
+
 .topology-option-control .controller .action-btn:hover {
     background-color: #FFCC11;
     color: #333;
+}
 
+.topology-option-control .controller .action-btn.disabled:hover {
+    background-color: #AAA;
+    color: #777;
 }
 
 .topology-option-control .controller .radio-btn {

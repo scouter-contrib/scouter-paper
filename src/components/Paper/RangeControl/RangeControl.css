@@ -28,9 +28,106 @@
     font-size: 8px;
     display: block;
     margin-bottom: 5px;
+    position: relative;
 }
 
-.range-controls .time-type > div {
+.range-controls .time-type > .time-start-position {
+    display: inline-block;
+    height: 20px;
+    width: calc(100% - 160px);
+    width: 52px;
+    background-color: white;
+    position: absolute;
+    top: 0;
+    right: 0;
+    box-sizing: border-box;
+    border-radius: 3px;
+}
+
+.range-controls .time-start-position > div {
+    display: inline-block;
+    width: 50%;
+    height: 100%;
+    position: relative;
+    box-sizing: border-box;
+    cursor: pointer;
+    border: 1px solid rgba(0, 0, 0, 0.3);
+}
+
+.range-controls .time-start-position > div:hover {
+    background-color: #FFF6C7;
+}
+
+.range-controls .time-start-position > div.selected {
+    background-color: #FFCC11;
+    color: #333;
+}
+
+.range-controls .time-start-position > div.selected:hover {
+    background-color: #FFC125;
+}
+
+.range-controls .time-type .time-start-position .start-from-past {
+    border-radius: 3px 0 0 3px;
+    border-right: 1px solid rgba(0, 0, 0, 0.3);
+}
+
+.range-controls .time-type .time-start-position .start-from-current {
+    border-radius: 0 3px 3px 0;
+    border-left: none;
+}
+
+.range-controls .time-start-position .dot {
+    width: 5px;
+    height: 5px;
+    box-sizing: border-box;
+    border-radius: 50%;
+    background-color: #444;
+    position: absolute;
+    top: 7px;
+}
+
+.range-controls .time-start-position .start-from-past .dot {
+    left: 5px;
+}
+
+.range-controls .time-start-position .start-from-current .dot {
+    right: 5px;
+}
+
+.range-controls .time-start-position .line {
+    left: 5px;
+    right: 5px;
+    height: 1px;
+    background-color: #444;
+    position: absolute;
+    top: 9px;
+}
+
+.range-controls .time-start-position .arrow {
+    width: 4px;
+    height: 4px;
+    border-top: 1px solid #444;
+    border-right: 1px solid #444;
+    position: absolute;
+    top: 7px;
+}
+
+.range-controls .time-start-position .start-from-past .arrow {
+    right: 5px;
+    transform: rotate(45deg);
+}
+
+.range-controls .time-start-position .start-from-current .arrow {
+    left: 5px;
+    transform: rotate(225deg);
+}
+
+.range-controls .time-start-position .start-from-current {
+    height: 100%;
+}
+
+.range-controls .time-type > div.time-type-item {
     display: inline-block;
     padding: 3px 5px;
     border: 1px solid rgba(0, 0, 0, 0.3);
@@ -52,7 +149,7 @@
     border-left: none;
 }
 
-.range-controls .time-type > div:hover {
+.range-controls .time-type > div.time-type-item:hover {
     background-color: #FFF6C7;
 }
 
@@ -77,16 +174,37 @@
     cursor: auto;
 }
 
-.time-controller {
-    display: table;
+.range-controls .time-controller {
+    display: block;
     height: 26px;
+    width: 100%;
+}
+
+.range-controls .time-controller-reatime-msg {
+    text-align: center;
+    padding-top: 17px;
+    height: 47px;
+    width: 100%;
+    box-sizing: border-box;
 }
 
 .time-controller > div {
-    display: table-cell;
+    display: inline-block;
     vertical-align: middle;
     height: 100%;
     position: relative;
+}
+
+.time-controller > div.time-controller-date {
+    width: 82px;
+}
+
+.time-controller > div.time-controller-hours {
+    width: 47px;
+}
+
+.time-controller > div.time-controller-minutes {
+    width: 47px;
 }
 
 .time-controller > div .desc-label {
@@ -124,8 +242,9 @@
     height: 26px;
 }
 
-.range-controls .span-separator {
-    width: 2px;
+.range-controls .range-time-control:disabled {
+    background-color: #CCC;
+    color: #888;
 }
 
 .range-controls .rage-date {
@@ -147,15 +266,20 @@
 }
 
 .range-controls .span-range {
-    width: 200px;
+    width: calc(100% - 82px - 65px - 47px - 47px);
     position: relative;
     z-index: 2;
+}
+
+.range-controls .span-range.from-current-range {
+    width: calc(100% - 65px);
 }
 
 .range-controls .range-right-btn {
     position: relative;
     z-index: 1;
     text-align: right;
+    width: 65px;
 }
 
 @media screen and (max-width: 600px) {
@@ -184,6 +308,7 @@
     color: #333;
     padding: 7px 6px;
     margin-left: 12px;
+    margin-right: 0;
     _border-radius: 3px;
     border: 1px solid rgba(0, 0, 0, 0.3);
 }
@@ -238,9 +363,8 @@
 }
 
 .range-controls .input-range__label--value {
-    top: -23px;
-    left: -50%;
-    font-family: "Righteous" !important;
+    top: 4px;
+    left: 20px;
     color: #333;
     background-color: white;
     padding: 2px 4px;
@@ -248,6 +372,11 @@
     box-sizing: border-box;
     text-align: center;
     border: 1px solid rgba(0, 0, 0, 0.2);
+}
+
+.range-controls .over-half .input-range__label--value {
+    left: auto;
+    right: 20px;
 }
 
 .range-controls .input-range--disabled .input-range__label--value {
@@ -275,7 +404,7 @@
 }
 
 .range-controls .selected-time {
-    margin-top: 2px;
+    margin-top: 5px;
     text-align: right;
     display: block;
 }
@@ -302,6 +431,7 @@
     cursor: pointer;
 }
 
+.range-controls .selected-time > div.move-before
 .range-controls .selected-time.disabled > div {
     cursor: auto;
 }

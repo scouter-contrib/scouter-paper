@@ -199,11 +199,6 @@ class ObjectSelector extends Component {
                                 objects = msg.result;
 
                                 if (objects && objects.length > 0) {
-                                    objects = objects
-                                        .filter(instance => {
-                                            return (instance.objName.match(new RegExp("/", "g")) || []).length < 3;
-                                        });
-
                                     objects.forEach((instance) => {
                                         urlObjectHashes.forEach((objHash) => {
                                             if (objHash === Number(instance.objHash)) {
@@ -219,7 +214,7 @@ class ObjectSelector extends Component {
                                     })
                                 }
                             }).fail(function (xhr, textStatus, errorThrown) {
-                                errorHandler(xhr, textStatus, errorThrown, that.props);
+                                errorHandler(xhr, textStatus, errorThrown, that.props, "setTargetFromUrl_1", true);
                             });
                         });
 
@@ -255,7 +250,7 @@ class ObjectSelector extends Component {
                 }
 
             }).fail((xhr, textStatus, errorThrown) => {
-                errorHandler(xhr, textStatus, errorThrown, that.props);
+                errorHandler(xhr, textStatus, errorThrown, that.props, "setTargetFromUrl_2", false);
             });
         }
     };
@@ -300,7 +295,7 @@ class ObjectSelector extends Component {
                 selectedObjects: {},
                 filter: ""
             });
-            errorHandler(xhr, textStatus, errorThrown, that.props);
+            errorHandler(xhr, textStatus, errorThrown, that.props, "getServers", false);
         }).always(() => {
             this.setState({
                 loading : false
@@ -350,7 +345,7 @@ class ObjectSelector extends Component {
                 }
             }
         }).fail((xhr, textStatus, errorThrown) => {
-            errorHandler(xhr, textStatus, errorThrown, that.props);
+            errorHandler(xhr, textStatus, errorThrown, that.props, "onServerClick", true);
         });
     };
 
@@ -460,11 +455,11 @@ class ObjectSelector extends Component {
                         });
                     }
                 }).fail((xhr, textStatus, errorThrown) => {
-                    errorHandler(xhr, textStatus, errorThrown, this.props);
+                    errorHandler(xhr, textStatus, errorThrown, this.props, "savePreset_1", true);
                 });
             }
         }).fail((xhr, textStatus, errorThrown) => {
-            errorHandler(xhr, textStatus, errorThrown, this.props);
+            errorHandler(xhr, textStatus, errorThrown, this.props, "savePreset_2", true);
         });
     };
 

@@ -1,0 +1,114 @@
+.stack-content {
+    padding: 20px;
+    font-size: 12px;
+}
+
+@media screen and (max-width: 800px) {
+    .stack-content {
+        padding: 10px;
+        font-size: 12px;
+    }
+}
+
+.stack-content .sub-title {
+    padding: 10px;
+    _border-radius: 3px 3px 0 0;
+    background-color: #333;
+    color: #fff;
+    display: block;
+    border: 1px solid #333;
+    text-transform: uppercase;
+}
+
+.stack-content .sub-title > div {
+    white-space: nowrap;
+    display: table;
+    table-layout: fixed;
+    width: 100%;
+}
+
+.stack-content .sub-title span {
+    box-sizing: border-box;
+    display: table-cell;
+}
+
+.stack-content .sub-title span.label {
+    padding-left: 5px;
+    width: 115px;
+}
+
+.stack-content .sub-title span.data {
+    white-space: nowrap;
+}
+
+.stack-content div.stack-frame {
+    margin-bottom: 20px;
+}
+
+.stack-content div.stack-frame > div {
+    white-space: nowrap;
+    display: table;
+    table-layout: fixed;
+    width: 100%;
+}
+
+.stack-content div.stack-frame span {
+    padding: 7px 10px;
+    box-sizing: border-box;
+    display: table-cell;
+}
+
+.stack-content div.stack-frame span.label {
+    width: 115px;
+    background-color: #eee;
+}
+
+.stack-content div.stack-frame span.data {
+    white-space: normal;
+    word-break: break-all;
+}
+
+.stack-content div.stack-frame span.data.short {
+
+}
+
+.stack-content div.stack-frame span.data.medium {
+    color: #EE7600;
+}
+
+.stack-content div.stack-frame span.data.long {
+    color: #FF5721;
+}
+
+.stack-content div.stack-trace-content::-webkit-scrollbar {
+    width: 7px;
+    height: 7px;
+    background-color: rgba(0, 0, 0, 0.2);
+}
+
+.stack-content div.stack-trace-content::-webkit-scrollbar-thumb {
+    background-color: #1D88EA;
+    background-color: rgba(0, 0, 0, 0.6);
+}
+
+.stack-content div.stack-trace-content pre::-webkit-scrollbar {
+    width: 7px;
+    height: 7px;
+    background-color: rgba(0, 0, 0, 0.2);
+}
+
+.stack-content div.stack-trace-content pre::-webkit-scrollbar-thumb {
+    background-color: #1D88EA;
+    background-color: rgba(0, 0, 0, 0.6);
+}
+
+.stack-content div.stack-trace-content pre {
+    margin: 0 !important;
+    font-size: 13px;
+    padding: 10px !important;
+    background-color: #EEE !important;
+}
+
+.stack-content div.stack-trace-content pre code {
+    line-height: 120%;
+}

@@ -75,11 +75,11 @@ class InstanceSelector extends Component {
                         });
                     }
                 }).fail((xhr, textStatus, errorThrown) => {
-                    errorHandler(xhr, textStatus, errorThrown, this.props);
+                    errorHandler(xhr, textStatus, errorThrown, this.props, "savePreset_1", true);
                 });
             }
         }).fail((xhr, textStatus, errorThrown) => {
-            errorHandler(xhr, textStatus, errorThrown, this.props);
+            errorHandler(xhr, textStatus, errorThrown, this.props, "savePreset_2", true);
         });
     };
 
@@ -173,7 +173,9 @@ class InstanceSelector extends Component {
                                         <span className="filter-tag">OBJECT</span><span className="filter-separator"></span><span className="filter-icon" onClick={this.props.clearFilter}><i className="fa fa-filter" aria-hidden="true"></i></span><input type="search" onChange={this.onFilterChange.bind(this)} value={this.props.filter}/><span className="check-btn" onClick={this.props.selectAll}>ALL</span>
                                     </div>
                                     <div className="icon-type-map">
-                                        {(this.props.objects && this.props.objects.length > 0) && (Object.keys(iconMap).map((icon, i) => {
+                                        {(this.props.objects && this.props.objects.length > 0) && (Object.keys(iconMap).sort((a, b) => {
+                                            return iconMap[b] - iconMap[a];
+                                        }).map((icon, i) => {
                                             return <span className={iconMap[icon] === selectedIconMap[icon] ? "selected" : ""} key={i} onClick={this.quickSelectByTypeClick.bind(this, icon)}>{icon} {iconMap[icon]}</span>
                                         }))}
                                     </div>
@@ -201,6 +203,7 @@ class InstanceSelector extends Component {
                                                 displayName = objType.displayName;
                                             }
 
+
                                             let iconInfo = PaperIcons.getObjectIcon(icon);
                                             return (
                                                 <div key={i} className={"instance " + (i === 0 ? 'first ' : ' ') + (!(!(this.props.selectedObjects && this.props.selectedObjects[instance.objHash])) ? "selected" : " ")} onClick={this.instanceClick.bind(this, instance)}>
@@ -212,8 +215,9 @@ class InstanceSelector extends Component {
                                                             </div>
                                                         </div>
                                                         <div className="instance-text-info">
-                                                            <div className="instance-name">{instance.objName}</div>
-                                                            <div className="instance-other"><span>{instance.address}</span><span className="instance-objtype">{displayName}</span></div>
+                                                            <div className={`instance-name ${instance.alive ? 'alive' : 'down'}`} >{instance.objName}</div>
+                                                            <div className={`instance-other ${instance.alive ? 'alive' : 'down'}`} ><span>{instance.address}</span><span className="instance-objtype">{displayName}</span></div>
+                                                            {!instance.alive && <div className="broken-instance-label">INACTIVE</div>}
                                                         </div>
                                                     </div>
                                                 </div>)

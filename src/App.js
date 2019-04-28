@@ -96,7 +96,7 @@ class App extends Component {
                 this.props.pushMessage("error", "CHECK SETTINGS", "current setting does not require authentication, but it actually requires authentication.");
                 this.props.setControlVisibility("Message", true);
             } else {
-                errorHandler(xhr, textStatus, errorThrown, this.props);
+                errorHandler(xhr, textStatus, errorThrown, this.props, "info", true);
             }
             localStorage.removeItem("user");
         }).always(() => {
@@ -247,7 +247,7 @@ class App extends Component {
                 }).fail((xhr, textStatus, errorThrown) => {
                     clearInterval(this.alertTimer);
                     this.alertTimer = null;
-                    errorHandler(xhr, textStatus, errorThrown, this.props);
+                    errorHandler(xhr, textStatus, errorThrown, this.props, "getRealTimeAlert", true);
                 });
             });
         }
@@ -274,7 +274,7 @@ class App extends Component {
                     this.props.pushMessage("error", "Not Supported", "failed to get matrix information. paper 2.0 is available only on scouter 2.0 and later.");
                     this.props.setControlVisibility("Message", true);
                 } else {
-                    errorHandler(xhr, textStatus, errorThrown, this.props);
+                    errorHandler(xhr, textStatus, errorThrown, this.props, "getCounterModel", true);
                 }
             }
         });
@@ -311,6 +311,10 @@ class App extends Component {
         if (str) {
             config = JSON.parse(str);
             config = mergeDeep(this.props.config, config); //for added config's properties on later versions.
+
+            if (config.fonts && config.fonts.filter(d => d.val === "NanumSquare").length < 1) {
+                config.fonts.unshift({val : "NanumSquare",name : "NanumSquare", generic: "sans-serif", type : "display"});
+            }
             localStorage.setItem("config", JSON.stringify(config));
         } else {
             config = this.props.config;

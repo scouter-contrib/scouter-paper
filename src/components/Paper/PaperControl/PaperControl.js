@@ -19,7 +19,8 @@ class PaperControl extends Component {
         }
 
         this.state = {
-            currentGroup: null
+            currentGroup: null,
+            clearConfirmShow : false
         }
     }
 
@@ -35,11 +36,23 @@ class PaperControl extends Component {
         }
     };
 
+    setClearConfirmState= (val)=>{
+        this.setState({
+            clearConfirmShow : val
+        });
+    };
+
+    clearLayout = () => {
+        this.setState({
+            clearConfirmShow : false
+        });
+        this.props.clearLayout();
+    };
+
     render() {
 
         return (
             <div className={"papers-controls noselect " + (this.touch ? 'touch' : '')}>
-
                 <div className="control-item first">
                     <div className="row desc">
                         <div className="step"><span>1</span></div>
@@ -89,8 +102,6 @@ class PaperControl extends Component {
                                     })}
                                 </ul>
                             </div>
-
-
                             {this.props.counterInfo.families.map((family, i) => {
                                 return <div key={i} className={"paper-control multi-control " + (this.state.currentGroup === family.name ? "opened" : "")} >
                                     {(!this.touch) && <div className="multi-metrics">
@@ -134,7 +145,6 @@ class PaperControl extends Component {
                         </div>
                     </div>
                 </div>
-
                 <div className="control-item">
                     <div className="row desc">
                         <div className="step"><span>3</span></div>
@@ -142,15 +152,26 @@ class PaperControl extends Component {
                     </div>
                     <div className="row control">
                         <div>
-                            <div className="paper-control paper-control-btn" onClick={this.props.clearLayout}>
+                            {!this.state.clearConfirmShow &&
+                            <div className="paper-control paper-control-btn" onClick={() => this.setClearConfirmState(true)}>
                                 <i className="fa fa-trash-o" aria-hidden="true"></i><span className="paper-control-text">CLEAR ALL PAPER</span>
                             </div>
+                            }
+                            {this.state.clearConfirmShow &&
+                            <div>
+                                <div className="paper-control paper-control-btn half" onClick={() => this.setClearConfirmState(false)}>
+                                    <i className="fa fa-trash-o" aria-hidden="true"></i><span className="paper-control-text">CANCEL</span>
+                                </div>
+                                <div className="paper-control paper-control-btn half warning" onClick={this.clearLayout}>
+                                    <i className="fa fa-trash-o" aria-hidden="true"></i><span className="paper-control-text">CLEAR ALL</span>
+                                </div>
+                            </div>
+                            }
                         </div>
                     </div>
                 </div>
             </div>
-        );
-    }
+        );}
 }
 
 let mapStateToProps = (state) => {

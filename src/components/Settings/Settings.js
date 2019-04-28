@@ -54,6 +54,7 @@ class Settings extends Component {
             }
         } else {
             server[attr] = event.target.value;
+            server.name = server.protocol + "://" + server.address + ":" + server.port
         }
 
         this.setState({
@@ -65,6 +66,7 @@ class Settings extends Component {
         let config = Object.assign({}, this.state.config);
         let newServer = Object.assign({}, config.servers[config.servers.length - 1]);
         newServer.default = false;
+        newServer.name = "";
         config.servers.push(newServer);
         this.setState({
             config: config
@@ -563,6 +565,17 @@ class Settings extends Component {
                                 </div>
                                 <div className="input">
                                     <input type="number" required min={60} step={60} readOnly={!this.state.edit} onChange={this.onChangeRange.bind(this, "longHistoryStep")} value={this.state.config.range.longHistoryStep} placeholder="MINUTES" />
+                                </div>
+                            </div>
+                            <div className="row">
+                                <div className="label">
+                                    <div>DATA PRELOAD</div>
+                                </div>
+                                <div className="input">
+                                    <select value={this.state.config.preload} onChange={this.onChange.bind(this, "preload")} disabled={!this.state.edit}>
+                                        <option value="Y">Y</option>
+                                        <option value="N">N</option>
+                                    </select>
                                 </div>
                             </div>
                         </div>

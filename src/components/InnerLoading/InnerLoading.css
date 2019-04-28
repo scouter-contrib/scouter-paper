@@ -1,4 +1,4 @@
-.loading {
+.innerLoading {
     z-index: 100;
     position: absolute;
     top : 0;
@@ -14,7 +14,7 @@
     text-align: center;
 }
 
-.loading > div {
+.innerLoading > div {
     z-index: 100;
     display: table-cell;
     vertical-align: middle;

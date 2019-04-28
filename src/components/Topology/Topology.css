@@ -50,6 +50,12 @@
     }
 }
 
+@keyframes blink {
+    50% {
+        fill: #ffffff;
+    }
+}
+
 .edge-flow-path {
     fill: none;
     stroke: white;
@@ -128,3 +134,10 @@
     width: 60px;
 }
 
+
+.node-group circle.cpu-WARNING{
+    animation: blink 4s ease-in 0s infinite;
+}
+.node-group circle.cpu-IN-DANGER{
+    animation: blink 2s ease-in 0s infinite;
+}

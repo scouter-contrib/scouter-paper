@@ -128,7 +128,7 @@ class Login extends Component {
             }
 
         }).fail((xhr, textStatus, errorThrown) => {
-            errorHandler(xhr, textStatus, errorThrown, this.props);
+            errorHandler(xhr, textStatus, errorThrown, this.props, "login", false);
         }).always(() => {
             this.props.setControlVisibility("Loading", false);
         });

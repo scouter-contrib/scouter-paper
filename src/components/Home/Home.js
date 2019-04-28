@@ -119,7 +119,7 @@ class Home extends Component {
                                 <div className="product">SCOUTER PAPER</div>
                                 <div className="version">V-{version}</div>
                                 <div className="power-by">powered by <a href="https://github.com/scouter-project/scouter" target="scouter_paper">scouter</a></div>
-                                <div className="compatibility">(SCOUTER Compatibility 1.8.5+)</div>
+                                <div className="compatibility">(SCOUTER Compatibility 2.6.2+)</div>
                                 <div className="git"><span className="tag">GITHUB</span><a href={git} target="scouter_paper">{git}</a></div>
                             </div>
                         </div>

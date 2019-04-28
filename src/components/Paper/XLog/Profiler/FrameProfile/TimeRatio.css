@@ -1,0 +1,117 @@
+.time-ratio {
+  background-color: #EEE;
+  padding-bottom: 20px;
+  margin-bottom: 20px;
+}
+
+.time-ratio .ratio-bar {
+  display: table;
+  margin: 10px 0 0;
+  width: 100%;
+}
+
+.time-ratio .narrow .ratio-bar {
+  margin: 5px 0 20px;;
+}
+
+.time-ratio .legend-row {
+  display: table-row;
+}
+
+.time-ratio .ratio-bar .ratio-legend {
+  display: table-cell;
+  padding-bottom: 10px;
+}
+
+.time-ratio .ratio-bar .legend {
+  padding-left: 10px;
+}
+
+.time-ratio .ratio-bar .legend::before {
+  display: inline-block;
+  content: " ";
+  width: 10px;
+  height: 10px;
+  /* border: 1px solid #333; */
+  margin-right: 3px;
+}
+
+.time-ratio .ratio-bar .legend .time {
+  font-size: 11px;
+}
+
+.time-ratio .ratio-bar .legend.cpu::before {
+  background-color: #8b104e;
+}
+
+.time-ratio .ratio-bar .legend.sql::before {
+  background-color: #104e8b;
+}
+
+.time-ratio .ratio-bar .legend.api::before {
+  background-color: #4e8b10;
+}
+
+.time-ratio .ratio-bar .legend.other::before {
+  background-color: #473C8B;
+}
+
+.time-ratio .ratio-row {
+  display: table-row;
+}
+
+.time-ratio .ratio-bar .ratio-body {
+  display: table-cell;
+  width: 100%;
+  height: 34px;
+  vertical-align: top;
+  padding: 0 20px;
+  box-sizing: border-box;
+}
+
+.time-ratio .narrow .ratio-bar .ratio-body {
+  height: 20px;
+}
+
+.time-ratio .ratio-bar .ratio-body > div {
+  display: table;
+  width: 100%;
+  height: 100%;
+}
+
+.time-ratio .ratio-bar .ratio {
+  display: table-cell;
+  height: 100%;
+  padding: 10px 0;
+  color: rgb(254,234, 51);
+  overflow: hidden;
+  text-overflow: clip;
+  white-space: nowrap;
+  text-align: center;
+  max-width: 0;
+}
+
+.time-ratio .narrow .ratio-bar .ratio {
+  padding: 3px 0;
+}
+
+.time-ratio .ratio-bar .ratio:last-child {
+  border-right: none;
+}
+
+.time-ratio .ratio-bar .ratio.cpu {
+  background-color: #8b104e;
+}
+
+.time-ratio .ratio-bar .ratio.sql {
+  background-color: #104e8b;
+}
+
+.time-ratio .ratio-bar .ratio.api {
+  background-color: #4e8b10;
+}
+
+.time-ratio .ratio-bar .ratio.other {
+  background-color: #473C8B;
+  width: 100%;
+}

@@ -67,3 +67,36 @@
     font-weight: 400;
     src: url('./fonts/Nanum_Gothic_Coding/NanumGothicCoding-Regular.ttf');
 }
+
+@font-face {
+    font-family: 'NanumSquare';
+    font-weight: 400;
+    src: url(./fonts/Nanum_Square/NanumSquareR.eot);
+    src: url(./fonts/Nanum_Square/NanumSquareR.eot?#iefix) format('embedded-opentype'),
+    url(./fonts/Nanum_Square/NanumSquareR.woff) format('woff'),
+    url(./fonts/Nanum_Square/NanumSquareR.ttf) format('truetype');
+}
+@font-face {
+    font-family: 'NanumSquare';
+    font-weight: 700;
+    src: url(./fonts/Nanum_Square/NanumSquareB.eot);
+    src: url(./fonts/Nanum_Square/NanumSquareB.eot?#iefix) format('embedded-opentype'),
+    url(./fonts/Nanum_Square/NanumSquareB.woff) format('woff'),
+    url(./fonts/Nanum_Square/NanumSquareB.ttf) format('truetype');
+}
+@font-face {
+    font-family: 'NanumSquare';
+    font-weight: 800;
+    src: url(./fonts/Nanum_Square/NanumSquareEB.eot);
+    src: url(./fonts/Nanum_Square/NanumSquareEB.eot?#iefix) format('embedded-opentype'),
+    url(./fonts/Nanum_Square/NanumSquareEB.woff) format('woff'),
+    url(./fonts/Nanum_Square/NanumSquareEB.ttf) format('truetype');
+}
+@font-face {
+    font-family: 'NanumSquare';
+    font-weight: 300;
+    src: url(./fonts/Nanum_Square/NanumSquareL.eot);
+    src: url(./fonts/Nanum_Square/NanumSquareL.eot?#iefix) format('embedded-opentype'),
+    url(./fonts/Nanum_Square/NanumSquareL.woff) format('woff'),
+    url(./fonts/Nanum_Square/NanumSquareL.ttf) format('truetype');
+}

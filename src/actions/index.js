@@ -12,6 +12,8 @@ export const SET_SELECTION = 'SET_SELECTION';
 export const SET_TEMPLATE = 'SET_TEMPLATE';
 export const SET_REAL_TIME = 'SET_REAL_TIME';
 export const SET_REAL_TIME_VALUE = 'SET_REAL_TIME_VALUE';
+export const SET_FROM_PAST = 'SET_FROM_PAST';
+
 export const SET_RANGE_DATE = 'SET_RANGE_DATE';
 export const SET_RANGE_HOURS = 'SET_RANGE_HOURS';
 export const SET_RANGE_MINUTES = 'SET_RANGE_MINUTES';
@@ -35,6 +37,33 @@ export const SET_MENU = 'SET_MENU';
 export const SET_TOPOLOGY_OPTION = 'SET_TOPOLOGY_OPTION';
 export const SET_ALERT = 'SET_ALERT';
 export const SET_BREAKPOINT = 'SET_BREAKPOINT';
+export const SET_ACTIVE_SERVICE = 'SET_ACTIVE_SERVICE';
+
+export const SET_TEMPLATE_NAME = 'SET_TEMPLATE_NAME';
+export const SET_PRESET_NAME = 'SET_PRESET_NAME';
+export const SET_LAYOUT_NAME = 'SET_LAYOUT_NAME';
+
+export function setTemplateName(preset, layout) {
+    return {
+        type: SET_TEMPLATE_NAME,
+        preset: preset,
+        layout: layout
+    }
+}
+
+export function setPresetName(preset) {
+    return {
+        type: SET_PRESET_NAME,
+        preset: preset
+    };
+}
+
+export function setLayoutName(layout) {
+    return {
+        type: SET_LAYOUT_NAME,
+        layout: layout
+    };
+}
 
 export function setBoxes(boxes) {
     return {
@@ -192,6 +221,13 @@ export function setRealTimeValue(realTime, longTerm, value) {
     };
 }
 
+export function setFromPast(fromPast) {
+    return {
+        type: SET_FROM_PAST,
+        fromPast : fromPast
+    };
+}
+
 export function setRealTimeRangeStepValue(realTime, longTerm, value, range, step) {
     return {
         type: SET_REAL_TIME_RANGE_STEP_VALUE,
@@ -322,4 +358,9 @@ export function setBreakpoint(breakpoint) {
     };
 }
 
-
+export function setActiveServiceList(object){
+    return {
+        type : SET_ACTIVE_SERVICE,
+        object : object
+    }
+}

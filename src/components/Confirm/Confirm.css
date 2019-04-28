@@ -1,0 +1,55 @@
+.confirm-message {
+  background-color: #fff;
+  text-align: center;
+}
+.message-content-layout {
+  max-width: 500px;
+  margin: 0 auto;
+  text-align: center;
+}
+.message-content-layout .message-indexer {
+  padding: 0 0 10px 0;
+  font-size: 16px;
+}
+.message-content-layout .message-indexer-holder {
+  height: 20px;
+  width: 100%;
+}
+.message-content-layout > .message-content {
+  display: table;
+  width: 100%;
+  table-layout: fixed;
+  min-height: 100px;
+  padding: 0px;
+}
+.message-content-layout > .message-content > div {
+  display: table-cell;
+  vertical-align: middle;
+}
+.message-content-layout > .message-content > .center-message {
+  padding: 0px 50px;
+  color: #333;
+}
+.message-content-layout > .message-content > .center-message .message-title {
+  padding: 0px 5px;
+  font-weight: bold;
+}
+.message-content-layout > .message-content > .center-message .message-title > span {
+  padding: 10px 15px;
+  display: inline-block;
+  color: #333;
+}
+.message-content-layout > .message-content > .center-message .message-title > i {
+  color: #333;
+  padding: 3px 5px;
+  font-size: 17px;
+}
+.message-content-layout > .message-content > .center-message .center-message-content {
+  padding: 5px;
+}
+.message-btns {
+  padding: 15px;
+}
+.message-btns button {
+  cursor: pointer;
+}

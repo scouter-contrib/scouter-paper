@@ -113,6 +113,27 @@
     transition: border-bottom-color, color 0.3s;
 }
 
+.menu .right-panel {
+    display: block;
+    float: right;
+    height: 56px;
+}
+
+.menu .right-panel .template-name {
+    display: inline-block;
+    padding: 0 4px 0 4px;
+}
+
+.menu .template-name .preset{
+    font-size: 13px;
+    padding: 12px 0 0 0;
+}
+
+.menu .template-name .layout {
+    font-size: 11px;
+    padding: 4px 0 0 0;
+}
+
 .menu-instance-selector {
     display: inline-block;
     padding-top: 10px;
@@ -150,6 +171,16 @@
         padding: 10px 15px 0;
     }
 
+    .menu .template-name .preset{
+        font-size: 11px;
+        padding: 6px 0 0 0;
+    }
+
+    .menu .template-name .layout {
+        font-size: 10px;
+        padding: 0;
+    }
+
 }
 
 @media screen and (max-width: 600px) {
@@ -168,8 +199,9 @@
         margin-right: 5px;
     }
 
-
-
+    .menu .right-panel .template-name {
+        display: none;
+    }
 }
 
 .menu .menu-item .menu-icon {
