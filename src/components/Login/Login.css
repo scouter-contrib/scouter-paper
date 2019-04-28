@@ -58,7 +58,10 @@
     margin-bottom: 10px;
     font-size: 10px;
     border-radius: 2px;
+}
 
+.login-wrapper input[type=password] {
+    font-family: normal !important;
 }
 
 .login-wrapper .product {
