@@ -54,6 +54,7 @@ class Settings extends Component {
             }
         } else {
             server[attr] = event.target.value;
+            server.name = server.protocol + "://" + server.address + ":" + server.port
         }
 
         this.setState({
@@ -65,6 +66,7 @@ class Settings extends Component {
         let config = Object.assign({}, this.state.config);
         let newServer = Object.assign({}, config.servers[config.servers.length - 1]);
         newServer.default = false;
+        newServer.name = "";
         config.servers.push(newServer);
         this.setState({
             config: config

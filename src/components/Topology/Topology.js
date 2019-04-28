@@ -252,7 +252,7 @@ class Topology extends Component {
                 servers: [],
                 objects: []
             });
-            errorHandler(xhr, textStatus, errorThrown, that.props, "getAllInstanceInfo", true);
+            errorHandler(xhr, textStatus, errorThrown, that.props, "getAllInstanceInfo", false);
         }).always(() => {
             this.setState({
                 loading: false

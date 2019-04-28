@@ -250,7 +250,7 @@ class ObjectSelector extends Component {
                 }
 
             }).fail((xhr, textStatus, errorThrown) => {
-                errorHandler(xhr, textStatus, errorThrown, that.props, "setTargetFromUrl_2", true);
+                errorHandler(xhr, textStatus, errorThrown, that.props, "setTargetFromUrl_2", false);
             });
         }
     };
@@ -295,7 +295,7 @@ class ObjectSelector extends Component {
                 selectedObjects: {},
                 filter: ""
             });
-            errorHandler(xhr, textStatus, errorThrown, that.props, "getServers", true);
+            errorHandler(xhr, textStatus, errorThrown, that.props, "getServers", false);
         }).always(() => {
             this.setState({
                 loading : false

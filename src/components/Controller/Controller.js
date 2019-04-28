@@ -432,7 +432,7 @@ class Controller extends Component {
             }
 
         }).fail((xhr, textStatus, errorThrown) => {
-            errorHandler(xhr, textStatus, errorThrown, that.props, "applyPreset_2", true);
+            errorHandler(xhr, textStatus, errorThrown, that.props, "applyPreset_2", false);
         });
 
 
@@ -556,7 +556,7 @@ class Controller extends Component {
                 }
 
             }).fail((xhr, textStatus, errorThrown) => {
-                errorHandler(xhr, textStatus, errorThrown, that.props, "setTargetFromUrl_2", true);
+                errorHandler(xhr, textStatus, errorThrown, that.props, "setTargetFromUrl_2", false);
             });
         }
     };
@@ -601,7 +601,7 @@ class Controller extends Component {
                 selectedObjects: {},
                 filter: ""
             });
-            errorHandler(xhr, textStatus, errorThrown, that.props, "getServers", true);
+            errorHandler(xhr, textStatus, errorThrown, that.props, "getServers", false);
         }).always(() => {
             this.setState({
                 loading: false
@@ -946,7 +946,6 @@ class Controller extends Component {
     };
 
     render() {
-
         let menu = this.props.menu.replace("/", "");
         return (
             <article className={"controller-wrapper scrollbar noselect " + this.props.control.Controller + " " + menu + "-menu"}>
