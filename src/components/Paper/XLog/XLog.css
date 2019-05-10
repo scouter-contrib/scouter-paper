@@ -77,6 +77,15 @@
     font-size: 8px;
 }
 
+.xlog-viewer .text-right {
+    position: absolute;
+    right: 5%;
+}
+
+.xlog-viewer .text-right .text-error  {
+    color: red;
+}
+
 .xlog-viewer .no-longterm-support {
     text-align: center;
     height: 100%;
