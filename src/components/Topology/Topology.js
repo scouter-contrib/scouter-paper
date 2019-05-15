@@ -575,6 +575,12 @@ class Topology extends Component {
                     this.links = this.mergeLink(this.links, links);
                     this.linked = linked;
 
+                    console.log("---------------------------------------------------------------");
+                    console.log('1. this.topology =>',this.topology);
+                    console.log('2. this.nodes =>',this.nodes);
+                    console.log('3. this.links =>',this.links);
+                    console.log('4. this.linked =>',this.linked);
+
                     /*this.setState({
                      list: msg.result
                      });*/
@@ -706,7 +712,7 @@ class Topology extends Component {
         return this.linked[`${a},${b}`] || this.linked[`${b},${a}`];
     };
 
-    dragstarted = (d) => {
+    dragStarted = (d) => {
         if (!d3.event.active) this.simulation.alphaTarget(0.3).restart();
         d3.event.sourceEvent.stopPropagation();
         d.fx = d.x;
@@ -718,7 +724,7 @@ class Topology extends Component {
         d.fy = d3.event.y;
     };
 
-    dragended = (d) => {
+    dragEnd = (d) => {
         if (!d3.event.active) this.simulation.alphaTarget(0);
         if (!d.fixed) {
             if (!this.props.topologyOption.pin) {
@@ -731,7 +737,7 @@ class Topology extends Component {
         }
     };
 
-    getCatgegoryInfo = (category) => {
+    getCategoryInfo = (category) => {
         if (category && this.objCategoryInfo[category]) {
             return this.objCategoryInfo[category];
         } else {
@@ -1062,9 +1068,9 @@ class Topology extends Component {
         this.node = this.node.enter().append("circle").merge(this.node).attr("r", this.r).style("stroke-width", "4px")
             .attr('class', (d) => 'node cpu-' + that.getCountersCpuInfo(d.objCountersCpu).state)
             .style("fill", (d) => that.getCountersCpuInfo(d.objCountersCpu).color)
-            .style("stroke", (d) => that.getCatgegoryInfo(d.objCategory).color);
+            .style("stroke", (d) => that.getCategoryInfo(d.objCategory).color);
 
-        this.node.call(d3.drag().on("start", this.dragstarted).on("drag", this.dragged).on("end", this.dragended));
+        this.node.call(d3.drag().on("start", this.dragStarted).on("drag", this.dragged).on("end", this.dragEnd));
         this.node.on("mouseover", that.hover);
         this.node.on("mouseout", that.leave);
 
@@ -1075,7 +1081,7 @@ class Topology extends Component {
         this.nodeLabel.text(function (d) {
             return (d.objTypeFamily ? d.objTypeFamily : d.objCategory).toUpperCase();
         }).style("fill", function (d) {
-            return that.getCatgegoryInfo(d.objCategory).color;
+            return that.getCategoryInfo(d.objCategory).color;
         });
 
         // 노드 아이콘
@@ -1083,14 +1089,14 @@ class Topology extends Component {
         this.nodeIcon.exit().remove();
         this.nodeIcon = this.nodeIcon.enter().append("text").merge(this.nodeIcon);
         this.nodeIcon.attr("class", "node-icon").style("font-family", function (d) {
-            return that.getCatgegoryInfo(d.objCategory).fontFamily;
+            return that.getCategoryInfo(d.objCategory).fontFamily;
         }).style("font-size", function (d) {
-            return that.getCatgegoryInfo(d.objCategory).fontSize;
+            return that.getCategoryInfo(d.objCategory).fontSize;
         }).style("fill", function (d) {
-            return that.getCatgegoryInfo(d.objCategory).color;
+            return that.getCategoryInfo(d.objCategory).color;
         }).text(function (d) {
-            return that.getCatgegoryInfo(d.objCategory).text;
-        }).call(d3.drag().on("start", this.dragstarted).on("drag", this.dragged).on("end", this.dragended));
+            return that.getCategoryInfo(d.objCategory).text;
+        }).call(d3.drag().on("start", this.dragStarted).on("drag", this.dragged).on("end", this.dragEnd));
         this.nodeIcon.on("mouseover", that.hover);
         this.nodeIcon.on("mouseout", that.leave);
 
