@@ -21,6 +21,7 @@ class Topology extends Component {
     topology = [];
     links = [];
     linked = {};
+    objTypeNameMap = new Map();
 
     preNodeCount = 0;
 
@@ -291,7 +292,20 @@ class Topology extends Component {
         });
     };
 
-
+    getObjectNameMerge = (category,name) => {
+        let obj = this.objTypeNameMap.get(category);
+        if( obj ){
+            if( obj.filter(d => d === name).length === 0 ){
+                obj.push(name);
+            }
+            this.objTypeNameMap.set(category,obj)
+            return obj;
+        }else{
+            let _ret = [name];
+            this.objTypeNameMap.set(category,_ret)
+            return _ret;
+        }
+    };
     getUnknownObjectType = (data, position) => {
         let result = {};
         result["objType"] = null;
@@ -321,8 +335,10 @@ class Topology extends Component {
             }
 
             case "INTR_NORMAL_OUTGOING" : {
-                result["objType"] = "NORMAL" + data[position + "ObjHash"];
-                result["objTypeName"] = data[position + "ObjName"];
+                // result["objType"] = "NORMAL" + data[position + "ObjHash"];
+                result["objType"] = "NORMAL";
+                result["objTypeName"] = this.getObjectNameMerge('EXTERNAL',data[position + "ObjName"]);
+
                 if (position === "from") {
 
                 } else {
@@ -333,7 +349,8 @@ class Topology extends Component {
             case "INTR_REDIS_CALL" : {
                 result["objType"] = "REDIS" + data[position + "ObjHash"];
                 const redisName = data[position + "ObjName"] || "-";
-                result["objTypeName"] = redisName.length > 1 ? redisName : "REDIS";
+                // result["objTypeName"] = redisName.length > 1 ? redisName : "REDIS";
+                result["objTypeName"] =  this.getObjectNameMerge('REDIS',redisName.length > 1 ? redisName : "REDIS");
                 if (position === "from") {
 
                 } else {
@@ -344,7 +361,8 @@ class Topology extends Component {
             case "INTR_KAFKA_CALL" : {
                 result["objType"] = "KAFKA" + data[position + "ObjHash"];
                 const kafkaName = data[position + "ObjName"] || "-";
-                result["objTypeName"] = kafkaName.length > 1 ? kafkaName : "KFAKA";
+                // result["objTypeName"] = kafkaName.length > 1 ? kafkaName : "KFAKA";
+                result["objTypeName"] =  this.getObjectNameMerge('KAFKA',kafkaName.length > 1 ? kafkaName : "KFAKA");
                 if (position === "from") {
 
                 } else {
@@ -355,7 +373,7 @@ class Topology extends Component {
             case "INTR_RABBITMQ_CALL" : {
                 result["objType"] = "RABBITMQ" + data[position + "ObjHash"];
                 const rabbitName = data[position + "ObjName"] || "-";
-                result["objTypeName"] = rabbitName.length > 1 ? rabbitName : "RABBITMQ";
+                result["objTypeName"] =  this.getObjectNameMerge('RABBITMQ',rabbitName.length > 1 ? rabbitName : "RABBITMQ");
                 if (position === "from") {
 
                 } else {
@@ -365,7 +383,8 @@ class Topology extends Component {
             }
             case "INTR_DB_CALL" : {
                 result["objType"] = "DB" + data[position + "ObjHash"];
-                result["objTypeName"] = data[position + "ObjName"];
+                // result["objTypeName"] = data[position + "ObjName"];
+                result["objTypeName"] = this.getObjectNameMerge('DB',data[position + "ObjName"]);
                 if (position === "from") {
 
                 } else {
@@ -387,7 +406,7 @@ class Topology extends Component {
         let that = this;
 
         let objects = Object.keys(filterMap);
-
+        this.objTypeNameMap.clear();
         if (objects && objects.length > 0) {
             this.props.addRequest();
             jQuery.ajax({
@@ -406,9 +425,9 @@ class Topology extends Component {
                 if (list) {
                     let objectTypeTopologyMap = {};
                     let objToTypeMap = {};
-
                     if (grouping) {
                         list.forEach((d) => {
+
                             if (that.instances[Number(d.fromObjHash)] && that.instances[Number(d.fromObjHash)].objType) {
                                 d.fromObjType = that.instances[d.fromObjHash].objType;
                                 d.fromObjTypeName = that.instances[d.fromObjHash].objType;
@@ -421,6 +440,7 @@ class Topology extends Component {
                                 d.fromObjTypeFamily = null;
                                 d.fromObjCategory = typeInfo["category"];
                             }
+
                             d.fromObjCountersCpu = _.find(d.fromObjCounters, {name: 'Cpu'});
 
                             if (that.instances[Number(d.toObjHash)] && that.instances[Number(d.toObjHash)].objType) {
@@ -438,16 +458,17 @@ class Topology extends Component {
                             d.toObjCountersCpu = _.find(d.toObjCounters, {name: 'Cpu'});
 
                             if (!objToTypeMap[d.fromObjHash]) objToTypeMap[d.fromObjHash] = {};
-                            if (!objToTypeMap[d.toObjHash]) objToTypeMap[d.fromObjHash] = {};
+                            if (!objToTypeMap[d.toObjHash]) objToTypeMap[d.toObjHash] = {};
                             objToTypeMap[d.fromObjHash] = d.fromObjType;
                             objToTypeMap[d.toObjHash] = d.toObjType;
 
-                            if (objectTypeTopologyMap[d.fromObjType + "_" + d.toObjType]) {
-                                objectTypeTopologyMap[d.fromObjType + "_" + d.toObjType].count += Number(d.count);
-                                objectTypeTopologyMap[d.fromObjType + "_" + d.toObjType].errorCount += Number(d.errorCount);
-                                objectTypeTopologyMap[d.fromObjType + "_" + d.toObjType].totalElapsed += Number(d.totalElapsed);
+                            const topology_key = [d.fromObjType,"_",d.toObjType].join(""); //- from + to object type 별로 그룹핑 함
+                            if (objectTypeTopologyMap[topology_key]) {
+                                objectTypeTopologyMap[topology_key].count += Number(d.count);
+                                objectTypeTopologyMap[topology_key].errorCount += Number(d.errorCount);
+                                objectTypeTopologyMap[topology_key].totalElapsed += Number(d.totalElapsed);
                             } else {
-                                objectTypeTopologyMap[d.fromObjType + "_" + d.toObjType] = {
+                                objectTypeTopologyMap[topology_key] = {
                                     fromObjHash: d.fromObjType,
                                     fromObjName: d.fromObjTypeName,
                                     fromObjTypeFamily: d.fromObjTypeFamily,
@@ -488,7 +509,7 @@ class Topology extends Component {
                                 d.toObjCategory = typeInfo["category"];
                             }
                             d.toObjCountersCpu = _.find(d.toObjCounters, {name: 'Cpu'});
-
+                            //- object hash 별로 개별 (from + to)
                             objectTypeTopologyMap[d.fromObjHash + "_" + d.toObjHash] = {
                                 group: false,
                                 fromObjHash: d.fromObjHash,
@@ -511,6 +532,7 @@ class Topology extends Component {
 
                     let topology = [];
                     let outCount = 0;
+                    // unknown link connect;
                     for (let attr in objectTypeTopologyMap) {
                         let obj = objectTypeTopologyMap[attr];
                         if (obj.fromObjHash === "0" || obj.fromObjHash === "") {
@@ -558,14 +580,14 @@ class Topology extends Component {
                     })), (d) => {
                         return d.id;
                     });
-
+                    //- node count calc
                     nodes.forEach((node) => {
                         node.grouping = grouping;
                         node.instanceCount = Object.values(objToTypeMap).filter((d) => d === node.objName).length;
                     });
 
                     let linked = {};
-
+                    //- linking 된 노드 체킹
                     links.forEach((d) => {
                         linked[`${d.source},${d.target}`] = true;
                     });
@@ -574,12 +596,6 @@ class Topology extends Component {
                     this.topology = topology;
                     this.links = this.mergeLink(this.links, links);
                     this.linked = linked;
-
-                    console.log("---------------------------------------------------------------");
-                    console.log('1. this.topology =>',this.topology);
-                    console.log('2. this.nodes =>',this.nodes);
-                    console.log('3. this.links =>',this.links);
-                    console.log('4. this.linked =>',this.linked);
 
                     /*this.setState({
                      list: msg.result
@@ -1046,6 +1062,13 @@ class Topology extends Component {
         this.edgeFlowPath.on("click", that.edgeClicked);
 
         // 노드 아래에 표시되는 명칭
+        // const nodes_name = (nodes.map(d => {
+        //     let _d = {};
+        //     _d.objName =d.objName;
+        //     _d.objTypeFamily = d.objTypeFamily;
+        //     return _d;
+        //  }));
+
         this.nodeNameText = this.nodeNameTextGroup.selectAll(".node-name").data(nodes);
         this.nodeNameText.exit().remove();
         this.nodeNameText = this.nodeNameText.enter().append("text").merge(this.nodeNameText).attr("class", "node-name")
