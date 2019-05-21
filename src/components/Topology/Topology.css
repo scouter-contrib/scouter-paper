@@ -14,7 +14,28 @@
 .topology-wrapper > div {
     height: 100%;
 }
+.topology-wrapper .topology-chart > div.tooltip {
+    position: absolute;
+    background-color: white;
+    max-width: 200px;
+    height: auto;
+    padding: 1px;
+    border-style: solid;
+    border-radius: 4px;
+    border-width: 1px;
+    box-shadow: 3px 3px 10px rgba(0, 0, 0, .5);
+    pointer-events: none;
+    font-weight: bold;
+    margin-top: 2px;
 
+}
+.topology-wrapper .topology-chart > div.tooltip > div {
+
+}
+.topology-wrapper .topology-chart > div.tooltip > div > p{
+    padding: 5px;
+    white-space: pre-wrap;
+}
 .topology-wrapper .topology-chart {
     height: 100%;
     overflow: hidden;

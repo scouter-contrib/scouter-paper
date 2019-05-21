@@ -853,7 +853,18 @@ class Topology extends Component {
             this.edgeFlowPath.transition(500).style('stroke-opacity', o => {
                 return this.linkTypeHover(d, o);
             });
+            if (this.props.topologyOption.grouping) {
+                if( d.objCategory === "CLIENT" || d.objTypeFamily === "javaee" ){
+                    return;
+                }
+
+                this.tooltip.transition().duration(300).style("opacity", .8);
+                this.tooltip.html(( Array.isArray(d.objName) ? d.objName : [d.objName] ).map(dp => `<div><p>${dp}</p></div>`).join(''))
+                    .style("left", (d.x) + "px")
+                    .style("top", (d.y) + "px");
+            }
         }
+
 
     };
 
@@ -866,6 +877,9 @@ class Topology extends Component {
             this.edgeTextList.transition(500).style('opacity', 1);
             this.edgeFlowPath.transition(500).style('stroke-opacity', 0.5);
         }
+        this.tooltip.transition()
+            .duration(100)
+            .style("opacity", 0);
     };
 
     getStepCountByTps = (tps, tpsMode) => {
@@ -974,6 +988,7 @@ class Topology extends Component {
         if (!this.svg) {
             this.svg = d3.select(this.refs.topologyChart).append("svg").attr("width", this.width).attr("height", this.height).append("g");
 
+
             this.edgePathGroup = this.svg.append("g").attr("class", "edge-path-group");
             this.edgeTextGroup = this.svg.append("g").attr("class", "edge-text-group");
             this.edgeFlowPathGroup = this.svg.append("g").attr("class", "edge-flow-path-group");
@@ -999,6 +1014,12 @@ class Topology extends Component {
             this.simulation.force("collide", d3.forceCollide(30));
             this.simulation.nodes(nodes).on("tick", this.ticked);
             this.simulation.force("link").links(links).distance([this.props.topologyOption.distance]);
+
+            this.tooltip = d3.select(".topology-chart")
+                .append("div")
+                .attr("class", "tooltip")
+                .style("z-index",999)
+                .style("opacity", 0);
         }
 
         // 노드에 표시되는 텍스트
@@ -1111,7 +1132,6 @@ class Topology extends Component {
         this.node.call(d3.drag().on("start", this.dragStarted).on("drag", this.dragged).on("end", this.dragEnd));
         this.node.on("mouseover", that.hover);
         this.node.on("mouseout", that.leave);
-
         // 노드 라벨
         this.nodeLabel = this.nodeLabelGroup.selectAll(".node-label").data(nodes);
         this.nodeLabel.exit().remove();
