@@ -1066,37 +1066,32 @@ class Topology extends Component {
         this.edgeFlowPath.on("click", that.edgeClicked);
 
         // 노드 아래에 표시되는 명칭
-
-        this.nodeNameText = this.nodeNameTextGroup.selectAll(".node-name").data(nodes);
+        this.nodeNameText = this.nodeNameTextGroup.selectAll(".node-name").data(nodes)
         this.nodeNameText.exit().remove();
+
         this.nodeNameText = this.nodeNameText.enter()
             .append("text")
+            .merge(this.nodeNameText)
             .attr("class", "node-name")
             .style("font-size", (this.option.fontSize + 1) + "px")
             .style("font-weight", (d) => d.objTypeFamily === "javaee" ? "bold" : "normal")
-            .style("fill", (d) => d.objTypeFamily === "javaee" ? "#ffd600" : "white");
-        this.nodeNameTextSpan = this.nodeNameText
-            .selectAll(".text")
-            .data(d => {
-                return Array.isArray(d.objName) ? d.objName : [d.objName]
-            })
-            .enter()
-            .merge(this.nodeNameText)
-            .append("tspan")
-            .text(d => d);
+            .style("fill", (d) => d.objTypeFamily === "javaee" ? "#ffd600" : "white")
+            .text(d =>{
+                if( !this.props.topologyOption.grouping ) {
+                    return d.objName;
+                }
+                if( d.objCategory === "CLIENT"){
+                    return;
+                }
+                if( d.objTypeFamily !== "javaee" ){
+                    if( Array.isArray(d.objName) ){
+                        return [d.objName.length, "cnt"].join(" ");
+                    }
+                }else{
+                    return d.objName;
+                }
 
-        // this.nodeNameTextSpan.selectAll(".node-sub-title")
-        //     .data(d => d.text.split(","))
-        //     .enter()
-        //     .append("tspan")
-        //     .attr("class", "text")
-        //     .text(d => d);
-
-
-
-
-
-
+            });
         // 노드의 인스턴수 수
         this.nodeInstanceCountText = this.nodeInstanceCountTextGroup.selectAll(".node-inst-count").data(nodes);
         this.nodeInstanceCountText.exit().remove();
@@ -1205,6 +1200,7 @@ class Topology extends Component {
             return d.y;
         });
 
+
         // 노드 명 아래 가운데 위치 하도록
         this.nodeNameText.attr("x", function (d) {
             const width = this.getComputedTextLength();
@@ -1212,11 +1208,6 @@ class Topology extends Component {
         }).attr("y", function (d) {
             return d.y + that.r + (that.option.fontSize / 2) + 6;
         });
-
-        // this.nodeNameTextSpan
-        //     .attr("x", (d) => 20)
-        //     .attr("dx", (d) => 20)
-        //     .attr("dy", (d) => 25);
 
         this.nodeInstanceCountText.attr("x", function (d) {
             const width = this.getComputedTextLength();
