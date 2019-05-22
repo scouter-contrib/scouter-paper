@@ -311,6 +311,36 @@ class Topology extends Component {
         }
 
     };
+
+    setObjectCounter = (data,name,grouping) =>{
+
+        if( name && grouping ){
+            const d = {
+                tps :   data.count / data.period ,
+                errorRate : data.errorCount / data.count * 100,
+                avgElaps:   data.totalElapsed / data.count
+            };
+            let acc = this.objCounterMap.get(name)
+            if( acc ){
+                // let [_1,_2,_3,_4] = acc;
+                // this.objCounterMap.set(name, [
+                //     name,
+                //     (_2 +=d.tps),
+                //     (_3 +=d.errorRate),
+                //     (_4 +=d.avgElaps)
+                // ]);
+            }else {
+                //new
+                this.objCounterMap.set(name, [
+                    name,
+                    d.tps,
+                    d.errorRate,
+                    d.avgElaps
+                ]);
+            }
+
+        }
+    }
     getUnknownObjectType = (data, position, grouping=false) => {
         let result = {};
         result["objType"] = null;
@@ -346,6 +376,7 @@ class Topology extends Component {
                 if (position === "from") {
 
                 } else {
+                    this.setObjectCounter(data,[result["objType"],data[position + "ObjName"]].join('-'),grouping);
                     result["category"] = "EXTERNAL";
                 }
                 break;
@@ -357,6 +388,7 @@ class Topology extends Component {
                 if (position === "from") {
 
                 } else {
+                    this.setObjectCounter(data,[ result["objType"],redisName.length > 1 ? redisName : "REDIS" ].join('-'),grouping);
                     result["category"] = "REDIS";
                 }
                 break;
@@ -368,6 +400,7 @@ class Topology extends Component {
                 if (position === "from") {
 
                 } else {
+                    this.setObjectCounter(data,[ result["objType"],kafkaName.length > 1 ? kafkaName : "KFAKA" ].join('-'),grouping);
                     result["category"] = "KAFKA";
                 }
                 break;
@@ -379,6 +412,7 @@ class Topology extends Component {
                 if (position === "from") {
 
                 } else {
+                    this.setObjectCounter(data,[ result["objType"],rabbitName.length > 1 ? rabbitName : "RABBITMQ" ].join('-'),grouping);
                     result["category"] = "RABBITMQ";
                 }
                 break;
@@ -389,6 +423,7 @@ class Topology extends Component {
                 if (position === "from") {
 
                 } else {
+                    this.setObjectCounter(data,[ result["objType"],data[position + "ObjName"]].join('-'),grouping);
                     result["category"] = "DB";
                 }
                 break;
@@ -405,9 +440,9 @@ class Topology extends Component {
     getTopology = (config, filterMap, user, grouping) => {
 
         let that = this;
-
         let objects = Object.keys(filterMap);
         this.objTypeNameMap.clear();
+        this.objCounterMap.clear();
         if (objects && objects.length > 0) {
             this.props.addRequest();
             jQuery.ajax({
@@ -421,7 +456,6 @@ class Topology extends Component {
                     setAuthHeader(xhr, config, getCurrentUser(config, user));
                 }
             }).done((msg) => {
-
                 let list = msg.result;
                 if (list) {
                     let objectTypeTopologyMap = {};
@@ -434,6 +468,7 @@ class Topology extends Component {
                                 d.fromObjTypeName = that.instances[d.fromObjHash].objType;
                                 d.fromObjTypeFamily = that.instances[d.fromObjHash].objFamily;
                                 d.fromObjCategory = that.instances[d.fromObjHash].objFamily;
+                                this.setObjectCounter(d,that.instances[Number(d.fromObjHash)].objName,grouping);
                             } else {
                                 let typeInfo = that.getUnknownObjectType(d, "from",true);
                                 d.fromObjType = typeInfo["objType"];
@@ -449,6 +484,7 @@ class Topology extends Component {
                                 d.toObjTypeName = that.instances[d.toObjHash].objType;
                                 d.toObjTypeFamily = that.instances[d.toObjHash].objFamily;
                                 d.toObjCategory = that.instances[d.toObjHash].objFamily;
+                                // this.setObjectCounter(d,that.instances[Number(d.toObjHash)].objName,grouping);
                             } else {
                                 let typeInfo = that.getUnknownObjectType(d, "to",true);
                                 d.toObjType = typeInfo["objType"];
@@ -462,6 +498,7 @@ class Topology extends Component {
                             if (!objToTypeMap[d.toObjHash]) objToTypeMap[d.toObjHash] = {};
                             objToTypeMap[d.fromObjHash] = d.fromObjType;
                             objToTypeMap[d.toObjHash] = d.toObjType;
+
 
 
                             // console.log(dd.fromObjType,d.toObjType);
@@ -856,18 +893,40 @@ class Topology extends Component {
             this.edgeFlowPath.transition(500).style('stroke-opacity', o => {
                 return this.linkTypeHover(d, o);
             });
-            if (this.props.topologyOption.grouping) {
-                if( d.objCategory === "CLIENT" ){
-                    return;
-                }
+
+
+            if (this.props.topologyOption.grouping && d.objCategory !== "CLIENT" ) {
+
                 let dpObjName = [];
+
                 if( d.objTypeFamily === "javaee" ){
                     dpObjName = this.objTypeNameMap.get(d.objName);
                 }else{
                     dpObjName = this.objTypeNameMap.get(d.id);
                 }
                 this.tooltip.transition(500).style("opacity", .8);
-                this.tooltip.html(( Array.isArray(dpObjName) ? dpObjName : [dpObjName] ).map(dp => `<div><p>${dp}</p></div>`).join(''))
+                this.tooltip.html(( Array.isArray(dpObjName) ? dpObjName : [dpObjName] ).map(dp  => {
+                        let counter  = [dp,0,0,0];
+                        if( d.objTypeFamily === "javaee" ){
+                            counter = this.objCounterMap.get(dp);
+                        }else{
+                            counter = this.objCounterMap.get([d.id,dp].join('-'));
+                        }
+                        if( !counter){
+                            return `<div><p>${dp? dp : 'Unknown'}</p></div>`;
+                        }else {
+                            const [name, tps, errorRate, avgElasp] = counter;
+                            return `<div class="tooltip-group"> 
+                                        <p>${name}</p> 
+                                    <div class="tooltip-counter"> 
+                                        <tspan>${numeral(tps).format(this.props.config.numberFormat)} r/s</tspan> 
+                                        <tspan style="color:red">${numeral(errorRate).format(this.props.config.numberFormat)}%</tspan> 
+                                        <tspan>${numeral(avgElasp).format(this.props.config.numberFormat)}ms</tspan> 
+                                    </div> 
+                            </div>`;
+                        }
+
+                    }).join(' '))
                     .style("left",  (d3.event.pageX-17)  + "px")
                     .style("top", (d3.event.pageY-100)  + "px");
             }
