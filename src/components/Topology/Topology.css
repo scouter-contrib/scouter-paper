@@ -17,7 +17,7 @@
 .topology-wrapper .topology-chart > div.tooltip {
     position: absolute;
     background-color: white;
-    max-width: 200px;
+    max-width: 250px;
     height: auto;
     padding: 1px;
     border-style: solid;

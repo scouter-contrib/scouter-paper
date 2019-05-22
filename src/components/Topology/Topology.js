@@ -293,10 +293,9 @@ class Topology extends Component {
     };
 
     getObjectNameMerge = (category,name,grouping) => {
-        if( !grouping ) {
+        if( !grouping || !category ) {
             return name;
         }
-
         let obj = this.objTypeNameMap.get(category);
         if( obj ){
             if( obj.filter(d => d === name).length === 0 ){
@@ -487,7 +486,8 @@ class Topology extends Component {
                                     count: Number(d.count),
                                     errorCount: Number(d.errorCount),
                                     period: Number(d.period),
-                                    totalElapsed: Number(d.totalElapsed)
+                                    totalElapsed: Number(d.totalElapsed),
+                                    name : d.objName
                                 };
                             }
                         });
@@ -588,7 +588,11 @@ class Topology extends Component {
                     //- node count calc
                     nodes.forEach((node) => {
                         node.grouping = grouping;
-                        node.instanceCount = Object.values(objToTypeMap).filter((d) => d === node.objName).length;
+                        const nodeInstance = Object.values(objToTypeMap).filter((d) => d === node.objName);
+                        Object.values(this.instances).filter(d=> node.id === d.objType ).forEach(d=>{
+                            this.getObjectNameMerge(node.id,d.objName,grouping);
+                        });
+                        node.instanceCount = nodeInstance.length;
                     });
 
                     let linked = {};
@@ -854,14 +858,19 @@ class Topology extends Component {
                 return this.linkTypeHover(d, o);
             });
             if (this.props.topologyOption.grouping) {
-                if( d.objCategory === "CLIENT" || d.objTypeFamily === "javaee" ){
+                if( d.objCategory === "CLIENT" ){
                     return;
                 }
-
-                this.tooltip.transition().duration(300).style("opacity", .8);
-                this.tooltip.html(( Array.isArray(d.objName) ? d.objName : [d.objName] ).map(dp => `<div><p>${dp}</p></div>`).join(''))
-                    .style("left", (d.x) + "px")
-                    .style("top", (d.y) + "px");
+                let dpObjName = [];
+                if( d.objTypeFamily === "javaee" ){
+                    dpObjName = this.objTypeNameMap.get(d.objName);
+                }else{
+                    dpObjName = d.objName;
+                }
+                this.tooltip.transition(500).style("opacity", .8);
+                this.tooltip.html(( Array.isArray(dpObjName) ? dpObjName : [dpObjName] ).map(dp => `<div><p>${dp}</p></div>`).join(''))
+                    .style("left",  (d3.event.pageX-17)  + "px")
+                    .style("top", (d3.event.pageY-100)  + "px");
             }
         }
 
@@ -876,10 +885,11 @@ class Topology extends Component {
             this.nodeLabel.transition(500).style('opacity', 1.0);
             this.edgeTextList.transition(500).style('opacity', 1);
             this.edgeFlowPath.transition(500).style('stroke-opacity', 0.5);
+            if (this.props.topologyOption.grouping) {
+                this.tooltip.transition(500).style("opacity", 0);
+            }
         }
-        this.tooltip.transition()
-            .duration(100)
-            .style("opacity", 0);
+
     };
 
     getStepCountByTps = (tps, tpsMode) => {
