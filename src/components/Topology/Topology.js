@@ -22,6 +22,7 @@ class Topology extends Component {
     links = [];
     linked = {};
     objTypeNameMap = new Map();
+    objCounterMap = new Map();
 
     preNodeCount = 0;
 
@@ -315,7 +316,6 @@ class Topology extends Component {
         result["objType"] = null;
         result["objTypeName"] = null;
         result["category"] = null;
-
         switch (data.interactionType) {
             case "INTR_API_INCOMING" : {
                 result["objType"] = "API" + data[position + "ObjHash"];
@@ -330,8 +330,9 @@ class Topology extends Component {
             }
 
             case "INTR_NORMAL_INCOMING" : {
-                result["objType"] = "NORMAL" + data[position + "ObjHash"];
+                result["objType"] = ["IN",this.instances[data.toObjHash].objType,"CLIENT"].join("-");
                 result["objTypeName"] = "";
+
                 if (position === "from") {
                     result["category"] = "CLIENT";
                 }
@@ -339,9 +340,8 @@ class Topology extends Component {
             }
 
             case "INTR_NORMAL_OUTGOING" : {
-                // result["objType"] = "NORMAL" + data[position + "ObjHash"];
-                result["objType"] = "NORMAL";
-                result["objTypeName"] = this.getObjectNameMerge('EXTERNAL',data[position + "ObjName"],grouping);
+                result["objType"] = ["OUT",this.instances[data.fromObjHash].objType,"NORMAL"].join("-");
+                result["objTypeName"] = this.getObjectNameMerge(result["objType"],data[position + "ObjName"],grouping);
 
                 if (position === "from") {
 
@@ -351,10 +351,9 @@ class Topology extends Component {
                 break;
             }
             case "INTR_REDIS_CALL" : {
-                result["objType"] = "REDIS" + data[position + "ObjHash"];
+                result["objType"] = ["OUT",this.instances[data.fromObjHash].objType,"REDIS"].join("-");
                 const redisName = data[position + "ObjName"] || "-";
-                // result["objTypeName"] = redisName.length > 1 ? redisName : "REDIS";
-                result["objTypeName"] =  this.getObjectNameMerge('REDIS',redisName.length > 1 ? redisName : "REDIS",grouping);
+                result["objTypeName"] =  this.getObjectNameMerge(result["objType"],redisName.length > 1 ? redisName : "REDIS",grouping);
                 if (position === "from") {
 
                 } else {
@@ -365,8 +364,7 @@ class Topology extends Component {
             case "INTR_KAFKA_CALL" : {
                 result["objType"] = "KAFKA" + data[position + "ObjHash"];
                 const kafkaName = data[position + "ObjName"] || "-";
-                // result["objTypeName"] = kafkaName.length > 1 ? kafkaName : "KFAKA";
-                result["objTypeName"] =  this.getObjectNameMerge('KAFKA',kafkaName.length > 1 ? kafkaName : "KFAKA",grouping);
+                result["objTypeName"] =  this.getObjectNameMerge(result["objType"],kafkaName.length > 1 ? kafkaName : "KFAKA",grouping);
                 if (position === "from") {
 
                 } else {
@@ -375,9 +373,9 @@ class Topology extends Component {
                 break;
             }
             case "INTR_RABBITMQ_CALL" : {
-                result["objType"] = "RABBITMQ" + data[position + "ObjHash"];
+                result["objType"] = ["OUT",this.instances[data.fromObjHash].objType,"RABBITMQ"].join("-");
                 const rabbitName = data[position + "ObjName"] || "-";
-                result["objTypeName"] =  this.getObjectNameMerge('RABBITMQ',rabbitName.length > 1 ? rabbitName : "RABBITMQ",grouping);
+                result["objTypeName"] =  this.getObjectNameMerge(result["objType"],rabbitName.length > 1 ? rabbitName : "RABBITMQ",grouping);
                 if (position === "from") {
 
                 } else {
@@ -386,9 +384,8 @@ class Topology extends Component {
                 break;
             }
             case "INTR_DB_CALL" : {
-                result["objType"] = "DB" + data[position + "ObjHash"];
-                // result["objTypeName"] = data[position + "ObjName"];
-                result["objTypeName"] = this.getObjectNameMerge('DB',data[position + "ObjName"],grouping);
+                result["objType"] = ["OUT",this.instances[data.fromObjHash].objType,"DB"].join("-");
+                result["objTypeName"] = this.getObjectNameMerge(result["objType"],data[position + "ObjName"],grouping);
                 if (position === "from") {
 
                 } else {
@@ -466,6 +463,8 @@ class Topology extends Component {
                             objToTypeMap[d.fromObjHash] = d.fromObjType;
                             objToTypeMap[d.toObjHash] = d.toObjType;
 
+
+                            // console.log(dd.fromObjType,d.toObjType);
                             const topology_key = [d.fromObjType,"_",d.toObjType].join(""); //- from + to object type 별로 그룹핑 함
                             if (objectTypeTopologyMap[topology_key]) {
                                 objectTypeTopologyMap[topology_key].count += Number(d.count);
@@ -563,7 +562,6 @@ class Topology extends Component {
                             totalElapsed: obj.totalElapsed
                         });
                     });
-
                     // from, to 정보에서 유일한 노드 정보 추출
                     let nodes = _.uniqBy(_.map(topology, (d) => {
                         return {
@@ -588,9 +586,11 @@ class Topology extends Component {
                     nodes.forEach((node) => {
                         node.grouping = grouping;
                         const nodeInstance = Object.values(objToTypeMap).filter((d) => d === node.objName);
-                        Object.values(this.instances).filter(d=> node.id === d.objType ).forEach(d=>{
-                            this.getObjectNameMerge(node.id,d.objName,grouping);
-                        });
+                        if( grouping ) {
+                            Object.values(this.instances).filter(d => node.id === d.objType).forEach(d => {
+                                this.getObjectNameMerge(node.id, d.objName, grouping);
+                            });
+                        }
                         node.instanceCount = nodeInstance.length;
                     });
 
@@ -864,7 +864,7 @@ class Topology extends Component {
                 if( d.objTypeFamily === "javaee" ){
                     dpObjName = this.objTypeNameMap.get(d.objName);
                 }else{
-                    dpObjName = d.objName;
+                    dpObjName = this.objTypeNameMap.get(d.id);
                 }
                 this.tooltip.transition(500).style("opacity", .8);
                 this.tooltip.html(( Array.isArray(dpObjName) ? dpObjName : [dpObjName] ).map(dp => `<div><p>${dp}</p></div>`).join(''))
