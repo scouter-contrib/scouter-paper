@@ -487,7 +487,6 @@ class Topology extends Component {
                                     errorCount: Number(d.errorCount),
                                     period: Number(d.period),
                                     totalElapsed: Number(d.totalElapsed),
-                                    name : d.objName
                                 };
                             }
                         });
