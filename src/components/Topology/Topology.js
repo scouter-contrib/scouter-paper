@@ -866,6 +866,9 @@ class Topology extends Component {
             return 0.5;
         }
     };
+    _trimPrefix =(prefix,name) =>{
+        return _.replace(name,prefix+"-","");
+    };
 
     hover = (d) => {
 
@@ -905,7 +908,8 @@ class Topology extends Component {
                     dpObjName = this.objTypeNameMap.get(d.id);
                 }
                 this.tooltip.transition(500).style("opacity", .8);
-                this.tooltip.html(( Array.isArray(dpObjName) ? dpObjName : [dpObjName] ).map(dp  => {
+                this.tooltip.html(( Array.isArray(dpObjName) ? dpObjName : [dpObjName] )
+                    .map(dp  => {
                         let counter  = [dp,0,0,0];
                         if( d.objTypeFamily === "javaee" ){
                             counter = this.objCounterMap.get(dp);
@@ -917,7 +921,7 @@ class Topology extends Component {
                         }else {
                             const [name, tps, errorRate, avgElasp] = counter;
                             return `<div class="tooltip-group"> 
-                                        <p>${name}</p> 
+                                        <p>${this._trimPrefix(d.id,name)}</p> 
                                     <div class="tooltip-counter"> 
                                         <tspan>${numeral(tps).format(this.props.config.numberFormat)} r/s</tspan> 
                                         <tspan style="color:red">${numeral(errorRate).format(this.props.config.numberFormat)}%</tspan> 
@@ -1174,7 +1178,7 @@ class Topology extends Component {
                 }
                 if( d.objTypeFamily !== "javaee" ){
                     if( Array.isArray(d.objName) ){
-                        return [d.objName.length, "cnt"].join(" ");
+                        return [d.objName.length, "target(s)"].join(" ");
                     }
                 }else{
                     return d.objName;
