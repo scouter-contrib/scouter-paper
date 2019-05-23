@@ -1185,18 +1185,20 @@ class Topology extends Component {
         });
 
         this.edgeFlowPath.style("pointer-events", "auto");
-        this.edgeFlowPath.attr("marker-end",(d,i)=>{
-            if (typeof(d.source) === "object") {
-                if(d.source.id === d.target.id){
-                    return `url(#arrowhead-${d.source.id})`;
+        if( this.props.topologyOption.grouping ) {
+            this.edgeFlowPath.attr("marker-end", (d, i) => {
+                if (typeof(d.source) === "object") {
+                    if (d.source.id === d.target.id) {
+                        return `url(#arrowhead-${d.source.id})`;
+                    }
+                } else {
+                    if (d.source === d.target) {
+                        return `url(#arrowhead-${d.source})`;
+                    }
                 }
-            } else {
-                if(d.source === d.target) {
-                    return `url(#arrowhead-${d.source})`;
-                }
-            }
-            return "url(#arrowhead)";
-        });
+                return "url(#arrowhead)";
+            });
+        }
 
         this.edgeFlowPath.on("click", that.edgeClicked);
 
