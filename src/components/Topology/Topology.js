@@ -917,7 +917,7 @@ class Topology extends Component {
 
                 this.tooltip.transition(500).style("opacity", .8);
                 this.tooltip.html(
-                    //- tooltip value 값을 최대 10개로 최대 한다.
+                    //- tooltip value 값을 응답 시간을 최대 시간 기준으로 최대 10개로 제한 한다.
                     _(( Array.isArray(dpObjName) ? dpObjName : [dpObjName] ).map(dp=> {
                         let counter  = [dp,0,0,0];
                         if( d.objTypeFamily === "javaee" ){
