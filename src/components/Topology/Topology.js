@@ -904,7 +904,7 @@ class Topology extends Component {
                 return this.linkTypeHover(d, o);
             });
 
-
+            // node tooltip task
             if (this.props.topologyOption.grouping && d.objCategory !== "CLIENT" ) {
 
                 let dpObjName = [];
@@ -914,31 +914,39 @@ class Topology extends Component {
                 }else{
                     dpObjName = this.objTypeNameMap.get(d.id);
                 }
+
                 this.tooltip.transition(500).style("opacity", .8);
-                this.tooltip.html(( Array.isArray(dpObjName) ? dpObjName : [dpObjName] ).map(dp  => {
+                this.tooltip.html(
+                    //- tooltip value 값을 최대 10개로 최대 한다.
+                    _(( Array.isArray(dpObjName) ? dpObjName : [dpObjName] ).map(dp=> {
                         let counter  = [dp,0,0,0];
                         if( d.objTypeFamily === "javaee" ){
                             counter = this.objCounterMap.get(dp);
                         }else{
                             counter = this.objCounterMap.get([d.id,dp].join('-'));
                         }
-                        if( !counter){
-                            return `<div><p>${dp? dp : 'Unknown'}</p></div>`;
-                        }else {
-                            const [name, tps, errorRate, avgElasp] = counter;
-                            return `<div class="tooltip-group"> 
-                                        <p>${name}</p> 
-                                    <div class="tooltip-counter"> 
-                                        <tspan>${numeral(tps).format(this.props.config.numberFormat)} r/s</tspan> 
-                                        <tspan style="color:red">${numeral(errorRate).format(this.props.config.numberFormat)}%</tspan> 
-                                        <tspan>${numeral(avgElasp).format(this.props.config.numberFormat)}ms</tspan> 
-                                    </div> 
-                            </div>`;
-                        }
+                        return counter;
+                    }).filter(v => v ? true : false ).sort((a,b)=> b[3]-a[3] ))
+                        .take(10)
+                        .values()
+                        .map( cnt  => {
 
-                    }).join(' '))
-                    .style("left",  (d3.event.pageX-17)  + "px")
-                    .style("top", (d3.event.pageY-100)  + "px");
+                                const [name, tps, errorRate, avgElasp] = cnt;
+                                return `<div class="tooltip-group"> 
+                                            <p>${name}</p> 
+                                        <div class="tooltip-counter"> 
+                                            <tspan>${numeral(tps).format(this.props.config.numberFormat)} r/s</tspan> 
+                                            <tspan style="color:red">${numeral(errorRate).format(this.props.config.numberFormat)}%</tspan> 
+                                            <tspan>${numeral(avgElasp).format(this.props.config.numberFormat)}ms</tspan> 
+                                        </div> 
+                                </div>`;
+
+
+                        })
+                    .join(' ')
+                )
+                .style("left",  (d3.event.pageX-17)  + "px")
+                .style("top", (d3.event.pageY-100)  + "px");
             }
         }
 
