@@ -155,6 +155,9 @@ class Topology extends Component {
         if (this.props.topologyOption.grouping !== nextProps.topologyOption.grouping) {
             this.getTopology(nextProps.config, nextProps.filterMap, nextProps.user, nextProps.topologyOption.grouping);
         }
+        if(this.props.topologyOption.arcLine !== nextProps.topologyOption.arcLine){
+            this.update(nextProps.topologyOption.pin, nextProps.topologyOption.tpsToLineSpeed, nextProps.topologyOption.speedLevel);
+        }
 
         if (this.props.topologyOption.tpsToLineSpeed !== nextProps.topologyOption.tpsToLineSpeed) {
             this.update(nextProps.topologyOption.pin, nextProps.topologyOption.tpsToLineSpeed, nextProps.topologyOption.speedLevel);
@@ -166,6 +169,7 @@ class Topology extends Component {
                 this.update(nextProps.topologyOption.pin, nextProps.topologyOption.tpsToLineSpeed, nextProps.topologyOption.speedLevel);
             }
         }
+
 
         if (this.props.topologyOption.pin !== nextProps.topologyOption.pin) {
             if (!nextProps.topologyOption.pin) {
@@ -840,7 +844,14 @@ class Topology extends Component {
             y2 = y2 + 1;
         }
 
-        return "M" + x1 + "," + y1 + "A" + drx + "," + dry + " " + xRotation + "," + largeArc + "," + sweep + " " + x2 + "," + y2;
+
+
+        // self or grouping 이 아닌경우 엣지 생성
+        if( !this.props.topologyOption.grouping || this.props.topologyOption.arcLine || d.source === d.target) {
+            return ["M", x1, ",", y1, "A", drx, ",", dry, " ", xRotation, ",", largeArc, ",", sweep, " ", x2, ",", y2].join("");
+        } else {
+            return ["M", x1, ",", y1, "A", 0, ",", 0, " ", xRotation, ",", largeArc, ",", sweep, " ", x2, ",", y2].join("");
+        }
     };
 
     zoomed = () => {
@@ -897,7 +908,7 @@ class Topology extends Component {
                 return this.linkTypeHover(d, o);
             });
 
-
+            // node tooltip task
             if (this.props.topologyOption.grouping && d.objCategory !== "CLIENT" ) {
 
                 let dpObjName = [];
@@ -907,32 +918,39 @@ class Topology extends Component {
                 }else{
                     dpObjName = this.objTypeNameMap.get(d.id);
                 }
+
                 this.tooltip.transition(500).style("opacity", .8);
-                this.tooltip.html(( Array.isArray(dpObjName) ? dpObjName : [dpObjName] )
-                    .map(dp  => {
+                this.tooltip.html(
+                    //- tooltip value 값을 응답 시간을 최대 시간 기준으로 최대 10개로 제한 한다.
+                    _(( Array.isArray(dpObjName) ? dpObjName : [dpObjName] ).map(dp=> {
                         let counter  = [dp,0,0,0];
                         if( d.objTypeFamily === "javaee" ){
                             counter = this.objCounterMap.get(dp);
                         }else{
                             counter = this.objCounterMap.get([d.id,dp].join('-'));
                         }
-                        if( !counter){
-                            return `<div><p>${dp? dp : 'Unknown'}</p></div>`;
-                        }else {
-                            const [name, tps, errorRate, avgElasp] = counter;
-                            return `<div class="tooltip-group"> 
-                                        <p>${this._trimPrefix(d.id,name)}</p> 
-                                    <div class="tooltip-counter"> 
-                                        <tspan>${numeral(tps).format(this.props.config.numberFormat)} r/s</tspan> 
-                                        <tspan style="color:red">${numeral(errorRate).format(this.props.config.numberFormat)}%</tspan> 
-                                        <tspan>${numeral(avgElasp).format(this.props.config.numberFormat)}ms</tspan> 
-                                    </div> 
-                            </div>`;
-                        }
+                        return counter;
+                    }).filter(v => v ? true : false ).sort((a,b)=> b[3]-a[3] ))
+                        .take(10)
+                        .values()
+                        .map( cnt  => {
 
-                    }).join(' '))
-                    .style("left",  (d3.event.pageX-17)  + "px")
-                    .style("top", (d3.event.pageY-100)  + "px");
+                                const [name, tps, errorRate, avgElasp] = cnt;
+                                return `<div class="tooltip-group"> 
+                                            <p>${this._trimPrefix(d.id,name)}</p>
+                                        <div class="tooltip-counter"> 
+                                            <tspan>${numeral(tps).format(this.props.config.numberFormat)} r/s</tspan> 
+                                            <tspan style="color:red">${numeral(errorRate).format(this.props.config.numberFormat)}%</tspan> 
+                                            <tspan>${numeral(avgElasp).format(this.props.config.numberFormat)}ms</tspan> 
+                                        </div> 
+                                </div>`;
+
+
+                        })
+                    .join(' ')
+                )
+                .style("left",  (d3.event.pageX-17)  + "px")
+                .style("top", (d3.event.pageY-100)  + "px");
             }
         }
 
@@ -1047,6 +1065,14 @@ class Topology extends Component {
         return Number(localStorage.getItem(d.id + "-y"));
     };
 
+    linkKey=(d) =>{
+        if (typeof(d.source) === "object") {
+            return d.source.id + "-" + d.target.id;
+        } else {
+            return d.source + "-" + d.target;
+        }
+    };
+
     update = (pin, tpsToLineSpeed, speedLevel) => {
         let that = this;
 
@@ -1059,6 +1085,25 @@ class Topology extends Component {
 
         if (!this.svg) {
             this.svg = d3.select(this.refs.topologyChart).append("svg").attr("width", this.width).attr("height", this.height).append("g");
+            //- allow adding
+            this.svg
+                .append("defs")
+                .append("marker")
+                .attr("class", "arrowhead")
+                .attr("id", "arrowhead")
+                .attr("viewBox", "-0 -5 10 10")
+                .attr("refX", "20")
+                .attr("refY", "0")
+                .attr("orient", "auto")
+                .attr("markerWidth", "3")
+                .attr("markerHeight", "3")
+                .attr("xoverflow", "visible")
+                .attr("opacity", .7)
+                .append("path")
+                .attr("d", "M 0,-5 L 10, 0 L 0, 5")
+                .style("fill", 'white');
+
+
 
 
             this.edgePathGroup = this.svg.append("g").attr("class", "edge-path-group");
@@ -1151,12 +1196,37 @@ class Topology extends Component {
             }
         }).attr('id', function (d, i) {
             return 'edgeFlowPath' + i
-        }).style("pointer-events", "none").style("animation", function (d) {
+        })
+        .style("pointer-events", "none")
+        .style("animation", function (d) {
             return that.styleAnimateEdge(d, this, tpsToLineSpeed, speedLevel);
         });
 
         this.edgeFlowPath.style("pointer-events", "auto");
+        //- arc
+        if( this.props.topologyOption.grouping ) {
+
+            this.edgeFlowPath.attr("marker-end", (d, i) => {
+                if(this.props.topologyOption.arcLine) {
+                    return "url(#arrowhead-unknown)";
+                }
+                if (typeof(d.source) === "object") {
+                    if (d.source.id === d.target.id) {
+                        return `url(#arrowhead-${d.source.id})`;
+                    }
+                } else {
+                    if (d.source === d.target) {
+                        return `url(#arrowhead-${d.source})`;
+                    }
+                }
+                return "url(#arrowhead)";
+
+            });
+        }
+
         this.edgeFlowPath.on("click", that.edgeClicked);
+
+
 
         // 노드 아래에 표시되는 명칭
         this.nodeNameText = this.nodeNameTextGroup.selectAll(".node-name").data(nodes)
