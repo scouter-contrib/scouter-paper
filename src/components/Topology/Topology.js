@@ -155,10 +155,12 @@ class Topology extends Component {
         if (this.props.topologyOption.grouping !== nextProps.topologyOption.grouping) {
             this.getTopology(nextProps.config, nextProps.filterMap, nextProps.user, nextProps.topologyOption.grouping);
         }
+        if(this.props.topologyOption.arcLine !== nextProps.topologyOption.arcLine){
+            this.update(nextProps.topologyOption.pin, nextProps.topologyOption.tpsToLineSpeed, nextProps.topologyOption.speedLevel);
+        }
 
         if (this.props.topologyOption.tpsToLineSpeed !== nextProps.topologyOption.tpsToLineSpeed) {
             this.update(nextProps.topologyOption.pin, nextProps.topologyOption.tpsToLineSpeed, nextProps.topologyOption.speedLevel);
-
         }
 
         if (this.props.topologyOption.speedLevel !== nextProps.topologyOption.speedLevel) {
@@ -166,6 +168,7 @@ class Topology extends Component {
                 this.update(nextProps.topologyOption.pin, nextProps.topologyOption.tpsToLineSpeed, nextProps.topologyOption.speedLevel);
             }
         }
+
 
         if (this.props.topologyOption.pin !== nextProps.topologyOption.pin) {
             if (!nextProps.topologyOption.pin) {
@@ -839,12 +842,15 @@ class Topology extends Component {
             x2 = x2 + 1;
             y2 = y2 + 1;
         }
-        if( !this.props.topologyOption.grouping ) {
+
+
+
+        // self or grouping 이 아닌경우 엣지 생성
+        if( !this.props.topologyOption.grouping || this.props.topologyOption.arcLine || d.source === d.target) {
             return ["M", x1, ",", y1, "A", drx, ",", dry, " ", xRotation, ",", largeArc, ",", sweep, " ", x2, ",", y2].join("");
         } else {
             return ["M", x1, ",", y1, "A", 0, ",", 0, " ", xRotation, ",", largeArc, ",", sweep, " ", x2, ",", y2].join("");
         }
-        // return "M 0,-5 L 10, 0 L 0, 5";
     };
 
     zoomed = () => {
@@ -1080,7 +1086,7 @@ class Topology extends Component {
                 .attr("markerWidth", "3")
                 .attr("markerHeight", "3")
                 .attr("xoverflow", "visible")
-                .attr("opacity", .5)
+                .attr("opacity", .7)
                 .append("path")
                 .attr("d", "M 0,-5 L 10, 0 L 0, 5")
                 .style("fill", 'white');
@@ -1185,8 +1191,13 @@ class Topology extends Component {
         });
 
         this.edgeFlowPath.style("pointer-events", "auto");
+        //- arc
         if( this.props.topologyOption.grouping ) {
+
             this.edgeFlowPath.attr("marker-end", (d, i) => {
+                if(this.props.topologyOption.arcLine) {
+                    return "url(#arrowhead-unknown)";
+                }
                 if (typeof(d.source) === "object") {
                     if (d.source.id === d.target.id) {
                         return `url(#arrowhead-${d.source.id})`;
@@ -1197,6 +1208,7 @@ class Topology extends Component {
                     }
                 }
                 return "url(#arrowhead)";
+
             });
         }
 
