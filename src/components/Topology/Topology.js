@@ -839,8 +839,12 @@ class Topology extends Component {
             x2 = x2 + 1;
             y2 = y2 + 1;
         }
-
-        return "M" + x1 + "," + y1 + "A" + drx + "," + dry + " " + xRotation + "," + largeArc + "," + sweep + " " + x2 + "," + y2;
+        if( !this.props.topologyOption.grouping ) {
+            return ["M", x1, ",", y1, "A", drx, ",", dry, " ", xRotation, ",", largeArc, ",", sweep, " ", x2, ",", y2].join("");
+        } else {
+            return ["M", x1, ",", y1, "A", 0, ",", 0, " ", xRotation, ",", largeArc, ",", sweep, " ", x2, ",", y2].join("");
+        }
+        // return "M 0,-5 L 10, 0 L 0, 5";
     };
 
     zoomed = () => {
@@ -1043,6 +1047,14 @@ class Topology extends Component {
         return Number(localStorage.getItem(d.id + "-y"));
     };
 
+    linkKey=(d) =>{
+        if (typeof(d.source) === "object") {
+            return d.source.id + "-" + d.target.id;
+        } else {
+            return d.source + "-" + d.target;
+        }
+    };
+
     update = (pin, tpsToLineSpeed, speedLevel) => {
         let that = this;
 
@@ -1055,6 +1067,25 @@ class Topology extends Component {
 
         if (!this.svg) {
             this.svg = d3.select(this.refs.topologyChart).append("svg").attr("width", this.width).attr("height", this.height).append("g");
+            //- allow adding
+            this.svg
+                .append("defs")
+                .append("marker")
+                .attr("class", "arrowhead")
+                .attr("id", "arrowhead")
+                .attr("viewBox", "-0 -5 10 10")
+                .attr("refX", "20")
+                .attr("refY", "0")
+                .attr("orient", "auto")
+                .attr("markerWidth", "3")
+                .attr("markerHeight", "3")
+                .attr("xoverflow", "visible")
+                .attr("opacity", .5)
+                .append("path")
+                .attr("d", "M 0,-5 L 10, 0 L 0, 5")
+                .style("fill", 'white');
+
+
 
 
             this.edgePathGroup = this.svg.append("g").attr("class", "edge-path-group");
@@ -1147,12 +1178,29 @@ class Topology extends Component {
             }
         }).attr('id', function (d, i) {
             return 'edgeFlowPath' + i
-        }).style("pointer-events", "none").style("animation", function (d) {
+        })
+        .style("pointer-events", "none")
+        .style("animation", function (d) {
             return that.styleAnimateEdge(d, this, tpsToLineSpeed, speedLevel);
         });
 
         this.edgeFlowPath.style("pointer-events", "auto");
+        this.edgeFlowPath.attr("marker-end",(d,i)=>{
+            if (typeof(d.source) === "object") {
+                if(d.source.id === d.target.id){
+                    return `url(#arrowhead-${d.source.id})`;
+                }
+            } else {
+                if(d.source === d.target) {
+                    return `url(#arrowhead-${d.source})`;
+                }
+            }
+            return "url(#arrowhead)";
+        });
+
         this.edgeFlowPath.on("click", that.edgeClicked);
+
+
 
         // 노드 아래에 표시되는 명칭
         this.nodeNameText = this.nodeNameTextGroup.selectAll(".node-name").data(nodes)
