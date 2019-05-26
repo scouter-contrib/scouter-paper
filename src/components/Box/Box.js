@@ -120,6 +120,8 @@ class Box extends Component {
                     titles : {}
                 });
             }
+            console.log('========================> add metric config..', this.props.box);
+
             this.props.setOption(this.props.box.key, option);
         }
     }

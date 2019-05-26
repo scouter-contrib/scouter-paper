@@ -123,7 +123,21 @@ export function options() {
                     value: false
                 }
             }
-        }/*,
+        },
+        lineChart: {
+            icon: "fa-line-chart",
+            mode: "nonexclusive",
+            type: "counter",
+            title: "LINE CHART",
+            config: {
+                name : "Chart Type",
+                type : "selector",
+                data : [ "LINE", "LINE FILL","STACK AREA"],
+                value : "LINE"
+            }
+        }
+
+        /*,
         WAS: [
             {
                 text: "TPS",

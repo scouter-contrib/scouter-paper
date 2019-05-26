@@ -81,7 +81,7 @@ class PaperControl extends Component {
                                     <span className="toggle-filter-icon"><i className="fa fa-angle-down" aria-hidden="true"></i></span>
                                 </div>
                                 <ul>
-                                    {Object.keys(this.options).map((name, i) => {
+                                    {Object.keys(this.options).filter(name => name !== "lineChart").map((name, i) => {
                                         return <li key={i}>
                                             <div key={i} className="paper-control" data-tip={this.options[name].title} >
                                                 {(!this.touch) &&

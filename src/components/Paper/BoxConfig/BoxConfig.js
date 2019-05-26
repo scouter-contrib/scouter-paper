@@ -90,6 +90,7 @@ class BoxConfig extends Component {
     };
 
     render() {
+        console.log("box config open",this.props.box);
         return (
             <div className={"box-config popup-div " + (this.state.singleRow ? "single-row" : "")} onMouseDown={(e) => {e.stopPropagation();}} onMouseUp={(e) => {e.stopPropagation();}} ref="boxConfig">
                 <div className="box-config-content">

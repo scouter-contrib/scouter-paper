@@ -1179,8 +1179,8 @@ class Paper extends Component {
 
     setOption = (key, option) => {
 
+        // paper init counter position : 2
         let boxes = this.props.boxes.slice(0);
-
         boxes.forEach((box) => {
             if (box.key === key) {
 
