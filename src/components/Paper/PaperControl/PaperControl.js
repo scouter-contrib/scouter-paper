@@ -114,6 +114,7 @@ class PaperControl extends Component {
                                                 return a.displayName.localeCompare(b.displayName);
                                             }).map((counter, j) => {
                                                 counter.familyName = family.name;
+                                                counter.advancedOption = this.options["lineChart"].config;
                                                 return <li key={j}>
                                                     <Draggable type="metric" className="draggable paper-control-item" data={JSON.stringify(counter)}>
                                                         <div className="draggable-icon">draggable</div>
@@ -131,6 +132,7 @@ class PaperControl extends Component {
                                                 return a.displayName.localeCompare(b.displayName);
                                             }).map((counter, j) => {
                                                 counter.familyName = family.name;
+                                                counter.advancedOption = this.options["lineChart"].config;
                                                 return <li key={j}>
                                                     <div className="paper-control-item" onClick={this.props.addPaperAndAddMetric.bind(this, JSON.stringify(counter))}>
                                                         <span className="text-icon">{counter.displayName}</span>

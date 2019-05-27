@@ -1220,6 +1220,9 @@ class Paper extends Component {
                             familyName: option.familyName
                         });
                     }
+                    if(!box.advancedOption && option.advancedOption ){
+                        box.advancedOption = option.advancedOption;
+                    }
                 }
 
                 box.values = {};

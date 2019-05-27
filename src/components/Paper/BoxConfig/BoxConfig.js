@@ -117,7 +117,7 @@ class BoxConfig extends Component {
                     }
                     </div>
                     <div className="box-config-items">
-                    {this.props.box.option && this.props.box.option.config && Object.keys(this.props.box.option.config).map((attr, i) => {
+                    { this.props.box.option && this.props.box.option.config && Object.keys(this.props.box.option.config).map((attr, i) => {
                         if (this.props.box.option.config[attr].type === "input") {
                             return <div className="box-config-item" key={i}>
                                         <label>{this.props.box.option.config[attr].name}</label>
@@ -158,8 +158,27 @@ class BoxConfig extends Component {
                         } else {
                             return undefined;
                         }
-                    })}
+                    })
+                    }
                     </div>
+                    <div className="box-config-advanced-items">
+                    { this.props.box.advancedOption && Object.keys(this.props.box.advancedOption).map((attr, i) => {
+                            if (this.props.box.advancedOption[attr].type === "selector") {
+                                return <div className="box-config-advanced-item" key={i}>
+                                    <label>{this.props.box.advancedOption[attr].name}</label>
+                                    <select onChange={this.onChange.bind(this, attr)} defaultValue={this.state.values[attr]}>
+                                        {this.props.box.advancedOption[attr].data.map((d, i) => {
+                                            return <option key={i}>{d}</option>
+                                        })}
+                                    </select>
+                                </div>
+                            }else{
+                                return undefined;
+                            }
+                        })
+                    }
+                    </div>
+
                     <div className="box-config-buttons">
                         <button onClick={this.onCancel}>CANCEL</button><button onClick={this.onApply}>APPLY</button>
                     </div>

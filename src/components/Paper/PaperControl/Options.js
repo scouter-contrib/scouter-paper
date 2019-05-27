@@ -130,10 +130,12 @@ export function options() {
             type: "counter",
             title: "LINE CHART",
             config: {
-                name : "Chart Type",
-                type : "selector",
-                data : [ "LINE", "LINE FILL","STACK AREA"],
-                value : "LINE"
+                chartType : {
+                    name: "Chart Type",
+                    type: "selector",
+                    data: ["LINE", "LINE FILL", "STACK AREA"],
+                    value: "LINE"
+                }
             }
         }
 
