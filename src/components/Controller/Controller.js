@@ -18,6 +18,7 @@ import * as _ from "lodash";
 import {buildHttpProtocol, errorHandler, getCurrentUser, getDefaultServerConfig, getDefaultServerConfigIndex, getHttpProtocol, getWithCredentials, setAuthHeader, setData, setRangePropsToUrl, setServerTimeGap} from "../../common/common";
 import jQuery from "jquery";
 import PaperControl from "../Paper/PaperControl/PaperControl";
+import * as common from "../../common/common";
 
 
 class Controller extends Component {
@@ -42,12 +43,13 @@ class Controller extends Component {
         if (getDefaultServerConfig(this.props.config).authentification !== "bearer") {
             this.setTargetFromUrl(this.props);
         } else {
-            let defaultServerconfig = getDefaultServerConfig(this.props.config);
-            let origin = defaultServerconfig.protocol + "://" + defaultServerconfig.address + ":" + defaultServerconfig.port;
+            let defaultServerConfig = getDefaultServerConfig(this.props.config);
+            let origin = defaultServerConfig.protocol + "://" + defaultServerConfig.address + ":" + defaultServerConfig.port;
             if (this.props.config || (this.props.user[origin] && this.props.user[origin].id)) {
                 this.setTargetFromUrl(this.props);
             }
         }
+        common.setTargetServerToUrl(this.props, this.props.config);
 
         if (localStorage.getItem("selectedObjects")) {
             let selectedObjects = JSON.parse(localStorage.getItem("selectedObjects"));
@@ -226,6 +228,8 @@ class Controller extends Component {
         if (localStorage) {
             localStorage.setItem("config", JSON.stringify(config));
         }
+
+        common.setTargetServerToUrl(this.props, config);
 
         this.props.setTarget([], []);
         this.setState({
@@ -683,7 +687,10 @@ class Controller extends Component {
     selectAll = () => {
         let filteredObjects = this.state.objects.filter((object) => {
             if (this.state.filter && this.state.filter.length > 1) {
-                if ((object.objType && object.objType.toLowerCase().indexOf(this.state.filter.toLowerCase()) > -1) || (object.objName && object.objName.toLowerCase().indexOf(this.state.filter.toLowerCase()) > -1) || (object.address && object.address.toLowerCase().indexOf(this.state.filter.toLowerCase()) > -1)) {
+                if ((object.objType && object.objType.toLowerCase().indexOf(this.state.filter.toLowerCase()) > -1)
+                    || (object.objName && object.objName.toLowerCase().indexOf(this.state.filter.toLowerCase()) > -1)
+                    || (object.address && object.address.toLowerCase().indexOf(this.state.filter.toLowerCase()) > -1))
+                {
                     return true;
                 } else {
                     return false;

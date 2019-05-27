@@ -67,6 +67,19 @@ export function getHttpProtocol(config) {
     }
 }
 
+export function getServerInfo(config) {
+    if (config.servers && config.servers.length > 0) {
+        let server = config.servers.filter((server) => server.default);
+        if (server && server.length > 0) {
+            return { address: server[0].address, port: server[0].port };
+        } else {
+            return null;
+        }
+    } else {
+        return null;
+    }
+}
+
 export function buildHttpProtocol(config) {
     if (config.servers && config.servers.length > 0) {
         let idx = 0;
@@ -389,6 +402,28 @@ export function setTxidPropsToUrl (props, txiddate, txid) {
         search.delete("txiddate");
         search.delete("txid");
     }
+
+    if (props.location.search !== ("?" + search.toString())) {
+        props.history.replace({
+            pathname: props.location.pathname,
+            search: "?" + search.toString()
+        });
+    }
+}
+
+export function setTargetServerToUrl (props, config) {
+    const server = getServerInfo(config);
+    if (server && server.address) {
+        setTargetServerToUrl0(props, server.address, server.port, server.protocol);
+    }
+}
+
+export function setTargetServerToUrl0 (props, serverAddr, serverPort, protocol) {
+    let search = new URLSearchParams(props.location.search);
+
+    search.set("address", serverAddr);
+    search.set("port", serverPort);
+    search.set("protocol", protocol || "http");
 
     if (props.location.search !== ("?" + search.toString())) {
         props.history.replace({
