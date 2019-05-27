@@ -74,7 +74,7 @@ class Paper extends Component {
 
         //URL로부터 layout 세팅
         let layout = common.getParam(this.props, "layout");
-        if (layout) {
+        if (layout || Object.keys(layouts).length === 0) {
             jQuery.ajax({
                 method: "GET",
                 async: true,
@@ -85,12 +85,22 @@ class Paper extends Component {
                 }
             }).done((msg) => {
                 if (msg && Number(msg.status) === 200) {
+                    let isSet = false;
                     let templates = JSON.parse(msg.result);
+                    let boxesFallback;
+                    let layoutsFallback;
                     for (let i = 0; i < templates.length; i++) {
                         if (layout === templates[i].name) {
                             this.props.setTemplate(templates[i].boxes, templates[i].layouts);
+                            isSet = true;
                             break;
+                        } else {
+                            boxesFallback = templates[i].boxes;
+                            layoutsFallback = templates[i].boxes;
                         }
+                    }
+                    if (!isSet && boxesFallback) {
+                        this.props.setTemplate(boxesFallback, layoutsFallback);
                     }
                 }
             }).fail((xhr, textStatus, errorThrown) => {
