@@ -39,6 +39,8 @@ class XLog extends Component {
     lastPastTimestamp = null;
     lastPageCnt = null;
     lastClearTimestamp = null;
+    errorCount = 0;
+    callCount = 0;
 
     constructor(props) {
         super(props);
@@ -150,8 +152,24 @@ class XLog extends Component {
             this.clear();
             this.redraw(this.props.filter);
         }
+        this.countXLogData();
     };
 
+    countXLogData = () => {
+        this.errorCount = 0;
+        this.callCount = 0;
+        let datas = common.getFilteredData(this.props.data.xlogs, this.props.filter);
+        datas.forEach((d, i) => {
+            let x = this.graph.x(d.endTime);
+            if (Number(d.error)) {
+                if (x < 0) this.errorCount--;
+                else this.errorCount++;
+            } else {
+                if (x < 0) this.callCount--;
+                else this.callCount++;
+            }
+        });
+    };
     resizeTimer = null;
     graphResize = () => {
         if (this.resizeTimer) {
@@ -526,7 +544,10 @@ class XLog extends Component {
                     </div>
                 </div>
                 }
-                <div className="axis-button axis-up noselect" onClick={this.axisUp} onMouseDown={this.stopPropagation}>+</div>
+                <div>
+                    <div className="axis-button axis-up noselect" onClick={this.axisUp} onMouseDown={this.stopPropagation}>+</div>
+                    <div className="text-right"><p>Error / Total : <span className="text-error">{this.errorCount}</span> / {this.callCount}</p></div>
+                </div>
                 <div className="axis-button axis-down noselect" onClick={this.axisDown} onMouseDown={this.stopPropagation}>-</div>
                 {this.props.box.values.showPreview === "Y" &&
                 <XLogPreviewer secondStepTimestamp={this.props.data.secondStepTimestamp} secondStepXlogs={this.props.data.secondStepXlogs} width={this.graph.preview.width} margin={this.graph.margin} maxElapsed={this.state.elapsed}/>
