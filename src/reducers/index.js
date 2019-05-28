@@ -529,6 +529,7 @@ let topologyOptionState = {
     pin : false,
     lastUpdateTime : null,
     grouping : true,
+    arcLine : false,
     nodeCount : 0,
     linkCount : 0
 };
