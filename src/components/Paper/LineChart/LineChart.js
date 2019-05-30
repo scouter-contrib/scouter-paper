@@ -13,7 +13,7 @@ class LineChart extends Component {
     lastCountersTime = null;
     lastCountersHistoryTime = null;
     historyInit = {};
-
+    chartType = "LINE";
     graph = {
         margin: {
             top: 15, right: 15, bottom: 25, left: 40
@@ -72,6 +72,14 @@ class LineChart extends Component {
 
     componentWillReceiveProps(nextProps) {
         let counters = Object.assign({}, this.state.counters);
+
+        //- LINE FILL => LINE Change 할경우
+        if( nextProps.box.values['chartType'] !== this.chartType){
+            if( nextProps.box.values['chartType'] === 'LINE' && this.chartType === 'LINE FILL' ){
+                this.removeLineFill();
+            }
+        }
+
         if (nextProps.countersHistory && this.lastCountersHistoryTime !== nextProps.countersHistoryTimestamp) {
 
             this.lastCountersHistoryTime = nextProps.countersHistoryTimestamp;
@@ -169,6 +177,7 @@ class LineChart extends Component {
             });
 
         }
+        this.chartType = nextProps.box.values['chartType'];
 
     }
 
@@ -301,7 +310,6 @@ class LineChart extends Component {
     }
 
     componentDidUpdate = (prevProps, prevState) => {
-
         if (prevProps.layoutChangeTime !== this.props.layoutChangeTime) {
             if (this.graphResize()) {
                 this.draw();
@@ -311,6 +319,7 @@ class LineChart extends Component {
             this.draw();
             this.removeObjLine(prevProps.objects, this.props.objects);
         }
+
 
     };
 
@@ -374,6 +383,18 @@ class LineChart extends Component {
         return name;
     }
 
+    removeLineFill = () =>{
+        for(const obj of this.props.objects) {
+            for (let counterKey in this.state.counters) {
+                let areaClass = "area-" + obj.objHash + "-" + this.replaceName(counterKey);
+                this.graph.svg.selectAll("path." + areaClass)
+                    .transition()
+                    .delay(100)
+                    .remove();
+            }
+        }
+
+    };
     removeObjectLine = (obj, counterKey) => {
         let pathClass = "line-" + obj.objHash + "-" + this.replaceName(counterKey);
         let path = this.graph.svg.selectAll("path." + pathClass);
@@ -426,11 +447,11 @@ class LineChart extends Component {
 
     drawObjectLine = (obj, option, counterKey, color) => {
         const that = this;
-
-        if (this.props.config.graph.fill === "Y") {
+        if (this.props.box.values['chartType'] === "LINE FILL") {
 
             let areaClass = "area-" + obj.objHash + "-" + this.replaceName(counterKey);
-            let area = this.graph.svg.selectAll("path." + areaClass);
+            let area = this.graph.svg.selectAll("path." + areaClass)
+
 
             if (area.size() < 1) {
                 area = this.graph.svg.insert("path", ":first-child").attr("class", areaClass).style("stroke", color);
@@ -448,7 +469,8 @@ class LineChart extends Component {
                     } else {
                         return that.graph.y(0);
                     }
-                });
+                })
+
 
             if (this.props.config.graph.break === "Y") {
                 valueArea.defined(function (d) {
@@ -459,9 +481,19 @@ class LineChart extends Component {
 
 
             if (!this.props.filterMap[obj.objHash]) {
-                area.data([that.state.counters[counterKey]]).attr("d", valueArea).style("fill", color).style("opacity", 0);
+                area.data([that.state.counters[counterKey]])
+                    .attr("d", valueArea)
+                    .style("fill", color)
+                    .style("opacity", 0)
+                    .transition()
+                    .delay(100);
             } else {
-                area.data([that.state.counters[counterKey]]).attr("d", valueArea).style("fill", color).style("opacity", this.props.config.graph.fillOpacity);
+                area.data([that.state.counters[counterKey]])
+                    .attr("d", valueArea)
+                    .style("fill", color)
+                    .style("opacity", this.props.config.graph.fillOpacity)
+                    .transition()
+                    .delay(100);
             }
         }
 

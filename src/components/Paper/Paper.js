@@ -207,6 +207,18 @@ class Paper extends Component {
             rangeControl: false
         };
 
+        // 초기화 : 만약 라인 차트 타입 설정이 없는 경우
+
+        if( boxes ){
+            for (const key in boxes) {
+                if( !boxes[key].advancedOption && Array.isArray(boxes[key].option) ){
+                    boxes[key].advancedOption = Options.options().lineChart.config;
+                    for(const attr in boxes[key].advancedOption ){
+                        boxes[key].values[attr] =  boxes[key].advancedOption[attr].value;
+                    }
+                }
+            }
+        }
         this.props.setBoxesLayouts(boxes, layouts);
     }
 
@@ -268,12 +280,15 @@ class Paper extends Component {
 
         if (JSON.stringify(nextProps.template) !== JSON.stringify(this.props.template)) {
             if (JSON.stringify(nextProps.template.boxes) !== JSON.stringify(this.state.boxes) || JSON.stringify(nextProps.template.layouts) !== JSON.stringify(this.state.layouts)) {
-                // 초기화 : 템플릿 설정 및 박스 업데이트
+                // 초기화 : 만약 라인 차트 타입 설정이 없는 경우
                 const boxes = nextProps.template.boxes;
                 if( boxes ){
                     for (const key in boxes) {
                         if( !boxes[key].advancedOption && Array.isArray(boxes[key].option) ){
                             boxes[key].advancedOption = Options.options().lineChart.config;
+                            for(const attr in boxes[key].advancedOption ){
+                                boxes[key].values[attr] =  boxes[key].advancedOption[attr].value;
+                            }
                         }
                     }
                 }
@@ -1236,7 +1251,11 @@ class Paper extends Component {
                 for (let attr in option.config) {
                     box.values[attr] = option.config[attr].value;
                 }
-
+                if(option.advancedOption) {
+                    for (let attr in option.advancedOption) {
+                        box.values[attr] = option.advancedOption[attr].value;
+                    }
+                }
                 if (Array.isArray(box.option)) {
                     box.config = false;
                     let title = "";
