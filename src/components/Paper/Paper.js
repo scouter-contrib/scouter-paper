@@ -13,6 +13,7 @@ import Profiler from "./XLog/Profiler/Profiler";
 import ActiveService from "./ActiveService/ActiveService";
 import ServerDate from "../../common/ServerDate";
 import moment from "moment";
+import * as Options from "./PaperControl/Options"
 import OldVersion from "../OldVersion/OldVersion";
 
 const ResponsiveReactGridLayout = WidthProvider(Responsive);
@@ -55,11 +56,9 @@ class Paper extends Component {
                 }
             }
         }
-
         if (!(layouts)) {
             layouts = {};
         }
-
         if (!boxes) {
             boxes = [];
         }
@@ -211,8 +210,7 @@ class Paper extends Component {
         this.props.setBoxesLayouts(boxes, layouts);
     }
 
-    componentDidUpdate = (prevProps, prevState) => {
-
+    componentDidUpdate = (prevProps, nextState) => {
         let counterKeyMap = {};
         for (let i = 0; i < this.props.boxes.length; i++) {
             let option = this.props.boxes[i].option;
@@ -270,7 +268,16 @@ class Paper extends Component {
 
         if (JSON.stringify(nextProps.template) !== JSON.stringify(this.props.template)) {
             if (JSON.stringify(nextProps.template.boxes) !== JSON.stringify(this.state.boxes) || JSON.stringify(nextProps.template.layouts) !== JSON.stringify(this.state.layouts)) {
-                this.props.setBoxesLayouts(nextProps.template.boxes, nextProps.template.layouts);
+                // 초기화 : 템플릿 설정 및 박스 업데이트
+                const boxes = nextProps.template.boxes;
+                if( boxes ){
+                    for (const key in boxes) {
+                        if( !boxes[key].advancedOption && Array.isArray(boxes[key].option) ){
+                            boxes[key].advancedOption = Options.options().lineChart.config;
+                        }
+                    }
+                }
+                this.props.setBoxesLayouts(boxes, nextProps.template.layouts);
             }
         }
 
