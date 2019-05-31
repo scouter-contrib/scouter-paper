@@ -450,7 +450,7 @@ class LineChart extends Component {
 
         let instanceMetricCount = {};
         const color = {};
-
+        //- instance color making
         for (const attr  in this.props.objects) {
             const _obj = this.props.objects[attr];
             if (_obj.objFamily === thisOption.familyName) {
@@ -466,7 +466,7 @@ class LineChart extends Component {
                 }
             }
         }
-
+        //- instance data flat data making
         const stackData = _(this.state.counters[counterKey])
                             .map((d) => {
                                 const _r = Object.keys(d.data).map(key => {
@@ -479,9 +479,11 @@ class LineChart extends Component {
                                 });
                                 return _r;
                             }).flatMapDepth().value();
-
+        //- 인스턴스 별 데이터로 변환
         let ld = d3.nest().key(d => d.objHash).entries(stackData);
         const _sort = [];
+
+        //- 인스턴스 순서 정렬
         for (const attr  in this.props.objects) {
             const _obj = this.props.objects[attr];
             const _find = _.findIndex(ld, (o) =>  o.key === _obj.objHash);
@@ -490,6 +492,7 @@ class LineChart extends Component {
             }
 
         }
+        //- 인스턴스 그리기
         const area = d3.area().curve(d3[this.props.config.graph.curve])
             .x(d =>{
                 return this.graph.x(d[0]);
@@ -503,7 +506,9 @@ class LineChart extends Component {
             })
         }
 
+        //- 시간 별 Y축 데이터 어그리게이션
         let pre = {};
+        //- 차트 갱신
         let paintGroup = this.graph.svg.selectAll("path.line")
             .data(_sort)
             .attr("d",(d)=> {
@@ -515,9 +520,10 @@ class LineChart extends Component {
                             return [_node.time,next_v,pre_v];
                         });
                 return area(_d);
-            }); // 갱신
+            });
 
-        paintGroup.enter() // 신규 생성
+        //- 차트 생성
+        paintGroup.enter()
             .append('path')
             .attr("d",(d)=> {
                 const _d = _.map(d.values,(_node) =>{
@@ -541,6 +547,7 @@ class LineChart extends Component {
             .style("stroke-width", this.props.config.graph.width)
             .style("opacity", this.props.config.graph.opacity);
 
+         //- 차트 갱신 후 데이터 삭제
          paintGroup.exit().remove();
     };
 
