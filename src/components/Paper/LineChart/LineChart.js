@@ -468,52 +468,80 @@ class LineChart extends Component {
         }
 
         const stackData = _(this.state.counters[counterKey])
-            .map((d) => {
-                const _r = Object.keys(d.data).map(key => {
+                            .map((d) => {
+                                const _r = Object.keys(d.data).map(key => {
+                                    const _keyValue = [];
+                                    _keyValue['objHash'] = d.data[key].objHash;
+                                    _keyValue['time']    = d.time;
+                                    _keyValue['value']   = Number(d.data[key].value);
+                                    _keyValue['color']   = color[d.data[key].objHash];
+                                    return _keyValue;
+                                });
+                                return _r;
+                            }).flatMapDepth().value();
 
-                    const _keyValue = [];
-                    _keyValue['objHash'] = d.data[key].objHash;
-                    _keyValue['time'] = d.time;
-                    _keyValue['value'] = d.data[key].value;
-                    _keyValue['color'] = color[d.data[key].objHash];
-                    return _keyValue;
-                });
-                return _r;
-            }).flatMapDepth().value();
+        let ld = d3.nest().key(d => d.objHash).entries(stackData);
+        const _sort = [];
+        for (const attr  in this.props.objects) {
+            const _obj = this.props.objects[attr];
+            const _find = _.findIndex(ld, (o) =>  o.key === _obj.objHash);
+            if(_find > -1 ){
+                _sort.push(ld[_find]);
+            }
 
-        const ld = d3.nest().key(d => d.objHash).entries(stackData);
-
+        }
         const area = d3.area().curve(d3[this.props.config.graph.curve])
-            .x((d) =>{
-                return this.graph.x(d.time);
+            .x(d =>{
+                return this.graph.x(d[0]);
             })
-            .y0(()=>this.graph.height)
-            .y1((d) =>{
-                return this.graph.y(d.value);
-            });
+            .y0(d => this.graph.y(d[2]))
+            .y1(d => this.graph.y(d[1]));
+
+        if (this.props.config.graph.break === "Y") {
+            area.defined((d)=>{
+                return !isNaN(d[0]) && !isNaN(d[1]) && !isNaN(d[2]);
+            })
+        }
+
+        let pre = {};
         let paintGroup = this.graph.svg.selectAll("path.line")
-            .exit()
-            .remove()
-            .data(ld,(d)=>{
-                return d.key;
-            })
-            .enter()
+            .data(_sort)
+            .attr("d",(d)=> {
+                const _d = _.map(d.values,(_node) =>{
+                            const _key = _node.time;
+                            const pre_v =  pre[_key] ? pre[_key] : 0;
+                            const next_v = pre_v + Number(_node.value);
+                            pre[_key] = next_v;
+                            return [_node.time,next_v,pre_v];
+                        });
+                return area(_d);
+            }); // 갱신
+
+        paintGroup.enter() // 신규 생성
             .append('path')
             .attr("d",(d)=> {
-                return area(d.values);
+                const _d = _.map(d.values,(_node) =>{
+                    const _key = _node.time;
+                    const pre_v =  pre[_key] ? pre[_key] : 0;
+                    const next_v = pre_v + _node.value;
+                    pre[_key] = next_v;
+                    return [_node.time,next_v,pre_v];
+                });
+                return area(_d);
             })
-
-            .attr('class',(d)=> `line` )
-            .attr('data-colname', (d)=> d.key)
+            .attr('class',(d)=> `line ${d.key}` )
+            .attr('data-col-name', (d)=> d.key)
             .style("fill", (d)=> {
                 return color[d.key];
             })
+            .attr("fill-opacity", (d)=>0.2)
             .attr("stroke",(d) =>{
                 return color[d.key];
             })
-            .style("opacity", this.props.config.graph.fillOpacity);
+            .style("stroke-width", this.props.config.graph.width)
+            .style("opacity", this.props.config.graph.opacity);
 
-        // paintGroup.exit().remove();
+         paintGroup.exit().remove();
     };
 
 
@@ -645,7 +673,6 @@ class LineChart extends Component {
                 this.graphAxis(this.graph.width, this.graph.height, false);
                 if (this.props.objects) {
                     let instanceMetricCount = {};
-                    let i=0;
                     for (let counterKey in this.state.counters) {
                         let thisOption = that.props.box.option.filter((d) => {return d.counterKey === counterKey})[0];
                         if (!thisOption) {
