@@ -3,6 +3,7 @@ import './LineChart.css';
 import {connect} from 'react-redux';
 import {withRouter} from 'react-router-dom';
 import * as d3 from "d3";
+import * as _ from "lodash";
 import ServerDate from "../../../common/ServerDate";
 import InstanceColor from "../../../common/InstanceColor";
 import numeral from "numeral";
@@ -445,6 +446,77 @@ class LineChart extends Component {
 
     };
 
+    drawGroupObjectLine=(thisOption,counterKey) => {
+
+        let instanceMetricCount = {};
+        const color = {};
+
+        for (const attr  in this.props.objects) {
+            const _obj = this.props.objects[attr];
+            if (_obj.objFamily === thisOption.familyName) {
+                if (!instanceMetricCount[_obj.objHash]) {
+                    instanceMetricCount[_obj.objHash] = 0;
+                }
+                if (this.props.config.graph.color === "metric") {
+                    const _cl = InstanceColor.getMetricColor(thisOption.counterKey, this.props.config.colorType);
+                    color[_obj.objHash] = _cl;
+                } else {
+                    const _cl = InstanceColor.getInstanceColors(this.props.config.colorType)[_obj.objHash][(instanceMetricCount[_obj.objHash]++) % 5];
+                    color[_obj.objHash] = _cl;
+                }
+            }
+        }
+
+        const stackData = _(this.state.counters[counterKey])
+            .map((d) => {
+                const _r = Object.keys(d.data).map(key => {
+
+                    const _keyValue = [];
+                    _keyValue['objHash'] = d.data[key].objHash;
+                    _keyValue['time'] = d.time;
+                    _keyValue['value'] = d.data[key].value;
+                    _keyValue['color'] = color[d.data[key].objHash];
+                    return _keyValue;
+                });
+                return _r;
+            }).flatMapDepth().value();
+
+        const ld = d3.nest().key(d => d.objHash).entries(stackData);
+
+        const area = d3.area().curve(d3[this.props.config.graph.curve])
+            .x((d) =>{
+                return this.graph.x(d.time);
+            })
+            .y0(()=>this.graph.height)
+            .y1((d) =>{
+                return this.graph.y(d.value);
+            });
+        let paintGroup = this.graph.svg.selectAll("path.line")
+            .exit()
+            .remove()
+            .data(ld,(d)=>{
+                return d.key;
+            })
+            .enter()
+            .append('path')
+            .attr("d",(d)=> {
+                return area(d.values);
+            })
+
+            .attr('class',(d)=> `line` )
+            .attr('data-colname', (d)=> d.key)
+            .style("fill", (d)=> {
+                return color[d.key];
+            })
+            .attr("stroke",(d) =>{
+                return color[d.key];
+            })
+            .style("opacity", this.props.config.graph.fillOpacity);
+
+        // paintGroup.exit().remove();
+    };
+
+
     drawObjectLine = (obj, option, counterKey, color) => {
         const that = this;
         if (this.props.box.values['chartType'] === "LINE FILL") {
@@ -469,7 +541,7 @@ class LineChart extends Component {
                     } else {
                         return that.graph.y(0);
                     }
-                })
+                });
 
 
             if (this.props.config.graph.break === "Y") {
@@ -496,6 +568,7 @@ class LineChart extends Component {
                     .delay(100);
             }
         }
+
 
 
         let pathClass = "line-" + obj.objHash + "-" + this.replaceName(counterKey);
@@ -572,14 +645,15 @@ class LineChart extends Component {
                 this.graphAxis(this.graph.width, this.graph.height, false);
                 if (this.props.objects) {
                     let instanceMetricCount = {};
-
+                    let i=0;
                     for (let counterKey in this.state.counters) {
                         let thisOption = that.props.box.option.filter((d) => {return d.counterKey === counterKey})[0];
-
                         if (!thisOption) {
                             for (let i = 0; i < this.props.objects.length; i++) {
                                 this.removeObjectLine(this.props.objects[i], counterKey);
                             }
+                        } else if(this.chartType ==='STACK AREA') {
+                           this.drawGroupObjectLine(thisOption,counterKey);
                         } else {
                             for (let i = 0; i < this.props.objects.length; i++) {
                                 const obj = that.props.objects[i];
@@ -597,6 +671,7 @@ class LineChart extends Component {
                                     this.drawObjectLine(obj, thisOption, counterKey, color);
                                 }
                             }
+
                         }
                     }
                 }
