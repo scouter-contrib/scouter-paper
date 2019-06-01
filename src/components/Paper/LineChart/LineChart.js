@@ -235,28 +235,47 @@ class LineChart extends Component {
 
     setMaxY = (counters, option) => {
 
+
         let metricMap = {};
         option.forEach((option) => {
             metricMap[option.counterKey] = true;
         });
 
         let maxY = 0;
-        for (let attr in counters) {
-            if (!metricMap[attr]) {
-                continue;
+        if( this.chartType === "STACK AREA"){
+            for (let attr in counters) {
+                if (!metricMap[attr]) {
+                    continue;
+                }
+                for (let i = 0; i < counters[attr].length; i++) {
+                    // y축 sum
+                    const sum = Object.keys(counters[attr][i].data)
+                        .map(_key => Number(counters[attr][i].data[_key].value))
+                        .reduce((acc,cur)=> acc+cur,0);
+                    if( sum > maxY){
+                        maxY = sum;
+                    }
+                }
             }
+        }else {
+            for (let attr in counters) {
+                if (!metricMap[attr]) {
+                    continue;
+                }
 
-            for (let i = 0; i < counters[attr].length; i++) {
-                for (let hash in counters[attr][i].data) {
-                    if (Array.isArray(counters[attr][i].data[hash].value)) {
-                        for (let j = 0; j < counters[attr][i].data[hash].value.length; j++) {
-                            if (Number(counters[attr][i].data[hash].value[j]) > maxY) {
-                                maxY = Number(counters[attr][i].data[hash].value[j]);
+                for (let i = 0; i < counters[attr].length; i++) {
+                    for (let hash in counters[attr][i].data) {
+                        if (Array.isArray(counters[attr][i].data[hash].value)) {
+                            for (let j = 0; j < counters[attr][i].data[hash].value.length; j++) {
+                                // line chart
+                                if (Number(counters[attr][i].data[hash].value[j]) > maxY) {
+                                    maxY = Number(counters[attr][i].data[hash].value[j]);
+                                }
                             }
-                        }
-                    } else {
-                        if (Number(counters[attr][i].data[hash].value) > maxY) {
-                            maxY = Number(counters[attr][i].data[hash].value);
+                        } else {
+                            if (Number(counters[attr][i].data[hash].value) > maxY) {
+                                maxY = Number(counters[attr][i].data[hash].value);
+                            }
                         }
                     }
                 }
@@ -276,6 +295,8 @@ class LineChart extends Component {
         if (this.graph.autoMaxY > this.graph.maxY) {
             this.graph.maxY = this.graph.autoMaxY * 1.2;
         }
+
+
     };
 
     removeObjLine(prevList, currentList) {
@@ -356,6 +377,7 @@ class LineChart extends Component {
             yAxisCount = 1;
         }
 
+        //- y
         if (init) {
             this.graph.svg.insert("g", ":first-child").attr("class", "axis-y").call(d3.axisLeft(this.graph.y).tickFormat(this.leftAxisFormat).ticks(yAxisCount));
             this.graph.svg.insert("g", ":first-child").attr("class", "grid-y").style("stroke-dasharray", "5 5").style("opacity", this.graph.opacity).call(d3.axisLeft(this.graph.y).tickSize(-this.graph.width).tickFormat("").ticks(yAxisCount));
@@ -367,6 +389,7 @@ class LineChart extends Component {
         if (init) {
             this.graph.svg.insert("g", ":first-child").attr("class", "axis-x").attr("transform", "translate(0," + this.graph.height + ")").call(d3.axisBottom(this.graph.x).tickFormat(d3.timeFormat(this.graph.timeFormat)).ticks(xAxisCount));
             this.graph.svg.insert("g", ":first-child").attr("class", "grid-x").style("stroke-dasharray", "5 5").style("opacity", this.graph.opacity).attr("transform", "translate(0," + this.graph.height + ")").call(d3.axisBottom(this.graph.x).tickSize(-this.graph.height).tickFormat("").ticks(xAxisCount));
+
         } else {
             this.graph.svg.select(".axis-y").transition().duration(500).call(d3.axisLeft(this.graph.y).tickFormat(this.leftAxisFormat).ticks(yAxisCount));
             this.graph.svg.select(".grid-y").transition().duration(500).call(d3.axisLeft(this.graph.y).tickSize(-this.graph.width).tickFormat("").ticks(yAxisCount));
@@ -509,18 +532,18 @@ class LineChart extends Component {
         //- 시간 별 Y축 데이터 어그리게이션
         let pre = {};
         //- 차트 갱신
-        let paintGroup = this.graph.svg.selectAll("path.line")
-            .data(_sort)
-            .attr("d",(d)=> {
-                const _d = _.map(d.values,(_node) =>{
-                            const _key = _node.time;
-                            const pre_v =  pre[_key] ? pre[_key] : 0;
-                            const next_v = pre_v + Number(_node.value);
-                            pre[_key] = next_v;
-                            return [_node.time,next_v,pre_v];
-                        });
-                return area(_d);
-            });
+        let paintGroup = this.graph.area.selectAll("path.line")
+                                        .data(_sort)
+                                        .attr("d",(d)=> {
+                                            const _d = _.map(d.values,(_node) =>{
+                                                        const _key = _node.time;
+                                                        const pre_v =  pre[_key] ? pre[_key] : 0;
+                                                        const next_v = pre_v + Number(_node.value);
+                                                        pre[_key] = next_v;
+                                                        return [_node.time,next_v,pre_v];
+                                                    });
+                                            return area(_d);
+                                        });
 
         //- 차트 생성
         paintGroup.enter()
@@ -540,7 +563,7 @@ class LineChart extends Component {
             .style("fill", (d)=> {
                 return color[d.key];
             })
-            .attr("fill-opacity", (d)=>0.2)
+            .attr("fill-opacity", this.props.config.graph.fillOpacity)
             .attr("stroke",(d) =>{
                 return color[d.key];
             })
@@ -782,10 +805,36 @@ class LineChart extends Component {
             svg.remove();
         }
 
-        this.graph.svg = d3.select(this.refs.lineChart).append("svg").attr("width", this.graph.width + this.graph.margin.left + this.graph.margin.right).attr("height", this.graph.height + this.graph.margin.top + this.graph.margin.bottom).append("g").attr("class", "top-group").attr("transform", "translate(" + this.graph.margin.left + "," + this.graph.margin.top + ")");
+        this.graph.svg = d3.select(this.refs.lineChart)
+            .append("svg")
+            .attr("width", this.graph.width + this.graph.margin.left + this.graph.margin.right)
+            .attr("height", this.graph.height + this.graph.margin.top + this.graph.margin.bottom);
+
+        this.graph.svg = this.graph.svg.append("g").attr("class", "top-group")
+                        .attr("transform", "translate(" + this.graph.margin.left + "," + this.graph.margin.top + ")");
+
+
         this.graph.focus = this.graph.svg.append("g").attr("class", "tooltip-focus");
 
+        this.graph.svg.append("defs")
+            .append("svg:clipPath")
+            .attr("id", "area-clip")
+            .attr("x", 0)
+            .attr("y", 0)
+            .append("svg:rect")
+            .attr("width", this.graph.width)
+            .attr("height",  this.graph.height);
+
+
+        this.graph.area = this.graph.svg.append("g")
+            .attr("class", "stack-area")
+            .attr("clip-path","url(#area-clip)");
+
+
         this.graph.overlay = this.graph.svg.append("rect").attr("class", "tooltip-overlay").attr("width", this.graph.width).attr("height", this.graph.height);
+
+
+
 
         this.graph.overlay.on("mouseover", function () {
             let layer = that.refs.lineChartRoot.parentNode.parentNode.parentNode.parentNode.parentNode;
