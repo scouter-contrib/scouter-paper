@@ -239,6 +239,7 @@ class Paper extends Component {
             this.props.setTemplateName(templateName.preset, templateName.layout);
         }
         this.props.setBoxesLayouts(boxes, layouts);
+        common.setTargetServerToUrl(this.props, this.props.config);
     }
 
     componentDidUpdate = (prevProps, prevState) => {
