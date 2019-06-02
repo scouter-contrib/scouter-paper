@@ -81,6 +81,9 @@ class BoxConfig extends Component {
 
         if (this.state.removeKeys && this.state.removeKeys.length > 0) {
             this.props.removeMetrics(this.props.box.key, this.state.removeKeys)
+            if( Object.keys(this.state.values).filter(attr => this.state.values[attr] === "STACK AREA" ? true : false).length > 0){
+                this.props.setOptionValues(this.props.box.key, this.state.values);
+            }
         } else {
             this.props.setOptionValues(this.props.box.key, this.state.values);
         }

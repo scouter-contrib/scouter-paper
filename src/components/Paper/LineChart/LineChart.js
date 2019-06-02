@@ -74,10 +74,20 @@ class LineChart extends Component {
     componentWillReceiveProps(nextProps) {
         let counters = Object.assign({}, this.state.counters);
 
-        //- LINE FILL => LINE Change 할경우
+
         if( nextProps.box.values['chartType'] !== this.chartType){
+            //- LINE FILL => LINE Change
             if( nextProps.box.values['chartType'] === 'LINE' && this.chartType === 'LINE FILL' ){
                 this.removeLineFill();
+            }
+            //- LINE or LINE FILL => STACK;
+            if( nextProps.box.values['chartType'] === 'STACK AREA' && ( this.chartType === 'LINE' || this.chartType === 'LINE FILL') ){
+                this.removeLineFill();
+                this.removeLine();
+            }
+            // STACK => LINE or LINE FILL
+            if( (nextProps.box.values['chartType'] === 'LINE' || nextProps.box.values['chartType'] === 'LINE FILL' ) && ( this.chartType === 'STACK AREA') ){
+                this.removeStackFill();
             }
         }
 
@@ -257,6 +267,7 @@ class LineChart extends Component {
                     }
                 }
             }
+
         }else {
             for (let attr in counters) {
                 if (!metricMap[attr]) {
@@ -406,6 +417,12 @@ class LineChart extends Component {
         }
         return name;
     }
+    removeStackFill = () =>{
+        this.graph.svg.select('g.stack-area').selectAll('path.line')
+            .transition()
+            .delay(100)
+            .remove();
+    };
 
     removeLineFill = () =>{
         for(const obj of this.props.objects) {
@@ -417,8 +434,20 @@ class LineChart extends Component {
                     .remove();
             }
         }
-
     };
+    removeLine = () =>{
+        for(const obj of this.props.objects) {
+            for (let counterKey in this.state.counters) {
+                let lineClass = "line-" + obj.objHash + "-" + this.replaceName(counterKey);
+                this.graph.svg.selectAll("path." + lineClass)
+                    .transition()
+                    .delay(100)
+                    .remove();
+            }
+        }
+    };
+
+
     removeObjectLine = (obj, counterKey) => {
         let pathClass = "line-" + obj.objHash + "-" + this.replaceName(counterKey);
         let path = this.graph.svg.selectAll("path." + pathClass);
@@ -775,14 +804,25 @@ class LineChart extends Component {
         let circleKey = "circle-" + obj.objHash + "_" + this.replaceName(thisOption.counterKey);
         let unit = that.state.counters[counterKey][dataIndex].data[obj.objHash] ? that.state.counters[counterKey][dataIndex].data[obj.objHash].unit : "";
 
+        let valueOutput =  obj.objHash && that.state.counters[counterKey][dataIndex].data[obj.objHash]  ? that.state.counters[counterKey][dataIndex].data[obj.objHash].value : null ;
+        if( this.chartType === "STACK AREA"){
+            // - valueOut valid
+            if( valueOutput ){
+                valueOutput = this.prevInstanceValue + valueOutput;
+                // change;
+                this.prevInstanceValue = valueOutput;
+            }
+
+        }
+
         if (that.state.counters[counterKey][dataIndex].time) {
             if (this.props.filterMap[obj.objHash]) {
                 tooltip.lines.push({
                     instanceName: obj.objName,
                     circleKey: circleKey,
                     metricName: thisOption.title,
-                    value: obj.objHash && that.state.counters[counterKey][dataIndex].data[obj.objHash] ? that.state.counters[counterKey][dataIndex].data[obj.objHash].value : null,
-                    displayValue: obj.objHash && that.state.counters[counterKey][dataIndex].data[obj.objHash] ? numeral(that.state.counters[counterKey][dataIndex].data[obj.objHash].value).format(this.props.config.numberFormat) + " " + unit : null,
+                    value: obj.objHash && that.state.counters[counterKey][dataIndex].data[obj.objHash] ? valueOutput : null,
+                    displayValue: obj.objHash && that.state.counters[counterKey][dataIndex].data[obj.objHash] ? numeral(valueOutput).format(this.props.config.numberFormat) + " " + unit : null,
                     color: color
                 });
             }
@@ -938,7 +978,7 @@ class LineChart extends Component {
                 if (!thisOption) {
                     break;
                 }
-
+                that.prevInstanceValue = 0;
                 for (let i = 0; i < that.props.objects.length; i++) {
                     const obj = that.props.objects[i];
                     if (thisOption.familyName === obj.objFamily) {
