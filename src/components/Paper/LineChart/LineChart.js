@@ -808,9 +808,9 @@ class LineChart extends Component {
         if( this.chartType === "STACK AREA"){
             // - valueOut valid
             if( valueOutput ){
-                valueOutput = this.prevInstanceValue + valueOutput;
+                valueOutput = this.counterSum + valueOutput;
                 // change;
-                this.prevInstanceValue = valueOutput;
+                this.counterSum = valueOutput;
             }
 
         }
@@ -822,7 +822,7 @@ class LineChart extends Component {
                     circleKey: circleKey,
                     metricName: thisOption.title,
                     value: obj.objHash && that.state.counters[counterKey][dataIndex].data[obj.objHash] ? valueOutput : null,
-                    displayValue: obj.objHash && that.state.counters[counterKey][dataIndex].data[obj.objHash] ? numeral(valueOutput).format(this.props.config.numberFormat) + " " + unit : null,
+                    displayValue: obj.objHash && that.state.counters[counterKey][dataIndex].data[obj.objHash] ? numeral(that.state.counters[counterKey][dataIndex].data[obj.objHash].value).format(this.props.config.numberFormat) + " " + unit : null,
                     color: color
                 });
             }
@@ -867,8 +867,8 @@ class LineChart extends Component {
 
 
         this.graph.area = this.graph.svg.append("g")
-            .attr("class", "stack-area")
-            .attr("clip-path","url(#area-clip)");
+            .attr("class", "stack-area");
+            // .attr("clip-path","url(#area-clip)");
 
 
         this.graph.overlay = this.graph.svg.append("rect").attr("class", "tooltip-overlay").attr("width", this.graph.width).attr("height", this.graph.height);
@@ -978,7 +978,7 @@ class LineChart extends Component {
                 if (!thisOption) {
                     break;
                 }
-                that.prevInstanceValue = 0;
+                that.counterSum = 0;
                 for (let i = 0; i < that.props.objects.length; i++) {
                     const obj = that.props.objects[i];
                     if (thisOption.familyName === obj.objFamily) {
@@ -1021,6 +1021,8 @@ class LineChart extends Component {
                 }
             }
 
+            tooltip.chartType = that.chartType;
+            tooltip.counterSum = numeral(that.counterSum).format(that.props.config.numberFormat);
             that.graph.currentTooltipTime = tooltip.timeValue;
             that.props.showTooltip(xPos, yPos, that.graph.margin.left, that.graph.margin.top, tooltip);
         });
