@@ -405,6 +405,8 @@ class LineChart extends Component {
             this.graph.svg.select(".axis-y").transition().duration(500).call(d3.axisLeft(this.graph.y).tickFormat(this.leftAxisFormat).ticks(yAxisCount));
             this.graph.svg.select(".grid-y").transition().duration(500).call(d3.axisLeft(this.graph.y).tickSize(-this.graph.width).tickFormat("").ticks(yAxisCount));
         }
+
+
     };
 
     replaceAll(str, searchStr, replaceStr) {
@@ -720,7 +722,6 @@ class LineChart extends Component {
     draw = () => {
 
         let that = this;
-
         if (this.drawTimer) {
             clearTimeout(this.drawTimer);
             this.drawTimer = null;
@@ -804,15 +805,11 @@ class LineChart extends Component {
         let circleKey = "circle-" + obj.objHash + "_" + this.replaceName(thisOption.counterKey);
         let unit = that.state.counters[counterKey][dataIndex].data[obj.objHash] ? that.state.counters[counterKey][dataIndex].data[obj.objHash].unit : "";
 
-        let valueOutput =  obj.objHash && that.state.counters[counterKey][dataIndex].data[obj.objHash]  ? that.state.counters[counterKey][dataIndex].data[obj.objHash].value : null ;
-        if( this.chartType === "STACK AREA"){
-            // - valueOut valid
-            if( valueOutput ){
-                valueOutput = this.counterSum + valueOutput;
-                // change;
-                this.counterSum = valueOutput;
-            }
-
+        let valueOutput = obj.objHash && that.state.counters[counterKey][dataIndex].data[obj.objHash]  ? that.state.counters[counterKey][dataIndex].data[obj.objHash].value : null ;
+        const valueOrigin = obj.objHash && that.state.counters[counterKey][dataIndex].data[obj.objHash]  ? that.state.counters[counterKey][dataIndex].data[obj.objHash].value : null ;
+        if( this.chartType === "STACK AREA" && valueOutput ){
+            valueOutput = this.counterSum + valueOutput;
+            this.counterSum = valueOutput;
         }
 
         if (that.state.counters[counterKey][dataIndex].time) {
@@ -821,8 +818,8 @@ class LineChart extends Component {
                     instanceName: obj.objName,
                     circleKey: circleKey,
                     metricName: thisOption.title,
-                    value: obj.objHash && that.state.counters[counterKey][dataIndex].data[obj.objHash] ? valueOutput : null,
-                    displayValue: obj.objHash && that.state.counters[counterKey][dataIndex].data[obj.objHash] ? numeral(that.state.counters[counterKey][dataIndex].data[obj.objHash].value).format(this.props.config.numberFormat) + " " + unit : null,
+                    value: valueOutput ? valueOutput : null,
+                    displayValue: valueOrigin ? numeral(valueOrigin).format(this.props.config.numberFormat) + " " + unit : null,
                     color: color
                 });
             }
@@ -850,25 +847,25 @@ class LineChart extends Component {
             .attr("width", this.graph.width + this.graph.margin.left + this.graph.margin.right)
             .attr("height", this.graph.height + this.graph.margin.top + this.graph.margin.bottom);
 
-        this.graph.svg = this.graph.svg.append("g").attr("class", "top-group")
-                        .attr("transform", "translate(" + this.graph.margin.left + "," + this.graph.margin.top + ")");
-
-
-        this.graph.focus = this.graph.svg.append("g").attr("class", "tooltip-focus");
-
-        this.graph.svg.append("defs")
+        this.graph.clipArea = d3.select(this.refs.lineChart).select("svg").append("defs")
             .append("svg:clipPath")
-            .attr("id", "area-clip")
+            .attr("id", `area-clip${this.props.box.key}`)
+            .append("svg:rect")
             .attr("x", 0)
             .attr("y", 0)
-            .append("svg:rect")
             .attr("width", this.graph.width)
             .attr("height",  this.graph.height);
 
+        this.graph.svg = this.graph.svg.append("g").attr("class", "top-group")
+                        .attr("transform", "translate(" + this.graph.margin.left + "," + this.graph.margin.top + ")");
+
+        this.graph.focus = this.graph.svg.append("g").attr("class", "tooltip-focus");
 
         this.graph.area = this.graph.svg.append("g")
-            .attr("class", "stack-area");
-            // .attr("clip-path","url(#area-clip)");
+            .attr("class", "stack-area")
+            .attr("clip-path",`url(#area-clip${this.props.box.key})`)
+            .append("g");
+
 
 
         this.graph.overlay = this.graph.svg.append("rect").attr("class", "tooltip-overlay").attr("width", this.graph.width).attr("height", this.graph.height);
