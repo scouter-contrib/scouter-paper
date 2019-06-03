@@ -84,8 +84,11 @@ class Paper extends Component {
         let xlogElapsedTime = common.getParam(this.props, "xlogElapsedTime");
 
         //URL로부터 layout 세팅
+        const templateName = getData("templateName");
+        const layoutOnLocal = templateName ? templateName.layout : null;
+
         let layout = common.getParam(this.props, "layout");
-        if (layout || Object.keys(layouts).length === 0) {
+        if ((layout && layout !== layoutOnLocal) || Object.keys(layouts).length === 0) {
             jQuery.ajax({
                 method: "GET",
                 async: true,
@@ -234,7 +237,6 @@ class Paper extends Component {
             visible: true,
             rangeControl: false
         };
-        let templateName = getData("templateName");
         if (templateName) {
             this.props.setTemplateName(templateName.preset, templateName.layout);
         }
