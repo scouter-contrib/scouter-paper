@@ -880,8 +880,62 @@ class Topology extends Component {
     _trimPrefix =(prefix,name) =>{
         return _.replace(name,prefix+"-","");
     };
+    _showTooltip = (d, isShow=false) =>{
 
-    hover = (d) => {
+
+        if (this.props.topologyOption.highlight && this.props.topologyOption.grouping && d.objCategory !== "CLIENT" ) {
+            const toolTipOffset= this.props.control.Controller === "max" ? -130: +230;
+
+            let dpObjName = [];
+
+            if( d.objTypeFamily === "javaee" ){
+                dpObjName = this.objTypeNameMap.get(d.objName);
+            }else{
+                dpObjName = this.objTypeNameMap.get(d.id);
+            }
+
+            this.tooltip.transition(500).style("opacity", 1);
+            this.tooltip.html(
+                //- tooltip value 값을 응답 시간을 최대 시간 기준으로 최대 10개로 제한 한다.
+                _(( Array.isArray(dpObjName) ? dpObjName : [dpObjName] ).map(dp=> {
+                    let counter  = [dp,0,0,0];
+                    if( d.objTypeFamily === "javaee" ){
+                        counter = this.objCounterMap.get(dp);
+                    }else{
+                        counter = this.objCounterMap.get([d.id,dp].join('-'));
+                    }
+                    return counter;
+                }).filter(v => v ? true : false ).sort((a,b)=> b[3]-a[3] ))
+                    .take(10)
+                    .values()
+                    .map( cnt  => {
+
+                            const [name, tps, errorRate, avgElasp] = cnt;
+                            return `<div class="tooltip-group">
+                                         <p>${this._trimPrefix(d.id,name)}</p>
+                                    <div class="tooltip-counter">
+                                         <tspan>${numeral(tps).format(this.props.config.numberFormat)} r/s</tspan>
+                                         <tspan style="color:red">${numeral(errorRate).format(this.props.config.numberFormat)}%</tspan>
+                                         <tspan>${numeral(avgElasp).format(this.props.config.numberFormat)}ms</tspan>
+                                     </div>
+                            </div>`;
+
+
+                    })
+                .join(' ')
+            )
+            .style("left",(d3.event.pageX - d3.select('.tooltip').node().offsetWidth + toolTipOffset) + "px")
+            .style("top",(d3.event.pageY - d3.select('.tooltip').node().offsetHeight) + "px");
+        }
+
+        if(!isShow){
+            if (this.props.topologyOption.grouping) {
+                this.tooltip.transition(500).style("opacity", 0);
+            }
+        }
+    };
+
+    hover = (d,isIcon=false) => {
 
         if (this.props.topologyOption.highlight) {
             this.node.transition(500).style('opacity', o => {
@@ -908,56 +962,13 @@ class Topology extends Component {
                 return this.linkTypeHover(d, o);
             });
 
-            // node tooltip task
-            if (this.props.topologyOption.grouping && d.objCategory !== "CLIENT" ) {
 
-                let dpObjName = [];
-
-                if( d.objTypeFamily === "javaee" ){
-                    dpObjName = this.objTypeNameMap.get(d.objName);
-                }else{
-                    dpObjName = this.objTypeNameMap.get(d.id);
-                }
-
-                this.tooltip.transition(500).style("opacity", .8);
-                this.tooltip.html(
-                    //- tooltip value 값을 응답 시간을 최대 시간 기준으로 최대 10개로 제한 한다.
-                    _(( Array.isArray(dpObjName) ? dpObjName : [dpObjName] ).map(dp=> {
-                        let counter  = [dp,0,0,0];
-                        if( d.objTypeFamily === "javaee" ){
-                            counter = this.objCounterMap.get(dp);
-                        }else{
-                            counter = this.objCounterMap.get([d.id,dp].join('-'));
-                        }
-                        return counter;
-                    }).filter(v => v ? true : false ).sort((a,b)=> b[3]-a[3] ))
-                        .take(10)
-                        .values()
-                        .map( cnt  => {
-
-                                const [name, tps, errorRate, avgElasp] = cnt;
-                                return `<div class="tooltip-group"> 
-                                            <p>${this._trimPrefix(d.id,name)}</p>
-                                        <div class="tooltip-counter"> 
-                                            <tspan>${numeral(tps).format(this.props.config.numberFormat)} r/s</tspan> 
-                                            <tspan style="color:red">${numeral(errorRate).format(this.props.config.numberFormat)}%</tspan> 
-                                            <tspan>${numeral(avgElasp).format(this.props.config.numberFormat)}ms</tspan> 
-                                        </div> 
-                                </div>`;
-
-
-                        })
-                    .join(' ')
-                )
-                .style("left",  (d3.event.pageX-17)  + "px")
-                .style("top", (d3.event.pageY-100)  + "px");
-            }
         }
 
 
     };
 
-    leave = () => {
+    leave = (d) => {
         if (this.props.topologyOption.highlight) {
             this.node.transition(500).style('opacity', 1.0);
             this.nodeNameText.transition(500).style('opacity', 1.0);
@@ -965,9 +976,7 @@ class Topology extends Component {
             this.nodeLabel.transition(500).style('opacity', 1.0);
             this.edgeTextList.transition(500).style('opacity', 1);
             this.edgeFlowPath.transition(500).style('stroke-opacity', 0.5);
-            if (this.props.topologyOption.grouping) {
-                this.tooltip.transition(500).style("opacity", 0);
-            }
+
         }
 
     };
@@ -1272,8 +1281,10 @@ class Topology extends Component {
             .style("stroke", (d) => that.getCategoryInfo(d.objCategory).color);
 
         this.node.call(d3.drag().on("start", this.dragStarted).on("drag", this.dragged).on("end", this.dragEnd));
-        this.node.on("mouseover", that.hover);
-        this.node.on("mouseout", that.leave);
+        // this.node.on("mouseover", (d) => that.hover(d));
+        // this.node.on("mouseout", (d) => that.leave(d));
+
+        //- node 부분과, node Icon 부분의 이벤트 경합으로 인한 부하 발생, 노드 ICON으로 이벤트 기반으로 단일화
         // 노드 라벨
         this.nodeLabel = this.nodeLabelGroup.selectAll(".node-label").data(nodes);
         this.nodeLabel.exit().remove();
@@ -1297,8 +1308,16 @@ class Topology extends Component {
         }).text(function (d) {
             return that.getCategoryInfo(d.objCategory).text;
         }).call(d3.drag().on("start", this.dragStarted).on("drag", this.dragged).on("end", this.dragEnd));
-        this.nodeIcon.on("mouseover", that.hover);
-        this.nodeIcon.on("mouseout", that.leave);
+        this.nodeIcon.on("mouseover", (d) => this.hover(d));
+        this.nodeIcon.on("mouseout", (d) => this.leave(d));
+        this.nodeIcon.on("mouseover.tooltip", (d) =>{
+            this._showTooltip(d,true);
+        });
+        this.nodeIcon.on("mouseleave.tooltip", (d) =>{
+            this._showTooltip(d,false);
+        });
+
+
 
         this.simulation.nodes(nodes).on("tick", this.ticked);
         this.simulation.force("link").links(links);
@@ -1352,7 +1371,6 @@ class Topology extends Component {
     };
 
     ticked = () => {
-
         let that = this;
         // 노드 위치
         this.node.attr("cx", function (d) {
@@ -1363,7 +1381,7 @@ class Topology extends Component {
         });
 
 
-        // 노드 명 아래 가운데 위치 하도록
+        // // 노드 명 아래 가운데 위치 하도록
         this.nodeNameText.attr("x", function (d) {
             const width = this.getComputedTextLength();
             return d.x - (width / 2);
@@ -1422,6 +1440,7 @@ class Topology extends Component {
 
 let mapStateToProps = (state) => {
     return {
+        control: state.control,
         objects: state.target.objects,
         selection: state.target.selection,
         config: state.config,
