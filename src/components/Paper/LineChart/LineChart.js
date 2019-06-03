@@ -847,7 +847,7 @@ class LineChart extends Component {
             .attr("width", this.graph.width + this.graph.margin.left + this.graph.margin.right)
             .attr("height", this.graph.height + this.graph.margin.top + this.graph.margin.bottom);
 
-        this.graph.clipArea = d3.select(this.refs.lineChart).select("svg").append("defs")
+        d3.select(this.refs.lineChart).select("svg").append("defs")
             .append("svg:clipPath")
             .attr("id", `area-clip${this.props.box.key}`)
             .append("svg:rect")
