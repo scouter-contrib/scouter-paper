@@ -24,6 +24,7 @@ class Paper extends Component {
     xlogHistoryTemp = [];
     xlogHistoryTotalDays = 0;
     xlogHistoryCurrentDays = 0;
+    isLoading = false;
 
     lastFrom = null;
     lastTo = null;
@@ -329,6 +330,24 @@ class Paper extends Component {
             common.setRangePropsToUrl(nextProps);
         }
 
+        // get box key & set xlog filter by url
+        let boxKey;
+        for (let i = 0; i < this.props.boxes.length; i++) {
+            let title = this.props.boxes[i].title;
+            let key = this.props.boxes[i].key;
+
+            if(title === "XLOG") {
+                boxKey = key;
+                break;
+            }
+        }
+
+        if(boxKey && this.isLoading === false) {
+            let xlogfilter = common.getParam(this.props, "xlogfilter");
+            if(xlogfilter)
+                this.setXlogFilterByUrl(boxKey, JSON.parse(decodeURI(xlogfilter)));
+            this.isLoading = true;
+        }
     }
 
     componentDidMount() {
@@ -1376,6 +1395,29 @@ class Paper extends Component {
 
         this.setState({
             filters: filters
+        });
+
+        // set xlog filter to url
+        common.setXlogfilterToUrl(this.props, filter);
+    };
+
+    // set xlog filter by url
+    setXlogFilterByUrl = (key, filter) => {
+        let filters = Object.assign(this.state.filters);
+        filters.push({
+             key: key,
+             show: false,
+             data: {
+                 filtering: true
+             }
+        });
+
+        let filterInfo = filters.filter((d) => d.key === key)[0];
+        filter.filtering = true;
+        filterInfo.data = filter;
+
+        this.setState({
+              filters: filters
         });
     };
 
