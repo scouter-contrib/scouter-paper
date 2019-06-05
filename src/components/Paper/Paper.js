@@ -345,7 +345,7 @@ class Paper extends Component {
         if(boxKey && this.isLoading === false) {
             let xlogfilter = common.getParam(this.props, "xlogfilter");
             if(xlogfilter)
-                this.setXlogFilterByUrl(boxKey, JSON.parse(decodeURI(xlogfilter)));
+                this.setXlogFilterByUrl(boxKey, JSON.parse(xlogfilter));
             this.isLoading = true;
         }
     }

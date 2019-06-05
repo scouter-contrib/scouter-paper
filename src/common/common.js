@@ -339,7 +339,7 @@ export function setXlogfilterToUrl (props, filter) {
     if(filter === null) {
         search.delete("xlogfilter");
     }else{
-        search.set("xlogfilter", encodeURI(JSON.stringify(filter)));
+        search.set("xlogfilter", JSON.stringify(filter));
     }
 
     if (props.location.search !== ("?" + search.toString())) {
