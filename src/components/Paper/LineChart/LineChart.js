@@ -203,9 +203,6 @@ class LineChart extends Component {
         //-
         this.chartType = nextProps.box.values['chartType'];
         this.showTimeFocus(nextProps.timeFocus.active);
-
-
-
     }
 
     loadHistoryCounter(countersHistory, counterKey, longTerm) {
@@ -829,6 +826,8 @@ class LineChart extends Component {
         if ((box.offsetWidth - this.graph.margin.left - this.graph.margin.right !== this.graph.width) || (this.graph.height !== box.offsetHeight - this.graph.margin.top - this.graph.margin.bottom - 27)) {
             resized = true;
             this.graphInit();
+            this.manualTooltipHide();
+            this.props.setTimeFocus(false,null,this.props.box.key);
         }
 
         return resized;
