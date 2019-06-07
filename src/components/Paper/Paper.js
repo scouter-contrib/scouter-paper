@@ -3,7 +3,21 @@ import "./Paper.css";
 import "./Resizable.css";
 import {connect} from "react-redux";
 import {withRouter} from "react-router-dom";
-import {addRequest, pushMessage, setBoxes, setBoxesLayouts, setLayoutChangeTime, setControlVisibility, setLayouts, setRangeDateHoursMinutesValue, setRealTime, setTemplate, setBreakpoint, setTemplateName} from "../../actions";
+import {
+    addRequest,
+    pushMessage,
+    setBoxes,
+    setBoxesLayouts,
+    setLayoutChangeTime,
+    setControlVisibility,
+    setLayouts,
+    setRangeDateHoursMinutesValue,
+    setRealTime,
+    setTemplate,
+    setBreakpoint,
+    setTemplateName,
+    setTimeFocus
+} from "../../actions";
 import {Responsive, WidthProvider} from "react-grid-layout";
 import {Box, BoxConfig, XLogFilter} from "../../components";
 import jQuery from "jquery";
@@ -345,6 +359,8 @@ class Paper extends Component {
                 clearInterval(this.dataRefreshTimer);
                 this.dataRefreshTimer = null;
             }
+
+            this.props.setTimeFocus(false,null,this.props.timeFocus.id);
         }
 
         if (JSON.stringify(this.props.objects) !== JSON.stringify(nextProps.objects) || JSON.stringify(this.props.range) !== JSON.stringify(nextProps.range)) {
@@ -1503,7 +1519,8 @@ let mapStateToProps = (state) => {
         boxes: state.paper.boxes,
         layouts: state.paper.layouts,
         layoutChangeTime: state.paper.layoutChangeTime,
-        searchCondition: state.searchCondition
+        searchCondition: state.searchCondition,
+        timeFocus : state.timeFocus
     };
 };
 
@@ -1520,7 +1537,8 @@ let mapDispatchToProps = (dispatch) => {
         setBoxesLayouts: (boxes, layouts) => dispatch(setBoxesLayouts(boxes, layouts)),
         setLayoutChangeTime: () => dispatch(setLayoutChangeTime()),
         setBreakpoint: (breakpoint) => dispatch(setBreakpoint(breakpoint)),
-        setTemplateName: (preset, layout) => dispatch(setTemplateName(preset, layout))
+        setTemplateName: (preset, layout) => dispatch(setTemplateName(preset, layout)),
+        setTimeFocus: (active, time, boxKey,keep) => dispatch(setTimeFocus(active, time, boxKey,keep))
     };
 };
 
