@@ -175,6 +175,7 @@ class XLog extends Component {
                     this.graphInit();
                 }
             }
+            this.props.setTimeFocus(false,null,this.props.box.key);
         }, 300);
     };
 
