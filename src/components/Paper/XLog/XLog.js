@@ -198,6 +198,7 @@ class XLog extends Component {
                 .attr("x2", (d) =>this.graph.x(d))
                 .exit()
                 .remove();
+
         }else{
             this.graph.focus.select("line.focus-line").remove();
         }
@@ -391,31 +392,44 @@ class XLog extends Component {
 
         d3.select(this.refs.xlogViewer).select(".canvas-div")
             .on('mousemove',function() {
-                let xPos = d3.mouse(this)[0];
-                const x0 = that.graph.x.invert(xPos-that.graph.margin.left);
-                let hoverLine = that.graph.focus.selectAll("line.x-hover-line");
+                if(!that.props.timeFocus.keep) {
+                    let xPos = d3.mouse(this)[0];
+                    const x0 = that.graph.x.invert(xPos - that.graph.margin.left);
+                    let hoverLine = that.graph.focus.selectAll("line.x-hover-line");
 
-                hoverLine.attr("x1", (d) =>that.graph.x(d))
-                    .attr("x2", (d) =>that.graph.x(d));
+                    hoverLine.attr("x1", (d) => that.graph.x(d))
+                        .attr("x2", (d) => that.graph.x(d));
 
-                hoverLine.data([x0])
-                    .enter()
-                    .append("line")
-                    .attr("class", "x-hover-line hover-line")
-                    .attr("y1", 0)
-                    .attr("y2", that.graph.height)
-                    .attr("x1", (d) =>{
-                        return that.graph.x(d);
-                    })
-                    .attr("x2", (d) =>that.graph.x(d))
-                    .exit()
-                    .remove();
+                    hoverLine.data([x0])
+                        .enter()
+                        .append("line")
+                        .attr("class", "x-hover-line hover-line")
+                        .attr("y1", 0)
+                        .attr("y2", that.graph.height)
+                        .attr("x1", (d) => {
+                            return that.graph.x(d);
+                        })
+                        .attr("x2", (d) => that.graph.x(d))
+                        .exit()
+                        .remove();
 
-                that.props.setTimeFocus(true, x0.getTime(), that.props.box.key);
+                    that.props.setTimeFocus(true, x0.getTime(), that.props.box.key);
+                }
             })
             .on('mouseout',() =>{
-                that.graph.focus.select("line.x-hover-line").remove();
-                that.props.setTimeFocus(false, null, that.props.box.key);
+                if(!this.props.timeFocus.keep) {
+                    this.graph.focus.select("line.x-hover-line").remove();
+                    this.props.setTimeFocus(false, null, that.props.box.key);
+                }
+            })
+            .on('dblclick',()=>{
+                this.props.setTimeFocus(
+                    this.props.timeFocus.active,
+                    this.props.timeFocus.time,
+                    this.props.timeFocus.id,
+                    !this.props.timeFocus.keep
+                );
+
             });
 
         // 드래그 셀렉트
@@ -609,7 +623,7 @@ let mapStateToProps = (state) => {
 let mapDispatchToProps = (dispatch) => {
     return {
         setSelection: (selection) => dispatch(setSelection(selection)),
-        setTimeFocus: (active, time, boxKey) => dispatch(setTimeFocus(active, time, boxKey))
+        setTimeFocus: (active, time, boxKey,keep) => dispatch(setTimeFocus(active, time, boxKey,keep))
     };
 };
 

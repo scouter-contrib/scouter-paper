@@ -645,7 +645,8 @@ const templateName = (state = templateNameState, action) => {
 const timeFocusState = {
     active : false,
     time : null,
-    id : null
+    id : null,
+    keep : false,
 };
 
 const timeFocus =(state=timeFocusState, action ) =>{
@@ -655,6 +656,7 @@ const timeFocus =(state=timeFocusState, action ) =>{
                 active : action.active,
                 time: action.time,
                 id: action.id,
+                keep : action.keep
             };
         default:
             return state;

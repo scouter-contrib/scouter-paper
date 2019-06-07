@@ -367,12 +367,13 @@ export function setActiveServiceList(object){
         object : object
     }
 }
-export function setTimeFocus(active,time,boxKey){
+export function setTimeFocus(active,time,boxKey,keep=false){
     return {
         type : SET_TIME_FOCUS,
         id: boxKey,
         active :active,
         time : time,
+        keep : keep
     }
 
 }
