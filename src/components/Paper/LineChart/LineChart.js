@@ -7,6 +7,7 @@ import * as _ from "lodash";
 import ServerDate from "../../../common/ServerDate";
 import InstanceColor from "../../../common/InstanceColor";
 import numeral from "numeral";
+import {setTimeFocus} from "../../../actions";
 
 
 class LineChart extends Component {
@@ -189,6 +190,8 @@ class LineChart extends Component {
 
         }
         this.chartType = nextProps.box.values['chartType'];
+        this.showTimeFocus(nextProps.timeFocus.active);
+
 
     }
 
@@ -352,7 +355,29 @@ class LineChart extends Component {
             this.draw();
             this.removeObjLine(prevProps.objects, this.props.objects);
         }
+    };
 
+    showTimeFocus = (isShow=false) => {
+            if( isShow && !this.state.noData && this.props.timeFocus.id && this.props.timeFocus.id !== this.props.box.key) {
+                let hoverLine = this.graph.focus.selectAll("line.focus-line");
+                hoverLine.attr("x1", (d) =>this.graph.x(d))
+                         .attr("x2", (d) =>this.graph.x(d));
+
+                hoverLine.data([this.props.timeFocus.time])
+                    .enter()
+                    .append("line")
+                    .attr("class", "focus-line focus-hover-line")
+                    .attr("y1", 0)
+                    .attr("y2", this.graph.height)
+                    .attr("x1", (d) =>{
+                        return this.graph.x(d);
+                    })
+                    .attr("x2", (d) =>this.graph.x(d))
+                    .exit()
+                    .remove();
+            }else{
+                this.graph.focus.select("line.focus-line").remove();
+            }
 
     };
 
@@ -919,10 +944,10 @@ class LineChart extends Component {
             if (hoverLine.size() > 0) {
                 hoverLine.style("display", "none");
             }
-
             that.graph.focus.selectAll("circle").style("display", "none");
-
             that.props.hideTooltip();
+            that.props.setTimeFocus(false, null,that.props.box.key);
+
         });
 
         this.graph.bisector = d3.bisector(function (d) {
@@ -1021,6 +1046,7 @@ class LineChart extends Component {
             tooltip.chartType = that.chartType;
             tooltip.counterSum = numeral(that.counterSum).format(that.props.config.numberFormat);
             that.graph.currentTooltipTime = tooltip.timeValue;
+            that.props.setTimeFocus(true, x0.getTime(), that.props.box.key);
             that.props.showTooltip(xPos, yPos, that.graph.margin.left, that.graph.margin.top, tooltip);
         });
 
@@ -1069,9 +1095,16 @@ let mapStateToProps = (state) => {
     return {
         objects: state.target.objects,
         config: state.config,
-        filterMap: state.target.filterMap
+        filterMap: state.target.filterMap,
+        timeFocus: state.timeFocus
     };
 };
 
-LineChart = connect(mapStateToProps, undefined)(LineChart);
+let mapDispatchToProps = (dispatch) => {
+    return {
+        setTimeFocus: (active, time, boxKey) => dispatch(setTimeFocus(active, time, boxKey))
+    };
+};
+
+LineChart = connect(mapStateToProps, mapDispatchToProps)(LineChart);
 export default withRouter(LineChart);

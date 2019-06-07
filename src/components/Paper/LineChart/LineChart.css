@@ -45,7 +45,12 @@
     stroke-dasharray: 3, 3;
     opacity: 0.5;
 }
-
+.focus-hover-line {
+    stroke: #e08429;
+    stroke-width: 2px;
+    stroke-dasharray: 3, 3;
+    opacity: 1;
+}
 .tooltip-focus circle {
     fill: none;
     stroke-width: 2px;
