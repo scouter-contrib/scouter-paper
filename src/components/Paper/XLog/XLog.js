@@ -50,13 +50,16 @@ class XLog extends Component {
 
     resize = () => {
         this.graphResize();
+
     };
 
     componentWillReceiveProps(nextProps) {
         if (this.props.layoutChangeTime !== nextProps.layoutChangeTime) {
             this.graphResize();
         }
-        this.showTimeFocus(nextProps.timeFocus.active);
+        if(!this.props.timeFocus.keep) {
+            this.drawTimeFocus();
+        }
     }
 
     shouldComponentUpdate(nextProps, nextState) {
@@ -175,14 +178,13 @@ class XLog extends Component {
                     this.graphInit();
                 }
             }
-            this.props.setTimeFocus(false,null,this.props.box.key);
         }, 300);
     };
 
 
 
-    showTimeFocus = (isShow=false) => {
-        if( isShow && !this.state.noData && this.props.timeFocus.id && this.props.timeFocus.id !== this.props.box.key) {
+    drawTimeFocus = () => {
+        if( !this.state.noData && this.props.timeFocus.id && this.props.timeFocus.id !== this.props.box.key) {
             let hoverLine = this.graph.focus.selectAll("line.focus-line");
             hoverLine.attr("x1", (d) =>this.graph.x(d))
                 .attr("x2", (d) =>this.graph.x(d));
@@ -207,9 +209,12 @@ class XLog extends Component {
     };
 
     draw = async (xlogs, filter) => {
+        if(this.props.timeFocus.keep) {
+            this.drawTimeFocus();
+        }
         if (this.refs.xlogViewer && xlogs) {
             let context = d3.select(this.refs.xlogViewer).select("canvas").node().getContext("2d");
-            
+
             //let datas = common.getFilteredData(xlogs, filter);
             let datas = await common.getFilteredData0(xlogs, filter, this.props);
             datas.forEach((d, i) => {
@@ -238,6 +243,7 @@ class XLog extends Component {
                     }
                 }
             });
+
         }
     };
 

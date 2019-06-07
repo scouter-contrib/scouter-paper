@@ -16,7 +16,7 @@ class LineChart extends Component {
     lastCountersHistoryTime = null;
     historyInit = {};
     chartType = "LINE";
-    boforeTimeFocusId = null;
+    timeFocusId = null;
     graph = {
         margin: {
             top: 15, right: 15, bottom: 25, left: 40
@@ -191,18 +191,21 @@ class LineChart extends Component {
 
         }
         //- 이전 툴팁이 고정 되었으면 자동 해지 할수 있도록 이벤트 체크
-        if( this.boforeTimeFocusId && !this.props.timeFocus.keep
-            && this.boforeTimeFocusId === this.props.box.key){
+        if( this.timeFocusId
+            && !this.props.timeFocus.keep
+            &&  this.timeFocusId === this.props.box.key){
             this.manualTooltipHide();
-            this.boforeTimeFocusId = null;
+            this.timeFocusId = null;
         }
 
         if( this.props.timeFocus.keep && this.props.box.key === nextProps.timeFocus.id){
-            this.boforeTimeFocusId = nextProps.timeFocus.id;
+            this.timeFocusId = nextProps.timeFocus.id;
         }
         //-
         this.chartType = nextProps.box.values['chartType'];
-        this.showTimeFocus(nextProps.timeFocus.active);
+        if(!this.props.timeFocus.keep) {
+            this.drawTimeFocus();
+        }
     }
 
     loadHistoryCounter(countersHistory, counterKey, longTerm) {
@@ -367,30 +370,7 @@ class LineChart extends Component {
         }
     };
 
-    showTimeFocus = (isShow=false) => {
-        if( isShow && !this.state.noData && this.props.timeFocus.id && this.props.timeFocus.id !== this.props.box.key) {
-            let hoverLine = this.graph.focus.selectAll("line.focus-line");
-            hoverLine.attr("x1", (d) =>this.graph.x(d))
-                     .attr("x2", (d) =>this.graph.x(d));
 
-            hoverLine.data([this.props.timeFocus.time])
-                .enter()
-                .append("line")
-                .attr("class", "focus-line focus-hover-line")
-                .attr("y1", 0)
-                .attr("y2", this.graph.height)
-                .attr("x1", (d) =>{
-                    return this.graph.x(d);
-                })
-                .attr("x2", (d) =>this.graph.x(d))
-                .exit()
-                .remove();
-        }else{
-            this.graph.focus.select("line.focus-line").remove();
-        }
-
-
-    };
 
     moveTooltip = () => {
         if (this.graph.currentTooltipTime) {
@@ -815,9 +795,40 @@ class LineChart extends Component {
             }
 
             this.moveTooltip();
+            if(this.props.timeFocus.keep) {
+                this.drawTimeFocus();
+            }
         }, 200);
 
     };
+
+
+    drawTimeFocus=()=>{
+
+        if( !this.state.noData
+            && this.props.timeFocus.active
+            && this.props.timeFocus.id !== this.props.box.key) {
+            let hoverLine = this.graph.focus.selectAll("line.focus-line");
+            hoverLine.attr("x1", (d) =>this.graph.x(d))
+                .attr("x2", (d) =>this.graph.x(d));
+
+            hoverLine.data([this.props.timeFocus.time])
+                .enter()
+                .append("line")
+                .attr("class", "focus-line focus-hover-line")
+                .attr("y1", 0)
+                .attr("y2", this.graph.height)
+                .attr("x1", (d) =>{
+                    return this.graph.x(d);
+                })
+                .attr("x2", (d) =>this.graph.x(d))
+                .exit()
+                .remove();
+        }else{
+            this.graph.focus.select("line.focus-line").remove();
+        }
+    };
+
 
 
     graphResize = () => {
@@ -827,7 +838,6 @@ class LineChart extends Component {
             resized = true;
             this.graphInit();
             this.manualTooltipHide();
-            this.props.setTimeFocus(false,null,this.props.box.key);
         }
 
         return resized;

@@ -46,10 +46,10 @@
     opacity: 0.5;
 }
 .focus-hover-line {
-    stroke: #e08429;
-    stroke-width: 2px;
-    stroke-dasharray: 2, 2;
-    opacity: 1;
+    stroke: #6F257F;
+    stroke-width: 3px;
+    /*stroke-dasharray: 2, 2;*/
+    opacity: 0.5;
 }
 .tooltip-focus circle {
     fill: none;
