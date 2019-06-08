@@ -418,6 +418,67 @@ export function setTargetServerToUrl (props, config) {
     }
 }
 
+const ALL_OPTIONS_OF_SERVER_KEY = "allOptionsOfServer";
+
+export function clearAllUrlParamOfPaper (props, config) {
+    props.history.push({
+        pathname: props.location.pathname
+    });
+}
+
+export function replaceAllLocalSettingsForServerChange (currentServer, props, config) {
+    if (currentServer && currentServer.address) {
+        saveCurrentAllLocalSettings(currentServer, config);
+        reloadAllLocalSettingsOfServer(props, config);
+    }
+}
+
+export function saveCurrentAllLocalSettings (currentServer, config) {
+    const serverKey = currentServer.address + ":" + currentServer.port;
+
+    const option = {
+        server: serverKey,
+        options: {
+            selectedObjects : getData("selectedObjects"),
+            templateName : getData("templateName"),
+            layouts : getData("layouts"),
+            boxes : getData("boxes"),
+            preset : getData("preset"),
+            profileOptions : getData("profileOptions"),
+            topologyPosition : getData("topologyPosition"),
+            topologyOptions : getData("topologyOptions"),
+            alert : getData("alert")
+        }
+    };
+
+    const allOptionsOfServer = getData(ALL_OPTIONS_OF_SERVER_KEY) || [];
+    let allOptions = allOptionsOfServer.filter(option => option.server !== serverKey);
+    allOptions.push(option);
+
+    setData(ALL_OPTIONS_OF_SERVER_KEY, allOptions);
+}
+
+export function reloadAllLocalSettingsOfServer (props, config) {
+    const server = getServerInfo(config);
+    if (server && server.address) {
+        const serverKey = server.address + ":" + server.port;
+        const allOptionsOfServer = getData(ALL_OPTIONS_OF_SERVER_KEY) || [];
+        const option = allOptionsOfServer.filter(option => option["server"] === serverKey);
+
+        if (option && option[0] && option[0].options) {
+            setData("selectedObjects", option[0].options["selectedObjects"]);
+            setData("templateName", option[0].options["templateName"]);
+            setData("layouts", option[0].options["layouts"]);
+            setData("boxes", option[0].options["boxes"]);
+            setData("preset", option[0].options["preset"]);
+            setData("profileOptions", option[0].options["profileOptions"]);
+            setData("topologyPosition", option[0].options["topologyPosition"]);
+            setData("topologyOptions", option[0].options["topologyOptions"]);
+            setData("alert", option[0].options["alert"]);
+        }
+    }
+}
+
 export function setTargetServerToUrl0 (props, serverAddr, serverPort, protocol) {
     let search = new URLSearchParams(props.location.search);
 

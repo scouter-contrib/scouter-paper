@@ -15,7 +15,20 @@ import * as PaperIcons from "../../common/PaperIcons";
 import LayoutManager from "../Menu/LayoutManager/LayoutManager";
 import PresetManager from "../Menu/PresetManager/PresetManager";
 import * as _ from "lodash";
-import {buildHttpProtocol, errorHandler, getCurrentUser, getDefaultServerConfig, getDefaultServerConfigIndex, getHttpProtocol, getWithCredentials, setAuthHeader, setData, setRangePropsToUrl, setServerTimeGap} from "../../common/common";
+import {
+    buildHttpProtocol,
+    errorHandler,
+    getCurrentUser,
+    getDefaultServerConfig,
+    getDefaultServerConfigIndex,
+    getHttpProtocol,
+    getServerInfo,
+    getWithCredentials,
+    setAuthHeader,
+    setData,
+    setRangePropsToUrl,
+    setServerTimeGap
+} from "../../common/common";
 import jQuery from "jquery";
 import PaperControl from "../Paper/PaperControl/PaperControl";
 import * as common from "../../common/common";
@@ -213,7 +226,8 @@ class Controller extends Component {
     };
 
     onChangeScouterServer = (inx) => {
-        let config = JSON.parse(JSON.stringify(this.props.config));
+        const config = JSON.parse(JSON.stringify(this.props.config));
+        const currentServer = common.getServerInfo(config);
 
         for (let i = 0; i < config.servers.length; i++) {
             if (i === inx) {
@@ -224,22 +238,21 @@ class Controller extends Component {
         }
 
         this.props.setConfig(config);
+
+        const nextServer = common.getServerInfo(config);
+        if (currentServer["address"] === nextServer["address"] && currentServer["port"] === nextServer["port"]) {
+            return;
+        }
+
         this.getServers(config);
         if (localStorage) {
             localStorage.setItem("config", JSON.stringify(config));
         }
 
         common.setTargetServerToUrl(this.props, config);
-
-        this.props.setTarget([], []);
-        this.setState({
-            servers: [],
-            objects: [],
-            activeServerId: null,
-            selectedObjects: {},
-            filter: ""
-        });
-
+        common.replaceAllLocalSettingsForServerChange(currentServer, this.props, config);
+        common.clearAllUrlParamOfPaper(this.props, config);
+        window.location.reload();
     };
 
     setObjects = () => {
