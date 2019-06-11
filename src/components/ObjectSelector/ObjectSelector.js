@@ -484,6 +484,8 @@ class ObjectSelector extends Component {
             localStorage.setItem("config", JSON.stringify(config));
         }
 
+        common.setTargetServerToUrl(this.props, config);
+
         this.props.setTarget([], []);
         this.setState({
             servers: [],

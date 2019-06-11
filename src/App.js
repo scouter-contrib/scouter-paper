@@ -331,7 +331,9 @@ class App extends Component {
             let found = false;
             for (let i=0; i<config.servers.length; i++) {
                 let server = config.servers[i];
-                if (server.protocol === paramProtocol && server.address === paramAddress && String(server.port) === String(paramPort) && server.authentification === paramAuthentification) {
+                if (server.protocol === paramProtocol && server.address === paramAddress
+                    && String(server.port) === String(paramPort))
+                {
                     found = true;
                     server.default = true;
                 } else {
