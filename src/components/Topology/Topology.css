@@ -14,7 +14,37 @@
 .topology-wrapper > div {
     height: 100%;
 }
+.topology-wrapper .topology-chart > div.tooltip {
+    position: absolute;
+    background-color: white;
+    max-width: 250px;
+    height: auto;
+    padding: 1px;
+    border-style: solid;
+    border-radius: 4px;
+    border-width: 1px;
+    box-shadow: 3px 3px 10px rgba(0, 0, 0, .5);
+    pointer-events: none;
+    font-weight: bold;
+}
 
+.topology-wrapper .topology-chart > div.tooltip > div.tooltip-group {
+    margin-bottom: 2px;
+    margin-top : 10px;
+    padding-left: 5px;
+}
+.topology-wrapper .topology-chart > div.tooltip > div.tooltip-group > div.tooltip-counter {
+    margin-left: 10px;
+
+}
+.topology-wrapper .topology-chart > div.tooltip > div {
+
+}
+.topology-wrapper .topology-chart > div.tooltip > div > p{
+    padding: 0px;
+    margin-bottom: 5px;
+    white-space: pre-wrap;
+}
 .topology-wrapper .topology-chart {
     height: 100%;
     overflow: hidden;
