@@ -3,21 +3,7 @@ import "./Paper.css";
 import "./Resizable.css";
 import {connect} from "react-redux";
 import {withRouter} from "react-router-dom";
-import {
-    addRequest,
-    pushMessage,
-    setBoxes,
-    setBoxesLayouts,
-    setLayoutChangeTime,
-    setControlVisibility,
-    setLayouts,
-    setRangeDateHoursMinutesValue,
-    setRealTime,
-    setTemplate,
-    setBreakpoint,
-    setTemplateName,
-    setLayoutName
-} from "../../actions";
+import {addRequest, pushMessage, setBoxes, setBoxesLayouts, setLayoutChangeTime, setControlVisibility, setLayouts, setRangeDateHoursMinutesValue, setRealTime, setTemplate, setBreakpoint, setTemplateName, setLayoutName, setTimeFocus} from "../../actions";
 import {Responsive, WidthProvider} from "react-grid-layout";
 import {Box, BoxConfig, XLogFilter} from "../../components";
 import jQuery from "jquery";
@@ -27,6 +13,7 @@ import Profiler from "./XLog/Profiler/Profiler";
 import ActiveService from "./ActiveService/ActiveService";
 import ServerDate from "../../common/ServerDate";
 import moment from "moment";
+import * as Options from "./PaperControl/Options"
 import OldVersion from "../OldVersion/OldVersion";
 
 const ResponsiveReactGridLayout = WidthProvider(Responsive);
@@ -66,11 +53,9 @@ class Paper extends Component {
                 }
             }
         }
-
         if (!(layouts)) {
             layouts = {};
         }
-
         if (!boxes) {
             boxes = [];
         }
@@ -240,6 +225,19 @@ class Paper extends Component {
         if (templateName) {
             this.props.setTemplateName(templateName.preset, templateName.layout);
         }
+
+        // 초기화 : 만약 라인 차트 타입 설정이 없는 경우
+        if( boxes ){
+            for (const key in boxes) {
+                if( !boxes[key].advancedOption && Array.isArray(boxes[key].option) ){
+                    boxes[key].advancedOption = Options.options().lineChart.config;
+                    for(const attr in boxes[key].advancedOption ){
+                        boxes[key].values[attr] =  boxes[key].advancedOption[attr].value;
+                    }
+                }
+            }
+        }
+
         this.props.setBoxesLayouts(boxes, layouts);
         common.setTargetServerToUrl(this.props, this.props.config);
     }
@@ -303,7 +301,19 @@ class Paper extends Component {
 
         if (JSON.stringify(nextProps.template) !== JSON.stringify(this.props.template)) {
             if (JSON.stringify(nextProps.template.boxes) !== JSON.stringify(this.state.boxes) || JSON.stringify(nextProps.template.layouts) !== JSON.stringify(this.state.layouts)) {
-                this.props.setBoxesLayouts(nextProps.template.boxes, nextProps.template.layouts);
+                // 초기화 : 만약 라인 차트 타입 설정이 없는 경우
+                const boxes = nextProps.template.boxes;
+                if( boxes ){
+                    for (const key in boxes) {
+                        if( !boxes[key].advancedOption && Array.isArray(boxes[key].option) ){
+                            boxes[key].advancedOption = Options.options().lineChart.config;
+                            for(const attr in boxes[key].advancedOption ){
+                                boxes[key].values[attr] =  boxes[key].advancedOption[attr].value;
+                            }
+                        }
+                    }
+                }
+                this.props.setBoxesLayouts(boxes, nextProps.template.layouts);
             }
         }
 
@@ -356,6 +366,8 @@ class Paper extends Component {
                 clearInterval(this.dataRefreshTimer);
                 this.dataRefreshTimer = null;
             }
+
+            this.props.setTimeFocus(false,null,this.props.timeFocus.id);
         }
 
         if (JSON.stringify(this.props.objects) !== JSON.stringify(nextProps.objects) || JSON.stringify(this.props.range) !== JSON.stringify(nextProps.range)) {
@@ -1212,8 +1224,8 @@ class Paper extends Component {
 
     setOption = (key, option) => {
 
+        // paper init counter position : 2
         let boxes = this.props.boxes.slice(0);
-
         boxes.forEach((box) => {
             if (box.key === key) {
 
@@ -1253,13 +1265,20 @@ class Paper extends Component {
                             familyName: option.familyName
                         });
                     }
+                    if(!box.advancedOption && option.advancedOption ){
+                        box.advancedOption = option.advancedOption;
+                    }
                 }
 
                 box.values = {};
                 for (let attr in option.config) {
                     box.values[attr] = option.config[attr].value;
                 }
-
+                if(option.advancedOption) {
+                    for (let attr in option.advancedOption) {
+                        box.values[attr] = option.advancedOption[attr].value;
+                    }
+                }
                 if (Array.isArray(box.option)) {
                     box.config = false;
                     let title = "";
@@ -1507,7 +1526,8 @@ let mapStateToProps = (state) => {
         boxes: state.paper.boxes,
         layouts: state.paper.layouts,
         layoutChangeTime: state.paper.layoutChangeTime,
-        searchCondition: state.searchCondition
+        searchCondition: state.searchCondition,
+        timeFocus : state.timeFocus
     };
 };
 
@@ -1525,7 +1545,8 @@ let mapDispatchToProps = (dispatch) => {
         setLayoutChangeTime: () => dispatch(setLayoutChangeTime()),
         setBreakpoint: (breakpoint) => dispatch(setBreakpoint(breakpoint)),
         setTemplateName: (preset, layout) => dispatch(setTemplateName(preset, layout)),
-        setLayoutName: (layout) => dispatch(setLayoutName(layout))
+        setLayoutName: (layout) => dispatch(setLayoutName(layout)),
+        setTimeFocus: (active, time, boxKey,keep) => dispatch(setTimeFocus(active, time, boxKey,keep))
     };
 };
 

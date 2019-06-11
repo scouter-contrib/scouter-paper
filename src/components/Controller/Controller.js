@@ -755,7 +755,6 @@ class Controller extends Component {
     setOption = (key, option) => {
 
         let boxes = this.props.boxes.slice(0);
-
         boxes.forEach((box) => {
             if (box.key === key) {
 
@@ -795,6 +794,9 @@ class Controller extends Component {
                             familyName: option.familyName
                         });
                     }
+                    if(!box.advancedOption && option.advancedOption ){
+                        box.advancedOption = option.advancedOption;
+                    }
                 }
 
                 box.values = {};
@@ -828,7 +830,6 @@ class Controller extends Component {
 
     addPaperAndAddMetric = (data) => {
         let key = this.addPaper();
-
         if (data) {
             let option = JSON.parse(data);
             this.setOption(key, option);

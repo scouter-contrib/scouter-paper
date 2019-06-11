@@ -43,6 +43,9 @@ export const SET_TEMPLATE_NAME = 'SET_TEMPLATE_NAME';
 export const SET_PRESET_NAME = 'SET_PRESET_NAME';
 export const SET_LAYOUT_NAME = 'SET_LAYOUT_NAME';
 
+
+export const SET_TIME_FOCUS = 'SET_TIME_FOCUS';
+
 export function setTemplateName(preset, layout) {
     return {
         type: SET_TEMPLATE_NAME,
@@ -363,4 +366,14 @@ export function setActiveServiceList(object){
         type : SET_ACTIVE_SERVICE,
         object : object
     }
+}
+export function setTimeFocus(active,time,boxKey,keep=false){
+    return {
+        type : SET_TIME_FOCUS,
+        id: boxKey,
+        active :active,
+        time : time,
+        keep : keep
+    }
+
 }
