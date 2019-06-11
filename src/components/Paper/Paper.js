@@ -227,18 +227,6 @@ class Paper extends Component {
         }
 
         // 초기화 : 만약 라인 차트 타입 설정이 없는 경우
-        if( boxes ){
-            for (const key in boxes) {
-                if( !boxes[key].advancedOption && Array.isArray(boxes[key].option) ){
-                    boxes[key].advancedOption = Options.options().lineChart.config;
-                    for(const attr in boxes[key].advancedOption ){
-                        boxes[key].values[attr] =  boxes[key].advancedOption[attr].value;
-                    }
-                }
-            }
-        }
-
-        // 초기화 : 만약 라인 차트 타입 설정이 없는 경우
 
         if( boxes ){
             for (const key in boxes) {
@@ -254,7 +242,7 @@ class Paper extends Component {
         common.setTargetServerToUrl(this.props, this.props.config);
     }
 
-    componentDidUpdate = (prevProps, prevState) => {
+    componentDidUpdate = (prevProps, nextState) => {
         let counterKeyMap = {};
         for (let i = 0; i < this.props.boxes.length; i++) {
             let option = this.props.boxes[i].option;
@@ -1573,7 +1561,6 @@ let mapDispatchToProps = (dispatch) => {
         setLayoutChangeTime: () => dispatch(setLayoutChangeTime()),
         setBreakpoint: (breakpoint) => dispatch(setBreakpoint(breakpoint)),
         setTemplateName: (preset, layout) => dispatch(setTemplateName(preset, layout)),
-        setLayoutName: (layout) => dispatch(setLayoutName(layout)),
         setTimeFocus: (active, time, boxKey,keep) => dispatch(setTimeFocus(active, time, boxKey,keep))
     };
 };
