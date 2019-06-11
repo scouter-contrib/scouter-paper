@@ -1,6 +1,6 @@
 import React, {Component} from 'react';
 import './Loading.css';
-
+import './Spinner.css'
 class Loading extends Component {
 
     shouldComponentUpdate(nextProps, nextState) {
