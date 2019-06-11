@@ -3,7 +3,21 @@ import "./Paper.css";
 import "./Resizable.css";
 import {connect} from "react-redux";
 import {withRouter} from "react-router-dom";
-import {addRequest, pushMessage, setBoxes, setBoxesLayouts, setLayoutChangeTime, setControlVisibility, setLayouts, setRangeDateHoursMinutesValue, setRealTime, setTemplate, setBreakpoint, setTemplateName} from "../../actions";
+import {
+    addRequest,
+    pushMessage,
+    setBoxes,
+    setBoxesLayouts,
+    setLayoutChangeTime,
+    setControlVisibility,
+    setLayouts,
+    setRangeDateHoursMinutesValue,
+    setRealTime,
+    setTemplate,
+    setBreakpoint,
+    setTemplateName,
+    setLayoutName
+} from "../../actions";
 import {Responsive, WidthProvider} from "react-grid-layout";
 import {Box, BoxConfig, XLogFilter} from "../../components";
 import jQuery from "jquery";
@@ -33,10 +47,7 @@ class Paper extends Component {
     needSearchTo = null;
 
     boxesRef = {};
-
-
     breakpoint = "lg";
-
     resizeTimer = null;
 
     constructor(props) {
@@ -73,8 +84,11 @@ class Paper extends Component {
         let xlogElapsedTime = common.getParam(this.props, "xlogElapsedTime");
 
         //URL로부터 layout 세팅
+        const templateName = getData("templateName");
+        const layoutOnLocal = templateName ? templateName.layout : null;
+
         let layout = common.getParam(this.props, "layout");
-        if (layout) {
+        if ((layout && layout !== layoutOnLocal) || Object.keys(layouts).length === 0) {
             jQuery.ajax({
                 method: "GET",
                 async: true,
@@ -85,12 +99,28 @@ class Paper extends Component {
                 }
             }).done((msg) => {
                 if (msg && Number(msg.status) === 200) {
+                    let isSet = false;
                     let templates = JSON.parse(msg.result);
+                    let boxesFallback;
+                    let layoutsFallback;
+                    let templateNameFallback;
                     for (let i = 0; i < templates.length; i++) {
                         if (layout === templates[i].name) {
                             this.props.setTemplate(templates[i].boxes, templates[i].layouts);
+                            setData("templateName", Object.assign({}, getData("templateName"), {layout: templates[i].name}));
+                            this.props.setLayoutName(templates[i].name);
+                            isSet = true;
                             break;
+                        } else {
+                            boxesFallback = templates[i].boxes;
+                            layoutsFallback = templates[i].boxes;
+                            templateNameFallback = templates[i].name;
                         }
+                    }
+                    if (!isSet && boxesFallback) {
+                        this.props.setTemplate(boxesFallback, layoutsFallback);
+                        setData("templateName", Object.assign({}, getData("templateName"), {layout: templateNameFallback}));
+                        this.props.setLayoutName(templateNameFallback);
                     }
                 }
             }).fail((xhr, textStatus, errorThrown) => {
@@ -131,6 +161,7 @@ class Paper extends Component {
         if (params[0] || params[0] === null) {//realtime
             this.props.setRealTime(true, false);
             common.setRangePropsToUrl(this.props);
+
         } else {
             if (params[1]) {//longterm
                 this.props.setRealTime(false, true);
@@ -159,7 +190,6 @@ class Paper extends Component {
             }
         }
 
-
         this.state = {
             filters: [],
 
@@ -176,7 +206,7 @@ class Paper extends Component {
                 startTime: startTime,
                 endTime: endTime,
                 range: range,
-                maxElapsed: 2000,
+                maxElapsed: 8000,
                 paramMaxElapsed: xlogElapsedTime,
                 lastRequestTime: null,
                 clearTimestamp: null
@@ -207,8 +237,11 @@ class Paper extends Component {
             visible: true,
             rangeControl: false
         };
-
+        if (templateName) {
+            this.props.setTemplateName(templateName.preset, templateName.layout);
+        }
         this.props.setBoxesLayouts(boxes, layouts);
+        common.setTargetServerToUrl(this.props, this.props.config);
     }
 
     componentDidUpdate = (prevProps, prevState) => {
@@ -1491,7 +1524,8 @@ let mapDispatchToProps = (dispatch) => {
         setBoxesLayouts: (boxes, layouts) => dispatch(setBoxesLayouts(boxes, layouts)),
         setLayoutChangeTime: () => dispatch(setLayoutChangeTime()),
         setBreakpoint: (breakpoint) => dispatch(setBreakpoint(breakpoint)),
-        setTemplateName: (preset, layout) => dispatch(setTemplateName(preset, layout))
+        setTemplateName: (preset, layout) => dispatch(setTemplateName(preset, layout)),
+        setLayoutName: (layout) => dispatch(setLayoutName(layout))
     };
 };
 

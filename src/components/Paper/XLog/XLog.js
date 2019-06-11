@@ -46,7 +46,7 @@ class XLog extends Component {
         super(props);
 
         this.state = {
-            elapsed: this.props.data.paramMaxElapsed ? Number(this.props.data.paramMaxElapsed) : common.getLocalSettingData(XLOG_ELAPSED, 2000)
+            elapsed: this.props.data.paramMaxElapsed ? Number(this.props.data.paramMaxElapsed) : common.getLocalSettingData(XLOG_ELAPSED, 8000)
         }
     }
 
