@@ -345,6 +345,25 @@ export function getParam(props, key) {
     }
 }
 
+export function setXlogfilterToUrl (props, filter) {
+
+    let search = new URLSearchParams(props.location.search);
+
+    if(filter === null) {
+        search.delete("xlogfilter");
+    }else{
+        search.set("xlogfilter", JSON.stringify(filter));
+    }
+
+    if (props.location.search !== ("?" + search.toString())) {
+        props.history.replace({
+          pathname: props.location.pathname,
+          search: "?" + search.toString()
+        });
+    }
+
+}
+
 export function setRangePropsToUrl (props, pathname, objects) {
     let search = new URLSearchParams(props.location.search);
 
