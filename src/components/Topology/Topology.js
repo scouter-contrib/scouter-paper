@@ -893,7 +893,6 @@ class Topology extends Component {
             }else{
                 dpObjName = this.objTypeNameMap.get(d.id);
             }
-            console.log(d3.event.pageX,d);
             this.tooltip.transition(500).style("opacity", 1);
             this.tooltip.html(
                 //- tooltip value 값을 응답 시간을 최대 시간 기준으로 최대 10개로 제한 한다.
