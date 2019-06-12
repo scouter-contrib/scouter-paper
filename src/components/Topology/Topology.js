@@ -882,9 +882,9 @@ class Topology extends Component {
     };
     _showTooltip = (d, isShow=false) =>{
 
-
-        if (this.props.topologyOption.highlight && this.props.topologyOption.grouping && d.objCategory !== "CLIENT" ) {
-            const toolTipOffset= this.props.control.Controller === "max" ? -130: +230;
+        if (this.props.topologyOption.highlight && this.props.topologyOption.grouping && (  d.objCategory && d.objCategory !== "CLIENT" ) ) {
+            const isLocationMove = this.props.control.Controller === "max" && this.props.control.pin;
+            const toolTipOffset=  isLocationMove ? -380 : -20;
 
             let dpObjName = [];
 
@@ -893,7 +893,7 @@ class Topology extends Component {
             }else{
                 dpObjName = this.objTypeNameMap.get(d.id);
             }
-
+            console.log(d3.event.pageX,d);
             this.tooltip.transition(500).style("opacity", 1);
             this.tooltip.html(
                 //- tooltip value 값을 응답 시간을 최대 시간 기준으로 최대 10개로 제한 한다.
@@ -924,8 +924,8 @@ class Topology extends Component {
                     })
                 .join(' ')
             )
-            .style("left",(d3.event.pageX - d3.select('.tooltip').node().offsetWidth + toolTipOffset) + "px")
-            .style("top",(d3.event.pageY - d3.select('.tooltip').node().offsetHeight) + "px");
+            .style("left",[d3.event.pageX + toolTipOffset,"px"].join(''))
+            .style("top",[d.fy,"px"].join(''));
         }
 
         if(!isShow){
