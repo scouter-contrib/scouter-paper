@@ -884,7 +884,8 @@ class Topology extends Component {
 
         if (this.props.topologyOption.highlight && this.props.topologyOption.grouping && (  d.objCategory && d.objCategory !== "CLIENT" ) ) {
             const isLocationMove = this.props.control.Controller === "max" && this.props.control.pin;
-            const toolTipOffset=  isLocationMove ? -380 : -20;
+            const toolTipOffsetX=  isLocationMove ? -380 : -20;
+            const toolTipOffsetY=  -70;
 
             let dpObjName = [];
 
@@ -923,8 +924,8 @@ class Topology extends Component {
                     })
                 .join(' ')
             )
-            .style("left",[d3.event.pageX + toolTipOffset,"px"].join(''))
-            .style("top",[d.fy,"px"].join(''));
+            .style("left",[d3.event.pageX + toolTipOffsetX,"px"].join(''))
+            .style("top",[d3.event.pageY + toolTipOffsetY,"px"].join(''));
         }
 
         if(!isShow){
