@@ -656,15 +656,11 @@ class Paper extends Component {
 
     setLoading = (visible) => {
         if (visible) {
-            this.refs.loading.style.display = "table";
-            this.refs.loading.style.opacity = "1";
+            this.props.setControlVisibility('Loading',true);
         } else {
-            setTimeout(() => {
-                if (this.refs.loading) {
-                    this.refs.loading.style.opacity = "0";
-                    this.refs.loading.style.display = "none";
-                }
-            }, 300);
+            setTimeout(() =>{
+                this.props.setControlVisibility('Loading', false);
+            },300);
         }
     };
 
@@ -1540,31 +1536,7 @@ class Paper extends Component {
                     }
                    <Profiler selection={this.props.selection} newXLogs={this.state.data.newXLogs} xlogs={this.state.data.xlogs} startTime={this.state.data.startTime} realtime={this.props.range.realTime}/>
                    <ActiveService realtime={this.props.range.realTime} />
-                   <div className="loading" ref="loading">
-                        <div className="spinner_wrap">
-                            <svg className="spinner1" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 100 100">
-                                <g className="anim-0">
-                                    <circle cx="50" cy="50" r="50" fill="#1864ab"/>
-                                </g>
-                                <g className="anim-1">
-                                    <circle cx="50" cy="50" r="5" fill="white"/>
-                                </g>
-                                <g className="anim-2">
-                                    <circle cx="75" cy="50" r="5" fill="white"/>
-                                    <line x1="25" y1="50" x2="75" y2="50" stroke="white" stroke-width="3"/>
-                                </g>
-                                <g className="anim-3">
-                                    <circle cx="50" cy="25" r="5" fill="white"/>
-                                    <line x1="50" y1="25" x2="25" y2="75" stroke="white" stroke-width="3"/>
-                                    <line x1="50" y1="25" x2="75" y2="75" stroke="white" stroke-width="3"/>
-                                </g>
-                                <g className="anim-4">
-                                    <circle cx="75" cy="25" r="5" fill="white"/>
-                                    <line x1="75" y1="25" x2="25" y2="25" stroke="white" stroke-width="3"/>
-                                </g>
-                            </svg>
-                        </div>
-                    </div>
+
                 </div>}
             </div>
         );

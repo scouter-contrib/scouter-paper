@@ -191,17 +191,6 @@ class LineChart extends Component {
 
         }
         //- 이전 툴팁이 고정 되었으면 자동 해지 할수 있도록 이벤트 체크
-        if( this.timeFocusId
-            && !this.props.timeFocus.keep
-            &&  this.timeFocusId === this.props.box.key){
-            this.manualTooltipHide();
-            this.timeFocusId = null;
-        }
-
-        if( this.props.timeFocus.keep && this.props.box.key === nextProps.timeFocus.id){
-            this.timeFocusId = nextProps.timeFocus.id;
-        }
-        //-
         this.chartType = nextProps.box.values['chartType'];
         if(!this.props.timeFocus.keep) {
             this.drawTimeFocus();
@@ -796,16 +785,39 @@ class LineChart extends Component {
 
             this.moveTooltip();
             if(this.props.timeFocus.keep) {
-                this.drawTimeFocus();
+                this.drawTimeFocus(true);
+
             }
         }, 200);
 
     };
 
 
-    drawTimeFocus=()=>{
+    drawTimeFocus=(isFixed=false)=>{
+        if( isFixed && !this.state.noData){
+            if( Object.keys(this.state.counters).map(k => this.state.counters[k][0].time).filter( t => this.props.timeFocus.time > t ).length ) {
+                let hoverLine = this.graph.focus.selectAll("line.focus-line");
+                hoverLine.attr("x1", (d) => this.graph.x(d))
+                    .attr("x2", (d) => this.graph.x(d));
 
-        if( !this.state.noData
+                hoverLine.data([this.props.timeFocus.time])
+                    .enter()
+                    .append("line")
+                    .attr("class", "focus-line focus-hover-line")
+                    .attr("y1", 0)
+                    .attr("y2", this.graph.height)
+                    .attr("x1", (d) => {
+                        return this.graph.x(d);
+                    })
+                    .attr("x2", (d) => this.graph.x(d))
+                    .exit()
+                    .remove();
+            }else{
+                // 해제
+                this.props.setTimeFocus(false,null,null,false);
+            }
+
+        }else if( !this.state.noData
             && this.props.timeFocus.active
             && this.props.timeFocus.id !== this.props.box.key) {
             let hoverLine = this.graph.focus.selectAll("line.focus-line");
@@ -936,10 +948,6 @@ class LineChart extends Component {
 
 
         this.graph.overlay.on("mouseover", function () {
-            if(that.props.timeFocus.keep) {
-                return;
-            }
-
             let layer = that.refs.lineChartRoot.parentNode.parentNode.parentNode.parentNode.parentNode;
             layer.style.zIndex = 9;
 
@@ -976,19 +984,20 @@ class LineChart extends Component {
 
             //that.props.showTooltip();
         });
-        this.graph.overlay.on("mouseout", function () {
-            if(!that.props.timeFocus.keep) {
-                let layer = that.refs.lineChartRoot.parentNode.parentNode.parentNode.parentNode.parentNode;
-                layer.style.zIndex = 5;
-                that.graph.focus.selectAll("circle").style("display", "none");
+        this.graph.overlay.on("mouseout",() =>{
 
-                let hoverLine = that.graph.focus.select("line.x-hover-line");
-                if (hoverLine.size() > 0) {
-                    hoverLine.style("display", "none");
-                }
-                that.props.hideTooltip();
-                that.props.setTimeFocus(false, null, that.props.box.key);
-            }
+                let layer = this.refs.lineChartRoot.parentNode.parentNode.parentNode.parentNode.parentNode;
+                layer.style.zIndex = 5;
+                this.graph.focus.selectAll("circle").style("display", "none");
+                this.graph
+                    .focus
+                    .select("line.x-hover-line")
+                    .style("display", "none");
+
+                this.props.hideTooltip();
+                if(!this.props.timeFocus.keep)
+                    this.props.setTimeFocus(false, null, that.props.box.key);
+
 
         });
 
@@ -997,6 +1006,13 @@ class LineChart extends Component {
         }).left;
 
         this.graph.overlay.on("dblclick",()=>{
+            if(!this.props.timeFocus.keep){
+                //toggle
+                //tooltip hidel
+                that.graph.focus.select("line.x-hover-line").style("display","none");
+                that.graph.focus.selectAll("circle").style("display","none");
+                that.props.hideTooltip();
+            }
             this.props.setTimeFocus(
                     this.props.timeFocus.active,
                     this.props.timeFocus.time,
@@ -1006,9 +1022,7 @@ class LineChart extends Component {
         });
 
         this.graph.overlay.on("mousemove", function () {
-            if(that.props.timeFocus.keep){
-                return;
-            }
+
 
 
             let tooltip = {};
@@ -1074,7 +1088,7 @@ class LineChart extends Component {
                 }
             }
 
-            let hoverLine = that.graph.focus.select("line.x-hover-line");
+            let hoverLine = that.graph.focus.select("line.x-hover-line").style('display','block');
             if (hoverLine.size() < 1) {
                 hoverLine = that.graph.focus.append("line").attr("class", "x-hover-line hover-line").attr("y1", 0).attr("y2", that.graph.height);
             }
@@ -1089,7 +1103,7 @@ class LineChart extends Component {
             if (tooltip && tooltip.lines) {
                 for (let i = 0; i < tooltip.lines.length; i++) {
                     if (!isNaN(tooltip.lines[i].value)) {
-                        let circle = that.graph.focus.select("circle." + tooltip.lines[i].circleKey);
+                        let circle = that.graph.focus.select("circle." + tooltip.lines[i].circleKey).style('display','block');
                         if (circle.size() > 0) {
                             circle.attr("cx", xPosition);
                             circle.attr("cy", that.graph.y(tooltip.lines[i].value));
@@ -1102,7 +1116,9 @@ class LineChart extends Component {
             tooltip.counterSum = numeral(that.counterSum).format(that.props.config.numberFormat);
             that.graph.currentTooltipTime = tooltip.timeValue;
 
-            that.props.setTimeFocus(true, x0.getTime(), that.props.box.key);
+            if(!that.props.timeFocus.keep){
+                that.props.setTimeFocus(true,x0.getTime(),that.props.box.key);
+            }
             that.props.showTooltip(xPos, yPos, that.graph.margin.left, that.graph.margin.top, tooltip);
 
         });
