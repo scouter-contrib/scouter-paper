@@ -1575,6 +1575,7 @@ let mapDispatchToProps = (dispatch) => {
         setLayoutChangeTime: () => dispatch(setLayoutChangeTime()),
         setBreakpoint: (breakpoint) => dispatch(setBreakpoint(breakpoint)),
         setTemplateName: (preset, layout) => dispatch(setTemplateName(preset, layout)),
+        setLayoutName: (layout) => dispatch(setLayoutName(layout)),
         setTimeFocus: (active, time, boxKey,keep) => dispatch(setTimeFocus(active, time, boxKey,keep))
     };
 };
