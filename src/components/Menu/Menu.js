@@ -28,10 +28,11 @@ class Menu extends Component {
             menu: this.props.location.pathname
         });
         this.props.setMenu(this.props.location.pathname);
-
         if (this.props.config.alert.notification === "Y") {
-            if (Notification && (Notification.permission !== "granted" || Notification.permission === "denied")) {
-                Notification.requestPermission();
+            if( typeof Notification === 'function' && Notification.hasOwnProperty('permission')) {
+                if( Notification.permission !== "granted" || Notification.permission === "denied") {
+                    Notification.requestPermission();
+                }
             }
         }
     }
