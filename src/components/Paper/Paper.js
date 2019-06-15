@@ -245,9 +245,8 @@ class Paper extends Component {
         }
 
         let anotherParam = {};
-        const templateNameReload = getData("templateName");
-        if (templateNameReload && templateNameReload.layout) {
-            anotherParam.layout = templateNameReload.layout;
+        if (templateName && templateName.layout) {
+            anotherParam.layout = templateName.layout;
         }
 
         common.setTargetServerToUrl(this.props, this.props.config, anotherParam);

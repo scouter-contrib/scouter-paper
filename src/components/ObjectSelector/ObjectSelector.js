@@ -19,8 +19,6 @@ import AgentColor from "../../common/InstanceColor";
 import InnerLoading from "../InnerLoading/InnerLoading";
 import SimpleSelector from "../SimpleSelector/SimpleSelector";
 
-
-
 class ObjectSelector extends Component {
 
     init = false;
