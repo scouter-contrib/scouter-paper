@@ -71,12 +71,12 @@ class Paper extends Component {
         //URL로부터 XLOG 응답시간 축 시간 값 세팅
         let xlogElapsedTime = common.getParam(this.props, "xlogElapsedTime");
 
-        //URL로부터 layout 세팅
         const templateName = getData("templateName");
         const layoutOnLocal = templateName ? templateName.layout : null;
 
-        let layout = common.getParam(this.props, "layout");
-        if ((layout && layout !== layoutOnLocal) || Object.keys(layouts).length === 0) {
+        //URL로부터 layout 세팅
+        let layoutFromParam = common.getParam(this.props, "layout");
+        if ((layoutFromParam && layoutFromParam !== layoutOnLocal) || Object.keys(layouts).length === 0) {
             jQuery.ajax({
                 method: "GET",
                 async: true,
@@ -88,21 +88,21 @@ class Paper extends Component {
             }).done((msg) => {
                 if (msg && Number(msg.status) === 200) {
                     let isSet = false;
-                    let templates = JSON.parse(msg.result);
+                    let layouts = JSON.parse(msg.result);
                     let boxesFallback;
                     let layoutsFallback;
                     let templateNameFallback;
-                    for (let i = 0; i < templates.length; i++) {
-                        if (layout === templates[i].name) {
-                            this.props.setTemplate(templates[i].boxes, templates[i].layouts);
-                            setData("templateName", Object.assign({}, getData("templateName"), {layout: templates[i].name}));
-                            this.props.setLayoutName(templates[i].name);
+                    for (let i = 0; i < layouts.length; i++) {
+                        if (layoutFromParam === layouts[i].name) {
+                            this.props.setTemplate(layouts[i].boxes, layouts[i].layouts);
+                            setData("templateName", Object.assign({}, getData("templateName"), {layout: layouts[i].name}));
+                            this.props.setLayoutName(layouts[i].name);
                             isSet = true;
                             break;
                         } else {
-                            boxesFallback = templates[i].boxes;
-                            layoutsFallback = templates[i].boxes;
-                            templateNameFallback = templates[i].name;
+                            boxesFallback = layouts[i].boxes;
+                            layoutsFallback = layouts[i].layouts;
+                            templateNameFallback = layouts[i].name;
                         }
                     }
                     if (!isSet && boxesFallback) {
@@ -114,6 +114,7 @@ class Paper extends Component {
             }).fail((xhr, textStatus, errorThrown) => {
                 errorHandler(xhr, textStatus, errorThrown, this.props, "layout", true);
             });
+
         }
 
         // URL로부터 range 컨트럴의 데이터를 세팅
@@ -225,12 +226,8 @@ class Paper extends Component {
             visible: true,
             rangeControl: false
         };
-        if (templateName) {
-            this.props.setTemplateName(templateName.preset, templateName.layout);
-        }
 
         // 초기화 : 만약 라인 차트 타입 설정이 없는 경우
-
         if( boxes ){
             for (const key in boxes) {
                 if( !boxes[key].advancedOption && Array.isArray(boxes[key].option) ){
@@ -242,7 +239,18 @@ class Paper extends Component {
             }
         }
         this.props.setBoxesLayouts(boxes, layouts);
-        common.setTargetServerToUrl(this.props, this.props.config);
+
+        if (templateName) {
+            this.props.setTemplateName(templateName.preset, templateName.layout);
+        }
+
+        let anotherParam = {};
+        const templateNameReload = getData("templateName");
+        if (templateNameReload && templateNameReload.layout) {
+            anotherParam.layout = templateNameReload.layout;
+        }
+
+        common.setTargetServerToUrl(this.props, this.props.config, anotherParam);
     }
 
     componentDidUpdate = (prevProps, nextState) => {
@@ -1607,6 +1615,7 @@ let mapDispatchToProps = (dispatch) => {
         setRealTime: (realTime, longTerm) => dispatch(setRealTime(realTime, longTerm)),
         setRangeDateHoursMinutesValue: (date, hours, minutes, value) => dispatch(setRangeDateHoursMinutesValue(date, hours, minutes, value)),
         setTemplate: (boxes, layouts) => dispatch(setTemplate(boxes, layouts)),
+        setLayoutName: (layout) => dispatch(setLayoutName(layout)),
         setBoxes: (boxes) => dispatch(setBoxes(boxes)),
         setLayouts: (layouts) => dispatch(setLayouts(layouts)),
         setBoxesLayouts: (boxes, layouts) => dispatch(setBoxesLayouts(boxes, layouts)),

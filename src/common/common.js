@@ -430,10 +430,10 @@ export function setTxidPropsToUrl (props, txiddate, txid) {
     }
 }
 
-export function setTargetServerToUrl (props, config) {
+export function setTargetServerToUrl (props, config, anotherParam) {
     const server = getServerInfo(config);
     if (server && server.address) {
-        setTargetServerToUrl0(props, server.address, server.port, server.protocol);
+        setTargetServerToUrl0(props, server.address, server.port, server.protocol, anotherParam);
     }
 }
 
@@ -498,12 +498,17 @@ export function reloadAllLocalSettingsOfServer (props, config) {
     }
 }
 
-export function setTargetServerToUrl0 (props, serverAddr, serverPort, protocol) {
+export function setTargetServerToUrl0 (props, serverAddr, serverPort, protocol, anotherParam) {
     let search = new URLSearchParams(props.location.search);
 
     search.set("address", serverAddr);
     search.set("port", serverPort);
     search.set("protocol", protocol || "http");
+    for (let key in anotherParam) {
+        if (anotherParam[key]) {
+            search.set(key, anotherParam[key]);
+        }
+    }
 
     if (props.location.search !== ("?" + search.toString())) {
         props.history.replace({
