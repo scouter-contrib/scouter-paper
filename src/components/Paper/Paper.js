@@ -15,6 +15,8 @@ import ServerDate from "../../common/ServerDate";
 import moment from "moment";
 import * as Options from "./PaperControl/Options"
 import OldVersion from "../OldVersion/OldVersion";
+import ScouterPatternMatcher from "../../common/ScouterPatternMatcher";
+
 
 const ResponsiveReactGridLayout = WidthProvider(Responsive);
 
@@ -1454,7 +1456,15 @@ class Paper extends Component {
 
     // set xlog filter by url
     setXlogFilterByUrl = (key, filter) => {
+
+        filter.serviceMatcher = new ScouterPatternMatcher(filter.service);
+        filter.referrerMatcher = new ScouterPatternMatcher(filter.referrer);
+        filter.userAgentMatcher = new ScouterPatternMatcher(filter.userAgent);
+        filter.loginMatcher = new ScouterPatternMatcher(filter.login);
+        filter.descMatcher = new ScouterPatternMatcher(filter.desc);
+
         let filters = Object.assign(this.state.filters);
+
         filters.push({
              key: key,
              show: false,
