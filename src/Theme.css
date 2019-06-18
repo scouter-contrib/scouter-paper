@@ -285,6 +285,9 @@ html.theme-gray, .theme-gray body {
 .theme-gray .frame-profile div.xlog-data span.label {
     background-color: #111;
 }
+.theme-gray .frame-profile div.time-ratio{
+    background-color: #111;
+}
 
 .theme-gray .frame-xlog-steps .step {
     background-color: #111;
