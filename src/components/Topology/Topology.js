@@ -1016,7 +1016,7 @@ class Topology extends Component {
                 return edge.prevStyle;
             }
         } else {
-            return "flow 1s infinite steps(20)";
+            return "flow 0s infinite steps(20)";
         }
     };
 
