@@ -1112,7 +1112,7 @@ class Controller extends Component {
                             </div>
                         </div>
                     </div>
-                    <div className="control-item paper-only">
+                    <div className="control-item paper-only control-item-search">
                         <div className="row desc">
                             <div className="step"><span>3</span></div>
                             <div className="row-message">SEARCH</div>
@@ -1126,11 +1126,11 @@ class Controller extends Component {
                         </div>
                     </div>
 
-                    <div className="control-item paper-only">
+                    <div className="control-item paper-only control-item-calendar">
                         <div className="row desc">
                             <div className="step"><span>4</span></div>
                             <div className="row-message">CHANGE LAYOUT
-                                <div className="breakpoints" data-tip="CURRENT PAPER LAYER"><span className={"breakpoint " + (this.props.control.breakpoint === "lg" ? "selected" : "")}>Large</span><span className={"breakpoint " + (this.props.control.breakpoint === "md" ? "selected" : "")}>Small</span></div>
+                                <div className="breakpoints"><span data-tip="SMALL LAYOUT ( < 800PX)" className={"breakpoint " + (this.props.control.breakpoint === "lg" ? "selected" : "")}>L</span><span  data-tip="LARGE LAYOUT ( > 800PX)" className={"breakpoint " + (this.props.control.breakpoint === "md" ? "selected" : "")}>S</span></div>
                             </div>
                         </div>
                         <div className="row control">

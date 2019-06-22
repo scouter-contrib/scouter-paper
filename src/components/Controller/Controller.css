@@ -121,6 +121,14 @@
 }
 
 .controller-wrapper .control-item.first {
+    z-index: 3;
+}
+
+.controller-wrapper .control-item.control-item-search {
+    z-index: 2;
+}
+
+.controller-wrapper .control-item.control-item-calendar {
     z-index: 1;
 }
 
@@ -159,20 +167,27 @@
     display: inline-block;
     margin-left: 10px;
     position: absolute;
-    top : 2px;
+    top : 3px;
+    right : 10px;
+    font-size: 10px;
 }
 
 .controller-wrapper .control-item .row > div.row-message .breakpoints .breakpoint {
     display: inline-block;
-    padding: 2px 4px;
+    padding-top: 1px;
+    text-align: center;
+    width: 14px;
+    height: 14px;
+    border-radius: 50%;
+    box-sizing: border-box;
 }
 
 .controller-wrapper .control-item .row > div.row-message .breakpoints .breakpoint:first-child {
-    border-radius: 2px 0 0 2px;
+    _border-radius: 5px 0 0 5px;
 }
 
 .controller-wrapper .control-item .row > div.row-message .breakpoints .breakpoint:last-child {
-    border-radius: 0 2px 2px 0;
+    _border-radius: 0 5px 5px 0;
 }
 
 .controller-wrapper .control-item .row > div.row-message .breakpoints .breakpoint.selected {

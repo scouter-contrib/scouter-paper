@@ -651,7 +651,7 @@ class XLog extends Component {
                 }
                 <div>
                     <div className="axis-button axis-up noselect" onClick={this.axisUp} onMouseDown={this.stopPropagation}>+</div>
-                    <div className="text-right"><p>Error / Total : <span className="text-error">{this.errorCount}</span> / {this.callCount}</p></div>
+                    <div className="text-right"><p>Total : {this.callCount} (<span className="text-error">{this.errorCount}</span>)</p></div>
                 </div>
                 <div className="axis-button axis-down noselect" onClick={this.axisDown} onMouseDown={this.stopPropagation}>-</div>
                 {this.props.box.values.showPreview === "Y" &&

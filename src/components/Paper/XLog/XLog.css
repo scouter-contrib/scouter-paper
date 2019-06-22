@@ -79,7 +79,14 @@
 
 .xlog-viewer .text-right {
     position: absolute;
-    right: 5%;
+    right: 15px;
+    top : 6px;
+    font-size: 8px;
+    text-transform: uppercase;
+}
+
+.xlog-viewer .text-right > p {
+    margin: 0;
 }
 
 .xlog-viewer .text-right .text-error  {
