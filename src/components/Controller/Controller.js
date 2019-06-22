@@ -37,7 +37,6 @@ import {
     getDefaultServerConfig,
     getDefaultServerConfigIndex,
     getHttpProtocol,
-    getServerInfo,
     getWithCredentials,
     setAuthHeader,
     setData,
