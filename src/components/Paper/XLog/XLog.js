@@ -201,8 +201,27 @@ class XLog extends Component {
 
 
 
-    drawTimeFocus = () => {
-        if( !this.state.noData && this.props.timeFocus.id && this.props.timeFocus.id !== this.props.box.key) {
+    drawTimeFocus = (isFixed = false) => {
+
+        if( isFixed && !this.state.noData){
+            let hoverLine = this.graph.focus.selectAll("line.focus-line");
+            hoverLine.attr("x1", (d) =>this.graph.x(d))
+                .attr("x2", (d) =>this.graph.x(d));
+
+            hoverLine.data([this.props.timeFocus.time])
+                .enter()
+                .append("line")
+                .attr("class", "focus-line focus-hover-line")
+                .attr("y1", 0)
+                .attr("y2", this.graph.height)
+                .attr("x1", (d) =>{
+                    return this.graph.x(d);
+                })
+                .attr("x2", (d) =>this.graph.x(d))
+                .exit()
+                .remove();
+
+        } else if( !this.state.noData && this.props.timeFocus.id && this.props.timeFocus.id !== this.props.box.key) {
             let hoverLine = this.graph.focus.selectAll("line.focus-line");
             hoverLine.attr("x1", (d) =>this.graph.x(d))
                 .attr("x2", (d) =>this.graph.x(d));
@@ -228,7 +247,7 @@ class XLog extends Component {
 
     draw = async (xlogs, filter) => {
         if(this.props.timeFocus.keep) {
-            this.drawTimeFocus();
+            this.drawTimeFocus(true);
         }
         if (this.refs.xlogViewer && xlogs) {
             let context = d3.select(this.refs.xlogViewer).select("canvas").node().getContext("2d");
@@ -417,7 +436,7 @@ class XLog extends Component {
 
         d3.select(this.refs.xlogViewer).select(".canvas-div")
             .on('mousemove',function() {
-                if(!that.props.timeFocus.keep) {
+
                     let xPos = d3.mouse(this)[0];
                     const x0 = that.graph.x.invert(xPos - that.graph.margin.left);
                     let hoverLine = that.graph.focus.selectAll("line.x-hover-line");
@@ -437,17 +456,21 @@ class XLog extends Component {
                         .attr("x2", (d) => that.graph.x(d))
                         .exit()
                         .remove();
-
+                if(!that.props.timeFocus.keep) {
                     that.props.setTimeFocus(true, x0.getTime(), that.props.box.key);
                 }
             })
             .on('mouseout',() =>{
+                this.graph.focus.select("line.x-hover-line").remove();
                 if(!this.props.timeFocus.keep) {
-                    this.graph.focus.select("line.x-hover-line").remove();
                     this.props.setTimeFocus(false, null, that.props.box.key);
                 }
             })
             .on('dblclick',()=>{
+                if(!this.props.timeFocus.keep) {
+                    this.graph.focus.select("line.x-hover-line").remove();
+                }
+
                 this.props.setTimeFocus(
                     this.props.timeFocus.active,
                     this.props.timeFocus.time,
