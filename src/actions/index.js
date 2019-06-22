@@ -272,13 +272,14 @@ export function setRangeDateHoursMinutes(date, hours, minutes) {
     };
 }
 
-export function setRangeDateHoursMinutesValue(date, hours, minutes, value) {
+export function setRangeDateHoursMinutesValue(date, hours, minutes, value, fromPast) {
     return {
         type: SET_RANGE_DATE_HOURS_MINUTES_VALUE,
         date : date,
         hours : hours,
         minutes : minutes,
-        value : value
+        value : value,
+        fromPast : fromPast
     };
 }
 

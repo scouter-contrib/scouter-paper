@@ -540,7 +540,7 @@ const range = (state = rangeState, action) => {
         case SET_RANGE_DATE_HOURS_MINUTES:
             return Object.assign({}, state, {date : action.date, hours : action.hours, minutes : action.minutes});
         case SET_RANGE_DATE_HOURS_MINUTES_VALUE:
-            return Object.assign({}, state, {date : action.date, hours : action.hours, minutes : action.minutes, value : action.value});
+            return Object.assign({}, state, {date : action.date, hours : action.hours, minutes : action.minutes, value : action.value, fromPast : action.fromPast});
         case SET_RANGE_ALL:
             return Object.assign({}, state, {date : action.date, hours : action.hours, minutes : action.minutes, value : action.value, realTime : action.realTime, longTerm: action.longTerm, range : action.range, step : action.step});
         case SET_FROM_PAST:

@@ -395,6 +395,7 @@ export function setRangePropsToUrl (props, pathname, objects) {
 
     search.set("from", from.format("YYYYMMDDHHmmss"));
     search.set("to", to.format("YYYYMMDDHHmmss"));
+    search.set("fromPast", props.range.fromPast);
 
     if (props.location.search !== ("?" + search.toString())) {
         if (pathname) {
