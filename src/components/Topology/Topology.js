@@ -352,14 +352,24 @@ class Topology extends Component {
         result["category"] = null;
         switch (data.interactionType) {
             case "INTR_API_INCOMING" : {
-                result["objType"] = "API" + data[position + "ObjHash"];
-                result["objTypeName"] = "API";
+                //result["objType"] = "API" + data[position + "ObjHash"];
+                result["objType"] = "API-INCOMING-UNKNOWN";
+                result["objTypeName"] = "API-INCOMING-UNKNOWN";
+
+                if (position === "from") {
+                    result["category"] = "API-INCOMING-UNKNOWN";
+                }
                 break;
             }
 
             case "INTR_API_OUTGOING" : {
-                result["objType"] = "API" + data[position + "ObjHash"];
-                result["objTypeName"] = "API";
+                //result["objType"] = "API" + data[position + "ObjHash"];
+                result["objType"] = "API-UNKNOWN";
+                result["objTypeName"] = "API-UNKNOWN";
+
+                if (position === "to") {
+                    result["category"] = "API-UNKNOWN";
+                }
                 break;
             }
 

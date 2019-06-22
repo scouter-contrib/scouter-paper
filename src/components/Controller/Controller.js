@@ -1,7 +1,22 @@
 import React, {Component} from "react";
 import "./Controller.css";
 
-import {addFilteredObject, addRequest, clearAllMessage, pushMessage, removeFilteredObject, setBoxes, setBoxesLayouts, setConfig, setControllerState, setControlVisibility, setFilterMap, setLayouts, setTarget} from "../../actions";
+import {
+    addFilteredObject,
+    addRequest,
+    clearAllMessage,
+    pushMessage,
+    removeFilteredObject,
+    setBoxes,
+    setBoxesLayouts,
+    setConfig,
+    setControllerState,
+    setControlVisibility,
+    setFilterMap,
+    setLayouts,
+    setPresetName,
+    setTarget
+} from "../../actions";
 import {connect} from "react-redux";
 import {withRouter} from "react-router-dom";
 import Logo from "../Logo/Logo";
@@ -501,7 +516,8 @@ class Controller extends Component {
                         }
                     }
 
-                    if (urlObjectHashes) {
+                    const presetName = new URLSearchParams(this.props.location.search).get('preset');
+                    if (urlObjectHashes || presetName) {
                         let selectedObjects = [];
                         let objects = [];
                         let activeServerId = null;
@@ -509,36 +525,66 @@ class Controller extends Component {
                             //일단 단일 서버로 가정하고 서버 시간과 맞춘다.
                             setServerTimeGap(Number(server.serverTime) - new Date().valueOf());
 
-                            jQuery.ajax({
-                                method: "GET",
-                                async: false,
-                                url: getHttpProtocol(this.props.config) + '/scouter/v1/object?serverId=' + server.id,
-                                xhrFields: getWithCredentials(props.config),
-                                beforeSend: function (xhr) {
-                                    setAuthHeader(xhr, props.config, getCurrentUser(props.config, props.user));
-                                }
-                            }).done(function (msg) {
-                                objects = msg.result;
-
-                                if (objects && objects.length > 0) {
-
-                                    objects.forEach((instance) => {
-                                        urlObjectHashes.forEach((objHash) => {
-                                            if (objHash === Number(instance.objHash)) {
-                                                selectedObjects.push(instance);
-                                                if (!server.selectedObjectCount) {
-                                                    server.selectedObjectCount = 0;
-                                                }
-                                                server.selectedObjectCount++;
-                                                // 마지막으로 찾은 서버 ID로 세팅
-                                                activeServerId = server.id;
+                            if (presetName) {
+                                jQuery.ajax({
+                                    method: "GET",
+                                    async: true,
+                                    url: getHttpProtocol(props.config) + "/scouter/v1/kv/__scouter_paper_preset",
+                                    xhrFields: getWithCredentials(props.config),
+                                    beforeSend: function (xhr) {
+                                        setAuthHeader(xhr, props.config, getCurrentUser(props.config, props.user));
+                                    }
+                                }).done((msg) => {
+                                    if (msg && Number(msg.status) === 200) {
+                                        if (msg.result) {
+                                            let presets = JSON.parse(msg.result);
+                                            if (presets && presets.length > 0) {
+                                                presets.forEach(serverPreset => {
+                                                    if (serverPreset.name === presetName) {
+                                                        this.props.setPresetName(presetName);
+                                                        this.applyPreset(serverPreset);
+                                                        activeServerId = server.id;
+                                                    }
+                                                });
                                             }
-                                        });
-                                    })
-                                }
-                            }).fail(function (xhr, textStatus, errorThrown) {
-                                errorHandler(xhr, textStatus, errorThrown, that.props, "setTargetFromUrl_1", true);
-                            });
+                                        }
+                                    }
+                                }).fail((xhr, textStatus, errorThrown) => {
+                                    errorHandler(xhr, textStatus, errorThrown, this.props, "loadPresets", true);
+                                });
+
+                            } else {
+                                jQuery.ajax({
+                                    method: "GET",
+                                    async: false,
+                                    url: getHttpProtocol(this.props.config) + '/scouter/v1/object?serverId=' + server.id,
+                                    xhrFields: getWithCredentials(props.config),
+                                    beforeSend: function (xhr) {
+                                        setAuthHeader(xhr, props.config, getCurrentUser(props.config, props.user));
+                                    }
+                                }).done(function (msg) {
+                                    objects = msg.result;
+
+                                    if (objects && objects.length > 0) {
+
+                                        objects.forEach((instance) => {
+                                            urlObjectHashes.forEach((objHash) => {
+                                                if (objHash === Number(instance.objHash)) {
+                                                    selectedObjects.push(instance);
+                                                    if (!server.selectedObjectCount) {
+                                                        server.selectedObjectCount = 0;
+                                                    }
+                                                    server.selectedObjectCount++;
+                                                    // 마지막으로 찾은 서버 ID로 세팅
+                                                    activeServerId = server.id;
+                                                }
+                                            });
+                                        })
+                                    }
+                                }).fail(function (xhr, textStatus, errorThrown) {
+                                    errorHandler(xhr, textStatus, errorThrown, that.props, "setTargetFromUrl_1", true);
+                                });
+                            }
                         });
 
                         if (selectedObjects.length > 0) {
@@ -1180,7 +1226,11 @@ let mapDispatchToProps = (dispatch) => {
 
         setBoxes: (boxes) => dispatch(setBoxes(boxes)),
         setLayouts: (layouts) => dispatch(setLayouts(layouts)),
-        setBoxesLayouts: (boxes, layouts) => dispatch(setBoxesLayouts(boxes, layouts))
+        setBoxesLayouts: (boxes, layouts) => dispatch(setBoxesLayouts(boxes, layouts)),
+        setPresetName: (preset) => {
+            localStorage.setItem("preset", JSON.stringify(preset));
+            return dispatch(setPresetName(preset));
+        }
     };
 };
 
