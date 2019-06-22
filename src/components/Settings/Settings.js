@@ -67,6 +67,7 @@ class Settings extends Component {
         let newServer = Object.assign({}, config.servers[config.servers.length - 1]);
         newServer.default = false;
         newServer.name = "";
+        newServer.authentification = "none";
         config.servers.push(newServer);
         this.setState({
             config: config

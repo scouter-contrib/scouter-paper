@@ -67,7 +67,7 @@ const configState = {
     colorType : "white",
     graph : {
         color : "instance",
-        width : 2,
+        width : 1,
         opacity : 0.7,
         fill : "N",
         fillOpacity : 0.4,
