@@ -72,7 +72,7 @@ class Tooltip extends Component {
             <div ref="tooltipRoot" className={"tooltip " + (hasData ? '' : 'no-data')} style={{left: x, top: y}}>
                 {show && this.props.tooltip.data &&
                 <div>
-                    <div className="time">{this.props.tooltip.data.time}</div>
+                    <div className="time">{this.props.tooltip.data.time} {`${this.props.tooltip.data.chartType === "STACK AREA" ? "Sum :"+this.props.tooltip.data.counterSum : "" }`}</div>
                     <ul>
                         {this.props.tooltip.data.lines.map((d, i) => {
                             return (

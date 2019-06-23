@@ -146,6 +146,16 @@ html.theme-gray, .theme-gray body {
     color: white;
 }
 
+.theme-gray .scrollbar::-webkit-scrollbar {
+    width: 7px;
+    height: 7px;
+    background-color: rgba(0, 0, 0, 0.4);
+}
+
+.theme-gray .scrollbar::-webkit-scrollbar-thumb {
+    background-color: #FCDC3B;
+}
+
 /* THEME, Menu.css */
 .theme-gray .menu-div {
     background-color: #222;
@@ -285,6 +295,9 @@ html.theme-gray, .theme-gray body {
 .theme-gray .frame-profile div.xlog-data span.label {
     background-color: #111;
 }
+.theme-gray .frame-profile div.time-ratio{
+    background-color: #111;
+}
 
 .theme-gray .frame-xlog-steps .step {
     background-color: #111;
@@ -319,3 +332,17 @@ html.theme-gray, .theme-gray body {
     background-color: rgba(255,255,255,0.4);
     color: white;
 }
+
+/* ProfileList.css */
+.xlog-profile-list > div.header.row.fixed > span {
+    position: sticky;
+    top: 0;
+    background-color: #F2F2F2;
+}
+
+.theme-gray .xlog-profile-list > div.header.row.fixed > span {
+    position: sticky;
+    top: 0;
+    background-color: #111;
+}
+

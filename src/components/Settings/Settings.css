@@ -442,6 +442,7 @@
 .settings .top-btns .buttons button {
     margin: 0 0 0 2px;
     padding: 4px 10px;
+    user-select: none;
 }
 
 .settings .buttons .restore-btn {

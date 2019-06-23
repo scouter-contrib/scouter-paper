@@ -1,5 +1,7 @@
 import React, {Component} from 'react';
 import './BoxConfig.css';
+import connect from "react-redux/es/connect/connect";
+import {pushMessage, setControlVisibility} from "../../../actions";
 
 class BoxConfig extends Component {
 
@@ -57,9 +59,31 @@ class BoxConfig extends Component {
     };
 
     onApply = () => {
+        //- stack area apply option couter check...
+
+        if( this.props.box.advancedOption && Object.keys(this.state.values).filter(attr =>
+                this.state.values[attr].indexOf("STACK")> -1 ? true : false
+            ).length > 0
+        ){
+            let removeKeyTotal = 0;
+            if( this.state.removeKeys ){
+                removeKeyTotal = this.state.removeKeys.length;
+            }
+            const counterKeyTotal = this.props.box.option.length - removeKeyTotal;
+            if( counterKeyTotal > 1 ){
+                this.props.pushMessage("error","Stack Area Info","Only one metric is available");
+                this.props.setControlVisibility("Message", true);
+                return;
+            }
+
+        }
+
 
         if (this.state.removeKeys && this.state.removeKeys.length > 0) {
             this.props.removeMetrics(this.props.box.key, this.state.removeKeys)
+            if( Object.keys(this.state.values).filter(attr => this.state.values[attr] === "STACK AREA" ? true : false).length > 0){
+                this.props.setOptionValues(this.props.box.key, this.state.values);
+            }
         } else {
             this.props.setOptionValues(this.props.box.key, this.state.values);
         }
@@ -97,6 +121,23 @@ class BoxConfig extends Component {
                         <span>CONFIG</span>
                         <span className="close-btn" onClick={this.onCancel}><i className="fa fa-times-circle-o" aria-hidden="true"></i></span>
                     </div>
+                    <div className="box-config-advanced-items">
+                        { this.props.box.advancedOption && Object.keys(this.props.box.advancedOption).map((attr, i) => {
+                            if (this.props.box.advancedOption[attr].type === "selector") {
+                                return <div className="box-config-advanced-item" key={i}>
+                                    <label>{this.props.box.advancedOption[attr].name}</label>
+                                    <select onChange={(e)=>this.onChange(attr,e)} defaultValue={this.state.values[attr]}>
+                                        {this.props.box.advancedOption[attr].data.map((d, i) => {
+                                            return <option key={i}>{d}</option>
+                                        })}
+                                    </select>
+                                </div>
+                            }else{
+                                return undefined;
+                            }
+                        })
+                        }
+                    </div>
                     <div className={"exclusive-options " + (this.props.box.option.length > 0 ? 'show' : '')}>
                     {(this.props.box.option && this.props.box.option.length > 0) &&
                     this.props.box.option.map((d, i) => {
@@ -116,7 +157,7 @@ class BoxConfig extends Component {
                     }
                     </div>
                     <div className="box-config-items">
-                    {this.props.box.option && this.props.box.option.config && Object.keys(this.props.box.option.config).map((attr, i) => {
+                    { this.props.box.option && this.props.box.option.config && Object.keys(this.props.box.option.config).map((attr, i) => {
                         if (this.props.box.option.config[attr].type === "input") {
                             return <div className="box-config-item" key={i}>
                                         <label>{this.props.box.option.config[attr].name}</label>
@@ -157,8 +198,11 @@ class BoxConfig extends Component {
                         } else {
                             return undefined;
                         }
-                    })}
+                    })
+                    }
                     </div>
+
+
                     <div className="box-config-buttons">
                         <button onClick={this.onCancel}>CANCEL</button><button onClick={this.onApply}>APPLY</button>
                     </div>
@@ -167,7 +211,12 @@ class BoxConfig extends Component {
         );
     }
 }
-
-
+let mapDispatchToProps = (dispatch) => {
+    return {
+        pushMessage: (category, title, content) => dispatch(pushMessage(category, title, content)),
+        setControlVisibility: (name, value) => dispatch(setControlVisibility(name, value)),
+    };
+};
+BoxConfig = connect(null, mapDispatchToProps)(BoxConfig)
 export default BoxConfig;
 

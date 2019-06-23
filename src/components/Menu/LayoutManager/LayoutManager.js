@@ -226,10 +226,7 @@ class LayoutManager extends Component {
 
                 this.props.setTemplate(template.boxes, template.layouts);
 
-                let search = new URLSearchParams();
-                search.set('objects', this.props.objects.map((d) => {
-                    return d.objHash
-                }));
+                let search = new URLSearchParams(this.props.location.search);
                 search.set('layout', template.name);
 
                 if (!(this.props.history.location.pathname === "/paper" && this.props.history.location.search === search)) {

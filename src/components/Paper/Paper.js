@@ -3,7 +3,7 @@ import "./Paper.css";
 import "./Resizable.css";
 import {connect} from "react-redux";
 import {withRouter} from "react-router-dom";
-import {addRequest, pushMessage, setBoxes, setBoxesLayouts, setLayoutChangeTime, setControlVisibility, setLayouts, setRangeDateHoursMinutesValue, setRealTime, setTemplate, setBreakpoint, setTemplateName} from "../../actions";
+import {addRequest, pushMessage, setBoxes, setBoxesLayouts, setLayoutChangeTime, setControlVisibility, setLayouts, setRangeDateHoursMinutesValue, setRealTime, setTemplate, setBreakpoint, setTemplateName, setLayoutName, setTimeFocus} from "../../actions";
 import {Responsive, WidthProvider} from "react-grid-layout";
 import {Box, BoxConfig, XLogFilter} from "../../components";
 import jQuery from "jquery";
@@ -13,7 +13,10 @@ import Profiler from "./XLog/Profiler/Profiler";
 import ActiveService from "./ActiveService/ActiveService";
 import ServerDate from "../../common/ServerDate";
 import moment from "moment";
+import * as Options from "./PaperControl/Options"
 import OldVersion from "../OldVersion/OldVersion";
+import ScouterPatternMatcher from "../../common/ScouterPatternMatcher";
+
 
 const ResponsiveReactGridLayout = WidthProvider(Responsive);
 
@@ -24,6 +27,7 @@ class Paper extends Component {
     xlogHistoryTemp = [];
     xlogHistoryTotalDays = 0;
     xlogHistoryCurrentDays = 0;
+    isLoading = false;
 
     lastFrom = null;
     lastTo = null;
@@ -33,10 +37,7 @@ class Paper extends Component {
     needSearchTo = null;
 
     boxesRef = {};
-
-
     breakpoint = "lg";
-
     resizeTimer = null;
 
     constructor(props) {
@@ -55,11 +56,9 @@ class Paper extends Component {
                 }
             }
         }
-
         if (!(layouts)) {
             layouts = {};
         }
-
         if (!boxes) {
             boxes = [];
         }
@@ -72,9 +71,12 @@ class Paper extends Component {
         //URL로부터 XLOG 응답시간 축 시간 값 세팅
         let xlogElapsedTime = common.getParam(this.props, "xlogElapsedTime");
 
+        const templateName = getData("templateName");
+        const layoutOnLocal = templateName ? templateName.layout : null;
+
         //URL로부터 layout 세팅
-        let layout = common.getParam(this.props, "layout");
-        if (layout) {
+        let layoutFromParam = common.getParam(this.props, "layout");
+        if ((layoutFromParam && layoutFromParam !== layoutOnLocal) || Object.keys(layouts).length === 0) {
             jQuery.ajax({
                 method: "GET",
                 async: true,
@@ -85,26 +87,49 @@ class Paper extends Component {
                 }
             }).done((msg) => {
                 if (msg && Number(msg.status) === 200) {
-                    let templates = JSON.parse(msg.result);
-                    for (let i = 0; i < templates.length; i++) {
-                        if (layout === templates[i].name) {
-                            this.props.setTemplate(templates[i].boxes, templates[i].layouts);
+                    let isSet = false;
+                    let layouts = JSON.parse(msg.result);
+                    let boxesFallback;
+                    let layoutsFallback;
+                    let templateNameFallback;
+                    for (let i = 0; i < layouts.length; i++) {
+                        if (layoutFromParam === layouts[i].name) {
+                            this.props.setTemplate(layouts[i].boxes, layouts[i].layouts);
+                            setData("templateName", Object.assign({}, getData("templateName"), {layout: layouts[i].name}));
+                            this.props.setLayoutName(layouts[i].name);
+                            isSet = true;
                             break;
+                        } else {
+                            boxesFallback = layouts[i].boxes;
+                            layoutsFallback = layouts[i].layouts;
+                            templateNameFallback = layouts[i].name;
                         }
+                    }
+                    if (!isSet && boxesFallback) {
+                        this.props.setTemplate(boxesFallback, layoutsFallback);
+                        setData("templateName", Object.assign({}, getData("templateName"), {layout: templateNameFallback}));
+                        this.props.setLayoutName(templateNameFallback);
                     }
                 }
             }).fail((xhr, textStatus, errorThrown) => {
                 errorHandler(xhr, textStatus, errorThrown, this.props, "layout", true);
             });
+
         }
 
         // URL로부터 range 컨트럴의 데이터를 세팅
-        let params = common.getParam(this.props, "realtime,longterm,from,to");
+        let params = common.getParam(this.props, "realtime,longterm,from,to,fromPast");
 
         let now = moment();
         let from = now.clone().subtract(10, "minutes");
         let to = now;
         if (params[2] && params[3]) {
+
+            let fromPast = true;
+            if (params[4] === false || params[4] === "false") {
+                fromPast = false;
+            }
+
             if (params[2].length === 14 && params[3].length === 14) {
                 from = moment(params[2], "YYYYMMDDhhmmss");
                 to = moment(params[3], "YYYYMMDDhhmmss");
@@ -120,8 +145,14 @@ class Paper extends Component {
                 to = from.clone().add(value, "minutes");
             }
 
+            // 현재 시간으로부터 조회라면, 계산된 value로 from to를 다시 세팅
+            if (!fromPast) {
+                to = moment();
+                from = to.clone().subtract(value, "minutes");
+            }
+
             if (!isNaN(value)) {
-                this.props.setRangeDateHoursMinutesValue(from, from.hours(), from.minutes(), value);
+                this.props.setRangeDateHoursMinutesValue(from, from.hours(), from.minutes(), value, fromPast);
                 this.needSearch = true;
                 this.needSearchFrom = from.valueOf();
                 this.needSearchTo = to.valueOf();
@@ -131,6 +162,7 @@ class Paper extends Component {
         if (params[0] || params[0] === null) {//realtime
             this.props.setRealTime(true, false);
             common.setRangePropsToUrl(this.props);
+
         } else {
             if (params[1]) {//longterm
                 this.props.setRealTime(false, true);
@@ -149,17 +181,6 @@ class Paper extends Component {
             }
         }
 
-        if (params[2] && params[3]) {
-            let value = Math.floor((to.valueOf() - from.valueOf()) / (1000 * 60));
-            if (!isNaN(value)) {
-                this.props.setRangeDateHoursMinutesValue(from, from.hours(), from.minutes(), value);
-                this.needSearch = true;
-                this.needSearchFrom = from.valueOf();
-                this.needSearchTo = to.valueOf();
-            }
-        }
-
-
         this.state = {
             filters: [],
 
@@ -176,7 +197,7 @@ class Paper extends Component {
                 startTime: startTime,
                 endTime: endTime,
                 range: range,
-                maxElapsed: 2000,
+                maxElapsed: 8000,
                 paramMaxElapsed: xlogElapsedTime,
                 lastRequestTime: null,
                 clearTimestamp: null
@@ -208,11 +229,32 @@ class Paper extends Component {
             rangeControl: false
         };
 
+        // 초기화 : 만약 라인 차트 타입 설정이 없는 경우
+        if( boxes ){
+            for (const key in boxes) {
+                if( !boxes[key].advancedOption && Array.isArray(boxes[key].option) ){
+                    boxes[key].advancedOption = Options.options().lineChart.config;
+                    for(const attr in boxes[key].advancedOption ){
+                        boxes[key].values[attr] =  boxes[key].advancedOption[attr].value;
+                    }
+                }
+            }
+        }
         this.props.setBoxesLayouts(boxes, layouts);
+
+        if (templateName) {
+            this.props.setTemplateName(templateName.preset, templateName.layout);
+        }
+
+        let anotherParam = {};
+        if (templateName && templateName.layout) {
+            anotherParam.layout = templateName.layout;
+        }
+
+        common.setTargetServerToUrl(this.props, this.props.config, anotherParam);
     }
 
-    componentDidUpdate = (prevProps, prevState) => {
-
+    componentDidUpdate = (prevProps, nextState) => {
         let counterKeyMap = {};
         for (let i = 0; i < this.props.boxes.length; i++) {
             let option = this.props.boxes[i].option;
@@ -270,7 +312,19 @@ class Paper extends Component {
 
         if (JSON.stringify(nextProps.template) !== JSON.stringify(this.props.template)) {
             if (JSON.stringify(nextProps.template.boxes) !== JSON.stringify(this.state.boxes) || JSON.stringify(nextProps.template.layouts) !== JSON.stringify(this.state.layouts)) {
-                this.props.setBoxesLayouts(nextProps.template.boxes, nextProps.template.layouts);
+                // 초기화 : 만약 라인 차트 타입 설정이 없는 경우
+                const boxes = nextProps.template.boxes;
+                if( boxes ){
+                    for (const key in boxes) {
+                        if( !boxes[key].advancedOption && Array.isArray(boxes[key].option) ){
+                            boxes[key].advancedOption = Options.options().lineChart.config;
+                            for(const attr in boxes[key].advancedOption ){
+                                boxes[key].values[attr] =  boxes[key].advancedOption[attr].value;
+                            }
+                        }
+                    }
+                }
+                this.props.setBoxesLayouts(boxes, nextProps.template.layouts);
             }
         }
 
@@ -323,12 +377,32 @@ class Paper extends Component {
                 clearInterval(this.dataRefreshTimer);
                 this.dataRefreshTimer = null;
             }
+
+            this.props.setTimeFocus(false,null,this.props.timeFocus.id);
         }
 
         if (JSON.stringify(this.props.objects) !== JSON.stringify(nextProps.objects) || JSON.stringify(this.props.range) !== JSON.stringify(nextProps.range)) {
             common.setRangePropsToUrl(nextProps);
         }
 
+        // get box key & set xlog filter by url
+        let boxKey;
+        for (let i = 0; i < this.props.boxes.length; i++) {
+            let title = this.props.boxes[i].title;
+            let key = this.props.boxes[i].key;
+
+            if(title === "XLOG") {
+                boxKey = key;
+                break;
+            }
+        }
+
+        if(boxKey && this.isLoading === false) {
+            let xlogfilter = common.getParam(this.props, "xlogfilter");
+            if(xlogfilter)
+                this.setXlogFilterByUrl(boxKey, JSON.parse(xlogfilter));
+            this.isLoading = true;
+        }
     }
 
     componentDidMount() {
@@ -593,15 +667,11 @@ class Paper extends Component {
 
     setLoading = (visible) => {
         if (visible) {
-            this.refs.loading.style.display = "table";
-            this.refs.loading.style.opacity = "1";
+            this.props.setControlVisibility('Loading',true);
         } else {
-            setTimeout(() => {
-                if (this.refs.loading) {
-                    this.refs.loading.style.opacity = "0";
-                    this.refs.loading.style.display = "none";
-                }
-            }, 300);
+            setTimeout(() =>{
+                this.props.setControlVisibility('Loading', false);
+            },300);
         }
     };
 
@@ -1179,8 +1249,8 @@ class Paper extends Component {
 
     setOption = (key, option) => {
 
+        // paper init counter position : 2
         let boxes = this.props.boxes.slice(0);
-
         boxes.forEach((box) => {
             if (box.key === key) {
 
@@ -1220,13 +1290,20 @@ class Paper extends Component {
                             familyName: option.familyName
                         });
                     }
+                    if(!box.advancedOption && option.advancedOption ){
+                        box.advancedOption = option.advancedOption;
+                    }
                 }
 
                 box.values = {};
                 for (let attr in option.config) {
                     box.values[attr] = option.config[attr].value;
                 }
-
+                if(option.advancedOption) {
+                    for (let attr in option.advancedOption) {
+                        box.values[attr] = option.advancedOption[attr].value;
+                    }
+                }
                 if (Array.isArray(box.option)) {
                     box.config = false;
                     let title = "";
@@ -1377,6 +1454,37 @@ class Paper extends Component {
         this.setState({
             filters: filters
         });
+
+        // set xlog filter to url
+        common.setXlogfilterToUrl(this.props, filter);
+    };
+
+    // set xlog filter by url
+    setXlogFilterByUrl = (key, filter) => {
+
+        filter.serviceMatcher = new ScouterPatternMatcher(filter.service);
+        filter.referrerMatcher = new ScouterPatternMatcher(filter.referrer);
+        filter.userAgentMatcher = new ScouterPatternMatcher(filter.userAgent);
+        filter.loginMatcher = new ScouterPatternMatcher(filter.login);
+        filter.descMatcher = new ScouterPatternMatcher(filter.desc);
+
+        let filters = Object.assign(this.state.filters);
+
+        filters.push({
+             key: key,
+             show: false,
+             data: {
+                 filtering: true
+             }
+        });
+
+        let filterInfo = filters.filter((d) => d.key === key)[0];
+        filter.filtering = true;
+        filterInfo.data = filter;
+
+        this.setState({
+              filters: filters
+        });
     };
 
     closeFilter = (key) => {
@@ -1447,14 +1555,7 @@ class Paper extends Component {
                     }
                    <Profiler selection={this.props.selection} newXLogs={this.state.data.newXLogs} xlogs={this.state.data.xlogs} startTime={this.state.data.startTime} realtime={this.props.range.realTime}/>
                    <ActiveService realtime={this.props.range.realTime} />
-                   <div className="loading" ref="loading">
-                        <div>
-                            <div className="spinner">
-                                <div className="cube1"></div>
-                                <div className="cube2"></div>
-                            </div>
-                        </div>
-                    </div>
+
                 </div>}
             </div>
         );
@@ -1474,7 +1575,8 @@ let mapStateToProps = (state) => {
         boxes: state.paper.boxes,
         layouts: state.paper.layouts,
         layoutChangeTime: state.paper.layoutChangeTime,
-        searchCondition: state.searchCondition
+        searchCondition: state.searchCondition,
+        timeFocus : state.timeFocus
     };
 };
 
@@ -1484,14 +1586,16 @@ let mapDispatchToProps = (dispatch) => {
         pushMessage: (category, title, content) => dispatch(pushMessage(category, title, content)),
         setControlVisibility: (name, value) => dispatch(setControlVisibility(name, value)),
         setRealTime: (realTime, longTerm) => dispatch(setRealTime(realTime, longTerm)),
-        setRangeDateHoursMinutesValue: (date, hours, minutes, value) => dispatch(setRangeDateHoursMinutesValue(date, hours, minutes, value)),
+        setRangeDateHoursMinutesValue: (date, hours, minutes, value, fromPast) => dispatch(setRangeDateHoursMinutesValue(date, hours, minutes, value, fromPast)),
         setTemplate: (boxes, layouts) => dispatch(setTemplate(boxes, layouts)),
+        setLayoutName: (layout) => dispatch(setLayoutName(layout)),
         setBoxes: (boxes) => dispatch(setBoxes(boxes)),
         setLayouts: (layouts) => dispatch(setLayouts(layouts)),
         setBoxesLayouts: (boxes, layouts) => dispatch(setBoxesLayouts(boxes, layouts)),
         setLayoutChangeTime: () => dispatch(setLayoutChangeTime()),
         setBreakpoint: (breakpoint) => dispatch(setBreakpoint(breakpoint)),
-        setTemplateName: (preset, layout) => dispatch(setTemplateName(preset, layout))
+        setTemplateName: (preset, layout) => dispatch(setTemplateName(preset, layout)),
+        setTimeFocus: (active, time, boxKey,keep) => dispatch(setTimeFocus(active, time, boxKey,keep))
     };
 };
 

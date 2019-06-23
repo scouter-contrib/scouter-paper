@@ -400,6 +400,10 @@ class Profiler extends Component {
             });
         }
 
+        if (this.refs.profileStepsContent) {
+            this.refs.profileStepsContent.scrollTop = 0;
+        }
+
         const tdate = (txiddate ? txiddate : moment(new Date(Number(xlog.endTime))).format("YYYYMMDD"));
 
         // XLOG DATA
@@ -584,7 +588,7 @@ class Profiler extends Component {
                                 {!this.state.smallScreen && <div className="close-btn" onClick={this.close}></div>}
                             </div>
                             <div className={"profile-steps " + (this.state.narrow ? 'narrow' : '')}>
-                                <div className="profile-steps-content scrollbar">
+                                <div ref="profileStepsContent" className="profile-steps-content scrollbar">
                                     {(this.state.paramTxid || this.state.txid) &&
                                     <FrameProfile rowClick={this.rowClick} txid={this.state.txid}
                                                   profile={this.state.profile} steps={this.state.steps}

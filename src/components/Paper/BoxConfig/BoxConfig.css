@@ -61,6 +61,7 @@
     box-sizing: border-box;
 }
 
+
 .box-config.single-row .box-config-items {
     display: block;
 }
@@ -97,7 +98,41 @@
     border-radius: 0;
 
 }
+/* 메트릭 추가 설정 */
+.box-config .box-config-advanced-items {
+    display: table;
+    width: 100%;
+    table-layout: fixed;
+}
 
+.box-config .box-config-advanced-item {
+    padding: 2px 0 5px;
+    width: 50%;
+    _height: 46px;
+    display: inline-block;
+    position: relative;
+    vertical-align: top;
+    box-sizing: border-box;
+}
+
+.box-config .box-config-advanced-item select {
+    width: calc(100% - 120px);
+    padding: 5px;
+    outline: none;
+    border-radius: 3px;
+    border: none;
+    line-height: 0;
+}
+
+.box-config .box-config-advanced-item label {
+    color: white;
+
+    line-height: 100%;
+    width: 100px;
+    display: inline-block;
+    text-align: center;
+}
+/* 추가 설정 분 */
 .box-config .box-config-buttons {
     padding: 5px 10px 0;
     text-align: center;

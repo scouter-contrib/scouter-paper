@@ -43,6 +43,9 @@ export const SET_TEMPLATE_NAME = 'SET_TEMPLATE_NAME';
 export const SET_PRESET_NAME = 'SET_PRESET_NAME';
 export const SET_LAYOUT_NAME = 'SET_LAYOUT_NAME';
 
+
+export const SET_TIME_FOCUS = 'SET_TIME_FOCUS';
+
 export function setTemplateName(preset, layout) {
     return {
         type: SET_TEMPLATE_NAME,
@@ -269,13 +272,14 @@ export function setRangeDateHoursMinutes(date, hours, minutes) {
     };
 }
 
-export function setRangeDateHoursMinutesValue(date, hours, minutes, value) {
+export function setRangeDateHoursMinutesValue(date, hours, minutes, value, fromPast) {
     return {
         type: SET_RANGE_DATE_HOURS_MINUTES_VALUE,
         date : date,
         hours : hours,
         minutes : minutes,
-        value : value
+        value : value,
+        fromPast : fromPast
     };
 }
 
@@ -363,4 +367,14 @@ export function setActiveServiceList(object){
         type : SET_ACTIVE_SERVICE,
         object : object
     }
+}
+export function setTimeFocus(active,time,boxKey,keep=false){
+    return {
+        type : SET_TIME_FOCUS,
+        id: boxKey,
+        active :active,
+        time : time,
+        keep : keep
+    }
+
 }

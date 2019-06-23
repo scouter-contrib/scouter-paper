@@ -19,8 +19,6 @@ import AgentColor from "../../common/InstanceColor";
 import InnerLoading from "../InnerLoading/InnerLoading";
 import SimpleSelector from "../SimpleSelector/SimpleSelector";
 
-
-
 class ObjectSelector extends Component {
 
     init = false;
@@ -483,6 +481,8 @@ class ObjectSelector extends Component {
         if (localStorage) {
             localStorage.setItem("config", JSON.stringify(config));
         }
+
+        common.setTargetServerToUrl(this.props, config);
 
         this.props.setTarget([], []);
         this.setState({

@@ -6,7 +6,7 @@ import XLogPreviewer from "./XLogPreviewer/XLogPreviewer";
 import * as common from "../../../common/common";
 
 import {connect} from 'react-redux';
-import {setSelection} from '../../../actions';
+import {setSelection, setTimeFocus} from '../../../actions';
 import {withRouter} from 'react-router-dom';
 
 const XLOG_ELAPSED = 'xlogElapsed';
@@ -39,22 +39,28 @@ class XLog extends Component {
     lastPastTimestamp = null;
     lastPageCnt = null;
     lastClearTimestamp = null;
+    errorCount = 0;
+    callCount = 0;
 
     constructor(props) {
         super(props);
 
         this.state = {
-            elapsed: this.props.data.paramMaxElapsed ? Number(this.props.data.paramMaxElapsed) : common.getLocalSettingData(XLOG_ELAPSED, 2000)
+            elapsed: this.props.data.paramMaxElapsed ? Number(this.props.data.paramMaxElapsed) : common.getLocalSettingData(XLOG_ELAPSED, 8000)
         }
     }
 
     resize = () => {
         this.graphResize();
+
     };
 
     componentWillReceiveProps(nextProps) {
         if (this.props.layoutChangeTime !== nextProps.layoutChangeTime) {
             this.graphResize();
+        }
+        if(!this.props.timeFocus.keep) {
+            this.drawTimeFocus();
         }
     }
 
@@ -150,8 +156,24 @@ class XLog extends Component {
             this.clear();
             this.redraw(this.props.filter);
         }
+        this.countXLogData();
     };
 
+    countXLogData = () => {
+        this.errorCount = 0;
+        this.callCount = 0;
+        let datas = common.getFilteredData(this.props.data.xlogs, this.props.filter);
+        datas.forEach((d, i) => {
+            let x = this.graph.x(d.endTime);
+            if (Number(d.error)) {
+                if (x < 0) this.errorCount--;
+                else this.errorCount++;
+            } else {
+                if (x < 0) this.callCount--;
+                else this.callCount++;
+            }
+        });
+    };
     resizeTimer = null;
     graphResize = () => {
         if (this.resizeTimer) {
@@ -177,12 +199,59 @@ class XLog extends Component {
         }, 300);
     };
 
-    
+
+
+    drawTimeFocus = (isFixed = false) => {
+
+        if( isFixed && !this.state.noData){
+            let hoverLine = this.graph.focus.selectAll("line.focus-line");
+            hoverLine.attr("x1", (d) =>this.graph.x(d))
+                .attr("x2", (d) =>this.graph.x(d));
+
+            hoverLine.data([this.props.timeFocus.time])
+                .enter()
+                .append("line")
+                .attr("class", "focus-line focus-hover-line")
+                .attr("y1", 0)
+                .attr("y2", this.graph.height)
+                .attr("x1", (d) =>{
+                    return this.graph.x(d);
+                })
+                .attr("x2", (d) =>this.graph.x(d))
+                .exit()
+                .remove();
+
+        } else if( !this.state.noData && this.props.timeFocus.id && this.props.timeFocus.id !== this.props.box.key) {
+            let hoverLine = this.graph.focus.selectAll("line.focus-line");
+            hoverLine.attr("x1", (d) =>this.graph.x(d))
+                .attr("x2", (d) =>this.graph.x(d));
+
+            hoverLine.data([this.props.timeFocus.time])
+                .enter()
+                .append("line")
+                .attr("class", "focus-line focus-hover-line")
+                .attr("y1", 0)
+                .attr("y2", this.graph.height)
+                .attr("x1", (d) =>{
+                    return this.graph.x(d);
+                })
+                .attr("x2", (d) =>this.graph.x(d))
+                .exit()
+                .remove();
+
+        }else{
+            this.graph.focus.select("line.focus-line").remove();
+        }
+
+    };
 
     draw = async (xlogs, filter) => {
+        if(this.props.timeFocus.keep) {
+            this.drawTimeFocus(true);
+        }
         if (this.refs.xlogViewer && xlogs) {
             let context = d3.select(this.refs.xlogViewer).select("canvas").node().getContext("2d");
-            
+
             //let datas = common.getFilteredData(xlogs, filter);
             let datas = await common.getFilteredData0(xlogs, filter, this.props);
             datas.forEach((d, i) => {
@@ -211,6 +280,7 @@ class XLog extends Component {
                     }
                 }
             });
+
         }
     };
 
@@ -350,13 +420,65 @@ class XLog extends Component {
         // Y축 단위 그리드 그리기
         svg.append("g").attr("class", "grid-y").style("stroke-dasharray", "5 5").style("opacity", this.graph.opacity).call(d3.axisLeft(this.graph.y).tickSize(-this.graph.width).tickFormat("").ticks(yAxisCount));
 
+
+        this.graph.focus = svg.append("g").attr("class", "tooltip-focus");
+
         // 캔버스 그리기
         let canvasDiv = d3.select(this.refs.xlogViewer).select(".canvas-div");
         if (canvasDiv.size() > 0) {
             canvasDiv.remove();
         }
         canvasDiv = d3.select(this.refs.xlogViewer).append("div").attr("class", "canvas-div").style('position', 'absolute').style('top', '0px').style('left', '0px');
+
+
         let canvas = canvasDiv.append('canvas').attr('height', this.graph.height).attr('width', this.graph.width + 20).style('position', 'absolute').style('top', this.graph.margin.top + 'px').style('left', this.graph.margin.left + 'px');
+
+
+        d3.select(this.refs.xlogViewer).select(".canvas-div")
+            .on('mousemove',function() {
+
+                    let xPos = d3.mouse(this)[0];
+                    const x0 = that.graph.x.invert(xPos - that.graph.margin.left);
+                    let hoverLine = that.graph.focus.selectAll("line.x-hover-line");
+
+                    hoverLine.attr("x1", (d) => that.graph.x(d))
+                        .attr("x2", (d) => that.graph.x(d));
+
+                    hoverLine.data([x0])
+                        .enter()
+                        .append("line")
+                        .attr("class", "x-hover-line hover-line")
+                        .attr("y1", 0)
+                        .attr("y2", that.graph.height)
+                        .attr("x1", (d) => {
+                            return that.graph.x(d);
+                        })
+                        .attr("x2", (d) => that.graph.x(d))
+                        .exit()
+                        .remove();
+                if(!that.props.timeFocus.keep) {
+                    that.props.setTimeFocus(true, x0.getTime(), that.props.box.key);
+                }
+            })
+            .on('mouseout',() =>{
+                this.graph.focus.select("line.x-hover-line").remove();
+                if(!this.props.timeFocus.keep) {
+                    this.props.setTimeFocus(false, null, that.props.box.key);
+                }
+            })
+            .on('dblclick',()=>{
+                if(!this.props.timeFocus.keep) {
+                    this.graph.focus.select("line.x-hover-line").remove();
+                }
+
+                this.props.setTimeFocus(
+                    this.props.timeFocus.active,
+                    this.props.timeFocus.time,
+                    this.props.timeFocus.id,
+                    !this.props.timeFocus.keep
+                );
+
+            });
 
         // 드래그 셀렉트
         svg.append("g").append("rect").attr("class", "selection").attr("opacity", 0.2);
@@ -425,6 +547,7 @@ class XLog extends Component {
             });
 
         canvas.call(dragBehavior);
+
 
         // 브러쉬 (XLOG)
         this.graph.normalBrush = document.createElement("canvas");
@@ -526,7 +649,10 @@ class XLog extends Component {
                     </div>
                 </div>
                 }
-                <div className="axis-button axis-up noselect" onClick={this.axisUp} onMouseDown={this.stopPropagation}>+</div>
+                <div>
+                    <div className="axis-button axis-up noselect" onClick={this.axisUp} onMouseDown={this.stopPropagation}>+</div>
+                    <div className="text-right"><p>Total : {this.callCount} (<span className="text-error">{this.errorCount}</span>)</p></div>
+                </div>
                 <div className="axis-button axis-down noselect" onClick={this.axisDown} onMouseDown={this.stopPropagation}>-</div>
                 {this.props.box.values.showPreview === "Y" &&
                 <XLogPreviewer secondStepTimestamp={this.props.data.secondStepTimestamp} secondStepXlogs={this.props.data.secondStepXlogs} width={this.graph.preview.width} margin={this.graph.margin} maxElapsed={this.state.elapsed}/>
@@ -540,13 +666,15 @@ let mapStateToProps = (state) => {
     return {
         config: state.config,
         user: state.user,
-        filterMap: state.target.filterMap
+        filterMap: state.target.filterMap,
+        timeFocus: state.timeFocus
     };
 };
 
 let mapDispatchToProps = (dispatch) => {
     return {
-        setSelection: (selection) => dispatch(setSelection(selection))
+        setSelection: (selection) => dispatch(setSelection(selection)),
+        setTimeFocus: (active, time, boxKey,keep) => dispatch(setTimeFocus(active, time, boxKey,keep))
     };
 };
 
