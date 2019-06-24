@@ -78,6 +78,10 @@ html.theme-gray {
     stroke: #deffba;
 }
 
+/* THEME, topology-chart.css */
+.theme-gray .topology-wrapper .tooltip-group{
+    color: #111;
+}
 
 /* THEME, Login.css */
 .theme-gray .login-wrapper .login-box {
