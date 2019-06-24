@@ -1,0 +1,7 @@
+version: '3.2'
+services:
+  scouter-paper:
+    image : scouterapm/scouter-paper:2.5.0
+    restart : always
+    ports:
+      - 8080:80
