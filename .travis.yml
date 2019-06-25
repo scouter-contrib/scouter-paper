@@ -7,5 +7,4 @@ script :
 cache: npm
 branches:
   only:
-    - master
     - development
