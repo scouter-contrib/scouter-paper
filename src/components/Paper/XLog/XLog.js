@@ -142,8 +142,10 @@ class XLog extends Component {
             this.redraw(this.props.filter);
         } else if (this.lastPastTimestamp === this.props.pastTimestamp && this.lastPageCnt !== this.props.pageCnt) {
             this.lastPageCnt = this.props.pageCnt;
+            this.clear();
             this.draw(this.props.data.newXLogs, this.props.filter);
         } else {
+            this.clear();
             this.redraw(this.props.filter);
         }
         
