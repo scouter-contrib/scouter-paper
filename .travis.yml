@@ -14,7 +14,7 @@ before_deploy:
 after_deploy :
   - echo "$DEMO_DEPLOY_KEY" | tr -d '\r' > $DEMO_DELOY_FILE
   - scp -i $DEMO_DELOY_FILE ./$SCOUTER_PAPER-COMPRESS-NAME $DEMO_SERVER_USER@$DEMO_SERVER_NODE
-  - ssh -T $DEMO_SERVER_USER@$DEMO_SERVER_NODE "/home/ec2-user/deploy.sh $SCOUTER_PAPER-COMPRESS-NAME"
+  - ssh -i $DEMO_DELOY_FILE -T $DEMO_SERVER_USER@$DEMO_SERVER_NODE "/home/ec2-user/deploy.sh $SCOUTER_PAPER-COMPRESS-NAME"
 cache:
   directories:
     - "node_modules"
