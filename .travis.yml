@@ -6,9 +6,13 @@ before_install:
   - npm install
 script :
   - npm run-script build
+after_script:
+  - tar cvf $SCOUTER_PAPER-COMPRESS-NAME build/
 cache:
   directories:
     - "node_modules"
 branches:
   only:
     - development
+notifications:
+  slack: scouterapm:fJndRYgbQA0uTLXiEqxZJhUU
