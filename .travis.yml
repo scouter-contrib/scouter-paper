@@ -23,7 +23,6 @@ cache:
 branches:
   only:
     - development
-    - master
 notifications:
   slack: scouterapm:fJndRYgbQA0uTLXiEqxZJhUU
 
