@@ -144,7 +144,7 @@ class XLog extends Component {
             this.lastPageCnt = this.props.pageCnt;
             this.draw(this.props.data.newXLogs, this.props.filter);
         } else {
-            this.redraw(this.props.filter);
+            this.draw(this.props.data.newXLogs, this.props.filter);
         }
         
         if (this.props.filter && JSON.stringify(prevProps.filter) !== JSON.stringify(this.props.filter)) {
@@ -196,7 +196,7 @@ class XLog extends Component {
                     this.graphInit();
                 }
             }
-        }, 300);
+        }, 100);
     };
 
 
