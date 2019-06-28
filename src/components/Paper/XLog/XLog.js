@@ -196,7 +196,7 @@ class XLog extends Component {
                     this.graphInit();
                 }
             }
-        }, 300);
+        }, 100);
     };
 
 
