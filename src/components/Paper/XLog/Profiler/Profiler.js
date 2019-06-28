@@ -302,8 +302,7 @@ class Profiler extends Component {
         }
 
         // remove duplication txid
-        var arrTxid = (filtered.map(x => x.txid).toString()).split(",");
-        var strTxid = arrTxid.reduce(function(a,b){ if(a.indexOf(b) < 0) a.push(b); return a;},[]);
+        let strTxid = filtered.map(x => x.txid).reduce(function(a,b){ if(a.indexOf(b) < 0) a.push(b); return a;},[]);
 
         let date = moment(new Date(x1)).format("YYYYMMDD");
 
