@@ -301,6 +301,9 @@ class Profiler extends Component {
             return;
         }
 
+        // remove duplication txid
+        let strTxid = filtered.map(x => x.txid).reduce(function(a,b){ if(a.indexOf(b) < 0) a.push(b); return a;},[]);
+
         let date = moment(new Date(x1)).format("YYYYMMDD");
 
         this.props.setControlVisibility("Loading", true);
@@ -308,7 +311,7 @@ class Profiler extends Component {
         jQuery.ajax({
             method: "GET",
             async: true,
-            url: getHttpProtocol(this.props.config) + '/scouter/v1/xlog-data/' + date + '/multi/' + filtered.map(x => x.txid).toString(),
+            url: getHttpProtocol(this.props.config) + '/scouter/v1/xlog-data/' + date + '/multi/' + strTxid,
             xhrFields: getWithCredentials(that.props.config),
             beforeSend: function (xhr) {
                 setAuthHeader(xhr, that.props.config, getCurrentUser(that.props.config, that.props.user));
