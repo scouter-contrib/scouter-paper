@@ -4,6 +4,7 @@ import {Droppable} from 'react-drag-and-drop'
 import {EmptyBox, ClockBox, XLogBar} from "../../components";
 import XLog from "../Paper/XLog/XLog";
 import Visitor from "../Paper/Visitor/Visitor";
+import DiskUsage from "../Paper/DiskUsage/DiskUsage";
 import LineChart from "../Paper/LineChart/LineChart";
 import ActiveSpeed from "../Paper/ActiveSpeed/ActiveSpeed";
 import Tooltip from "./Tooltip/Tooltip";
@@ -191,6 +192,7 @@ class Box extends Component {
                             {type === "xlogBar" && <XLogBar visible={this.props.visible} layoutChangeTime={this.props.layoutChangeTime} box={this.props.box} data={this.props.data} interval={this.props.config.interval} filterMap={this.props.filterMap} />}
                             {type === "xlog" && <XLog visible={this.props.visible} layoutChangeTime={this.props.layoutChangeTime} box={this.props.box} filter={this.props.filter} pastTimestamp={this.props.pastTimestamp} pageCnt={this.props.pageCnt} data={this.props.data} config={this.props.config} startTime={this.props.data.startTime} longTerm={this.props.longTerm} xlogHistoryDoing={this.props.xlogHistoryDoing} xlogHistoryRequestCnt={this.props.xlogHistoryRequestCnt} setStopXlogHistory={this.props.setStopXlogHistory} xlogNotSupportedInRange={this.props.xlogNotSupportedInRange}/>}
                             {type === "visitor" && <Visitor visible={this.props.visible} layoutChangeTime={this.props.layoutChangeTime} visitor={this.props.visitor} box={this.props.box} realtime={this.props.realtime} />}
+                            {type === "diskUsage" && <DiskUsage visible={this.props.visible} layoutChangeTime={this.props.layoutChangeTime} diskUsage={this.props.diskUsage} box={this.props.box} realtime={this.props.realtime} showTooltip={this.showTooltip} hideTooltip={this.hideTooltip} />}
                             {type === "counter" && <LineChart visible={this.props.visible} layoutChangeTime={this.props.layoutChangeTime} time={this.props.counters.time} box={this.props.box} counters={this.props.counters.data} countersHistory={this.props.countersHistory} countersHistoryTimestamp={this.props.countersHistoryTimestamp} countersHistoryFrom={this.props.countersHistoryFrom} countersHistoryTo={this.props.countersHistoryTo} longTerm={this.props.longTerm} setTitle={this.setTitle} removeTitle={this.removeTitle} showTooltip={this.showTooltip} hideTooltip={this.hideTooltip} />}
                             {type === "ActiveSpeed" && <ActiveSpeed visible={this.props.visible} layoutChangeTime={this.props.layoutChangeTime} time={this.props.counters.time} box={this.props.box} counters={this.props.counters.data} setTitle={this.setTitle} removeTitle={this.removeTitle} realtime={this.props.realtime} />}
                             {this.state.tooltip.show && <Tooltip tooltip={this.state.tooltip}/>}

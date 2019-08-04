@@ -211,6 +211,9 @@ class Paper extends Component {
             /* visitor */
             visitor: {},
 
+            /* diskUsage */
+            diskUsage: {},
+
             /* counters */
             counters: {
                 time: null,
@@ -469,6 +472,7 @@ class Paper extends Component {
         }
 
         this.getVisitor(this.props);
+        this.getDiskUsage(this.props);
         this.getRealTimeCounter();
 
         clearInterval(this.dataRefreshTimer);
@@ -1050,6 +1054,71 @@ class Paper extends Component {
         }
     };
 
+    getDiskUsage = (props) => {
+        let that = this;
+        if (props.objects && props.objects.length > 0) {
+            let filterdObjects = props.objects.filter((instance) => {
+                return props.filterMap[instance.objHash]
+            });
+
+            if (filterdObjects.length > 0) {
+
+                props.addRequest();
+
+                let arrTime = [];
+                let arrDiskUsage = [];
+                let arrObjName = [];
+
+                filterdObjects.map((data) => {
+                    jQuery.ajax({
+                        method: "GET",
+                        async: true,
+                        url: getHttpProtocol(props.config) + '/scouter/v1/object/host/realTime/disk/ofObject/'+ JSON.parse(JSON.stringify(data)).objHash,
+                        xhrFields: getWithCredentials(props.config),
+                            beforeSend: function (xhr) {
+                            setAuthHeader(xhr, props.config, getCurrentUser(props.config, props.user));
+                        }
+                    }).done((msg) => {
+                        if (!that.mounted) {
+                            return null;
+                        }
+
+                        let time = (new ServerDate()).getTime();
+                        arrTime.push(time);
+                        arrDiskUsage.push(msg.result);
+                        arrObjName.push(JSON.parse(JSON.stringify(data)).objName)
+
+                    }).fail((xhr, textStatus, errorThrown) => {
+                    });
+
+                    return null;
+                });
+
+                setTimeout(() =>{
+                    if(arrTime.length > 0) {
+                        this.setState({
+                            diskUsage: {
+                                time: arrTime,
+                                objName: arrObjName,
+                                diskUsage: arrDiskUsage
+                            }
+                        });
+                    }
+
+                },3000);
+
+            } else {
+                let time = (new ServerDate()).getTime();
+                this.setState({
+                    diskUsage: {
+                      time: time,
+                      objName : [],
+                      diskUsage: []
+                    }
+                });
+            }
+        }
+    };
 
     getCounterHistoryData = (url, counterKey, from, to, now, append) => {
         this.setLoading(true);
@@ -1531,12 +1600,12 @@ class Paper extends Component {
                             return (
                                 <div className="box-layout" key={box.key} data-grid={box.layout}>
                                     <button className="box-control box-layout-remove-btn last" onClick={this.removePaper.bind(null, box.key)}><i className="fa fa-times-circle-o" aria-hidden="true"></i></button>
-                                    {box.option && <button className="box-control box-layout-config-btn" onClick={this.toggleConfig.bind(null, box.key)}><i className="fa fa-cog" aria-hidden="true"></i></button>}
-                                    {box.option && box.option.type !== "xlog" && box.option && <button className="box-control box-layout-config-btn" onClick={this.reloadData.bind(null, box.key)}><i className="fa fa-refresh" aria-hidden="true"></i></button>}
+                                    {box.option && box.option.type !== 'diskUsage' && <button className="box-control box-layout-config-btn" onClick={this.toggleConfig.bind(null, box.key)}><i className="fa fa-cog" aria-hidden="true"></i></button>}
+                                    {box.option && box.option.mode !== "exclusive" && box.option && <button className="box-control box-layout-config-btn" onClick={this.reloadData.bind(null, box.key)}><i className="fa fa-refresh" aria-hidden="true"></i></button>}
                                     {box.option && (box.option.length > 1 || box.option.config ) && box.option.type === "xlog" && <button className={"box-control filter-btn " + (filterInfo && filterInfo.data && filterInfo.data.filtering ? "filtered" : "")} onClick={this.toggleFilter.bind(null, box.key)}><i className="fa fa-filter" aria-hidden="true"></i></button>}
                                     {box.config && <BoxConfig box={box} setOptionValues={this.setOptionValues} setOptionClose={this.setOptionClose} removeMetrics={this.removeMetrics}/>}
                                     {filterInfo && filterInfo.show && <XLogFilter box={box} filterInfo={filterInfo ? filterInfo.data : {filtering: false}} setXlogFilter={this.setXlogFilter} closeFilter={this.closeFilter}/>}
-                                    <Box onRef={ref => this.boxesRef[box.key] = ref} visible={this.state.visible} setOption={this.setOption} box={box} filter={filterInfo ? filterInfo.data : {filtering: false}} pastTimestamp={this.state.pastTimestamp} pageCnt={this.state.pageCnt} data={this.state.data} config={this.props.config} visitor={this.state.visitor} counters={this.state.counters} countersHistory={this.state.countersHistory.data} countersHistoryFrom={this.state.countersHistory.from} countersHistoryTo={this.state.countersHistory.to} countersHistoryTimestamp={this.state.countersHistory.time} longTerm={this.props.range.longTerm} layoutChangeTime={this.props.layoutChangeTime} realtime={this.props.range.realTime} xlogHistoryDoing={this.state.xlogHistoryDoing} xlogHistoryRequestCnt={this.state.xlogHistoryRequestCnt} setStopXlogHistory={this.setStopXlogHistory} xlogNotSupportedInRange={this.state.xlogNotSupportedInRange}/>
+                                    <Box onRef={ref => this.boxesRef[box.key] = ref} visible={this.state.visible} setOption={this.setOption} box={box} filter={filterInfo ? filterInfo.data : {filtering: false}} pastTimestamp={this.state.pastTimestamp} pageCnt={this.state.pageCnt} data={this.state.data} config={this.props.config} visitor={this.state.visitor} diskUsage={this.state.diskUsage} counters={this.state.counters} countersHistory={this.state.countersHistory.data} countersHistoryFrom={this.state.countersHistory.from} countersHistoryTo={this.state.countersHistory.to} countersHistoryTimestamp={this.state.countersHistory.time} longTerm={this.props.range.longTerm} layoutChangeTime={this.props.layoutChangeTime} realtime={this.props.range.realTime} xlogHistoryDoing={this.state.xlogHistoryDoing} xlogHistoryRequestCnt={this.state.xlogHistoryRequestCnt} setStopXlogHistory={this.setStopXlogHistory} xlogNotSupportedInRange={this.state.xlogNotSupportedInRange}/>
                                 </div>
                             )
                         })}

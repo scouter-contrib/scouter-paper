@@ -1,0 +1,52 @@
+.disk-usage-list {
+    width: 100%;
+    display: table;
+    text-align: left;
+    font-size: 1px;
+}
+
+.disk-usage-list > div.row {
+    display: table-row;
+    cursor: pointer;
+}
+
+.disk-usage-list > div.row.active {
+    background-color: #26466d;
+    color: white;
+    font-size: 10px;
+}
+
+.disk-usage-list > div:hover {
+    background-color: rgba(0, 0, 0, 0.1);
+}
+
+.disk-usage-list > div.header.row {
+    background-color: #F2F2F2;
+}
+
+.disk-usage-list > div:first-child > span {
+    border-top: 1px solid #CCC;
+}
+
+.disk-usage-list > div.header:first-child > span {
+    border-top: none;
+}
+
+.disk-usage-list > div.header.row.fixed > span {
+    position: sticky;
+    top: 0;
+    background-color: #F2F2F2;
+}
+
+.disk-usage-list > div > span {
+    display: table-cell;
+    line-height: 100%;
+    vertical-align: middle;
+    white-space: nowrap;
+    padding: 10px;
+    border-bottom: 1px solid #CCC;
+}
+
+.disk-usage-list > div.header > span {
+    border-bottom: none;
+}

@@ -90,6 +90,15 @@ export function options() {
                 }
             }
         },
+        diskUsage: {
+            icon: "fa-hdd-o",
+            mode: "exclusive",
+            type: "diskUsage",
+            title: "DISK USAGE",
+            config: {
+
+            }
+        },
         activeSpeed: {
             icon: "fa-bars",
             mode: "exclusive",
