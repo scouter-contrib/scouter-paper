@@ -1056,9 +1056,20 @@ class Paper extends Component {
 
     getDiskUsage = (props) => {
         let that = this;
-        if (props.objects && props.objects.length > 0) {
+        let time = (new ServerDate()).getTime();
+        let refreshTime = 1000 * 60 * 15; // 15min
+        let diffTime = time - (!this.state.diskRefreshTime ? time-refreshTime: this.state.diskRefreshTime);
+
+        if (props.objects && props.objects.length > 0 && diffTime >= refreshTime) {
+
+            this.setState({
+                diskRefreshTime: time,
+            });
+
             let filterdObjects = props.objects.filter((instance) => {
                 return props.filterMap[instance.objHash]
+            }).filter((data) => {
+                return JSON.parse(JSON.stringify(data)).objFamily === 'host'
             });
 
             if (filterdObjects.length > 0) {
@@ -1069,10 +1080,11 @@ class Paper extends Component {
                 let arrDiskUsage = [];
                 let arrObjName = [];
 
-                filterdObjects.map((data) => {
+                filterdObjects.forEach(function (data) {
+
                     jQuery.ajax({
                         method: "GET",
-                        async: true,
+                        async: false,
                         url: getHttpProtocol(props.config) + '/scouter/v1/object/host/realTime/disk/ofObject/'+ JSON.parse(JSON.stringify(data)).objHash,
                         xhrFields: getWithCredentials(props.config),
                             beforeSend: function (xhr) {
@@ -1091,31 +1103,18 @@ class Paper extends Component {
                     }).fail((xhr, textStatus, errorThrown) => {
                     });
 
-                    return null;
                 });
 
-                setTimeout(() =>{
-                    if(arrTime.length > 0) {
-                        this.setState({
-                            diskUsage: {
-                                time: arrTime,
-                                objName: arrObjName,
-                                diskUsage: arrDiskUsage
-                            }
-                        });
-                    }
-
-                },3000);
-
-            } else {
-                let time = (new ServerDate()).getTime();
-                this.setState({
-                    diskUsage: {
-                      time: time,
-                      objName : [],
-                      diskUsage: []
-                    }
-                });
+                if(arrTime.length > 0) {
+                    arrObjName.sort();
+                    this.setState({
+                        diskUsage: {
+                            time: arrTime,
+                            objName: arrObjName,
+                            diskUsage: arrDiskUsage
+                        }
+                    });
+                }
             }
         }
     };
@@ -1310,7 +1309,16 @@ class Paper extends Component {
         let boxes = this.props.boxes;
         boxes.forEach((box, i) => {
             if (box.key === key) {
-                this.getSingleCounterHistory(box);
+
+                if(box.option !== undefined && box.option.type !== undefined && box.option.type === "diskUsage") {
+                    this.setLoading(true);
+                    this.setState({
+                        diskRefreshTime: null
+                    });
+                    setTimeout(() =>{ this.setLoading(false); },300);
+                }else{
+                    this.getSingleCounterHistory(box);
+                }
                 return false;
            }
         });
@@ -1601,7 +1609,7 @@ class Paper extends Component {
                                 <div className="box-layout" key={box.key} data-grid={box.layout}>
                                     <button className="box-control box-layout-remove-btn last" onClick={this.removePaper.bind(null, box.key)}><i className="fa fa-times-circle-o" aria-hidden="true"></i></button>
                                     {box.option && box.option.type !== 'diskUsage' && <button className="box-control box-layout-config-btn" onClick={this.toggleConfig.bind(null, box.key)}><i className="fa fa-cog" aria-hidden="true"></i></button>}
-                                    {box.option && box.option.mode !== "exclusive" && box.option && <button className="box-control box-layout-config-btn" onClick={this.reloadData.bind(null, box.key)}><i className="fa fa-refresh" aria-hidden="true"></i></button>}
+                                    {box.option && box.option.type !== "xlog" && box.option && <button className="box-control box-layout-config-btn" onClick={this.reloadData.bind(null, box.key)}><i className="fa fa-refresh" aria-hidden="true"></i></button>}
                                     {box.option && (box.option.length > 1 || box.option.config ) && box.option.type === "xlog" && <button className={"box-control filter-btn " + (filterInfo && filterInfo.data && filterInfo.data.filtering ? "filtered" : "")} onClick={this.toggleFilter.bind(null, box.key)}><i className="fa fa-filter" aria-hidden="true"></i></button>}
                                     {box.config && <BoxConfig box={box} setOptionValues={this.setOptionValues} setOptionClose={this.setOptionClose} removeMetrics={this.removeMetrics}/>}
                                     {filterInfo && filterInfo.show && <XLogFilter box={box} filterInfo={filterInfo ? filterInfo.data : {filtering: false}} setXlogFilter={this.setXlogFilter} closeFilter={this.closeFilter}/>}

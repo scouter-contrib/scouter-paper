@@ -7,7 +7,7 @@ const layout = [
         name: "OBJECT"
     },
     {
-        key: "device",
+        key: "diskDevice",
         name: "DEVICE"
     },
     {
@@ -56,16 +56,18 @@ class DiskUsage extends Component {
 
         let box = this.refs.listBox.parentNode.parentNode.parentNode.parentNode;
 
+        // used & total 사이즈가 0 보다 큰 데이터만 정리
         arrDiskUsage.map((data, index) => {
 
             if(data !== null) {
                  JSON.stringify((data).map((instance) => {
-                    if(instance.used > 0 && instance.mount) {
+                    if(instance.used > 0 && instance.total > 0) {
                         instance.objName = arrObjName[index];
                         instance.diskUsage = Math.round((instance.used / instance.total) * 100)
                         instance.diskUsed = instance.used;
                         instance.diskTotal = instance.total;
                         instance.diskMount = instance.mount;
+                        instance.diskDevice = instance.device;
                         allInstance.push(instance);
                     }
                     return null;
@@ -86,11 +88,7 @@ class DiskUsage extends Component {
 
     getRow = (row, i) => {
 
-        let limit = this.state.boxHeight/40;
-        if(this.state.boxHeight < 151) limit = 3;
-        if(this.state.boxHeight < 121) limit = 1;
-
-        return (i < limit) && layout.map((meta, j) => {
+        return layout.map((meta, j) => {
 
             let limit = this.state.boxWidth/100;
             if(this.state.boxWidth < 250) limit = 0;
@@ -100,11 +98,11 @@ class DiskUsage extends Component {
 
             if(data !== undefined && (j < limit)){
                 if (meta.type === "bytes") {
-                    return <span key={j}>{this.bytesToSize(data)}</span>
+                    return <span className={meta.key} key={j}>{this.bytesToSize(data)}</span>
                 }else if (meta.type === "percent"){
-                    return <span key={j}>{data}%</span>
+                    return <span className={meta.key} key={j}>{data}%</span>
                 }else{
-                    return <span key={j}>{data}</span>
+                    return <span className={meta.key} key={j}>{data}</span>
                 }
             }
             return null;
@@ -115,20 +113,20 @@ class DiskUsage extends Component {
         return layout.map((meta, j) => {
 
             let limit = this.state.boxWidth/100;
-
             if(this.state.boxWidth < 250) limit = 0;
 
             if(j < limit){
                 if(meta.key === 'objName') {
-                    return <span key={j}>{meta.name} (Total : {this.state.allInstance.length})</span>
+                    return <span className={meta.key} key={j}>{meta.name} (Total : {this.state.allInstance.length})</span>
                 }else{
-                    return <span key={j}>{meta.name}</span>
+                    return <span className={meta.key} key={j}>{meta.name}</span>
                 }
             }
             return null;
         });
     };
 
+    // 데이터 변환
     bytesToSize(bytes) {
         const sizes = ['Bytes', 'KB', 'MB', 'GB', 'TB'];
         if (bytes === 0) return 'n/a';
@@ -139,11 +137,13 @@ class DiskUsage extends Component {
 
     render() {
         return (
-           <div className="disk-usage-list" ref="listBox">
-             <div className="row active">{this.state.allInstance && this.getHeader()}</div>
+           <div className="disk-usage-list scrollbar" ref="listBox">
+             <div className="row table-title">{this.state.allInstance && this.getHeader()}</div>
                 {this.state.allInstance && this.state.allInstance.map((data, i) => {
                     return <div className="row" key={i}>{this.getRow(data, i)}</div>;
                 })}
+                {(!this.state.allInstance) && <div className="no-data">
+                   <div>NO DATA RECEIVED</div> </div>}
            </div>
         );
     }
