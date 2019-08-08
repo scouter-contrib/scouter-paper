@@ -94,7 +94,7 @@ export function options() {
             icon: "fa-hdd-o",
             mode: "exclusive",
             type: "diskUsage",
-            title: "DISK USAGE",
+            title: "Disk Usage",
             config: {
 
             }

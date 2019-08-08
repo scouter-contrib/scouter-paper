@@ -83,20 +83,16 @@ class DiskUsage extends Component {
                 boxWidth : box.offsetWidth
             });
         }
-
     }
 
     getRow = (row, i) => {
 
         return layout.map((meta, j) => {
 
-            let limit = this.state.boxWidth/100;
-            if(this.state.boxWidth < 250) limit = 0;
-
             let className = meta.key;
             let data = row[className];
 
-            if(data !== undefined && (j < limit)){
+            if(data !== undefined){
                 if (meta.type === "bytes") {
                     return <span className={meta.key} key={j}>{this.bytesToSize(data)}</span>
                 }else if (meta.type === "percent"){
@@ -112,17 +108,12 @@ class DiskUsage extends Component {
     getHeader = () => {
         return layout.map((meta, j) => {
 
-            let limit = this.state.boxWidth/100;
-            if(this.state.boxWidth < 250) limit = 0;
-
-            if(j < limit){
-                if(meta.key === 'objName') {
-                    return <span className={meta.key} key={j}>{meta.name} (Total : {this.state.allInstance.length})</span>
-                }else{
-                    return <span className={meta.key} key={j}>{meta.name}</span>
-                }
+            if(meta.key === 'objName') {
+                return <span className={meta.key} key={j}>{meta.name} (Total : {this.state.allInstance.length})</span>
+            }else{
+                return <span className={meta.key} key={j}>{meta.name}</span>
             }
-            return null;
+
         });
     };
 
@@ -137,7 +128,7 @@ class DiskUsage extends Component {
 
     render() {
         return (
-           <div className="disk-usage-list scrollbar" ref="listBox">
+           <div className="disk-usage-list scrollbar" ref="listBox" style={{width: this.state.boxWidth + "px"}}>
              <div className="row table-title">{this.state.allInstance && this.getHeader()}</div>
                 {this.state.allInstance && this.state.allInstance.map((data, i) => {
                     return <div className="row" key={i}>{this.getRow(data, i)}</div>;

@@ -1,6 +1,6 @@
 .disk-usage-list {
     text-align: left;
-    overflow-y: scroll;
+    overflow-y: auto;
     height: 100%;
 }
 
@@ -17,10 +17,6 @@
     color: white;
     text-align: left;
     font-size: 10px;
-}
-
-.disk-usage-list > div.header.row {
-    background-color: #F2F2F2;
 }
 
 .disk-usage-list > div > span {
