@@ -9,6 +9,7 @@ import Box from './Box/Box';
 import Paper from './Paper/Paper';
 import BoxConfig from './Paper/BoxConfig/BoxConfig';
 import ClockBox from './Paper/ClockBox/ClockBox';
+import DiskUsage from './Paper/DiskUsage/DiskUsage';
 import XLogBar from './Paper/XLogBar/XLogBar';
 import EmptyBox from './Paper/EmptyBox/EmptyBox';
 import PaperControl from './Paper/PaperControl/PaperControl';
@@ -31,6 +32,7 @@ export {
     Paper,
     BoxConfig,
     ClockBox,
+    DiskUsage,
     XLogBar,
     EmptyBox,
     PaperControl,
