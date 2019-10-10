@@ -19,7 +19,7 @@ function toString32(num) {
     const minus = num < 0;
 
     if (minus) {
-        let rad32 = MINUS + (-1 * num).toString(32);
+        let rad32 = MINUS + (-num).toString(32);
         return rad32;
 
     } else {

@@ -407,13 +407,20 @@ class FrameProfile extends Component {
 
     };
 
+    boolTostr = (val="0") => {
+        switch (val) {
+            case "1": return "Y";
+            case "0": return "N";
+            default:
+                return "N";
+        }
+    };
 
     render() {
         let nav = null;
         if (this.props.profile) {
             nav = this.getNavData(this.props.profile.endTime, this.props.profile.gxid, this.props.profile.caller, this.props.profile.txid, this.props.steps);
         }
-
         return (
             <div className='frame-profile'>
                 <div className={"sub-title " + (this.props.narrow ? 'narrow' : '')}>GENERAL INFO</div>
@@ -436,17 +443,31 @@ class FrameProfile extends Component {
                         </span>
                     </div>
                     }
+                    {
+                        this.props.profile && <div>
+                            <span className="label">txid</span>
+                            <span className="data">{IdAbbr.toString32(this.props.profile.txid)}</span>
+                        </div>
+                    }
+                    {
+                        this.props.profile &&
+                        <div>
+                            <span className="label">gxid</span>
+                            <span className="data">{IdAbbr.toString32(this.props.profile.gxid)}</span>
+                        </div>
+                    }
                     {this.props.profile && profileMetas && profileMetas.filter((d) => {
-                        return this.props.summary ? d.show : true
+                        return this.props.summary ? (d.show && this.props.profile[d.key] ) : true
                     }).map((meta, i) => {
                         return <div key={i}>
                             <span className="label">{meta.name}</span>
                             <span className={"data " + (meta.name.toLowerCase() === "error" ? "error" : "")}>
                                 {meta.type === "datetime" && d3.timeFormat(this.fullTimeFormat)(new Date(Number(this.props.profile[meta.key])))}
-                                {meta.type === "ms" && numeral(this.props.profile[meta.key]).format(this.props.config.numberFormat) + " ms"}
-                                {meta.type === "bytes" && numeral(this.props.profile[meta.key]).format(this.props.config.numberFormat + "b")}
+                                {meta.type === "ms" && `${numeral(this.props.profile[meta.key]).format(this.props.config.numberFormat)} ms`}
+                                {meta.type === "bytes" && `${numeral(this.props.profile[meta.key]).format(this.props.config.numberFormat)} b`}
                                 {meta.type === "number" && numeral(this.props.profile[meta.key]).format(this.props.config.numberFormat)}
-                                {(meta.type !== "datetime" && meta.type !== "ms" && meta.type !== "bytes" && meta.type !== "number") && this.props.profile[meta.key]}
+                                {meta.type === "boolean" && this.boolTostr(this.props.profile[meta.key]) }
+                                {(meta.type !== "datetime" && meta.type !== "ms" && meta.type !== "bytes" && meta.type !== "number" && meta.type !== "boolean") && this.props.profile[meta.key]}
                             </span>
                         </div>
                     })}
