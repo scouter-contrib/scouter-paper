@@ -53,6 +53,16 @@
     color: #FF030D;
 }
 
+.frame-profile div.xlog-data span.data.tx-link {
+    cursor:pointer;
+    color:#7B3E81;
+    text-decoration:underline;
+}
+.frame-profile div.xlog-data span.data.tx-link:hover {
+    text-decoration:none;
+}
+
+
 .frame-profile div.xlog-data.wrap span.data {
     white-space: normal;
     word-break: break-all;

@@ -1,0 +1,45 @@
+{
+  "-2608246922300427269" : {
+      "name"   : "/traceability/cross-service/complex<GET>\n(/sc-api-demo-m01.localdomain/sampleweb)",
+      "error" : "",
+      "xtype" : "WEB_SERVICE",
+      "elapsed" : "485",
+      "threadName" : "http-nio-8080-exec-5",
+      "tag" : {
+          "caller" : "-2608246922300427269",
+          "ip": "172.31.31.84",
+          "serverId" : "scouter-demo-collector"
+      }
+  },
+  "-1561743063494029368" : {
+    "name"  :  "/traceability/cross-service/simple2<GET>\n(/sc-api-demo-m01.localdomain/sampleweb)",
+    "error" : "",
+    "xtype" : "WEB_SERVICE",
+    "threadName" : "http-nio-8080-exec-5",
+    "tag" : {
+      "caller" : "-2608246922300427269",
+      "ip": "172.31.31.84",
+      "serverId" : "scouter-demo-collector"
+    },
+    "childMap" : {
+      "210230" : {
+        "name" :"",
+        "error" :"",
+        "xtype" :"",
+        "threadName" :""
+      },
+      "210231" : {
+        "name" :"",
+        "error" :"",
+        "xtype" :"",
+        "address":"",
+        "threadName" :"",
+        "tag" :{
+          "serverId" : "scouter-demo-collector"
+        }
+      }
+    }
+  }
+}
+
+

@@ -415,6 +415,13 @@ class FrameProfile extends Component {
                 return "N";
         }
     };
+    onClickTxToXFlow=(gxid,txid,caller,endtime) =>{
+        console.log('onClickTxToXFlow',gxid,txid,caller,endtime);
+        const yyyymmdd = moment(new Date(Number(endtime))).format("YYYYMMDD");
+        const url=`/scouter/v1/xlog-data/${yyyymmdd}/gxid/${gxid}`;
+        console.log(url);
+
+    };
 
     render() {
         let nav = null;
@@ -444,18 +451,17 @@ class FrameProfile extends Component {
                     </div>
                     }
                     {
-                        this.props.profile && <div>
-                            <span className="label">txid</span>
-                            <span className="data">{IdAbbr.toString32(this.props.profile.txid)}</span>
-                        </div>
+                        this.props.profile && ['Txid','Gxid'].map(k=>{
+                            return <div key={k}>
+                                <span className="label">{k}</span>
+                                <span className="data tx-link" onClick={()=>{
+                                    const { gxid,txid,caller,endTime } = this.props.profile;
+                                    this.onClickTxToXFlow(gxid,txid,caller,endTime);
+                                }}>{IdAbbr.toString32(this.props.profile[k.toLowerCase()])}</span>
+                            </div>
+                        })
                     }
-                    {
-                        this.props.profile &&
-                        <div>
-                            <span className="label">gxid</span>
-                            <span className="data">{IdAbbr.toString32(this.props.profile.gxid)}</span>
-                        </div>
-                    }
+
                     {this.props.profile && profileMetas && profileMetas.filter((d) => {
                         return this.props.summary ? (d.show && this.props.profile[d.key] ) : true
                     }).map((meta, i) => {
