@@ -457,7 +457,7 @@ class FrameProfile extends Component {
                                 <span className="data tx-link" onClick={()=>{
                                     const { gxid,txid,caller,endTime } = this.props.profile;
                                     this.onClickTxToXFlow(gxid,txid,caller,endTime);
-                                }}>{IdAbbr.toString32(this.props.profile[k.toLowerCase()])}</span>
+                                }}>{IdAbbr.abbr(this.props.profile[k.toLowerCase()])}</span>
                             </div>
                         })
                     }
