@@ -1,6 +1,7 @@
 import React, {Component} from 'react';
 import './FrameProfile.css';
 import FrameStepDetail from "./FrameStepDetail/FrameStepDetail";
+import XlogFlow from "./XlogFlow/XlogFlow";
 import {connect} from 'react-redux';
 import {withRouter} from 'react-router-dom';
 import * as d3 from "d3";
@@ -30,7 +31,11 @@ class FrameProfile extends Component {
 
         this.state = {
             selectedStepIndex: null,
-            lastResizeTime : null
+            lastResizeTime : null,
+            flow : {
+                show : false,
+                parameter : {}
+            }
         };
     }
 
@@ -45,6 +50,16 @@ class FrameProfile extends Component {
         if (nextProps.rightWidth !== this.props.rightWidth) {
             this.resize();
         }
+        if(nextProps.steps !== this.props.steps){
+            this.setState({
+                selectedStepIndex: null,
+                flow : {
+                    show : false,
+                    parameter : {}
+                }
+            })
+        }
+
     }
 
     init = (props) => {
@@ -250,6 +265,11 @@ class FrameProfile extends Component {
             selectedStepIndex: index
         });
     };
+    showFlowClose =(flow) =>{
+        this.setState({
+            flow : flow
+        });
+    };
 
     //sql3 literal bind?
     getElapsedTime = (row) => {
@@ -416,10 +436,16 @@ class FrameProfile extends Component {
         }
     };
     onClickTxToXFlow=(gxid,txid,caller,endtime) =>{
-        console.log('onClickTxToXFlow',gxid,txid,caller,endtime);
         const yyyymmdd = moment(new Date(Number(endtime))).format("YYYYMMDD");
-        const url=`/scouter/v1/xlog-data/${yyyymmdd}/gxid/${gxid}`;
-        console.log(url);
+        this.setState({
+            flow : {
+                show : true,
+                gxid : gxid,
+                txid : txid,
+                caller : caller,
+                yyyymmdd : yyyymmdd
+            }
+        });
 
     };
 
@@ -581,7 +607,18 @@ class FrameProfile extends Component {
                                          toggleFormatter={this.props.toggleFormatter} toggleBind={this.props.toggleBind}
                                          toggleWrap={this.props.toggleWrap}></FrameStepDetail>
                     </div>
-                </div>}
+                </div>
+                }
+                {
+                    this.state.flow.show &&
+                        <div className="frame-xlog-flow">
+                            <div>
+                                <XlogFlow flow={this.state.flow} close={this.showFlowClose} >
+                                </XlogFlow>
+                            </div>
+                        </div>
+                }
+
             </div>
         );
     }
