@@ -1,40 +1,60 @@
-GET http://demo.scouterapm.com:6188/scouter/v1/xlog-data/20191010/gxid/-2608246922300427269
+GET http://demo.scouterapm.com:6188/scouter/v1/xlog-data/20191015/gxid/899870199175109144
 ###
-GET http://demo.scouterapm.com:6188/scouter/v1/profile-data/20191010/-2608246922300427269
-
+#"result": [
+#    {
+#      "endTime": "1571082075636",
+#      "objHash": "1026166527",
+#      "service": "http:/traceability/cross-service/simple2",
+#      "txid": "6990900342269582982",
+#      "threadName": "",
+#      "caller": "899870199175109144",
+#      "gxid": "899870199175109144",
+#      "elapsed": "578",
+#      "error": "",
+#      "cpu": "0",
+#      "sqlCount": "0",
+#      "sqlTime": "0",
+#      "ipAddr": "0.0.0.0",
+#      "allocatedMemory": "0",
+#      "internalId": "0",
+#      "userAgent": "",
+#      "referrer": "",
+#      "group": "",
+#      "apicallCount": "0",
+#      "apicallTime": "0",
+#      "countryCode": "",
+#      "city": "",
+#      "login": "",
+#      "desc": "",
+#      "hasDump": "0",
+#      "text1": "ip-172-31-21-206.ap-northeast-2.compute.internal:ScouterDemoWeb",
+#      "text2": "",
+#      "text3": "",
+#      "text4": "",
+#      "text5": "",
+#      "queuingHost": "",
+#      "queuingTime": "0",
+#      "queuing2ndHost": "",
+#      "queuing2ndTime": "0",
+#      "xlogType": "ZIPKIN_SPAN"
+#    },
+GET http://demo.scouterapm.com:6188/scouter/v1/profile-data/20191015/899870199175109144
 ###
-
-#filter ->
-# xlogType :
-
-#	public final static byte WEB_SERVICE = 0;
-#	public final static byte APP_SERVICE = 1;
-#	public final static byte BACK_THREAD = 2;
-#	public final static byte ASYNCSERVLET_DISPATCHED_SERVICE = 3;
-#	public final static byte BACK_THREAD2 = 4;
-#	public final static byte ZIPKIN_SPAN = 5;
-##################
-#	public final static byte METHOD = 1;
-#	public final static byte METHOD2 = 10;
-#	public final static byte SPAN = 51;
-#	public final static byte SQL = 2;
-#	public final static byte SQL2 = 8;
-#	public final static byte SQL3 = 16;
-#	public final static byte MESSAGE = 3;
-#	public final static byte SOCKET = 5;
-#	public final static byte APICALL = 6;
-#	public final static byte APICALL2 = 15;
-#	public final static byte SPANCALL = 52;
-#	public final static byte THREAD_SUBMIT = 7;
-#	public final static byte HASHED_MESSAGE = 9;
-#	public final static byte PARAMETERIZED_MESSAGE = 17;
-#	public final static byte DUMP = 12;
-#	public final static byte DISPATCH = 13;
-#	public final static byte THREAD_CALL_POSSIBLE = 14;
-#
-#	public final static byte METHOD_SUM = 11;
-#	public final static byte SQL_SUM = 21;
-#	public final static byte MESSAGE_SUM = 31;
-#	public final static byte SOCKET_SUM = 42;
-#	public final static byte APICALL_SUM = 43;
-#	public final static byte CONTROL = 99;
+#"result": [
+#    {
+#      "mainValue": "[driving thread] http-nio-8080-exec-21",
+#      "additionalValueList": [],
+#      "step": {
+#        "parent": "-1",
+#        "index": "0",
+#        "start_time": "0",
+#        "start_cpu": "0",
+#        "spanPack": null,
+#        "hash": "1712797862",
+#        "time": "-1",
+#        "value": "0",
+#        "stepType": "9",
+#        "order": "0",
+#        "stepTypeName": "HASHED_MESSAGE"
+#      }
+#    },

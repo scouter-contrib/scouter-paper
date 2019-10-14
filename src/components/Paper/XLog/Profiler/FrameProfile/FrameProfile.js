@@ -440,10 +440,12 @@ class FrameProfile extends Component {
         this.setState({
             flow : {
                 show : true,
-                gxid : gxid,
-                txid : txid,
-                caller : caller,
-                yyyymmdd : yyyymmdd
+                parameter : {
+                    gxid : gxid,
+                    txid : txid,
+                    caller : caller,
+                    yyyymmdd : yyyymmdd
+                }
             }
         });
 
