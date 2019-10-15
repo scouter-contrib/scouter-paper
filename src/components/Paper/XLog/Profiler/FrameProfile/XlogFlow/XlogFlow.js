@@ -87,7 +87,8 @@ const Steps = {
             case this.SOCKET_SUM : return "SOCKET_SUM";
             case this.APICALL_SUM : return "APICALL_SUM";
             case this.CONTROL : return "CONTROL";
-
+            default :
+                return "UNKNOWN";
         }
     },
     toElapsedTime(step){
@@ -153,10 +154,10 @@ class XlogFlow extends Component {
         data: []
     };
 
-    constructor(props) {
-        super(props);
-
-    };
+    // constructor(props) {
+    //     super(props);
+    //
+    // };
     componentDidMount() {
         // console.log("componentDidMount");
         //- first create event
@@ -169,7 +170,7 @@ class XlogFlow extends Component {
     }
 
     componentWillReceiveProps(nextProps){
-        console.log("componentWillReceiveProps");
+        // console.log("componentWillReceiveProps");
     }
 
     resize = () =>{
@@ -285,6 +286,8 @@ class XlogFlow extends Component {
             // case Steps.THREAD_SUBMIT:
             //     -analys
             //     break;
+            default :
+
         }
     }
     flowOrder(globalTracing,serviceMap,objects){
@@ -300,6 +303,10 @@ class XlogFlow extends Component {
                     excludeObjName = true;
                     eType = ElementType.THREAD;
                     break;
+                default:
+                    excludeObjName=false;
+                    eType = ElementType.SERVICE;
+
             }
             const serviceElement = new DependencyElement({type:eType , id : _global.txid});
             if(excludeObjName) {
@@ -311,7 +318,7 @@ class XlogFlow extends Component {
                 serviceElement.name =  `${_global.service}\n(" ${_name} ")`;
             }
 
-            serviceElement.elapsed      = new Number(_global.elapsed);
+            serviceElement.elapsed      = Number(_global.elapsed);
             serviceElement.error        = _global.error;
             serviceElement.threadName   = _global.threadName;
             serviceElement.xtype        = _global.xlogType;
