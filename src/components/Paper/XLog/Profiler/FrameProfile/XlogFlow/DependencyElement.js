@@ -1,6 +1,6 @@
 export default class DependencyElement {
     name = null;
-    elapsed=-1;
+    elapsed=0;
     error="";
     xtype="";
     address="";
@@ -30,4 +30,5 @@ export default class DependencyElement {
             this.children.set(child.id,child);
         }
     }
+
 }

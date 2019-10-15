@@ -9,6 +9,7 @@ import DependencyElement from "./DependencyElement";
 
 import {getCurrentUser, getHttpProtocol, getWithCredentials, setAuthHeader} from "../../../../../../common/common";
 import {addRequest, setControlVisibility} from "../../../../../../actions";
+import * as _ from "lodash";
 import moment from "moment/moment";
 
 
@@ -174,23 +175,29 @@ class XlogFlow extends Component {
     resize = () =>{
 
     };
+    stringTruncate(str,len){
+        return !str || str.length <= len ? str : str.substring(0, len);
+    }
+    toDependencyElement(type,id){
+        return new DependencyElement({type : type , id : id});
+    }
     stepToElement(serviceMap,thisElement,steps){
         const {stepType} = steps.step;
         const {step,mainValue} = steps;
         switch(stepType){
             case Steps.APICALL:
             case Steps.APICALL2:
-                const apiElement = new DependencyElement(ElementType.API_CALL,step.txid + step.hash);
-                apiElement.elapsed= Steps.toElapsedTime(steps.step);
+                const apiElement = this.toDependencyElement(ElementType.API_CALL, step.txid + step.hash);
+                apiElement.elapsed= Steps.toElapsedTime(step);
                 apiElement.error = step.error;
                 apiElement.name = mainValue;
                 apiElement.address = step.address;
-                if(steps.step.txid !== "0"){
+                if(step.txid !== "0"){
                     //other call check 
-                    const {serviceElement} = serviceMap.get(step.txid);
-                    if(serviceElement){
-                        serviceElement.address = step.address;
-                        thisElement.addChild(serviceElement);
+                    const callElement = serviceMap.get(step.txid);
+                    if(callElement){
+                        callElement.serviceElement.address = step.address;
+                        thisElement.addChild(callElement.serviceElement);
                     }else{
                         thisElement.addChild(apiElement);
                     }
@@ -199,16 +206,16 @@ class XlogFlow extends Component {
                 }
                 break;
             case Steps.SPANCALL:
-                const  spanCallElement = new DependencyElement(ElementType.API_CALL, step.txid + step.hash);
-                spanCallElement.elapsed = step.elapsed;
+                const  spanCallElement = this.toDependencyElement(ElementType.API_CALL, step.txid + step.hash);
+                spanCallElement.elapsed = Steps.toElapsedTime(step);
                 spanCallElement.error = step.error;
                 spanCallElement.name = mainValue;
                 spanCallElement.address = step.address;
-                if (step.txid != 0) {
-                    const {serviceElement} = serviceMap.get(step.txid);
-                    if (serviceElement) {
-                        serviceElement.address = step.address;
-                        thisElement.addChild(serviceElement);
+                if (step.txid !== "0") {
+                    const callElement = serviceMap.get(step.txid);
+                    if (callElement) {
+                        callElement.serviceElement.address = step.address;
+                        thisElement.addChild(callElement.serviceElement);
                     } else {
                         thisElement.addChild(spanCallElement);
                     }
@@ -217,23 +224,110 @@ class XlogFlow extends Component {
                 }                
                 break;
             case Steps.DISPATCH:
+                const dispatchElement = this.toDependencyElement(ElementType.DISPATCH, step.txid + step.hash);
+                dispatchElement.elapsed = Steps.toElapsedTime(step);
+                dispatchElement.error = step.error;
+                dispatchElement.name = mainValue
+                if (step.txid !== "0") {
+                    const callElement = serviceMap.get(step.txid);
+                    if (callElement) {
+                        thisElement.addChild(callElement.serviceElement);
+                    } else {
+                        thisElement.addChild(dispatchElement);
+                    }
+                } else {
+                    thisElement.addChild(dispatchElement);
+                }
                 break;
             case Steps.THREAD_CALL_POSSIBLE:
-                break;                
-            case Steps.APICALL_SUM:                
+                //- other thread call checking
+                const tcElement = this.toDependencyElement(ElementType.DISPATCH, step.txid + step.hash);
+                tcElement.elapsed = Steps.toElapsedTime(step);
+                tcElement.name = mainValue;
+                if (step.txid !== "0") {
+                    const callElement  = serviceMap.get(step.txid);
+                    if (callElement) {
+                        thisElement.addChild(callElement.serviceElement);
+                    } else {
+                        thisElement.addChild(tcElement);
+                    }
+                } else {
+                    thisElement.addChild(tcElement);
+                }
+                break;
+            case Steps.APICALL_SUM:
+                const apiSumElement = this.toDependencyElement(ElementType.API_CALL, step.hash);
+                apiSumElement.dupleCnt = step.count;
+                apiSumElement.elapsed = Steps.toElapsedTime(step);
+                apiSumElement.error = step.error;
+                apiSumElement.name = mainValue;
+                thisElement.addChild(apiSumElement);
                 break;
             case Steps.SQL:
             case Steps.SQL2:
             case Steps.SQL3:
+                const sqlElement = this.toDependencyElement(ElementType.SQL, step.hash);
+                sqlElement.elapsed = Steps.toElapsedTime(step);
+                sqlElement.name =  `${this.stringTruncate(mainValue, 20)}...`;
+                sqlElement.error = step.error;
+                sqlElement.tags.sql = mainValue;
+                thisElement.addChild(sqlElement);
                 break;
             case Steps.SQL_SUM:
+                const sqlSumElement = this.toDependencyElement(ElementType.SQL, step.hash);
+                sqlSumElement.dupleCnt = step.count;
+                sqlSumElement.elapsed = Steps.toElapsedTime(step);
+                sqlSumElement.error = step.error;
+                sqlSumElement.name =  `${this.stringTruncate(mainValue, 20)}...`;
+                sqlSumElement.tags.sql=mainValue;
+                thisElement.addChild(sqlSumElement);
                 break;
-            case Steps.THREAD_SUBMIT:
-                //-analys
-                break;
-                            
-                
+            // case Steps.THREAD_SUBMIT:
+            //     -analys
+            //     break;
         }
+    }
+    flowOrder(globalTracing,serviceMap,objects){
+       return globalTracing.map(_global => {
+            let excludeObjName = false;
+            let eType = ElementType.SERVICE;
+            switch(_global.xlogType){
+                case XLogTypes.WEB_SERVICE:
+                    eType = ElementType.DISPATCH;
+                    excludeObjName = true;
+                    break;
+                case XLogTypes.BACK_THREAD2:
+                    excludeObjName = true;
+                    eType = ElementType.THREAD;
+                    break;
+            }
+            const serviceElement = new DependencyElement({type:eType , id : _global.txid});
+            if(excludeObjName) {
+                serviceElement.name = _global.service;
+            } else {
+                const _object = objects.get(_global.objHash);
+
+                const _name = _object.objName ? _object.objName : 'unknown';
+                serviceElement.name =  `${_global.service}\n(" ${_name} ")`;
+            }
+
+            serviceElement.elapsed      = new Number(_global.elapsed);
+            serviceElement.error        = _global.error;
+            serviceElement.threadName   = _global.threadName;
+            serviceElement.xtype        = _global.xlogType;
+            serviceElement.tags = {
+                caller: _global.caller,
+                ip: _global.ipAddr
+            };
+
+           serviceMap.set(_global.txid, {
+                serviceElement : serviceElement
+            });
+
+            return {
+                txid : _global.txid
+            };
+        });
     }
     tryDepFlowSearch(globalTracing){
         //next try step
@@ -244,7 +338,8 @@ class XlogFlow extends Component {
             return jQuery.ajax({
                 method: "GET",
                 async: true,
-                dataType: 'text',
+                // dataType: 'text',
+                dataType: "json",
                 url: _url,
                 xhrFields: getWithCredentials(config),
                 beforeSend: (xhr)=>{
@@ -257,6 +352,7 @@ class XlogFlow extends Component {
                                             return jQuery.ajax({
                                                 method: "GET",
                                                 async: true,
+                                                dataType: "json",
                                                 url: `${getHttpProtocol(this.props.config)}/scouter/v1/object?serverId=${_server.id}`,
                                                 xhrFields: getWithCredentials(this.props.config),
                                                 beforeSend: (xhr) =>{
@@ -264,95 +360,58 @@ class XlogFlow extends Component {
                                                 }
                                             });
                                         });
+        const _objects = new Map();
+        const _serviceMap = new Map();
+        const _stepMap = new Map();
+        const _rootMap = new Map();
+        jQuery.when(_allofObject[0],..._allofTrace)
+              .done((fullObject,...fullTrace)=> {
+               try{
 
-        jQuery.when(_allofTrace,_allofObject).then((fullTrace,fullObject)=>{
-            try {
-                const _objects = new Map();
-                const _serviceMap = new Map();
-                const _stepMap = new Map();
-                const _rootMap = new Map();
+                   fullObject.forEach(_res => {
+                       _.forEach(_res.result,(_obj) =>_objects.set(_obj.objHash,_obj));
+                  });
 
-                fullObject.map(_data =>JSON.parse(_data.responseText))
-                          .flatMap(_data => _data.result)
-                          .forEach(_obj => {
-                              const _ret = {};
-                              _objects.set(_obj.objHash,_obj);
-                          });
-                const _order = globalTracing.map(_global => {
-                       let excludeObjName = false;
-                       let eType = ElementType.SERVICE;
-                       switch(_global.xlogType){
-                           case XLogTypes.WEB_SERVICE:
-                               eType = ElementType.DISPATCH;
-                               excludeObjName = true;
-                               break;
-                           case XLogTypes.BACK_THREAD2:
-                               excludeObjName = true;
-                               eType = ElementType.THREAD;
-                               break;
-                       }
-                      const serviceElement = new DependencyElement({type:eType , id : _global.txid});
-                       if(excludeObjName) {
-                        serviceElement.name = _global.service;
-                      } else {
-                         const _object = _objects.get(_global.objHash);
-                         const _name = _object.objName ? _object.objName : 'unknown';
-                         serviceElement.name =  `${_global.service}\n(" ${_name} ")`;
-                      }
-
-                      serviceElement.elapsed      = new Number(_global.elapsed);
-                      serviceElement.error        = _global.error;
-                      serviceElement.threadName   = _global.threadName;
-                      serviceElement.xType        = _global.xlogType;
-                      serviceElement.tags = {
-                          caller: _global.caller,
-                          ip: _global.ipAddr
-                      };
-
-                      _serviceMap.set(_global.txid, {
-                        serviceElement : serviceElement
-                      });
-
-                      return {
-                        txid : _global.txid
-                      };
-                });
-                let index = 0;
-                fullTrace.map(_data =>JSON.parse(_data.responseText))
-                         .forEach(_data => {
-                              _stepMap.set(_order[index].txid,_data.result);
-                              index++;
-                           });
+                   const _order = this.flowOrder(globalTracing,_serviceMap,_objects);
+                   let index = 0;
+                   fullTrace.forEach(_res =>{
+                       _stepMap.set(_order[index].txid,_res[0].result);
+                       index++;
+                   });
 //-- iter
-                _order.forEach(_tx =>{
-                    const {txid} = _tx;
-                    const {serviceElement} = _serviceMap.get(txid);
-                    if(!serviceElement){
-                        return;
-                    }
-                    const steps = _stepMap.get(txid);
-                    if(!steps){
-                        return;
-                    }
-                    steps.forEach(_step => this.stepToElement(_serviceMap,serviceElement,_step));
-                    if( _serviceMap.size  === 1 || serviceElement.tags.caller === "0"){
-                        const {ip} = serviceElement.tags;
-                        if(ip){
-                            let ipElement = _rootMap.get(ip);
-                            if(!ipElement){
-                                ipElement = new DependencyElement({type:ElementType.USER , id : ip});
-                                _rootMap.set(ip, ipElement);
-                            }
-                            ipElement.addChild(serviceElement);
-                        }
-                    }
-                });
-                console.log(_rootMap);
-            }catch (e) {
-                console.log('error =>',e);
-            }
-        });
-
+                   _order.forEach(_tx =>{
+                       const {txid} = _tx;
+                       const {serviceElement} = _serviceMap.get(txid);
+                       if(!serviceElement){
+                           return;
+                       }
+                       const steps = _stepMap.get(txid);
+                       if(!steps){
+                           return;
+                       }
+                       steps.forEach(_step => this.stepToElement(_serviceMap,serviceElement,_step));
+                       if( _serviceMap.size  === 1 || serviceElement.tags.caller === "0"){
+                           const {ip} = serviceElement.tags;
+                           if(ip){
+                               let ipElement = _rootMap.get(ip);
+                               if(!ipElement){
+                                   ipElement = this.toDependencyElement(ElementType.USER,ip);
+                                   ipElement.name = ip;
+                                   _rootMap.set(ip, ipElement);
+                               }
+                               ipElement.addChild(serviceElement);
+                           }else{
+                               const dummyElement = this.toDependencyElement(ElementType.USER,new Date().getTime());
+                               dummyElement.name = "???.???.???.???";
+                               _rootMap.put(dummyElement.id, dummyElement);
+                           }
+                       }
+                   });
+                   console.log(_rootMap);
+               }catch (e) {
+                   console.log(e);
+               }
+            })
     }
 
     loadByGxId(){
@@ -399,9 +458,7 @@ class XlogFlow extends Component {
 
 //- render
     render() {
-
         const {data} = this.state;
-
         return(
             <div className="xlog-flow">
                 <div className="title">
@@ -416,6 +473,7 @@ class XlogFlow extends Component {
         );
      }
 }
+
 const mapStateToProps = (state) => {
     return {
         config: state.config,
