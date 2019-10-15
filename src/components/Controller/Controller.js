@@ -216,19 +216,23 @@ class Controller extends Component {
                     doneCount++;
 
                     if (msg.result && msg.result.length > 0) {
-                        serverNameMap[server.key] = msg.result[0].name;
+                        serverNameMap[server.key] = { info : msg.result[0]};
+
                     } else {
-                        serverNameMap[server.key] = "";
+                        serverNameMap[server.key] = {};
                     }
                 }).fail(() => {
                     doneCount++;
-                    serverNameMap[server.key] = "FAILED TO GET NAME";
+                    serverNameMap[server.key] = {
+                        info : { name : "FAILED TO GET NAME", id : "-1"}
+                    };
                 }).always(() => {
                     if (doneCount >= allCount) {
                         let _conf = _.clone(props.config);
                         _conf.servers.forEach((server, idx) => {
                             if (serverNameMap[idx]) {
-                                server.name = `${serverNameMap[idx]} (${server.name})`;
+                                server.name = `${serverNameMap[idx].info.name} (${server.name})`;
+                                server.id = serverNameMap[idx].info.id;
                             }
                         });
                         props.setConfig(_conf);
