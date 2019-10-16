@@ -4,10 +4,11 @@ import './XlogFlow.css'
 import {connect} from 'react-redux';
 import {withRouter} from 'react-router-dom';
 import XlogFlowChart from './XlogFlowChart/XlogFlowChart'
-import XlogFlowRender from './XlogFlowChart/XlogFlowRender'
-import DependencyElement from "./DependencyElement";
+import XlogFlowGraph from './XlogFlowChart/XlogFlowGraph'
+import FlowElement from "./FlowElement";
 
 import {getCurrentUser, getHttpProtocol, getWithCredentials, setAuthHeader} from "../../../../../../common/common";
+import ElementType from "../../../../../../common/ElementType";
 import {addRequest, setControlVisibility} from "../../../../../../actions";
 import * as _ from "lodash";
 import moment from "moment/moment";
@@ -126,32 +127,12 @@ const Steps = {
     }
 };
 
-const ElementType = {
-    USER : "0",
-    SERVICE : "1",
-    API_CALL : "2",
-    SQL : "3",
-    DISPATCH : "4",
-    THREAD : "5",
-
-    toString(value) {
-        switch(value){
-            case this.USER : return "USER";
-            case this.SERVICE : return "SERVICE";
-            case this.API_CALL : return "API_CALL";
-            case this.SQL : return "SQL";
-            case this.DISPATCH : return "DISPATCH";
-            case this.THREAD : return "THREAD";
-            default:
-                return "UNKNOWN";
-        }
-    }
-};
 
 class XlogFlow extends Component {
 
     state = {
-        data: []
+        data : null,
+        dimensions : null
     };
 
     // constructor(props) {
@@ -163,6 +144,7 @@ class XlogFlow extends Component {
         //- first create event
         window.addEventListener("resize", this.resize);
         this.loadByGxId();
+
     }
 
     componentWillUnmount(){
@@ -174,13 +156,18 @@ class XlogFlow extends Component {
     }
 
     resize = () =>{
-
+        // this.setState({
+        //     dimensions: {
+        //         width: this.container.offsetWidth,
+        //         height: this.container.offsetHeight,
+        //     },
+        // });
     };
     stringTruncate(str,len){
         return !str || str.length <= len ? str : str.substring(0, len);
     }
-    toDependencyElement(type,id){
-        return new DependencyElement({type : type , id : id});
+    FlowElement(type,id){
+        return new FlowElement({type : type , id : id});
     }
     stepToElement(serviceMap,thisElement,steps){
         const {stepType} = steps.step;
@@ -188,7 +175,7 @@ class XlogFlow extends Component {
         switch(stepType){
             case Steps.APICALL:
             case Steps.APICALL2:
-                const apiElement = this.toDependencyElement(ElementType.API_CALL, step.txid + step.hash);
+                const apiElement = this.FlowElement(ElementType.defaultProps.API_CALL, step.txid + step.hash);
                 apiElement.elapsed= Steps.toElapsedTime(step);
                 apiElement.error = step.error;
                 apiElement.name = mainValue;
@@ -207,7 +194,7 @@ class XlogFlow extends Component {
                 }
                 break;
             case Steps.SPANCALL:
-                const  spanCallElement = this.toDependencyElement(ElementType.API_CALL, step.txid + step.hash);
+                const  spanCallElement = this.FlowElement(ElementType.defaultProps.API_CALL, step.txid + step.hash);
                 spanCallElement.elapsed = Steps.toElapsedTime(step);
                 spanCallElement.error = step.error;
                 spanCallElement.name = mainValue;
@@ -225,10 +212,10 @@ class XlogFlow extends Component {
                 }                
                 break;
             case Steps.DISPATCH:
-                const dispatchElement = this.toDependencyElement(ElementType.DISPATCH, step.txid + step.hash);
+                const dispatchElement = this.FlowElement(ElementType.defaultProps.DISPATCH, step.txid + step.hash);
                 dispatchElement.elapsed = Steps.toElapsedTime(step);
                 dispatchElement.error = step.error;
-                dispatchElement.name = mainValue
+                dispatchElement.name = mainValue;
                 if (step.txid !== "0") {
                     const callElement = serviceMap.get(step.txid);
                     if (callElement) {
@@ -240,24 +227,24 @@ class XlogFlow extends Component {
                     thisElement.addChild(dispatchElement);
                 }
                 break;
-            case Steps.THREAD_CALL_POSSIBLE:
-                //- other thread call checking
-                const tcElement = this.toDependencyElement(ElementType.DISPATCH, step.txid + step.hash);
-                tcElement.elapsed = Steps.toElapsedTime(step);
-                tcElement.name = mainValue;
-                if (step.txid !== "0") {
-                    const callElement  = serviceMap.get(step.txid);
-                    if (callElement) {
-                        thisElement.addChild(callElement.serviceElement);
-                    } else {
-                        thisElement.addChild(tcElement);
-                    }
-                } else {
-                    thisElement.addChild(tcElement);
-                }
-                break;
+            // case Steps.THREAD_CALL_POSSIBLE:
+            //     //- other thread call checking
+            //     const tcElement = this.FlowElement(ElementType.defaultProps.DISPATCH, step.txid + step.hash);
+            //     tcElement.elapsed = Steps.toElapsedTime(step);
+            //     tcElement.name = mainValue;
+            //     if (step.txid !== "0") {
+            //         const callElement  = serviceMap.get(step.txid);
+            //         if (callElement) {
+            //             thisElement.addChild(callElement.serviceElement);
+            //         } else {
+            //             thisElement.addChild(tcElement);
+            //         }
+            //     } else {
+            //         thisElement.addChild(tcElement);
+            //     }
+            //     break;
             case Steps.APICALL_SUM:
-                const apiSumElement = this.toDependencyElement(ElementType.API_CALL, step.hash);
+                const apiSumElement = this.FlowElement(ElementType.defaultProps.API_CALL, step.hash);
                 apiSumElement.dupleCnt = step.count;
                 apiSumElement.elapsed = Steps.toElapsedTime(step);
                 apiSumElement.error = step.error;
@@ -267,7 +254,7 @@ class XlogFlow extends Component {
             case Steps.SQL:
             case Steps.SQL2:
             case Steps.SQL3:
-                const sqlElement = this.toDependencyElement(ElementType.SQL, step.hash);
+                const sqlElement = this.FlowElement(ElementType.defaultProps.SQL, step.hash);
                 sqlElement.elapsed = Steps.toElapsedTime(step);
                 sqlElement.name =  `${this.stringTruncate(mainValue, 20)}...`;
                 sqlElement.error = step.error;
@@ -275,7 +262,7 @@ class XlogFlow extends Component {
                 thisElement.addChild(sqlElement);
                 break;
             case Steps.SQL_SUM:
-                const sqlSumElement = this.toDependencyElement(ElementType.SQL, step.hash);
+                const sqlSumElement = this.FlowElement(ElementType.defaultProps.SQL, step.hash);
                 sqlSumElement.dupleCnt = step.count;
                 sqlSumElement.elapsed = Steps.toElapsedTime(step);
                 sqlSumElement.error = step.error;
@@ -293,35 +280,31 @@ class XlogFlow extends Component {
     flowOrder(globalTracing,serviceMap,objects){
        return globalTracing.map(_global => {
             let excludeObjName = false;
-            let eType = ElementType.SERVICE;
+            let eType = null;
             switch(_global.xlogType){
-                case XLogTypes.WEB_SERVICE:
-                    eType = ElementType.DISPATCH;
+                case XLogTypes.ASYNCSERVLET_DISPATCHED_SERVICE:
+                    eType = ElementType.defaultProps.DISPATCH;
                     excludeObjName = true;
                     break;
                 case XLogTypes.BACK_THREAD2:
                     excludeObjName = true;
-                    eType = ElementType.THREAD;
+                    eType = ElementType.defaultProps.THREAD;
                     break;
                 default:
                     excludeObjName=false;
-                    eType = ElementType.SERVICE;
+                    eType = ElementType.defaultProps.SERVICE;
 
             }
-            const serviceElement = new DependencyElement({type:eType , id : _global.txid});
-            if(excludeObjName) {
-                serviceElement.name = _global.service;
-            } else {
-                const _object = objects.get(_global.objHash);
+            const serviceElement = this.FlowElement(eType , _global.txid);
+            serviceElement.name = _global.service;
+            const _object = objects.get(_global.objHash);
 
-                const _name = _object.objName ? _object.objName : 'unknown';
-                serviceElement.name =  `${_global.service}\n(" ${_name} ")`;
-            }
-
-            serviceElement.elapsed      = Number(_global.elapsed);
-            serviceElement.error        = _global.error;
-            serviceElement.threadName   = _global.threadName;
-            serviceElement.xtype        = _global.xlogType;
+            serviceElement.objName   = _object ? _object.objName : 'unknown';
+            serviceElement.excludeObjName = excludeObjName;
+            serviceElement.elapsed        = Number(_global.elapsed);
+            serviceElement.error          = _global.error;
+            serviceElement.threadName     = _global.threadName;
+            serviceElement.xtype          = _global.xlogType;
             serviceElement.tags = {
                 caller: _global.caller,
                 ip: _global.ipAddr
@@ -338,6 +321,7 @@ class XlogFlow extends Component {
     }
     tryDepFlowSearch(globalTracing){
         //next try step
+        this.props.setControlVisibility("Loading", true);
         const {config, user} = this.props;
         const _allofTrace = globalTracing.map(_tx =>{
             const yyyymmdd = moment(new Date(Number(_tx.endTime))).format("YYYYMMDD");
@@ -367,6 +351,7 @@ class XlogFlow extends Component {
                                                 }
                                             });
                                         });
+
         const _objects = new Map();
         const _serviceMap = new Map();
         const _stepMap = new Map();
@@ -402,23 +387,38 @@ class XlogFlow extends Component {
                            if(ip){
                                let ipElement = _rootMap.get(ip);
                                if(!ipElement){
-                                   ipElement = this.toDependencyElement(ElementType.USER,ip);
+                                   ipElement = this.FlowElement(ElementType.defaultProps.USER,ip);
                                    ipElement.name = ip;
                                    _rootMap.set(ip, ipElement);
                                }
                                ipElement.addChild(serviceElement);
                            }else{
-                               const dummyElement = this.toDependencyElement(ElementType.USER,new Date().getTime());
+                               const dummyElement = this.FlowElement(ElementType.defaultProps.USER,new Date().getTime());
                                dummyElement.name = "???.???.???.???";
                                _rootMap.put(dummyElement.id, dummyElement);
                            }
                        }
                    });
-                   console.log(_rootMap);
                }catch (e) {
                    console.log(e);
                }
-            })
+            }).always(()=>{
+                this.props.setControlVisibility("Loading", false);
+                if(_rootMap.size > 0){
+                    this.setState((preState,props)=>{
+                        if(!preState.data){
+                            return {
+                                data : _rootMap,
+                                dimensions: {
+                                    width: this.container.offsetWidth,
+                                    height: this.container.offsetHeight
+                                }
+                            }
+                        }
+                    });
+                }
+
+           });
     }
 
     loadByGxId(){
@@ -446,9 +446,9 @@ class XlogFlow extends Component {
         });
     };
     shouldComponentUpdate(nextProps,nextState) {
-        if( nextProps.flow !== this.props.flow) {
-            return false;
-        }
+        // if( nextProps.flow !== this.props.flow) {
+        //     return false;
+        // }
         return true;
     }
 
@@ -465,15 +465,15 @@ class XlogFlow extends Component {
 
 //- render
     render() {
-        const {data} = this.state;
+        const {data,dimensions} = this.state;
         return(
             <div className="xlog-flow">
                 <div className="title">
                 </div>
                 <div className="close-btn" onClick={this.close}></div>
-                <div className="flow-content">
+                <div className="flow-content" ref={el => this.container = el }>
                     <XlogFlowChart width="100%" height="100%">
-                        <XlogFlowRender data={data} />
+                        <XlogFlowGraph xlogflow={data} dimensions={dimensions}/>
                     </XlogFlowChart>
                 </div>
             </div>
