@@ -1,12 +1,12 @@
 export default class ElementType {
 
     static defaultProps = {
-        USER : "0",
-        SERVICE : "1",
+        USER     : "0",
+        SERVICE  : "1",
         API_CALL : "2",
-        SQL : "3",
+        SQL      : "3",
         DISPATCH : "4",
-        THREAD : "5",
+        THREAD   : "5",
 
         toString(value) {
             switch(value){
@@ -18,6 +18,19 @@ export default class ElementType {
                 case this.THREAD : return "THREAD";
                 default:
                     return "UNKNOWN";
+            }
+        }
+        ,
+        toColor(value){
+            switch(value){
+                case this.USER : return "#bd2c00";
+                case this.SERVICE : return "#6e40aa";
+                case this.API_CALL : return "#417de0";
+                case this.SQL : return "#1ac7c2";
+                case this.DISPATCH : return "#c9510c";
+                case this.THREAD : return "#ffdd00";
+                default:
+                    return "#003666";
             }
         }
     };

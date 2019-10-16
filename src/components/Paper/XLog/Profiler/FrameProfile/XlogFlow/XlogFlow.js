@@ -473,7 +473,7 @@ class XlogFlow extends Component {
                 <div className="close-btn" onClick={this.close}></div>
                 <div className="flow-content" ref={el => this.container = el }>
                     <XlogFlowChart width="100%" height="100%">
-                        <XlogFlowGraph xlogflow={data} dimensions={dimensions}/>
+                        <XlogFlowGraph xlogflow={data} resize={dimensions}/>
                     </XlogFlowChart>
                 </div>
             </div>

@@ -1,13 +1,8 @@
-.node circle {
-  fill: #fff;
-  stroke: #4682b4;
-  stroke-width: 3px;
+.node text {
+  font: 12px sans-serif;
 }
-/*.node text {*/
-  /*font: 12px sans-serif;*/
-/*}*/
-.link {
+.tree-link {
   fill: none;
-  stroke: #ccc;
+  stroke: rgba(0,0,0,0.1);
   stroke-width: 2px;
 }
