@@ -5,7 +5,9 @@ import {connect} from 'react-redux';
 import {withRouter} from 'react-router-dom';
 import XlogFlowChart from './XlogFlowChart/XlogFlowChart'
 import XlogFlowGraph from './XlogFlowChart/XlogFlowGraph'
+import XlogFlowContent from './XlogFlowContent/XlogFlowContent'
 import FlowElement from "./FlowElement";
+
 
 import {getCurrentUser, getHttpProtocol, getWithCredentials, setAuthHeader} from "../../../../../../common/common";
 import ElementType from "../../../../../../common/ElementType";
@@ -134,7 +136,11 @@ class XlogFlow extends Component {
 
     state = {
         data : null,
-        dimensions : null
+        dimensions : null,
+        flowContent: {
+            show : false,
+            data : null
+        }
     };
 
     // constructor(props) {
@@ -493,20 +499,36 @@ class XlogFlow extends Component {
         return true;
     }
 
-
+    clickContent=(flowData)=>{
+        this.setState({
+            flowContent :{
+                show : true,
+                data : flowData
+            }
+        });
+    };
 //-- event list
+    closeContent=() =>{
+        this.setState({
+            flowContent :{
+                show : false,
+                data : null
+            }
+        });
+    };
     close= () =>{
         this.props.close({
             flow : {
                 show : false,
-                parameter : {}
+                parameter : {},
+
             }
         });
     };
 
 //- render
     render() {
-        const {data,dimensions} = this.state;
+        const {data,dimensions,flowContent} = this.state;
         const {flow} = this.props;
         return(
             <div className="xlog-flow">
@@ -518,11 +540,19 @@ class XlogFlow extends Component {
                     </span>
                 </div>
                 <div className="close-btn" onClick={this.close}></div>
-                <div className="flow-content" ref={el => this.container = el }>
+                <div className="contents" ref={el => this.container = el }>
                     <XlogFlowChart width="100%" height="100%">
-                        <XlogFlowGraph xlogflow={data} resize={dimensions}/>
+                        <XlogFlowGraph xlogflow={data} resize={dimensions} txid={flow.parameter.txid} clickContent={this.clickContent}/>
                     </XlogFlowChart>
                 </div>
+                {
+                    flowContent.show &&
+                        <div className="frame-xlog-flow-content">
+                            <div>
+                                <XlogFlowContent content={flowContent.data} close={this.closeContent} />
+                            </div>
+                        </div>
+                }
             </div>
         );
      }

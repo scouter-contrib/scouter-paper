@@ -59,17 +59,16 @@ export default class FlowElement {
     }
     toTree(){
         const ret = {};
-
         ret["name"]           = this.name;
         ret["objName"]        = this.objName ? this.objName : "";
         ret["excludeObjName"] = this.excludeObjName;
         ret["threadName"]     = this.threadName ? this.threadName : "";
         ret["address"]        = this.address ? this.address : "";
         ret["type"]           = this.type;
-        ret["elapsed"]        = this.elapsed;
+        ret["elapsed"]        = isNaN(this.elapsed) ? 0 : this.elapsed;
         ret["txid"]           = this.id;
         ret["children"]       = [];
-        ret["isError"]        = this.error !== "0" ? true : false;
+        ret["isError"]        = this.error === "0" || this.error === "" ? false: true;
 
         for(const value of this.children.values()){
             ret["children"].push(value.toTree());

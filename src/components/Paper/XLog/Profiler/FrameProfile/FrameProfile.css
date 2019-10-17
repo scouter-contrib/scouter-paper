@@ -479,6 +479,6 @@
 
 .frame-profile .frame-xlog-flow > div > div {
     background-color: white;
-    height: calc(100% - 120px);
+    height: calc(100% - 400px);
     width: 100%;
 }

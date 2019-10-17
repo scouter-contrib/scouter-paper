@@ -28,7 +28,7 @@ export default class ElementType {
                 case this.API_CALL : return "#417de0";
                 case this.SQL : return "#1ac7c2";
                 case this.DISPATCH : return "#c9510c";
-                case this.THREAD : return "#ffdd00";
+                case this.THREAD : return "#76b852";
                 default:
                     return "#003666";
             }

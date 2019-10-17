@@ -21,7 +21,7 @@ class XlogFlowGraph extends Component {
     defaultProps ={
         height: 500,
         width: 400,
-        duration : 750 ,//ms,
+        duration : 500 ,//ms,
         margin: {
             top: 15, right: 15, bottom: 25, left: 40
         },
@@ -38,7 +38,7 @@ class XlogFlowGraph extends Component {
             this.defaultProps.width = nextProps.resize.width;
             this.init(this.getTreeData(nextProps.xlogflow))
         }else if (nextProps.xlogflow !== this.props.xlogflow) {
-            this.draw(this.getTreeData(nextProps.xlogflow));
+           this.draw(this.getTreeData(nextProps.xlogflow));
         }
 
     }
@@ -49,7 +49,7 @@ class XlogFlowGraph extends Component {
     }
 
     getTreeData(data){
-        const [[key,value]]= [...data];
+        const [[,value]]= [...data];
         return {
             elapsed : value.toElaped(),
             tree : value.toTree()
@@ -75,24 +75,22 @@ class XlogFlowGraph extends Component {
                 .html(d =>{
                     let svc = "";
                     switch(d.data.type){
-                        case ElementType.defaultProps.SERVICE:
-                            svc=d.data.name;
-                            break;
-                        case ElementType.defaultProps.THREAD:
-                            svc=d.data.name;
+                        case ElementType.defaultProps.SQL:
+                            svc="";
                             break;
                         default :
-                            svc="";
+                            svc=d.data.name;
                     }
                     return [
-                         { key : 'svc', value : svc , dis : `${svc}` }
-                        ,{ key : 'obj', value : d.data.objName , dis : `( ${d.data.objName} )` }
-                        ,{ key : 'adr', value : d.data.address , dis : `: ${d.data.address} `}
-                        ,{ key : 'the', value : d.data.threadName ,  dis : `: ${d.data.threadName} `}
+                         { key : 'svc', value : svc , dis : `<i class="fa fa-exchange"></i>${svc}` }
+                        ,{ key : 'obj', value : d.data.objName , dis : `<i class="fa fa-television"></i>${d.data.objName}` }
+                        ,{ key : 'adr', value : d.data.address , dis : `<i class="fa fa-external-link-square"></i>${d.data.address} `}
+                        ,{ key : 'the', value : d.data.threadName ,  dis : `<i class="fa fa-tasks"></i>${d.data.threadName}`}
                         ]
                         .filter(d=> d.value ? true: false)
                         .map(d=> `<div>${d.dis}</div>`).join('')
                 });
+            d3.select(ref.parentNode)
             d3.select(ref.parentNode)
                .call(this.tip);
 
@@ -150,15 +148,16 @@ class XlogFlowGraph extends Component {
             .on('mouseout', function(d, i) {
                 that.tip.hide(d,this);
             })
-            .on('click', function(d) {
+            .on('click', (d)=> {
                 d3.event.stopPropagation();
+                this.props.clickContent(d.data);
                 // that.scope.handleSelectSpan(d);
             });
 
         nodeEnter.append('circle')
             .attr('class', 'node')
             .attr('r', 1e-6)
-            .style("fill", d => d._children ? ElementType.defaultProps.toColor(d.data.type) : "#fff")
+            .style("fill", d => d.children || d._children  ? ElementType.defaultProps.toColor(d.data.type) : "#fff")
             .attr('stroke', d => ElementType.defaultProps.toColor(d.data.type))
             .attr('stroke-width', 2.5);
 
@@ -169,8 +168,24 @@ class XlogFlowGraph extends Component {
             .attr("dy", "-0.5em")
             .attr("x", (d) =>d.children || d._children ? -15 : 15)
             .attr("text-anchor", (d)=>d.children || d._children ? "end" : "start")
-            .text(d => d.data.name.length > 19 ? (d.data.isError ?'◉ ': '') + d.data.name.slice(0, 19) + '...' :  (d.data.isError?'◉ ': '') + d.data.name)
-            .style("fill", d => !d.data.isError? '#3d444f': '#E54C17');
+            .text(d => {
+                const {txid,isError,name} = d.data;
+                const isOwner = txid === this.props.txid;
+                if( name.length > 19 ){
+                    return `${isOwner ? '▶ ' : (isError ? '◉' : '')}${name.slice(0, 19)}...`;
+                }else {
+                    return `${isOwner ? '▶ ' : (isError ? '◉' : '')}${name}`;
+                }
+            })
+            .style("fill", d => {
+                const {txid,isError} = d.data;
+                const isOwner = txid === this.props.txid;
+                if( isOwner ){
+                    return '#2529d8';
+                }else{
+                    return !isError ? '#3d444f':'#E54C17';
+                }
+            });
 
         nodeEnter.append('text')
             .attr('class','node-text')
@@ -179,7 +194,7 @@ class XlogFlowGraph extends Component {
             .attr('fill', (d) => ElementType.defaultProps.toColor(d.data.type))
             .attr("text-anchor",(d) => d.children || d._children ? "end" : "start")
             .style('font-size', '10px')
-            .text(d =>`${ElementType.defaultProps.toString(d.data.type)}-${d.data.elapsed}ms`);
+            .text(d =>`${ElementType.defaultProps.toString(d.data.type)}`+ (d.data.type !== '0' ? `-${d.data.elapsed}ms` : '') );
 
         nodeEnter
             .append('rect')
@@ -196,7 +211,7 @@ class XlogFlowGraph extends Component {
             .attr('ry', 1)
             .attr('height', 2)
             .attr('width', d => this.xScale(d.data.elapsed) + 1 || 0)
-            .attr('x', (d) => d.children ? "-110" : "10")
+            .attr('x', (d) => d.children || d._children  ? "-110" : "10")
             .attr('y', -1)
             .style('fill',d =>ElementType.defaultProps.toColor(d.data.type));
 
@@ -216,7 +231,7 @@ class XlogFlowGraph extends Component {
         nodeUpdate.select('circle.node')
             .attr('r', 5)
             .style("fill", (d) => {
-                return d._children ? ElementType.defaultProps.toColor(d.data.type) : "#fff"
+                return d.children || d._children  ? ElementType.defaultProps.toColor(d.data.type) : "#fff"
             } )
             .attr('cursor', 'pointer')
             .on('click', d => {
@@ -247,7 +262,7 @@ class XlogFlowGraph extends Component {
             .style('stroke-width', 1.5);
 
         let linkEnter = link.enter().insert('path', "g")
-            .attr("class", "tree-link")
+            .attr("class",(d)=>`tree-link ${d.data.isError ? 'error-link' : ''}`)
             .attr('d', function(d){
                 let o = {x: source.x0, y: source.y0}
                 return diagonal(o, o);
