@@ -1,4 +1,7 @@
-GET http://demo.scouterapm.com:6188/scouter/v1/xlog-data/20191015/gxid/899870199175109144
+// XLogDataController.java
+// SingleXLogRequest
+GET http://demo.scouterapm.com:6188/scouter/v1/xlog-data/{yyyymmdd}/{txid}
+#
 ###
 #"result": [
 #    {
@@ -38,7 +41,7 @@ GET http://demo.scouterapm.com:6188/scouter/v1/xlog-data/20191015/gxid/899870199
 #      "queuing2ndTime": "0",
 #      "xlogType": "ZIPKIN_SPAN"
 #    },
-GET http://demo.scouterapm.com:6188/scouter/v1/profile-data/20191015/899870199175109144
+GET http://demo.scouterapm.com:6188/scouter/v1/profile-data/20191017/6506185853545897725
 ###
 #"result": [
 #    {
@@ -58,3 +61,11 @@ GET http://demo.scouterapm.com:6188/scouter/v1/profile-data/20191015/89987019917
 #        "stepTypeName": "HASHED_MESSAGE"
 #      }
 #    },
+
+GET http://demo.scouterapm.com:6188/scouter/v1/xlog/20191017/374225541302635030
+
+###
+
+GET http://demo.scouterapm.com:6188/scouter/v1/xlog-data/20191017/-854231684852475423
+
+###

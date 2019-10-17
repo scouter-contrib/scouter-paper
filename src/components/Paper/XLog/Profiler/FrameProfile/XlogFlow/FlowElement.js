@@ -6,11 +6,12 @@ export default class FlowElement {
     objName = null;
     excludeObjName = false;
     elapsed=0;
-    error="";
+    error="0";
     xtype="";
     address="";
     threadName="";
     parent=null;
+    endTime = 0;
 //-
     type;
     id;
@@ -60,15 +61,15 @@ export default class FlowElement {
         const ret = {};
 
         ret["name"]           = this.name;
-        ret["objName"]        = this.objName;
+        ret["objName"]        = this.objName ? this.objName : "";
         ret["excludeObjName"] = this.excludeObjName;
-        ret["threadName"]     = this.threadName;
-        ret["address"]        = this.address;
+        ret["threadName"]     = this.threadName ? this.threadName : "";
+        ret["address"]        = this.address ? this.address : "";
         ret["type"]           = this.type;
         ret["elapsed"]        = this.elapsed;
         ret["txid"]           = this.id;
         ret["children"]       = [];
-        ret["isError"]        = false;
+        ret["isError"]        = this.error !== "0" ? true : false;
 
         for(const value of this.children.values()){
             ret["children"].push(value.toTree());

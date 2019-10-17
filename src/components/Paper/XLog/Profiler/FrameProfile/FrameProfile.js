@@ -435,7 +435,7 @@ class FrameProfile extends Component {
                 return "N";
         }
     };
-    onClickTxToXFlow=(gxid,txid,caller,endtime) =>{
+    onClickTxToXFlow=(gxid,txid,caller,endtime,clickId ) =>{
         const yyyymmdd = moment(new Date(Number(endtime))).format("YYYYMMDD");
         this.setState({
             flow : {
@@ -444,7 +444,8 @@ class FrameProfile extends Component {
                     gxid : gxid,
                     txid : txid,
                     caller : caller,
-                    yyyymmdd : yyyymmdd
+                    yyyymmdd : yyyymmdd,
+                    isGX : clickId === "Gxid"
                 }
             }
         });
@@ -484,7 +485,7 @@ class FrameProfile extends Component {
                                 <span className="label">{k}</span>
                                 <span className="data tx-link" onClick={()=>{
                                     const { gxid,txid,caller,endTime } = this.props.profile;
-                                    this.onClickTxToXFlow(gxid,txid,caller,endTime);
+                                    this.onClickTxToXFlow(gxid,txid,caller,endTime,k);
                                 }}>{IdAbbr.abbr(this.props.profile[k.toLowerCase()])}</span>
                             </div>
                         })

@@ -12,9 +12,11 @@ import ElementType from "../../../../../../common/ElementType";
 import {addRequest, setControlVisibility} from "../../../../../../actions";
 import * as _ from "lodash";
 import moment from "moment/moment";
+import {IdAbbr} from "../../../../../../common/idAbbr";
 
 
 // const url=`/scouter/v1/xlog-data/${yyyymmdd}/gxid/${gxid}`;
+// # load Txid
 
 const XLogTypes= {
     WEB_SERVICE : "WEB_SERVICE",
@@ -143,7 +145,7 @@ class XlogFlow extends Component {
         // console.log("componentDidMount");
         //- first create event
         window.addEventListener("resize", this.resize);
-        this.loadByGxId();
+        this.loadFlow();
 
     }
 
@@ -156,12 +158,14 @@ class XlogFlow extends Component {
     }
 
     resize = () =>{
-        // this.setState({
-        //     dimensions: {
-        //         width: this.container.offsetWidth,
-        //         height: this.container.offsetHeight,
-        //     },
-        // });
+        if(this.container) {
+            this.setState({
+                dimensions: {
+                    width: this.container.offsetWidth,
+                    height: this.container.offsetHeight,
+                }
+            });
+        }
     };
     stringTruncate(str,len){
         return !str || str.length <= len ? str : str.substring(0, len);
@@ -227,22 +231,38 @@ class XlogFlow extends Component {
                     thisElement.addChild(dispatchElement);
                 }
                 break;
-            // case Steps.THREAD_CALL_POSSIBLE:
-            //     //- other thread call checking
-            //     const tcElement = this.FlowElement(ElementType.defaultProps.DISPATCH, step.txid + step.hash);
-            //     tcElement.elapsed = Steps.toElapsedTime(step);
-            //     tcElement.name = mainValue;
-            //     if (step.txid !== "0") {
-            //         const callElement  = serviceMap.get(step.txid);
-            //         if (callElement) {
-            //             thisElement.addChild(callElement.serviceElement);
-            //         } else {
-            //             thisElement.addChild(tcElement);
-            //         }
-            //     } else {
-            //         thisElement.addChild(tcElement);
-            //     }
-            //     break;
+            case Steps.THREAD_CALL_POSSIBLE:
+                if(step.threaded === "0") break;
+                //- other thread call checking
+
+                const yyyymmdd = moment(new Date(Number(thisElement.endTime))).format("YYYYMMDD");
+                const _url = `${getHttpProtocol(this.props.config)}/scouter/v1/xlog/${yyyymmdd}/${step.txid}`;
+                jQuery.ajax({
+                        method: "GET",
+                        async: false,
+                        dataType: "json",
+                        url: _url,
+                        xhrFields: getWithCredentials(this.props.config),
+                        beforeSend: (xhr)=>{
+                            setAuthHeader(xhr, this.props.config, getCurrentUser(this.props.config, this.props.user));
+                        }
+                 }).done(data=>{
+                     step.elapsed = data.elapsed;
+                 });
+                const tcElement = this.FlowElement(ElementType.defaultProps.DISPATCH, step.txid + step.hash);
+                tcElement.elapsed = Steps.toElapsedTime(step);
+                tcElement.name = mainValue;
+                if (step.txid !== "0") {
+                    const callElement  = serviceMap.get(step.txid);
+                    if (callElement) {
+                        thisElement.addChild(callElement.serviceElement);
+                    } else {
+                        thisElement.addChild(tcElement);
+                    }
+                } else {
+                    thisElement.addChild(tcElement);
+                }
+                break;
             case Steps.APICALL_SUM:
                 const apiSumElement = this.FlowElement(ElementType.defaultProps.API_CALL, step.hash);
                 apiSumElement.dupleCnt = step.count;
@@ -256,7 +276,7 @@ class XlogFlow extends Component {
             case Steps.SQL3:
                 const sqlElement = this.FlowElement(ElementType.defaultProps.SQL, step.hash);
                 sqlElement.elapsed = Steps.toElapsedTime(step);
-                sqlElement.name =  `${this.stringTruncate(mainValue, 20)}...`;
+                sqlElement.name =  mainValue;
                 sqlElement.error = step.error;
                 sqlElement.tags.sql = mainValue;
                 thisElement.addChild(sqlElement);
@@ -266,13 +286,30 @@ class XlogFlow extends Component {
                 sqlSumElement.dupleCnt = step.count;
                 sqlSumElement.elapsed = Steps.toElapsedTime(step);
                 sqlSumElement.error = step.error;
-                sqlSumElement.name =  `${this.stringTruncate(mainValue, 20)}...`;
+                sqlSumElement.name =  mainValue;
                 sqlSumElement.tags.sql=mainValue;
                 thisElement.addChild(sqlSumElement);
                 break;
-            // case Steps.THREAD_SUBMIT:
-            //     -analys
-            //     break;
+            case Steps.THREAD_SUBMIT:
+                const sub_yyyymmdd = moment(new Date(Number(thisElement.endTime))).format("YYYYMMDD");
+                const sub_url = `${getHttpProtocol(this.props.config)}/scouter/v1/profile-data/${sub_yyyymmdd}/${step.txid}`;
+                try {
+                    jQuery.ajax({
+                        method: "GET",
+                        async: false,
+                        dataType: "json",
+                        url: sub_url,
+                        xhrFields: getWithCredentials(this.props.config),
+                        beforeSend: (xhr) => {
+                            setAuthHeader(xhr, this.props.config, getCurrentUser(this.props.config, this.props.user));
+                        }
+                    }).done(data => {
+                        data.result.forEach(_step => this.stepToElement(serviceMap, thisElement, _step));
+                    });
+                }catch (e) {
+                    console.log(e);
+                }
+                break;
             default :
 
         }
@@ -305,6 +342,7 @@ class XlogFlow extends Component {
             serviceElement.error          = _global.error;
             serviceElement.threadName     = _global.threadName;
             serviceElement.xtype          = _global.xlogType;
+            serviceElement.endTime        = _global.endTime;
             serviceElement.tags = {
                 caller: _global.caller,
                 ip: _global.ipAddr
@@ -319,6 +357,7 @@ class XlogFlow extends Component {
             };
         });
     }
+
     tryDepFlowSearch(globalTracing){
         //next try step
         this.props.setControlVisibility("Loading", true);
@@ -421,17 +460,18 @@ class XlogFlow extends Component {
            });
     }
 
-    loadByGxId(){
+    loadFlow(){
         this.props.setControlVisibility("Loading", true);
         this.props.addRequest();
         const {config, user,flow } = this.props;
         // console.log("loadByGxId",flow,user);
-        const _url = `${getHttpProtocol(config)}/scouter/v1/xlog-data/${flow.parameter.yyyymmdd}/gxid/${flow.parameter.gxid}`;
+        const _gx_url = `${getHttpProtocol(config)}/scouter/v1/xlog-data/${flow.parameter.yyyymmdd}/gxid/${flow.parameter.gxid}`;
+        const _tx_url = `${getHttpProtocol(config)}/scouter/v1/xlog-data/${flow.parameter.yyyymmdd}/${flow.parameter.txid}`;
         jQuery.ajax({
             method: "GET",
             async: true,
             dataType: 'text',
-            url: _url,
+            url: flow.parameter.isGX ? ( flow.parameter.gxid !== "0" ? _gx_url : _tx_url ) : _tx_url,
             xhrFields: getWithCredentials(config),
             beforeSend: function (xhr) {
                 setAuthHeader(xhr, config, getCurrentUser(config, user));
@@ -439,7 +479,8 @@ class XlogFlow extends Component {
         }).done((msg) => {
             const reponseObj = JSON.parse(msg);
             if(reponseObj.status === "200"){
-                this.tryDepFlowSearch(reponseObj.result);
+                const isArray = Array.isArray(reponseObj.result);
+                this.tryDepFlowSearch(isArray ? reponseObj.result : [reponseObj.result]);
             }
         }).always(() => {
             this.props.setControlVisibility("Loading", false);
@@ -466,9 +507,15 @@ class XlogFlow extends Component {
 //- render
     render() {
         const {data,dimensions} = this.state;
+        const {flow} = this.props;
         return(
             <div className="xlog-flow">
                 <div className="title">
+                    <span>SERVICE FLOW- {
+                    flow.parameter.isGX ? (flow.parameter.gxid !== "0" ? IdAbbr.abbr(flow.parameter.gxid) : IdAbbr.abbr(flow.parameter.txid))
+                                        : IdAbbr.abbr(flow.parameter.txid)
+                }
+                    </span>
                 </div>
                 <div className="close-btn" onClick={this.close}></div>
                 <div className="flow-content" ref={el => this.container = el }>
