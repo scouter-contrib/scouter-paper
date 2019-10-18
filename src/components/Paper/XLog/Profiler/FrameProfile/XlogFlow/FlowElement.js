@@ -1,5 +1,5 @@
 import ElementType from "../../../../../../common/ElementType.js";
-import * as _ from 'lodash';
+
 
 export default class FlowElement {
     name = null;
@@ -39,7 +39,7 @@ export default class FlowElement {
         }
     }
     toArray(){
-        const ret = [{id : this.id,elapsed : this.elapsed} ];
+        const ret = [{id : this.id, elapsed : this.elapsed} ];
         for(const value of this.children.values()){
             ret.push(value);
         }
@@ -79,23 +79,10 @@ export default class FlowElement {
         return ret;
     }
     toElaped(){
-        const elaps =  [];
+        const elaps = [{id : this.id, dup : this.elapsed} ];
         for(const value of this.children.values()){
-            elaps.push(
-                value.toArray()
-                    .filter(_d => _d.elapsed > 0 )
-                    .map(_d => {
-                         return {
-                             id  :_d.id,
-                             dup : _d.elapsed
-                         }})
-            );
-
+            elaps.push(value.toElaped());
         }
-        const flatMap = _.flatMapDeep(elaps);
-        return {
-            min : _.minBy(flatMap,(_d) => _d.dup),
-            max : _.maxBy(flatMap,(_d) => _d.dup)
-        }
+        return elaps;
     }
 }

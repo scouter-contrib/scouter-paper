@@ -3,6 +3,7 @@ import {withRouter} from "react-router-dom";
 import React,{Component} from "react";
 import * as d3 from "d3";
 import d3tip from 'd3-tip';
+import * as _ from 'lodash'
 import "./XlogFlowGraph.css";
 import ElementType from "../../../../../../../common/ElementType";
 import numeral from "numeral";
@@ -51,8 +52,16 @@ class XlogFlowGraph extends Component {
 
     getTreeData(data){
         const [[,value]]= [...data];
+
+        const max = _(value.toElaped())
+                        .flatMapDeep()
+                        .map(d=>d.dup)
+                        .max();
         return {
-            elapsed : value.toElaped(),
+            elapsed : {
+                max : max,
+                min : 0
+            },
             tree : value.toTree()
         }
     }
@@ -112,7 +121,8 @@ class XlogFlowGraph extends Component {
         this.root.x0 = height / 2;
         this.root.y0 = 0;
         // this.min = elapsed.min ?  elapsed.min.dup : 0;
-        this.max = elapsed.max.dup > 1000 ? elapsed.max.dup : 1000; // default max;
+        this.max = elapsed.max ? elapsed.max : 0; // default max;
+
         this.xScale = d3
             .scaleLinear()
             .range([0, 100])
