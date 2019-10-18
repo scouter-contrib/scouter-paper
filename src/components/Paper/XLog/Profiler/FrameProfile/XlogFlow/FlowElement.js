@@ -30,9 +30,7 @@ export default class FlowElement {
         if(childObj){
             childObj.dupleCnt += Number(child.dupleCnt);
             childObj.elapsed += child.elapsed;
-            if (!(this.error === "0" || this.error === "")) {
-                childObj.error = child.error;
-            }
+            childObj.error = child.error;
         }else{
             child.parent = this.id;
             this.children.set(child.id,child);
