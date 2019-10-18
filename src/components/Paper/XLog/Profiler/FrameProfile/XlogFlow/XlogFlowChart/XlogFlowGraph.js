@@ -5,13 +5,14 @@ import * as d3 from "d3";
 import d3tip from 'd3-tip';
 import "./XlogFlowGraph.css";
 import ElementType from "../../../../../../../common/ElementType";
-
+import numeral from "numeral";
 
 // # zoom in, zoom out
 // # resizing
 // # positing
 // # tooltip
 // # full info
+
 class XlogFlowGraph extends Component {
 
     state = {
@@ -111,7 +112,7 @@ class XlogFlowGraph extends Component {
         this.root.x0 = height / 2;
         this.root.y0 = 0;
         // this.min = elapsed.min ?  elapsed.min.dup : 0;
-        this.max = elapsed.max ? elapsed.max.dup : 0;
+        this.max = elapsed.max.dup > 1000 ? elapsed.max.dup : 1000; // default max;
         this.xScale = d3
             .scaleLinear()
             .range([0, 100])
@@ -149,6 +150,7 @@ class XlogFlowGraph extends Component {
                 that.tip.hide(d,this);
             })
             .on('click', (d)=> {
+                that.tip.hide(d,this);
                 d3.event.stopPropagation();
                 this.props.clickContent(d.data);
                 // that.scope.handleSelectSpan(d);
@@ -181,7 +183,7 @@ class XlogFlowGraph extends Component {
                 const {txid,isError} = d.data;
                 const isOwner = txid === this.props.txid;
                 if( isOwner ){
-                    return '#2529d8';
+                    return '#e03d60';
                 }else{
                     return !isError ? '#3d444f':'#E54C17';
                 }
@@ -194,7 +196,12 @@ class XlogFlowGraph extends Component {
             .attr('fill', (d) => ElementType.defaultProps.toColor(d.data.type))
             .attr("text-anchor",(d) => d.children || d._children ? "end" : "start")
             .style('font-size', '10px')
-            .text(d =>`${ElementType.defaultProps.toString(d.data.type)}`+ (d.data.type !== '0' ? `-${d.data.elapsed}ms` : '') );
+            .text(d =>{
+                const {type,elapsed,dupCount} = d.data;
+                const {numberFormat} = this.props.config;
+                const dupCnt = dupCount > 1 ? `(${dupCount})` : '';
+                return `${ElementType.defaultProps.toString(type)}${dupCnt}`+ (type !== '0' ? `-${numeral(elapsed).format(numberFormat)}ms` : '');
+            });
 
         nodeEnter
             .append('rect')
@@ -334,121 +341,3 @@ const mapStateToProps = (state) => {
 
 XlogFlowGraph = connect(mapStateToProps, undefined)(XlogFlowGraph);
 export default withRouter(XlogFlowGraph);
-
-//
-// update(source){
-//     const treeData = this.treemap(source);
-//
-//     // Compute the new tree layout.
-//     let nodes = treeData.descendants(),links = treeData.descendants().slice(1);
-//
-//     // Normalize for fixed-depth.
-//     nodes.forEach(function(d){ d.y = d.depth * 180});
-//
-//     // ****************** Nodes section ***************************
-//
-//     // Update the nodes...
-//     let i=0;
-//     let node = this.state.g.selectAll('g.node')
-//         .data(nodes, function(d) {return d.id || (d.id = ++i); });
-//
-//     // Enter any new modes at the parent's previous position.
-//     let nodeEnter = node.enter().append('g')
-//         .attr('class', 'node')
-//         .attr("transform", function(d) {
-//             return "translate(" + source.y0 + "," + source.x0 + ")";
-//         });
-//     // .on('click', click);
-//
-//     // Add Circle for the nodes
-//     nodeEnter.append('circle')
-//         .attr('class', 'node')
-//         .attr('r', 1e-6)
-//         .style("fill", function(d) {
-//             return d._children ? "lightsteelblue" : "#fff";
-//         });
-//
-//     // Add labels for the nodes
-//     nodeEnter.append('text')
-//         .attr("dy", ".35em")
-//         .attr("x", function(d) {
-//             return d.children || d._children ? -13 : 13;
-//         })
-//         .attr("text-anchor", function(d) {
-//             return d.children || d._children ? "end" : "start";
-//         })
-//         .text(function(d) { return d.data.name; });
-//
-//     // UPDATE
-//     let nodeUpdate = nodeEnter.merge(node);
-//
-//     // Transition to the proper position for the node
-//     nodeUpdate.transition()
-//         .duration(this.defaultProps.duration)
-//         .attr("transform", function(d) {
-//             return "translate(" + d.y + "," + d.x + ")";
-//         });
-//
-//     // Update the node attributes and style
-//     nodeUpdate.select('circle.node')
-//         .attr('r', 10)
-//         .style("fill", function(d) {
-//             return d._children ? "lightsteelblue" : "#fff";
-//         })
-//         .attr('cursor', 'pointer');
-//
-//
-//     // Remove any exiting nodes
-//     var nodeExit = node.exit().transition()
-//         .duration(this.defaultProps.duration)
-//         .attr("transform", function(d) {
-//             return "translate(" + source.y + "," + source.x + ")";
-//         })
-//         .remove();
-//
-//     // On exit reduce the node circles size to 0
-//     nodeExit.select('circle')
-//         .attr('r', 1e-6);
-//
-//     // On exit reduce the opacity of text labels
-//     nodeExit.select('text')
-//         .style('fill-opacity', 1e-6);
-//
-//     // ****************** links section ***************************
-//
-//     // Update the links...
-//     let link = this.state.g.selectAll('path.link')
-//         .data(links, function(d) { return d.id; });
-//
-//     // Enter any new links at the parent's previous position.
-//     let linkEnter = link.enter().insert('path', "g")
-//         .attr("class", "link")
-//         .attr('d', (d)=>{
-//             const o = {x: source.x0, y: source.y0}
-//             return this.diagonal(o, o);
-//         });
-//
-//     // UPDATE
-//     let linkUpdate = linkEnter.merge(link);
-//
-//     // Transition back to the parent element position
-//     linkUpdate.transition()
-//         .duration(this.defaultProps.duration)
-//         .attr('d', (d)=>this.diagonal(d, d.parent));
-//
-//     // Remove any exiting links
-//     let linkExit = link.exit().transition()
-//         .duration(this.defaultProps.duration)
-//         .attr('d', (d)=> {
-//             const o = {x: source.x, y: source.y};
-//             return this.diagonal(o, o);
-//         })
-//         .remove();
-//
-//     // Store the old positions for transition.
-//     nodes.forEach(function(d){
-//         d.x0 = d.x;
-//         d.y0 = d.y;
-//     });
-//
-// }

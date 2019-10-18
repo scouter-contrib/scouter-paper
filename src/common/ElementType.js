@@ -23,7 +23,7 @@ export default class ElementType {
         ,
         toColor(value){
             switch(value){
-                case this.USER : return "#bd2c00";
+                case this.USER : return "#aeaeae";
                 case this.SERVICE : return "#6e40aa";
                 case this.API_CALL : return "#417de0";
                 case this.SQL : return "#1ac7c2";

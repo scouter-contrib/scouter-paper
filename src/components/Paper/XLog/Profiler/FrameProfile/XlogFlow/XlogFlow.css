@@ -46,6 +46,6 @@
 }
 .xlog-flow .frame-xlog-flow-content > div > div {
   background-color: #fff;
-  height: calc(100% - 110px);
+  height: calc(100% - 60px);
   width: 100%;
 }

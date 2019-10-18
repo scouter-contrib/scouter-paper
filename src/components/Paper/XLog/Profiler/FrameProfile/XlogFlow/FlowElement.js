@@ -28,9 +28,9 @@ export default class FlowElement {
     addChild(child){
         const childObj = this.children.get(child.id);
         if(childObj){
-            childObj.dupleCnt += child.dupleCnt;
+            childObj.dupleCnt += Number(child.dupleCnt);
             childObj.elapsed += child.elapsed;
-            if (!child.error) {
+            if (!(this.error === "0" || this.error === "")) {
                 childObj.error = child.error;
             }
         }else{
@@ -60,6 +60,7 @@ export default class FlowElement {
     toTree(){
         const ret = {};
         ret["name"]           = this.name;
+        ret["endTime"]        = this.endTime? this.endTime : "";
         ret["objName"]        = this.objName ? this.objName : "";
         ret["excludeObjName"] = this.excludeObjName;
         ret["threadName"]     = this.threadName ? this.threadName : "";
@@ -67,8 +68,10 @@ export default class FlowElement {
         ret["type"]           = this.type;
         ret["elapsed"]        = isNaN(this.elapsed) ? 0 : this.elapsed;
         ret["txid"]           = this.id;
+        ret["dupCount"]       = this.dupleCnt;
         ret["children"]       = [];
         ret["isError"]        = this.error === "0" || this.error === "" ? false: true;
+        ret["tags"]           = this.tags;
 
         for(const value of this.children.values()){
             ret["children"].push(value.toTree());

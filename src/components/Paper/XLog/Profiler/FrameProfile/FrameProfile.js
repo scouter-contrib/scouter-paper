@@ -616,7 +616,7 @@ class FrameProfile extends Component {
                     this.state.flow.show &&
                         <div className="frame-xlog-flow">
                             <div>
-                                <XlogFlow flow={this.state.flow} close={this.showFlowClose} >
+                                <XlogFlow flow={this.state.flow} close={this.showFlowClose} doubleClick={this.props.rowClick} >
                                 </XlogFlow>
                             </div>
                         </div>

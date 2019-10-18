@@ -24,3 +24,35 @@
   height: calc(100% - 36px);
   overflow-y: auto;
 }
+.xlog-flow-content .contents .flow-data {
+  margin-bottom: 20px;
+  padding: 5px 10px;
+}
+.xlog-flow-content .contents .flow-data > div {
+  white-space: nowrap;
+  display: table;
+  table-layout: fixed;
+  width: 100%;
+}
+.xlog-flow-content .contents .flow-data span {
+  padding: 7px 10px;
+  box-sizing: border-box !important;
+  display: table-cell;
+}
+.xlog-flow-content .contents .flow-data .label {
+  width: 100px;
+  background-color: #aeaeae;
+}
+.xlog-flow-content .contents .flow-data .data {
+  white-space: nowrap;
+}
+.xlog-flow-content .contents .xlog-flow-btn {
+  position: relative;
+  margin: 0px auto 5px;
+  border-radius: 5px;
+  font-size: 11px;
+  cursor: pointer;
+  background: #ff0;
+  padding: 6px 8px;
+  display: inline-block !important;
+}

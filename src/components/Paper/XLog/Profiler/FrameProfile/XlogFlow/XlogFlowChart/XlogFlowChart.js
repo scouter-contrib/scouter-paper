@@ -1,14 +1,19 @@
 import React from 'react'
 import connect from "react-redux/es/connect/connect";
 import {withRouter} from "react-router-dom";
-function XlogFlowChart({ width, height, children }) {
-    return (
-        <svg className="xlog-flow-chart" width={width} height={height}>
-            {
-                children
-            }
-        </svg>
-    )
+
+class XlogFlowChart extends React.Component {
+
+    render() {
+        const {width, height, children} = this.props;
+        return (
+            <svg className="xlog-flow-chart" width={width} height={height}>
+                {
+                    children
+                }
+            </svg>
+        )
+    }
 }
 
 // XlogFlowChart.propTypes = {

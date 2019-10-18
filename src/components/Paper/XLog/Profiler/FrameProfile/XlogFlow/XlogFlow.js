@@ -239,8 +239,7 @@ class XlogFlow extends Component {
                 break;
             case Steps.THREAD_CALL_POSSIBLE:
                 if(step.threaded === "0") break;
-                //- other thread call checking
-
+               //- other thread call checking
                 const yyyymmdd = moment(new Date(Number(thisElement.endTime))).format("YYYYMMDD");
                 const _url = `${getHttpProtocol(this.props.config)}/scouter/v1/xlog/${yyyymmdd}/${step.txid}`;
                 jQuery.ajax({
@@ -253,8 +252,9 @@ class XlogFlow extends Component {
                             setAuthHeader(xhr, this.props.config, getCurrentUser(this.props.config, this.props.user));
                         }
                  }).done(data=>{
-                     step.elapsed = data.elapsed;
+                     step.elapsed = data.result.elapsed;
                  });
+
                 const tcElement = this.FlowElement(ElementType.defaultProps.DISPATCH, step.txid + step.hash);
                 tcElement.elapsed = Steps.toElapsedTime(step);
                 tcElement.name = mainValue;
@@ -542,14 +542,14 @@ class XlogFlow extends Component {
                 <div className="close-btn" onClick={this.close}></div>
                 <div className="contents" ref={el => this.container = el }>
                     <XlogFlowChart width="100%" height="100%">
-                        <XlogFlowGraph xlogflow={data} resize={dimensions} txid={flow.parameter.txid} clickContent={this.clickContent}/>
+                        <XlogFlowGraph xlogflow={data} resize={dimensions} txid={flow.parameter.txid} clickContent={this.clickContent} />
                     </XlogFlowChart>
                 </div>
                 {
                     flowContent.show &&
                         <div className="frame-xlog-flow-content">
                             <div>
-                                <XlogFlowContent content={flowContent.data} close={this.closeContent} />
+                                <XlogFlowContent content={flowContent.data} close={this.closeContent} txBtnClick={this.props.doubleClick}/>
                             </div>
                         </div>
                 }
