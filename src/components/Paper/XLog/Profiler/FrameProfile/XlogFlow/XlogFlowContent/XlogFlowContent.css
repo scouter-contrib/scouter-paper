@@ -3,7 +3,7 @@
 }
 .xlog-flow-content .title {
   padding: 8px;
-  background-color: #333;
+  background-color: #666;
   color: #fff;
   height: 36px;
   box-sizing: border-box;
@@ -20,10 +20,14 @@
 }
 .xlog-flow-content .contents {
   position: relative;
-  width: calc(100% - 30px);
-  height: calc(100% - 36px);
-  overflow-y: auto;
+  width: calc(100% - 12px);
+  height: calc(100% - 50px);
   margin: 10px 10px;
+  overflow-y: auto;
+}
+.xlog-flow-content .contents::-webkit-scrollbar {
+  width: 7px;
+  height: 7px;
 }
 .xlog-flow-content .contents .sub-title {
   background-color: #333;
@@ -59,5 +63,9 @@
 .xlog-flow-content .contents .type {
   position: relative;
   margin-top: 10px;
-  display: inline-block !important;
+  display: block !important;
+}
+.xlog-flow-content .contents .error {
+  color: #f00;
+  display: block !important;
 }

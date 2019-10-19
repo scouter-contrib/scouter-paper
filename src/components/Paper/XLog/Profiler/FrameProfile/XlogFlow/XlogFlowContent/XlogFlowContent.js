@@ -8,6 +8,9 @@ import sqlFormatter from "sql-formatter";
 import ElementType from "../../../../../../../common/ElementType";
 import * as d3 from "d3";
 import numeral from "numeral";
+import moment from "moment/moment";
+import {getCurrentUser, getHttpProtocol, getWithCredentials, setAuthHeader} from "../../../../../../../common/common";
+import jQuery from "jquery";
 
 const contents = [
     {
@@ -104,6 +107,28 @@ class XlogFlowContent extends Component {
                 return false;
         }
     }
+    getError(){
+        let ret = '';
+        const {endTime,error} = this.props.content;
+
+        jQuery.ajax({
+            method: "GET",
+            async: false,
+            dataType: "json",
+            url: `${getHttpProtocol(this.props.config)}/scouter/v1/dictionary/${moment(new Date(Number(endTime))).format("YYYYMMDD")}?dictKeys=[error:${error}]`,
+            xhrFields: getWithCredentials(this.props.config),
+            beforeSend: (xhr)=>{
+                setAuthHeader(xhr, this.props.config, getCurrentUser(this.props.config, this.props.user));
+            }
+        }).done(data=>{
+            const res = data.result[0];
+            if(res) {
+                ret = res.text
+            }
+        });
+        return ret;
+    }
+
     dataTodisplay(meta,value){
         const {numberFormat,timeFormat,dateFormat} = this.props.config;
         const fullTimeFormat = `${dateFormat} ${timeFormat}`;
@@ -130,13 +155,14 @@ class XlogFlowContent extends Component {
         return `${cov} ${meta.unit}`;
     }
     render(){
+        const isSQL = this.getProfileType() === 'SQL';
         return (
             <div className="xlog-flow-content">
                 <div className="title">
                     <span>FLOW CONTENTS - {IdAbbr.abbr(this.props.content.txid)}(TXID : {this.props.content.txid})</span>
                 </div>
                 <div className="close-btn" onClick={this.close}></div>
-                <div className="contents">
+                <div className="contents scrollbar">
                     <div className="sub-title">
                         FLOW INFO
                     </div>
@@ -154,10 +180,14 @@ class XlogFlowContent extends Component {
                     <div className="sub-title">
                         FLOW TYPE - {this.getProfileType()}
                     </div>
-                    <div key='text' className={`type ${this.getProfileType() === 'SQL' ? 'sql-statement formatter' :''}`}>
-                       {this.dataTodisplay({type : this.getProfileType(), unit : ''},this.props.content.name)}
+                    <div key='text' className='type'>
+                       {this.dataTodisplay({type : this.getProfileType(), unit : ''}, isSQL ? this.props.content.tags.sql : this.props.content.name)}
                     </div>
-
+                    {
+                        this.props.content.isError && <div className="type error">
+                            {this.getError()}
+                        </div>
+                    }
 
                 </div>
             </div>
@@ -167,6 +197,7 @@ class XlogFlowContent extends Component {
 const mapStateToProps = (state) => {
     return {
         config: state.config,
+        user : state.user
     };
 };
 XlogFlowContent = connect(mapStateToProps, null)(XlogFlowContent);

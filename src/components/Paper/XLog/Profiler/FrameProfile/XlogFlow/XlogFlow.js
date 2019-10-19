@@ -190,6 +190,7 @@ class XlogFlow extends Component {
                 apiElement.error = step.error;
                 apiElement.name = mainValue;
                 apiElement.address = step.address;
+                apiElement.endTime = thisElement.endTime;
                 if(step.txid !== "0"){
                     //other call check 
                     const callElement = serviceMap.get(step.txid);
@@ -209,6 +210,7 @@ class XlogFlow extends Component {
                 spanCallElement.error = step.error;
                 spanCallElement.name = mainValue;
                 spanCallElement.address = step.address;
+                spanCallElement.endTime = thisElement.endTime;
                 if (step.txid !== "0") {
                     const callElement = serviceMap.get(step.txid);
                     if (callElement) {
@@ -226,6 +228,7 @@ class XlogFlow extends Component {
                 dispatchElement.elapsed = Steps.toElapsedTime(step);
                 dispatchElement.error = step.error;
                 dispatchElement.name = mainValue;
+                dispatchElement.endTime = thisElement.endTime;
                 if (step.txid !== "0") {
                     const callElement = serviceMap.get(step.txid);
                     if (callElement) {
@@ -258,6 +261,8 @@ class XlogFlow extends Component {
                 const tcElement = this.FlowElement(ElementType.defaultProps.DISPATCH, step.txid + step.hash);
                 tcElement.elapsed = Steps.toElapsedTime(step);
                 tcElement.name = mainValue;
+                tcElement.endTime = thisElement.endTime;
+
                 if (step.txid !== "0") {
                     const callElement  = serviceMap.get(step.txid);
                     if (callElement) {
@@ -275,16 +280,38 @@ class XlogFlow extends Component {
                 apiSumElement.elapsed = Steps.toElapsedTime(step);
                 apiSumElement.error = step.error;
                 apiSumElement.name = mainValue;
+                apiSumElement.endTime = thisElement.endTime;
                 thisElement.addChild(apiSumElement);
                 break;
             case Steps.SQL:
             case Steps.SQL2:
             case Steps.SQL3:
                 const sqlElement = this.FlowElement(ElementType.defaultProps.SQL, step.hash);
+                let relMainValue = mainValue;
+                jQuery.ajax({
+                    method: "GET",
+                    async: false,
+                    dataType: "json",
+                    url: `${getHttpProtocol(this.props.config)}/scouter/v1/dictionary/${moment(new Date(Number(thisElement.endTime))).format("YYYYMMDD")}?dictKeys=[table:${step.hash}]`,
+                    xhrFields: getWithCredentials(this.props.config),
+                    beforeSend: (xhr)=>{
+                        setAuthHeader(xhr, this.props.config, getCurrentUser(this.props.config, this.props.user));
+                    }
+                }).done(data=>{
+                    const res = data.result[0];
+                    if(res) {
+                        relMainValue = res.text;
+                    }
+                });
+
                 sqlElement.elapsed = Steps.toElapsedTime(step);
-                sqlElement.name =  mainValue;
+                sqlElement.name =  relMainValue;
                 sqlElement.error = step.error;
                 sqlElement.tags.sql = mainValue;
+                sqlElement.tags.param = step.param;
+                sqlElement.tags.prefix = step.xtypePrefix;
+                sqlElement.endTime = thisElement.endTime;
+
                 thisElement.addChild(sqlElement);
                 break;
             case Steps.SQL_SUM:
@@ -294,6 +321,7 @@ class XlogFlow extends Component {
                 sqlSumElement.error = step.error;
                 sqlSumElement.name =  mainValue;
                 sqlSumElement.tags.sql=mainValue;
+                sqlSumElement.endTime = thisElement.endTime;
                 thisElement.addChild(sqlSumElement);
                 break;
             case Steps.THREAD_SUBMIT:

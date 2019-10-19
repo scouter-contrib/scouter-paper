@@ -68,7 +68,8 @@ export default class FlowElement {
         ret["txid"]           = this.id;
         ret["dupCount"]       = this.dupleCnt;
         ret["children"]       = [];
-        ret["isError"]        = this.error === "0" || this.error === "" ? false: true;
+        ret["isError"]        = this.isError();
+        ret["error"]          = this.error;
         ret["tags"]           = this.tags;
 
         for(const value of this.children.values()){
@@ -76,6 +77,10 @@ export default class FlowElement {
         }
         return ret;
     }
+    isError(){
+        return this.error === "0" || this.error === "" ? false: true;
+    }
+
     toElaped(){
         const elaps = [{id : this.id, dup : this.elapsed} ];
         for(const value of this.children.values()){
