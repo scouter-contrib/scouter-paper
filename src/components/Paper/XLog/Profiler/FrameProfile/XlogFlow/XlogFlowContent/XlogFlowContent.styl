@@ -9,6 +9,7 @@
     & span
       display: inline-block
       padding: 4px
+
   .close-btn
     position: absolute
     top : 7px
@@ -16,44 +17,51 @@
     display: inline-block !important
   .contents
     position: relative
-    width: 100%
+    width: calc(100% - 30px)
     height: calc(100% - 36px)
     overflow-y : auto
+    margin: 10px 10px
+    .sub-title
+      //padding: 10px !important;
+      background-color: #333
+      color: white
+      //display:
+      border: 1px solid #333
     .flow-data
       margin-bottom: 20px
-      padding : 5px 10px
       & > div
         white-space: nowrap
         display: table
         table-layout: fixed
         width: 100%
-      //  & div.span
-      //    padding: 7px 10px
-      //    box-sizing: border-box
-      //    display: table-cell
-      //    .label
-      //      width: 100px
-      //      background-color: #608cee
-      //    .data
-      //      white-space: nowrap;
       & span
         padding: 7px 10px
         box-sizing: border-box !important
         display: table-cell
       .label
         width: 100px
-        background-color: #aeaeae
+        background-color: #EEE
       .data
-        white-space: nowrap;
-    .xlog-flow-btn
+        white-space: nowrap
+      .txid
+        cursor:pointer
+        color:#7B3E81
+        text-decoration:underline
+    .type
       position: relative
-      margin:0px auto 5px
-      border-radius : 5px
-      font-size : 11px
-      cursor : pointer
-      background : yellow
-      padding  : 6px 8px
+      margin-top : 10px
       display: inline-block !important
+    //
+    //
+    //.xlog-flow-btn
+    //  position: relative
+    //  margin:0px auto 5px
+    //  border-radius : 5px
+    //  font-size : 11px
+    //  cursor : pointer
+    //  background : yellow
+    //  padding  : 6px 8px
+    //  display: inline-block !important
 
 
 

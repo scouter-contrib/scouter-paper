@@ -20,13 +20,18 @@
 }
 .xlog-flow-content .contents {
   position: relative;
-  width: 100%;
+  width: calc(100% - 30px);
   height: calc(100% - 36px);
   overflow-y: auto;
+  margin: 10px 10px;
+}
+.xlog-flow-content .contents .sub-title {
+  background-color: #333;
+  color: #fff;
+  border: 1px solid #333;
 }
 .xlog-flow-content .contents .flow-data {
   margin-bottom: 20px;
-  padding: 5px 10px;
 }
 .xlog-flow-content .contents .flow-data > div {
   white-space: nowrap;
@@ -41,18 +46,18 @@
 }
 .xlog-flow-content .contents .flow-data .label {
   width: 100px;
-  background-color: #aeaeae;
+  background-color: #eee;
 }
 .xlog-flow-content .contents .flow-data .data {
   white-space: nowrap;
 }
-.xlog-flow-content .contents .xlog-flow-btn {
-  position: relative;
-  margin: 0px auto 5px;
-  border-radius: 5px;
-  font-size: 11px;
+.xlog-flow-content .contents .flow-data .txid {
   cursor: pointer;
-  background: #ff0;
-  padding: 6px 8px;
+  color: #7b3e81;
+  text-decoration: underline;
+}
+.xlog-flow-content .contents .type {
+  position: relative;
+  margin-top: 10px;
   display: inline-block !important;
 }

@@ -3,6 +3,7 @@ import {withRouter} from "react-router-dom";
 import {connect} from "react-redux";
 import "./XlogFlowContent.css"
 import {IdAbbr} from "../../../../../../../common/idAbbr";
+import sqlFormatter from "sql-formatter";
 // import moment from "moment";
 import ElementType from "../../../../../../../common/ElementType";
 import * as d3 from "d3";
@@ -12,7 +13,7 @@ const contents = [
     {
         key : 'txid',
         show : true,
-        dip : 'Transaction ID',
+        dip : 'Txid',
         type : 'scouter-tx',
         unit : ''
     },
@@ -39,7 +40,7 @@ const contents = [
     },
     {
         key : 'type',
-        show : true,
+        show : false,
         dip : 'Profile Type',
         type : 'profile-category',
         unit : ''
@@ -80,11 +81,17 @@ class XlogFlowContent extends Component {
     close=()=>{
         this.props.close();
     };
-    click=()=>{
-        const {txid,endTime} = this.props.content;
-        this.props.txBtnClick({txid: txid,endTime:endTime});
-    };
 
+    click=(target)=>{
+        if(target === 'txid') {
+            const {txid, endTime} = this.props.content;
+            this.props.txBtnClick({txid: txid, endTime: endTime});
+        }
+    };
+    getProfileType(){
+        const {type} = this.props.content;
+        return ElementType.defaultProps.toString(type)
+    }
     isTxFlow(){
         const {type} = this.props.content;
         switch (type) {
@@ -108,10 +115,13 @@ class XlogFlowContent extends Component {
                 cov= numeral(value).format(numberFormat);
                 break
             case 'scouter-tx':
-                cov = `${IdAbbr.abbr(value)} (${value})`;
+                cov = `${IdAbbr.abbr(value)}`;
                 break;
             case 'profile-category':
                 cov = ElementType.defaultProps.toString(value);
+                break;
+            case 'SQL':
+                cov = sqlFormatter.format(value,{indent : "  "});
                 break;
             default:
                 cov=value;
@@ -122,36 +132,32 @@ class XlogFlowContent extends Component {
         return (
             <div className="xlog-flow-content">
                 <div className="title">
-                    <span>FLOW CONTENTS - {IdAbbr.abbr(this.props.content.txid)}</span>
+                    <span>FLOW CONTENTS - {IdAbbr.abbr(this.props.content.txid)}(TXID : {this.props.content.txid})</span>
                 </div>
                 <div className="close-btn" onClick={this.close}></div>
                 <div className="contents">
-                    <div className="flow-data">
-
-                    {contents.filter(d => d.show)
-                             .filter(d => this.props.content[d.key] ? true : false)
-                        .map(d =>
-                            <div key={d.key}>
-                                <span className="label">{d.dip}</span>
-                                <span className={`data ${d.key}`}>{this.dataTodisplay(d,this.props.content[d.key])}</span>
-                            </div>
-                        )
-                    }
-                    {
-                       this.isTxFlow() ?
-                           <div key='service'>
-                             <span className="label">EndPoint</span>
-                             <span className="data">{this.props.content.name}</span>
-                          </div>
-                          :
-                           <div key='pre'>
-                               <pre>{this.props.content.name}</pre>
-                           </div>
-                    }
+                    <div className="sub-title">
+                        FLOW INFO
                     </div>
-                    {this.isTxFlow() && <div className="xlog-flow-btn" onClick={this.click}>
-                        <div className="flow-btn"><i className="fa fa-sign-out"></i> TRY TX FLOW</div>
-                    </div>}
+                    <div className="flow-data">
+                        {contents.filter(d => d.show)
+                                 .filter(d => this.props.content[d.key] ? true : false)
+                            .map(d =>
+                                <div key={d.key}>
+                                    <span className="label">{d.dip}</span>
+                                    <span className={`data ${this.isTxFlow() ? d.key : ''}`} onClick={()=>this.click(d.key)}>{this.dataTodisplay(d,this.props.content[d.key])}</span>
+                                </div>
+                            )
+                        }
+                    </div>
+                    <div className="sub-title">
+                        FLOW TYPE - {this.getProfileType()}
+                    </div>
+                    <div key='text' className={`type ${this.getProfileType() === 'SQL' ? 'sql-statement formatter' :''}`}>
+                       {this.dataTodisplay({type : this.getProfileType(), unit : ''},this.props.content.name)}
+                    </div>
+
+
                 </div>
             </div>
         )
