@@ -549,7 +549,7 @@ class XlogFlow extends Component {
                     flowContent.show &&
                         <div className="frame-xlog-flow-content">
                             <div>
-                                <XlogFlowContent content={flowContent.data} close={this.closeContent} txBtnClick={this.props.doubleClick}/>
+                                <XlogFlowContent thisTxid={flow.parameter.txid} content={flowContent.data} close={this.closeContent} txBtnClick={this.props.doubleClick}/>
                             </div>
                         </div>
                 }

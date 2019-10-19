@@ -93,12 +93,13 @@ class XlogFlowContent extends Component {
         return ElementType.defaultProps.toString(type)
     }
     isTxFlow(){
-        const {type} = this.props.content;
+
+        const {type,txid} = this.props.content;
         switch (type) {
             case ElementType.defaultProps.SERVICE:
             case ElementType.defaultProps.DISPATCH:
             case ElementType.defaultProps.THREAD:
-                return true;
+                return this.props.thisTxid !== txid;
             default:
                 return false;
         }

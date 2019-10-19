@@ -19,15 +19,19 @@ class XlogFlowGraph extends Component {
     state = {
         g: null,
     };
+    constructor(props){
+        super(props);
+        this.properies ={
+            height: 500,
+            width: 400,
+            duration : 500 ,//ms,
+            margin: {
+                top: 15, right: 15, bottom: 25, left: 40
+            },
+        };
+    }
+    
 
-    defaultProps ={
-        height: 500,
-        width: 400,
-        duration : 500 ,//ms,
-        margin: {
-            top: 15, right: 15, bottom: 25, left: 40
-        },
-    };
     //
     //
     // constructor(props){
@@ -36,11 +40,11 @@ class XlogFlowGraph extends Component {
 
     componentWillReceiveProps(nextProps){
         if (nextProps.resize !== this.props.resize) {
-            this.defaultProps.height = nextProps.resize.height;
-            this.defaultProps.width = nextProps.resize.width;
-            this.init(this.getTreeData(nextProps.xlogflow))
+            this.properies.height = nextProps.resize.height;
+            this.properies.width = nextProps.resize.width;
+            this.init(this.getTreeData(nextProps.xlogflow));
         }else if (nextProps.xlogflow !== this.props.xlogflow) {
-           this.draw(this.getTreeData(nextProps.xlogflow));
+            this.init(this.getTreeData(nextProps.xlogflow));
         }
 
     }
@@ -114,7 +118,7 @@ class XlogFlowGraph extends Component {
     };
 
     init(data){
-        const {height,width} = this.defaultProps;
+        const {height,width} = this.properies;
         const {elapsed,tree} = data;
         this.treemap = d3.tree().size([height, width]);
         this.root    = d3.hierarchy(tree, d => d.children);
@@ -132,12 +136,12 @@ class XlogFlowGraph extends Component {
         this.topSlow=[];
         this.topChild=[];
         this.root.children.forEach((d)=>this.collapse(d));
-        this.draw(tree);
+        this.draw(this.root);
     }
     draw(source) {
         const that = this;
         // Assigns the x and y position for the nodes
-        let treeData = this.treemap(this.root);
+        let treeData = this.treemap(source);
         // Compute the new tree layout.
         let nodes = treeData.descendants(),
             links = treeData.descendants().slice(1);
@@ -239,7 +243,7 @@ class XlogFlowGraph extends Component {
         let nodeUpdate = nodeEnter.merge(node);
 
         nodeUpdate.transition()
-            .duration(this.defaultProps.duration)
+            .duration(this.properies.duration)
             .attr('transform', function(d) {
                 return 'translate(' + d.y + ',' + d.x + ')';
             });
@@ -258,7 +262,7 @@ class XlogFlowGraph extends Component {
 
         // Remove any exiting nodes
         let nodeExit = node.exit().transition()
-            .duration(this.defaultProps.duration)
+            .duration(this.properies.duration)
             .attr('transform', function(d) {
                 return 'translate(' + source.y + ',' + source.x + ')';
             })
@@ -288,11 +292,11 @@ class XlogFlowGraph extends Component {
 
         let linkUpdate = linkEnter.merge(link);
         linkUpdate.transition()
-            .duration(this.defaultProps.duration)
+            .duration(this.properies.duration)
             .attr('d', function(d){ return diagonal(d, d.parent) });
 //linkExit
         link.exit().transition()
-            .duration(this.defaultProps.duration)
+            .duration(this.properies.duration)
             .attr('d', function(d) {
                 var o = {x: source.x, y: source.y}
                 return diagonal(o, o)
