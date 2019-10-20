@@ -65,6 +65,18 @@
   margin-top: 10px;
   display: block !important;
 }
+.xlog-flow-content .contents .type > span {
+  display: inline-block;
+  padding: 4px;
+  background-color: #333;
+  color: #fff;
+  background-color: #eee;
+  color: #333;
+  border-radius: 2px;
+}
+.xlog-flow-content .contents .type .info {
+  margin-top: 10px;
+}
 .xlog-flow-content .contents .error {
   color: #f00;
   display: block !important;

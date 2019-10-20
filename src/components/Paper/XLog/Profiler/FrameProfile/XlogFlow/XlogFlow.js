@@ -299,7 +299,7 @@ class XlogFlow extends Component {
                     }
                 }).done(data=>{
                     const res = data.result[0];
-                    if(res) {
+                    if(res && res.text) {
                         relMainValue = res.text;
                     }
                 });

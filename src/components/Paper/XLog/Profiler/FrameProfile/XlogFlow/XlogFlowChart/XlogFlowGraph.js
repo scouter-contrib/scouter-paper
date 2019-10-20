@@ -141,7 +141,7 @@ class XlogFlowGraph extends Component {
     draw(source) {
         const that = this;
         // Assigns the x and y position for the nodes
-        let treeData = this.treemap(source);
+        let treeData = this.treemap(this.root);
         // Compute the new tree layout.
         let nodes = treeData.descendants(),
             links = treeData.descendants().slice(1);
@@ -329,11 +329,13 @@ class XlogFlowGraph extends Component {
             let dur = d.elapsed;
             // d.children.forEach((_d) => dur -= _d.elapsed);
             //
+            d._children = d.children;
             d.dur = d.elapsed;
             this.topSlow.push(dur);
             this.topChild.push(d.children.length);
             d.childrenLength = d.children.length;
-            d.children.forEach(_d=>this.collapse(_d))
+            d.children.forEach(_d=>this.collapse(_d));
+            // d.children = null
         }
     };
 

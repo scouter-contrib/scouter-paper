@@ -1,9 +1,9 @@
 import React,{Component} from "react";
 import {withRouter} from "react-router-dom";
 import {connect} from "react-redux";
+import SQLText from "./SQLText/SQLText"
 import "./XlogFlowContent.css"
 import {IdAbbr} from "../../../../../../../common/idAbbr";
-import sqlFormatter from "sql-formatter";
 // import moment from "moment";
 import ElementType from "../../../../../../../common/ElementType";
 import * as d3 from "d3";
@@ -146,9 +146,6 @@ class XlogFlowContent extends Component {
             case 'profile-category':
                 cov = ElementType.defaultProps.toString(value);
                 break;
-            case 'SQL':
-                cov = sqlFormatter.format(value,{indent : "  "});
-                break;
             default:
                 cov=value;
         }
@@ -178,14 +175,18 @@ class XlogFlowContent extends Component {
                         }
                     </div>
                     <div className="sub-title">
-                        FLOW TYPE - {this.getProfileType()}
+                        FLOW TYPE
                     </div>
-                    <div key='text' className='type'>
-                       {this.dataTodisplay({type : this.getProfileType(), unit : ''}, isSQL ? this.props.content.tags.sql : this.props.content.name)}
+                    <div className="type">
+                        <span>{this.getProfileType()}</span>
+                        {isSQL ? <SQLText meta={this.props.content.tags}/> : <div key="type" className="info">{this.props.content.name}</div>}
                     </div>
                     {
                         this.props.content.isError && <div className="type error">
+                            <span>ERROR</span>
+                            <div key="error" className="info">
                             {this.getError()}
+                            </div>
                         </div>
                     }
 
