@@ -110,7 +110,10 @@ class XlogFlowContent extends Component {
     getError(){
         let ret = '';
         const {endTime,error} = this.props.content;
-
+        const re = /^[0-9.]+$/;
+        if(!(error.match(re))){
+            return error;
+        }
         jQuery.ajax({
             method: "GET",
             async: false,
