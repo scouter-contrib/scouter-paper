@@ -89,7 +89,7 @@ class XlogFlowContent extends Component {
         if(target === 'txid') {
             const {txid, endTime} = this.props.content;
             const {thisTxid} = this.props;
-            if(thisTxid !== txid) {
+            if(thisTxid !== txid && this.isTxFlow()) {
                 this.props.txBtnClick({txid: txid, endTime: endTime});
             }
         }

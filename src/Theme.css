@@ -362,4 +362,9 @@ html.theme-gray, .theme-gray body {
 .theme-gray div.xlog-flow-content > div.contents > div.type > div.info{
     color : #333;
 }
-
+.theme-gray div.xlog-flow-content > div.contents > div.error > div.info{
+    color : red;
+}
+.theme-gray div.active-speed-content > div.row:hover{
+    color : #333;
+}
