@@ -88,7 +88,10 @@ class XlogFlowContent extends Component {
     click=(target)=>{
         if(target === 'txid') {
             const {txid, endTime} = this.props.content;
-            this.props.txBtnClick({txid: txid, endTime: endTime});
+            const {thisTxid} = this.props;
+            if(thisTxid !== txid) {
+                this.props.txBtnClick({txid: txid, endTime: endTime});
+            }
         }
     };
     getProfileType(){
@@ -98,11 +101,13 @@ class XlogFlowContent extends Component {
     isTxFlow(){
 
         const {type,txid} = this.props.content;
+        const {thisTxid} = this.props;
+
         switch (type) {
             case ElementType.defaultProps.SERVICE:
             case ElementType.defaultProps.DISPATCH:
             case ElementType.defaultProps.THREAD:
-                return this.props.thisTxid !== txid;
+                return thisTxid !== txid;
             default:
                 return false;
         }
