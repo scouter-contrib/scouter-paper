@@ -1,0 +1,27 @@
+{
+  "name": "0.0.0.0",
+  "parent": "null",
+  "children": [
+    {
+      "name": "/traceability/cross-service/complex<GET>",
+      "parent": "0.0.0.0",
+      "children": [
+        {
+          "name": "/traceability/cross-service/simple2<GET>",
+          "parent": "/traceability/cross-service/complex<GET>"
+        },
+        {
+          "name": "/traceability/cross-service/simple<GET>",
+          "parent": "/traceability/cross-service/complex<GET>"
+        },
+        {
+
+        }
+      ]
+    },
+    {
+      "name": "Level 2: B",
+      "parent": "Top Level"
+    }
+  ]
+}

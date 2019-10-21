@@ -118,7 +118,7 @@ export const profileMetas = [
         key: "hasDump",
         name: "Dump",
         type: "boolean",
-        show: false
+        show: true
     },
     {
         key: "internalId",
@@ -211,7 +211,7 @@ export const profileMetas = [
         key: "userAgent",
         name: "User Agent",
         type: "string",
-        show: false
+        show: true
     },
     {
         key: "xlogType",

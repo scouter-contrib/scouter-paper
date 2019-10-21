@@ -1,0 +1,22 @@
+.sql-text {
+  width: calc(100% - 12px);
+  height: calc(100% - 50px);
+  margin-top: 10px;
+}
+.sql-text::-webkit-scrollbar {
+  width: 7px;
+  height: 7px;
+}
+.sql-text .prefix {
+  color: #006400 !important;
+}
+.sql-text .sql-statement {
+  line-height: 140%;
+  color: #0000c3;
+  white-space: nowrap;
+  overflow-x: auto;
+  width: 100%;
+}
+.sql-text .formatter {
+  white-space: pre;
+}
