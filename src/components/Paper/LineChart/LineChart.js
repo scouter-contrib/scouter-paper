@@ -449,7 +449,7 @@ class LineChart extends Component {
         for(const obj of this.props.objects) {
             for (let counterKey in this.state.counters) {
                 let areaClass = "area-" + obj.objHash + "-" + this.replaceName(counterKey);
-                this.graph.svg.selectAll("path." + areaClass)
+                this.graph.line.selectAll("path." + areaClass)
                     .transition()
                     .delay(100)
                     .remove();
@@ -460,7 +460,7 @@ class LineChart extends Component {
         for(const obj of this.props.objects) {
             for (let counterKey in this.state.counters) {
                 let lineClass = "line-" + obj.objHash + "-" + this.replaceName(counterKey);
-                this.graph.svg.selectAll("path." + lineClass)
+                this.graph.line.selectAll("path." + lineClass)
                     .transition()
                     .delay(100)
                     .remove();
@@ -471,7 +471,7 @@ class LineChart extends Component {
 
     removeObjectLine = (obj, counterKey) => {
         let pathClass = "line-" + obj.objHash + "-" + this.replaceName(counterKey);
-        let path = this.graph.svg.selectAll("path." + pathClass);
+        let path = this.graph.line.selectAll("path." + pathClass);
 
         // 데이터 삭제
         let counters = Object.assign({}, this.state.counters);
@@ -502,7 +502,7 @@ class LineChart extends Component {
 
     removeObjectLineOnly = (obj, counterKey) => {
         let pathClass = "line-" + obj.objHash + "-" + this.replaceName(counterKey);
-        let path = this.graph.svg.selectAll("path." + pathClass);
+        let path = this.graph.line.selectAll("path." + pathClass);
 
         // 라인 그래프 삭제
         if (path && path.size() > 0) {
@@ -630,11 +630,11 @@ class LineChart extends Component {
         if (this.props.box.values['chartType'] === "LINE FILL") {
 
             let areaClass = "area-" + obj.objHash + "-" + this.replaceName(counterKey);
-            let area = this.graph.svg.selectAll("path." + areaClass)
+            let area = this.graph.line.selectAll("path." + areaClass)
 
 
             if (area.size() < 1) {
-                area = this.graph.svg.insert("path", ":first-child").attr("class", areaClass).style("stroke", color);
+                area = this.graph.line.insert("path", ":first-child").attr("class", areaClass).style("stroke", color);
             }
 
             let valueArea = d3.area().curve(d3[this.props.config.graph.curve])
@@ -680,10 +680,10 @@ class LineChart extends Component {
 
 
         let pathClass = "line-" + obj.objHash + "-" + this.replaceName(counterKey);
-        let path = this.graph.svg.selectAll("path." + pathClass);
+        let path = this.graph.line.selectAll("path." + pathClass);
 
         if (path.size() < 1) {
-            path = this.graph.svg.insert("path", ":first-child").attr("class", pathClass).style("stroke", color);
+            path = this.graph.line.insert("path", ":first-child").attr("class", pathClass).style("stroke", color);
             if (this.props.config.graph.color === "instance") {
                 if (this.props.config.colorType === "white") {
                     this.props.setTitle(counterKey, option.title, "#333", option.familyName);
@@ -840,7 +840,14 @@ class LineChart extends Component {
             this.graph.focus.select("line.focus-line").remove();
         }
     };
+    zoomBrush = () =>{
+        const extent=d3.event.selection;
+        if(extent) {
+            // console.log(this.graph.x.invert(extent[0]), this.graph.x.invert(extent[1]));
+            this.graph.svg.select(".brush").call(this.brush.move, null);
+        }
 
+    };
 
 
     graphResize = () => {
@@ -937,17 +944,17 @@ class LineChart extends Component {
 
         this.graph.area = this.graph.svg.append("g")
             .attr("class", "stack-area")
-            .attr("clip-path",`url(#area-clip${this.props.box.key})`)
-            .append("g");
+            .attr("clip-path",`url(#area-clip${this.props.box.key})`);
+
+        this.graph.line = this.graph.svg.append("g")
+            .attr("class", "line-plot")
+            .attr("clip-path",`url(#area-clip${this.props.box.key})`);
 
 
 
-        this.graph.overlay = this.graph.svg.append("rect").attr("class", "tooltip-overlay").attr("width", this.graph.width).attr("height", this.graph.height);
+        this.graph.overlay = this.graph.svg.append("g").append("rect").attr("class", "tooltip-overlay").attr("width", this.graph.width).attr("height", this.graph.height);
 
-
-
-
-        this.graph.overlay.on("mouseover", function () {
+        this.graph.svg.on("mouseover", function () {
             let layer = that.refs.lineChartRoot.parentNode.parentNode.parentNode.parentNode.parentNode;
             layer.style.zIndex = 9;
 
@@ -984,7 +991,7 @@ class LineChart extends Component {
 
             //that.props.showTooltip();
         });
-        this.graph.overlay.on("mouseout",() =>{
+        this.graph.svg.on("mouseout",() =>{
 
                 let layer = this.refs.lineChartRoot.parentNode.parentNode.parentNode.parentNode.parentNode;
                 layer.style.zIndex = 5;
@@ -1005,7 +1012,7 @@ class LineChart extends Component {
             return d.time;
         }).left;
 
-        this.graph.overlay.on("dblclick",()=>{
+        this.graph.svg.on("dblclick",()=>{
             if(!this.props.timeFocus.keep){
                 //toggle
                 //tooltip hidel
@@ -1021,7 +1028,7 @@ class LineChart extends Component {
                 );
         });
 
-        this.graph.overlay.on("mousemove", function () {
+        this.graph.svg.on("mousemove", function () {
 
 
 
@@ -1030,7 +1037,6 @@ class LineChart extends Component {
 
             let xPos = d3.mouse(this)[0];
             let yPos = d3.mouse(this)[1];
-
             if (navigator.userAgent.toLowerCase().indexOf('firefox') > -1) {
                 let box = that.refs.lineChart.parentNode.parentNode.parentNode.parentNode.parentNode.parentNode;
                 if (window.getComputedStyle) {
@@ -1102,6 +1108,7 @@ class LineChart extends Component {
 
             if (tooltip && tooltip.lines) {
                 for (let i = 0; i < tooltip.lines.length; i++) {
+
                     if (!isNaN(tooltip.lines[i].value)) {
                         let circle = that.graph.focus.select("circle." + tooltip.lines[i].circleKey).style('display','block');
                         if (circle.size() > 0) {
@@ -1122,6 +1129,14 @@ class LineChart extends Component {
             that.props.showTooltip(xPos, yPos, that.graph.margin.left, that.graph.margin.top, tooltip);
 
         });
+
+
+        //-- brush
+        // Add the brush feature using the d3.brush function
+        this.brush = d3.brushX()
+            .extent([[0, 0], [this.graph.width, this.graph.height]])
+            .on("end", this.zoomBrush);
+        this.graph.svg.append("g").attr("class", "brush").call(this.brush);
 
         this.graphAxis(this.graph.width, this.graph.height, true);
 
