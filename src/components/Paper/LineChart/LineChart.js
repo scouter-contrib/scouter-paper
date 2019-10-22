@@ -7,8 +7,14 @@ import * as _ from "lodash";
 import ServerDate from "../../../common/ServerDate";
 import InstanceColor from "../../../common/InstanceColor";
 import numeral from "numeral";
-import {setTimeFocus} from "../../../actions";
-
+import {
+    setRangeDateHoursMinutes,
+    setRealTimeRangeStepValue,
+    setRealTimeValue,
+    setSearchCondition,
+    setTimeFocus
+} from "../../../actions";
+import moment from 'moment';
 
 class LineChart extends Component {
 
@@ -31,6 +37,7 @@ class LineChart extends Component {
         startTime: (new ServerDate()).getTime() - (1000 * 60 * 10),
         endTime: (new ServerDate()).getTime(),
         timeFormat: "%H:%M",
+        timeFormatSec: "%H:%M:%S",
         fullTimeFormat: "%Y-%m-%d %H:%M:%S",
         xAxisWidth: 70,
         yAxisHeight: 30,
@@ -135,7 +142,7 @@ class LineChart extends Component {
             this.lastCountersTime = nextProps.time;
 
             let endTime = nextProps.time;
-            let startTime = nextProps.time - (1000 * 60 * 10);
+            let startTime = nextProps.time - (1000 * 60 * 10); //- realtime
 
             for (let i = 0; i < nextProps.box.option.length; i++) {
                 let counterKey = nextProps.box.option[i].counterKey;
@@ -375,7 +382,17 @@ class LineChart extends Component {
     leftAxisFormat = (d) => {
         return numeral(d).format('0.0a');
     };
-
+    setAnimation(svg){
+        const {realTime} = this.props.range;
+        return realTime ? svg : svg.transition().duration(500);
+    }
+    getTimeFormat(){
+        if( this.state.endTime-this.state.startTime < (60000 * 5)){
+            return this.graph.timeFormatSec;
+        } else{
+            return this.graph.timeFormat;
+        }
+    }
     graphAxis = (width, height, init) => {
         this.graph.x = d3.scaleTime().range([0, width]);
         this.graph.y = d3.scaleLinear().range([height, 0]);
@@ -398,8 +415,10 @@ class LineChart extends Component {
             this.graph.svg.insert("g", ":first-child").attr("class", "axis-y").call(d3.axisLeft(this.graph.y).tickFormat(this.leftAxisFormat).ticks(yAxisCount));
             this.graph.svg.insert("g", ":first-child").attr("class", "grid-y").style("stroke-dasharray", "5 5").style("opacity", this.graph.opacity).call(d3.axisLeft(this.graph.y).tickSize(-this.graph.width).tickFormat("").ticks(yAxisCount));
         } else {
-            this.graph.svg.select(".axis-x").call(d3.axisBottom(this.graph.x).tickFormat(d3.timeFormat(this.graph.timeFormat)).ticks(xAxisCount));
-            this.graph.svg.select(".grid-x").call(d3.axisBottom(this.graph.x).tickSize(-this.graph.height).tickFormat("").ticks(xAxisCount));
+            this.setAnimation(this.graph.svg.select(".axis-x"))
+                .call(d3.axisBottom(this.graph.x).tickFormat(d3.timeFormat(this.getTimeFormat())).ticks(xAxisCount));
+            this.setAnimation(this.graph.svg.select(".grid-x"))
+                .call(d3.axisBottom(this.graph.x).tickSize(-this.graph.height).tickFormat("").ticks(xAxisCount));
         }
 
         if (init) {
@@ -519,7 +538,7 @@ class LineChart extends Component {
 
     };
 
-    drawGroupObjectLine=(thisOption,counterKey) => {
+    drawStackArea=(thisOption,counterKey) => {
 
         let instanceMetricCount = {};
         const color = {};
@@ -730,10 +749,11 @@ class LineChart extends Component {
         });
 
         if (!this.props.filterMap[obj.objHash]) {
-            path.data([that.state.counters[counterKey]]).attr("d", valueLine).style("stroke-width", this.props.config.graph.width).style("opacity", 0);
+            this.setAnimation(path.data([that.state.counters[counterKey]])).attr("d", valueLine).style("stroke-width", this.props.config.graph.width).style("opacity", 0);
         } else {
-            path.data([that.state.counters[counterKey]]).attr("d", valueLine).style("stroke-width", this.props.config.graph.width).style("opacity", this.props.config.graph.opacity);
+            this.setAnimation(path.data([that.state.counters[counterKey]])).attr("d", valueLine).style("stroke-width", this.props.config.graph.width).style("opacity", this.props.config.graph.opacity);
         }
+
     };
 
     drawTimer = null;
@@ -759,7 +779,7 @@ class LineChart extends Component {
                                 this.removeObjectLine(this.props.objects[i], counterKey);
                             }
                         } else if(this.chartType ==='STACK AREA') {
-                           this.drawGroupObjectLine(thisOption,counterKey);
+                           this.drawStackArea(thisOption,counterKey);
                         } else {
                             for (let i = 0; i < this.props.objects.length; i++) {
                                 const obj = that.props.objects[i];
@@ -794,8 +814,9 @@ class LineChart extends Component {
 
 
     drawTimeFocus=(isFixed=false)=>{
+
         if( isFixed && !this.state.noData){
-            if( Object.keys(this.state.counters).map(k => this.state.counters[k][0].time).filter( t => this.props.timeFocus.time > t ).length ) {
+            if( Object.keys(this.state.counters).map(k => this.state.counters[k][0] ? this.state.counters[k][0].time : null).filter( t => this.props.timeFocus.time > t ).length ) {
                 let hoverLine = this.graph.focus.selectAll("line.focus-line");
                 hoverLine.attr("x1", (d) => this.graph.x(d))
                     .attr("x2", (d) => this.graph.x(d));
@@ -842,9 +863,41 @@ class LineChart extends Component {
     };
     zoomBrush = () =>{
         const extent=d3.event.selection;
+        const {realTime} = this.props.range;
         if(extent) {
-            // console.log(this.graph.x.invert(extent[0]), this.graph.x.invert(extent[1]));
             this.graph.svg.select(".brush").call(this.brush.move, null);
+            const endTime = this.graph.x.invert(extent[1]);
+            const startTime = this.graph.x.invert(extent[0]);
+            if(realTime) {
+                //- 조회
+                const startDate= moment(startTime);
+                this.props.setRealTimeRangeStepValue(false, this.props.range.longTerm,
+                    this.props.range.value,
+                    this.props.config.range.shortHistoryRange, this.props.config.range.shortHistoryStep);
+                this.props.setRangeDateHoursMinutes(startDate, startDate.hours(), startDate.minutes());
+                this.props.setSearchCondition(startTime.valueOf(), endTime.valueOf(), new Date().getTime());
+
+            }else{
+                //- 확대
+                this.setState({
+                    startTime : startTime.getTime(),
+                    endTime : endTime.getTime()
+                });
+            }
+        }else{
+            const {time,countersHistoryTo,countersHistoryFrom} = this.props;
+            if(realTime){
+                this.setState({
+                    startTime : time - (1000*60*10),
+                    endTime : time
+                });
+            }else{
+                this.setState({
+                    startTime : countersHistoryFrom,
+                    endTime : countersHistoryTo
+                });
+            }
+
         }
 
     };
@@ -1012,19 +1065,22 @@ class LineChart extends Component {
             return d.time;
         }).left;
 
-        this.graph.svg.on("dblclick",()=>{
-            if(!this.props.timeFocus.keep){
-                //toggle
-                //tooltip hidel
-                that.graph.focus.select("line.x-hover-line").style("display","none");
-                that.graph.focus.selectAll("circle").style("display","none");
-                that.props.hideTooltip();
-            }
-            this.props.setTimeFocus(
-                    this.props.timeFocus.active,
-                    this.props.timeFocus.time,
-                    this.props.timeFocus.id,
-                    !this.props.timeFocus.keep
+        this.graph.svg.on("contextmenu",()=>{
+                // console.log(d3.event.which);
+                d3.event.preventDefault();
+                // e.preventDefault();
+                if(!this.props.timeFocus.keep){
+                    //toggle
+                    //tooltip hidel
+                    that.graph.focus.select("line.x-hover-line").style("display","none");
+                    that.graph.focus.selectAll("circle").style("display","none");
+                    that.props.hideTooltip();
+                }
+                this.props.setTimeFocus(
+                        this.props.timeFocus.active,
+                        this.props.timeFocus.time,
+                        this.props.timeFocus.id,
+                        !this.props.timeFocus.keep
                 );
         });
 
@@ -1184,13 +1240,18 @@ let mapStateToProps = (state) => {
         objects: state.target.objects,
         config: state.config,
         filterMap: state.target.filterMap,
-        timeFocus: state.timeFocus
+        timeFocus: state.timeFocus,
+        range: state.range,
     };
 };
 
 let mapDispatchToProps = (dispatch) => {
     return {
-        setTimeFocus: (active, time, boxKey,keep) => dispatch(setTimeFocus(active, time, boxKey,keep))
+        setTimeFocus: (active, time, boxKey,keep) => dispatch(setTimeFocus(active, time, boxKey,keep)),
+        setRealTimeValue: (realTime, longTerm, value) => dispatch(setRealTimeValue(realTime, longTerm, value)),
+        setRangeDateHoursMinutes: (date, hours, minutes) => dispatch(setRangeDateHoursMinutes(date, hours, minutes)),
+        setRealTimeRangeStepValue: (realTime, longTerm, value, range, step) => dispatch(setRealTimeRangeStepValue(realTime, longTerm, value, range, step)),
+        setSearchCondition: (from, to, time) => dispatch(setSearchCondition(from, to, time)),
     };
 };
 
