@@ -415,10 +415,10 @@ class XLog extends Component {
         }).ticks(yAxisCount));
 
         // X축 단위 그리드 그리기
-        svg.append("g").attr("class", "grid-x").style("stroke-dasharray", "5 5").style("opacity", this.graph.opacity).attr("transform", "translate(0," + this.graph.height + ")").call(d3.axisBottom(this.graph.x).tickSize(-this.graph.height).tickFormat("").ticks(xAxisCount));
+        svg.append("g").attr("class", "grid-x").style("stroke-dasharray", "5 2").style("opacity", this.graph.opacity).attr("transform", "translate(0," + this.graph.height + ")").call(d3.axisBottom(this.graph.x).tickSize(-this.graph.height).tickFormat("").ticks(xAxisCount));
 
         // Y축 단위 그리드 그리기
-        svg.append("g").attr("class", "grid-y").style("stroke-dasharray", "5 5").style("opacity", this.graph.opacity).call(d3.axisLeft(this.graph.y).tickSize(-this.graph.width).tickFormat("").ticks(yAxisCount));
+        svg.append("g").attr("class", "grid-y").style("stroke-dasharray", "5 2").style("opacity", this.graph.opacity).call(d3.axisLeft(this.graph.y).tickSize(-this.graph.width).tickFormat("").ticks(yAxisCount));
 
 
         this.graph.focus = svg.append("g").attr("class", "tooltip-focus");
