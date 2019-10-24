@@ -54,20 +54,21 @@ class LineChart extends Component {
 
     }
     resize(){
-        console.log('resize....');
-        let box = this.refs.lineChart.parentNode.parentNode.parentNode.parentNode;
-        this.graph.width = box.offsetWidth - this.graph.margin.left - this.graph.margin.right;
-        this.graph.height = box.offsetHeight - this.graph.margin.top - this.graph.margin.bottom - 27;
-        this.setState({
-            options : {...this.graph, type : this.chartType}
-        });
+
+        if(this.refs) {
+            let box = this.refs.lineChart.parentNode.parentNode.parentNode.parentNode;
+            this.graph.width = box.offsetWidth - this.graph.margin.left - this.graph.margin.right;
+            this.graph.height = box.offsetHeight - this.graph.margin.top - this.graph.margin.bottom - 27;
+            this.setState({
+                options: {...this.graph, type: this.chartType}
+            });
+        }
     }
 
     componentWillUnmount() {
-        window.removeEventListener("resize", this.resize);
+
     };
     componentDidMount() {
-        window.addEventListener("resize", this.resize);
         if (this.props.config.colorType === "white") {
             this.graph.opacity = 0.3;
         } else {
@@ -203,7 +204,8 @@ class LineChart extends Component {
                 startTime: startTime,
                 endTime: endTime,
                 counters: counters,
-                noData: noData
+                noData: noData,
+                options : {...this.graph,type : this.chartType}
             });
 
         }
@@ -333,16 +335,50 @@ class LineChart extends Component {
     };
 
     axisUp = () => {
-
+        this.graph.maxY = this.graph.maxY * 1.2;
+        this.setState({
+            options: {...this.graph}
+        });
     };
 
     axisDown = () => {
-
+        this.graph.maxY = this.graph.maxY * 0.8;
+        if (this.graph.maxY < this.graph.autoMaxY) {
+            this.graph.maxY = this.graph.autoMaxY;
+        }
+        this.setState({
+           options: {...this.graph}
+        });
     };
 
     stopProgation = (e) => {
         e.stopPropagation();
     };
+    componentDidUpdate = (prevProps, prevState) => {
+
+        if(this.isChangedSize()){
+            this.resize();
+        }
+
+        // if (prevProps.layoutChangeTime !== this.props.layoutChangeTime) {
+        //   if(this.isChangedSize()){
+        //       this.resize();
+        //   }
+        // }else{
+        //     // this.graphResize();
+        //     // this.removeObjLine(prevProps.objects, this.props.objects);
+        //
+        // }
+    };
+
+    isChangedSize(){
+        const box = this.refs.lineChart.parentNode.parentNode.parentNode.parentNode;
+        if ((box.offsetWidth - this.graph.margin.left - this.graph.margin.right !== this.graph.width) || (this.graph.height !== box.offsetHeight - this.graph.margin.top - this.graph.margin.bottom - 27)) {
+            return true;
+        }
+        return false;
+
+    }
 
     render() {
         return (
@@ -355,7 +391,8 @@ class LineChart extends Component {
                                noData={this.state.noData}
                                options={this.state.options}
                                box = {this.props.box}
-                         >
+                               setTitle={this.props.setTitle}
+                         >\
                          </Line>
                     </svg>
                 </div>
