@@ -161,6 +161,7 @@ class XlogFlow extends Component {
 
     componentWillReceiveProps(nextProps){
         // console.log("componentWillReceiveProps");
+        window.removeEventListener("resize", this.resize);
     }
 
     resize = () =>{
