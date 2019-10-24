@@ -25,8 +25,8 @@ class LineChart extends Component {
         },
         svg: null,
         overlay: null,
-        width: null,
-        height: null,
+        width: 700,
+        height: 50,
         x: null,
         y: null,
         path: null,
@@ -49,17 +49,25 @@ class LineChart extends Component {
             counters: {},
             maxY: null,
             autoMaxY: null,
-            options: null
+            options: {...this.graph},
         }
 
     }
     resize(){
+        console.log('resize....');
         let box = this.refs.lineChart.parentNode.parentNode.parentNode.parentNode;
         this.graph.width = box.offsetWidth - this.graph.margin.left - this.graph.margin.right;
         this.graph.height = box.offsetHeight - this.graph.margin.top - this.graph.margin.bottom - 27;
-
+        this.setState({
+            options : {...this.graph, type : this.chartType}
+        });
     }
+
+    componentWillUnmount() {
+        window.removeEventListener("resize", this.resize);
+    };
     componentDidMount() {
+        window.addEventListener("resize", this.resize);
         if (this.props.config.colorType === "white") {
             this.graph.opacity = 0.3;
         } else {
@@ -69,9 +77,6 @@ class LineChart extends Component {
         this.graph.fullTimeFormat = this.props.config.dateFormat + " " + this.props.config.timeFormat;
         this.resize();
 
-        this.setState({
-            options : {...this.graph, type : this.chartType}
-        });
     }
 
     shouldComponentUpdate(nextProps, nextState) {
@@ -92,16 +97,16 @@ class LineChart extends Component {
         if( nextProps.box.values['chartType'] !== this.chartType){
             //- LINE FILL => LINE Change
             if( nextProps.box.values['chartType'] === 'LINE' && this.chartType === 'LINE FILL' ){
-                this.removeLineFill();
+                // this.removeLineFill();
             }
             //- LINE or LINE FILL => STACK;
             if( nextProps.box.values['chartType'] === 'STACK AREA' && ( this.chartType === 'LINE' || this.chartType === 'LINE FILL') ){
-                this.removeLineFill();
-                this.removeLine();
+                // this.removeLineFill();
+                // this.removeLine();
             }
             // STACK => LINE or LINE FILL
             if( (nextProps.box.values['chartType'] === 'LINE' || nextProps.box.values['chartType'] === 'LINE FILL' ) && ( this.chartType === 'STACK AREA') ){
-                this.removeStackFill();
+                // this.removeStackFill();
             }
         }
 
@@ -343,14 +348,16 @@ class LineChart extends Component {
         return (
             <div className="line-chart-wrapper" ref="lineChartRoot">
                 <div className="line-chart" ref="lineChart">
-                    <Line  startTime={this.state.startTime}
-                           endTime={this.state.endTime}
-                           counters={this.state.counters}
-                           noData={this.state.noData}
-                           options={this.state.options}
-                           box = {this.props.box}
-                    >
-                    </Line>
+                    <svg width={this.state.options.width + this.graph.margin.left+this.graph.margin.right} height={this.state.options.height+this.graph.margin.top+this.graph.margin.bottom} >
+                        <Line  startTime={this.state.startTime}
+                               endTime={this.state.endTime}
+                               counters={this.state.counters}
+                               noData={this.state.noData}
+                               options={this.state.options}
+                               box = {this.props.box}
+                         >
+                         </Line>
+                    </svg>
                 </div>
                 <div className="axis-button axis-up noselect" onClick={this.axisUp} onMouseDown={this.stopProgation}><i className="fa fa-angle-up" aria-hidden="true"></i></div>
                 <div className="axis-button axis-down noselect" onClick={this.axisDown} onMouseDown={this.stopProgation}><i className="fa fa-angle-down" aria-hidden="true"></i></div>
