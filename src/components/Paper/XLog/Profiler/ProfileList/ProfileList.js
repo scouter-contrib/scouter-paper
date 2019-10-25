@@ -159,23 +159,24 @@ const xlogTypes = {
 };
 
 class ProfileList extends Component {
-
+    state = {
+        layoutOrder: layout.map(d=>({...d, order:"no"}))
+    };
     dateFormat = null;
     fullTimeFormat = null;
 
-    componentDidMount() {
+    componentDidMount() {        
         this.dateFormat = this.props.config.dateFormat;
         this.fullTimeFormat = this.props.config.dateFormat + " " + this.props.config.timeFormat;
     }
 
     sortTemp = null;
-    // data sorting
     onSort(event, type, sortKey) {
 
         const data = this.props.xlogs;
-
+        const { layoutOrder } = this.state;
         if (type === "number" || type === "ms" || type === "kbytes") {
-
+        
             if (this.sortTemp !== sortKey) {
                 data.sort((a, b) => a[sortKey].localeCompare(b[sortKey], 'en-US', { numeric: true, sensitivity: 'base' }));
                 this.sortTemp = sortKey;
@@ -185,17 +186,21 @@ class ProfileList extends Component {
             }
 
         }else{
-
+            
             if (this.sortTemp !== sortKey) {
                 data.sort((a, b) => a[sortKey].localeCompare(b[sortKey]));
                 this.sortTemp = sortKey;
-            }else{
+            }else{  
                 data.sort((a, b) => b[sortKey].localeCompare(a[sortKey]));
                 this.sortTemp = null;
             }
-        }
-
-        this.setState({data});
+        }        
+        const isDesc = this.sortTemp !== sortKey;
+        this.setState({data, layoutOrder: layoutOrder.map(
+            d => d.key === sortKey
+            ? { ...d, order: isDesc ? "asc" : "desc"}
+            : { ...d, order: "no"}
+        )});
     }
 
     getRow = (row, i) => {
@@ -219,8 +224,14 @@ class ProfileList extends Component {
     };
 
     getHeader = () => {
-        return layout.map((meta, j) => {
-            return <span key={j} onClick={e => this.onSort(e, meta.type, meta.key)}>{meta.name}</span>
+        const { layoutOrder } = this.state;
+        return layout.map((meta, key) => {
+            const [column] = layoutOrder.filter(d => d.key === meta.key);            
+            if (column.order === "asc") 
+                return <span key={key} onClick={e => this.onSort(e, meta.type, meta.key)}><span>{meta.name}</span><i className="fa fa-sort-up" style={{color:"#a0a0a0"}}></i></span>
+            if (column.order === "desc") 
+                return <span key={key} onClick={e => this.onSort(e, meta.type, meta.key)}><span>{meta.name}</span><i className="fa fa-sort-desc" style={{color:"#a0a0a0"}}></i></span>
+            return <span key={key} onClick={e => this.onSort(e, meta.type, meta.key)}><span>{meta.name}</span><i className="fa fa-sort" style={{color:"#a0a0a0"}}></i></span>
         });
     };
 
@@ -233,12 +244,21 @@ class ProfileList extends Component {
                     let rowClass = (xlog.error ? 'error' : '');
                     const xtype = xlogTypes[xlog.xlogType];
                     rowClass += xtype && xtype >= 2 && xtype <= 4 ? ' async' : '';
-
                     return <div onClick={this.props.rowClick.bind(this, xlog, null)} key={i} className={"row " + rowClass + ' ' + (this.props.txid === xlog.txid ? 'active' : '')}>{this.getRow(xlog, i)}</div>;
                 })}
             </div>
 
         );
+    }
+    componentWillReceiveProps(nextProps) {                    
+        if(nextProps.xlogs !== this.props.xlogs){
+            const { layoutOrder } = this.state;            
+            this.setState({
+                layoutOrder: layoutOrder.map(
+                    d => ({...d, order:"no"})
+                )
+            });
+        }
     }
 }
 
