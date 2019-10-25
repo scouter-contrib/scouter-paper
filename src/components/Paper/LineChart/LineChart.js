@@ -95,21 +95,6 @@ class LineChart extends Component {
         let counters = Object.assign({}, this.state.counters);
 
 
-        if( nextProps.box.values['chartType'] !== this.chartType){
-            //- LINE FILL => LINE Change
-            if( nextProps.box.values['chartType'] === 'LINE' && this.chartType === 'LINE FILL' ){
-                // this.removeLineFill();
-            }
-            //- LINE or LINE FILL => STACK;
-            if( nextProps.box.values['chartType'] === 'STACK AREA' && ( this.chartType === 'LINE' || this.chartType === 'LINE FILL') ){
-                // this.removeLineFill();
-                // this.removeLine();
-            }
-            // STACK => LINE or LINE FILL
-            if( (nextProps.box.values['chartType'] === 'LINE' || nextProps.box.values['chartType'] === 'LINE FILL' ) && ( this.chartType === 'STACK AREA') ){
-                // this.removeStackFill();
-            }
-        }
 
         if (nextProps.countersHistory && this.lastCountersHistoryTime !== nextProps.countersHistoryTimestamp) {
 
@@ -120,12 +105,12 @@ class LineChart extends Component {
 
                     counters = this.loadHistoryCounter(nextProps.countersHistory, counterKey, nextProps.longTerm);
                     this.setState({
-                        counters: counters
+                        counters: counters,
                     });
                 } else {
                     counters[counterKey] = [];
                     this.setState({
-                        counters: counters
+                        counters: counters,
                     });
                 }
             }
@@ -144,7 +129,9 @@ class LineChart extends Component {
 
             this.setState({
                 startTime: startTime,
-                endTime: endTime
+                endTime: endTime,
+                search : true,
+                options : {...this.graph,type : this.chartType},
             });
         }
 
@@ -199,21 +186,67 @@ class LineChart extends Component {
                     noData = false;
                 }
             }
-
+            //- object remove , couter remove
+            const removeCounter = this.removeCounter(this.props.box.option,counters);
+            removeCounter.forEach(d=> delete counters[d.counter]);
             this.setState({
                 startTime: startTime,
                 endTime: endTime,
-                counters: counters,
+                counters: noData ? [] : counters,
+                removeCounter : removeCounter,
+                removeObject  : this.removeObject(nextProps.objects,this.props.objects),
                 noData: noData,
-                options : {...this.graph,type : this.chartType}
+                options : {...this.graph,type : nextProps.box.values['chartType']},
+                search : false
             });
 
         }
-        //- 이전 툴팁이 고정 되었으면 자동 해지 할수 있도록 이벤트 체크
-        this.chartType = nextProps.box.values['chartType'];
-        if(!this.props.timeFocus.keep) {
-            // this.drawTimeFocus();
+    }
+    removeObject(prevList, currentList){
+        const ret = [];
+        let currentInstanceMap = {};
+        if (currentList && currentList.length > 0) {
+            for (let i = 0; i < currentList.length; i++) {
+                currentInstanceMap[currentList[i].objHash] = true;
+            }
         }
+
+        if (prevList && prevList.length > 0) {
+            for (let i = 0; i < prevList.length; i++) {
+                if (!currentInstanceMap[prevList[i].objHash]) {
+
+                    for (let counterKey in this.state.counters) {
+
+                        let thisOption = null;
+                        for (let j = 0; j < this.props.box.option.length; j++) {
+                            if (this.props.box.option[j].counterKey === counterKey) {
+                                thisOption = this.props.box.option[j];
+                                break;
+                            }
+                        }
+
+                        if (thisOption) {
+                            ret.push( { key : prevList[i].objHash , counter : counterKey});
+                        }
+                    }
+                }
+            }
+        }
+        return ret;
+    }
+    removeCounter(boxOption,counters){
+        const ret = [];
+        for(const counterKey in counters) {
+            let thisOption = boxOption.filter((d) => {
+                return d.counterKey === counterKey
+            })[0];
+            if(!thisOption){
+                ret.push(this.props.objects.map( d => {
+                    return {key : d.objHash , counter : counterKey}
+                }));
+            }
+        }
+        return ret.flatMap(d=>d);
     }
 
     loadHistoryCounter(countersHistory, counterKey, longTerm) {
@@ -323,6 +356,7 @@ class LineChart extends Component {
 
         this.graph.autoMaxY = maxY;
 
+
         if (!this.graph.maxY) {
             this.graph.maxY = maxY * 1.2;
         }
@@ -366,7 +400,7 @@ class LineChart extends Component {
         //   }
         // }else{
         //     // this.graphResize();
-        //     // this.removeObjLine(prevProps.objects, this.props.objects);
+        //  //      this.removeObjLine(prevProps.objects, this.props.objects);
         //
         // }
     };
@@ -390,9 +424,15 @@ class LineChart extends Component {
                                counters={this.state.counters}
                                noData={this.state.noData}
                                options={this.state.options}
+                               removeCounter={this.state.removeCounter}
+                               removeObject={this.state.removeObject}
                                box = {this.props.box}
                                setTitle={this.props.setTitle}
-                         >\
+                               removeTitle={this.props.removeTitle}
+                               search={this.state.search}
+                               hideTooltip={this.props.hideTooltip}
+                               showTooltip={this.props.showTooltip}
+                        >
                          </Line>
                     </svg>
                 </div>
@@ -414,8 +454,6 @@ let mapStateToProps = (state) => {
     return {
         objects: state.target.objects,
         config: state.config,
-        filterMap: state.target.filterMap,
-        timeFocus: state.timeFocus,
         range: state.range,
     };
 };

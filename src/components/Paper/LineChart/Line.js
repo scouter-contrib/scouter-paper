@@ -9,6 +9,7 @@ import {
 import connect from "react-redux/es/connect/connect";
 import {withRouter} from "react-router-dom";
 import * as d3 from "d3";
+import * as _ from "lodash";
 import numeral from "numeral";
 import InstanceColor from "../../../common/InstanceColor";
 
@@ -27,50 +28,124 @@ class Line extends Component {
         if(!this.isInit){
             return;
         }
+
+        if(nextProps.search !== this.props.search){
+            switch(this.props.options.type){
+                case "LINE FILL":
+                case "LINE":
+                    this.removePathLine(true);
+                    break;
+                case "STACK AREA":
+                    this.removePathLine(false);
+                    break;
+            }
+        }
+
+        const {type} = nextProps.options;
+        const thisType  = this.props.options.type;
+
+        if( type !== thisType){
+            switch(type){
+                case "LINE FILL":
+                case "LINE":
+                    this.removePathLine(true);
+                    break;
+                case "STACK AREA":
+                    this.removePathLine(false);
+                    break;
+            }
+        }
+
         if( nextProps.options !== this.props.options){
             this.changedOption(nextProps.options,nextProps);
         }
         this.paint(nextProps);
     };
+    removePathLine(isStack){
+        if(!isStack) {
+            for (const obj of this.props.objects) {
+
+                for (let counterKey in this.props.counters) {
+                    let areaClass = "area-" + obj.objHash + "-" + this.replaceName(counterKey);
+                    let lineClass = "line-" + obj.objHash + "-" + this.replaceName(counterKey);
+                    this.line.selectAll("path." + areaClass)
+                        .transition()
+                        .delay(100)
+                        .remove();
+                    this.line.selectAll("path." + lineClass)
+                        .transition()
+                        .delay(100)
+                        .remove();
+                }
+            }
+        }else{
+            this.stackArea.selectAll('path.line')
+                    .transition()
+                    .delay(100)
+                    .remove();
+        }
+    }
     paint (data){
 
-
+        this.clearLine();
         if (data.objects) {
             let instanceMetricCount = {};
             for (let counterKey in data.counters) {
                 let thisOption = data.box.option.filter((d) => {return d.counterKey === counterKey})[0];
-                if (!thisOption) {
-                    for (let i = 0; i < data.objects.length; i++) {
-                        this.removeCounterLine(data.objects[i], counterKey);
-                    }
-                } else if(data.options.type ==='STACK AREA') {
-                    // this.drawStackLine(thisOption,counterKey);
-                } else {
-                    for (let i = 0; i < data.objects.length; i++) {
-                        const obj = data.objects[i];
-
-                        if (obj.objFamily === thisOption.familyName) {
-                            if (!instanceMetricCount[obj.objHash]) {
-                                instanceMetricCount[obj.objHash] = 0;
+                if(thisOption){
+                    switch(data.options.type){
+                        case 'STACK AREA':
+                            this.drawStackArea(thisOption,counterKey,data);
+                            break;
+                        default :
+                            //- LINE,LINEFILL
+                            for (let i = 0; i < data.objects.length; i++) {
+                                const obj = data.objects[i];
+                                if (obj.objFamily === thisOption.familyName) {
+                                    if (!instanceMetricCount[obj.objHash]) {
+                                        instanceMetricCount[obj.objHash] = 0;
+                                    }
+                                    let color;
+                                    if (data.config.graph.color === "metric") {
+                                        color = InstanceColor.getMetricColor(thisOption.counterKey, data.config.colorType);
+                                    } else {
+                                        color = InstanceColor.getInstanceColors(data.config.colorType)[obj.objHash][(instanceMetricCount[obj.objHash]++) % 5];
+                                    }
+                                    this.drawLine(obj, thisOption, counterKey, color,data);
+                                }
                             }
-                            let color;
-                            if (data.config.graph.color === "metric") {
-                                color = InstanceColor.getMetricColor(thisOption.counterKey, data.config.colorType);
-                            } else {
-                                color = InstanceColor.getInstanceColors(data.config.colorType)[obj.objHash][(instanceMetricCount[obj.objHash]++) % 5];
-                            }
-                            this.drawLine(obj, thisOption, counterKey, color,data);
-                        }
-                    }
 
+
+
+                    }
                 }
             }
         }
+        this.moveTooltip();
+        this.drawTimeFocus(data.timeFocus.keep,data);
+
     };
+
+    moveTooltip = () => {
+        if (this.currentTooltipTime) {
+            let xPosition = this.xScale(this.currentTooltipTime);
+            this.focus.selectAll("circle").attr("cx", xPosition);
+
+            let hoverLine = this.focus.select("line.x-hover-line");
+            hoverLine.attr("x1", xPosition);
+            hoverLine.attr("x2", xPosition);
+        }
+    };
+
+    clearLine(){
+        _.forEach(this.props.removeCounter,d=>this.removeCounterLine(d.key,d.counter));
+        _.forEach(this.props.removeObject, d=>this.removeCounterLine(d.key,d.counter));
+    }
 
     replaceAll(str, searchStr, replaceStr) {
         return str.split(searchStr).join(replaceStr);
     }
+
 
     replaceName (name) {
         if (name) {
@@ -78,8 +153,8 @@ class Line extends Component {
         }
         return name;
     }
-    removeCounterLine(obj, counterKey) {
-        let pathClass = "line-" + obj.objHash + "-" + this.replaceName(counterKey);
+    removeCounterLine(objHash, counterKey) {
+        let pathClass = "line-" + objHash + "-" + this.replaceName(counterKey);
         let path = this.line.selectAll("path." + pathClass);
 
         // 라인 그래프 삭제
@@ -88,7 +163,7 @@ class Line extends Component {
         }
 
         // 툴팁 그래프 삭제
-        let circleKey = "circle-" + obj.objHash + "_" + this.replaceName(counterKey);
+        let circleKey = "circle-" + objHash + "_" + this.replaceName(counterKey);
         let circle = this.focus.selectAll("circle." + circleKey);
 
         if (circle.size() > 0) {
@@ -98,17 +173,159 @@ class Line extends Component {
         this.props.removeTitle(counterKey);
     };
 
-    drawLine = (obj, option, counterKey, color,data) => {
-        if (this.props.box.values['chartType'] === "LINE FILL") {
+    drawTimeFocus=(isFixed=false,nextProps)=>{
 
-            let areaClass = "area-" + obj.objHash + "-" + this.replaceName(counterKey);
-            let area = this.line.selectAll("path." + areaClass)
+        if( isFixed && !this.props.noData){
+            if( Object.keys(this.props.counters).map(k => this.props.counters[k][0] ? this.props.counters[k][0].time : null).filter( t => this.props.timeFocus.time > t ).length ) {
+                let hoverLine = this.focus.selectAll("line.focus-line");
+                hoverLine.attr("x1", (d) => this.xScale(d))
+                         .attr("x2", (d) => this.xScale(d));
 
-
-            if (area.size() < 1) {
-                area = this.line.insert("path", ":first-child").attr("class", areaClass).style("stroke", color);
+                hoverLine.data([this.props.timeFocus.time])
+                    .enter()
+                    .append("line")
+                    .attr("class", "focus-line focus-hover-line")
+                    .attr("y1", 0)
+                    .attr("y2", nextProps.options.height)
+                    .attr("x1", (d) => {
+                        return this.xScale(d);
+                    })
+                    .attr("x2", (d) => this.xScale(d))
+                    .exit()
+                    .remove();
+            }else{
+                // 해제
+                this.props.setTimeFocus(false,null,null,false);
             }
 
+        }else if( !this.props.noData
+            && this.props.active
+            && this.props.timeFocus.id !== this.props.box.key) {
+            let hoverLine = this.focus.selectAll("line.focus-line");
+            hoverLine.attr("x1", (d) =>this.xScale(d))
+                .attr("x2", (d) =>this.xScale(d));
+
+            hoverLine.data([this.props.timeFocus.time])
+                .enter()
+                .append("line")
+                .attr("class", "focus-line focus-hover-line")
+                .attr("y1", 0)
+                .attr("y2", nextProps.options.height)
+                .attr("x1", (d) =>{
+                    return this.xScale(d);
+                })
+                .attr("x2", (d) =>this.xScale(d))
+                .exit()
+                .remove();
+        }else{
+            this.focus.select("line.focus-line").remove();
+        }
+    };
+    drawStackArea=(thisOption,counterKey,data) => {
+        let instanceMetricCount = {};
+        const color = {};
+        //- instance color making
+        for (const attr  in this.props.objects) {
+            const _obj = this.props.objects[attr];
+            if (_obj.objFamily === thisOption.familyName) {
+                if (!instanceMetricCount[_obj.objHash]) {
+                    instanceMetricCount[_obj.objHash] = 0;
+                }
+                if (this.props.config.graph.color === "metric") {
+                    const _cl = InstanceColor.getMetricColor(thisOption.counterKey, this.props.config.colorType);
+                    color[_obj.objHash] = _cl;
+                } else {
+                    const _cl = InstanceColor.getInstanceColors(this.props.config.colorType)[_obj.objHash][(instanceMetricCount[_obj.objHash]++) % 5];
+                    color[_obj.objHash] = _cl;
+                }
+            }
+        }
+        //- instance data flat data making
+        const stackData = _(data.counters[counterKey])
+            .map((d) => {
+                const _r = Object.keys(d.data).map(key => {
+                    const _keyValue = [];
+                    _keyValue['objHash'] = d.data[key].objHash;
+                    _keyValue['time']    = d.time;
+                    _keyValue['value']   = Number(d.data[key].value);
+                    _keyValue['color']   = color[d.data[key].objHash];
+                    return _keyValue;
+                });
+                return _r;
+            }).flatMapDepth().value();
+        //- 인스턴스 별 데이터로 변환
+        let ld = d3.nest().key(d => d.objHash).entries(stackData);
+        const _sort = [];
+
+        //- 인스턴스 순서 정렬
+        for (const attr  in this.props.objects) {
+            const _obj = this.props.objects[attr];
+            const _find = _.findIndex(ld, (o) =>  o.key === _obj.objHash);
+            if(_find > -1 ){
+                _sort.push(ld[_find]);
+            }
+
+        }
+        //- 인스턴스 그리기
+        const area = d3.area().curve(d3[this.props.config.graph.curve])
+            .x(d =>{
+                return this.xScale(d[0]);
+            })
+            .y0(d => this.yScale(d[2]))
+            .y1(d => this.yScale(d[1]));
+
+        if (this.props.config.graph.break === "Y") {
+            area.defined((d)=>{
+                return !isNaN(d[0]) && !isNaN(d[1]) && !isNaN(d[2]);
+            })
+        }
+
+        //- 시간 별 Y축 데이터 어그리게이션
+        let pre = {};
+        //- 차트 갱신
+        let paintGroup = this.stackArea.selectAll("path.line")
+            .data(_sort)
+            .attr("d",(d)=> {
+                const _d = _.map(d.values,(_node) =>{
+                    const _key = _node.time;
+                    const pre_v =  pre[_key] ? pre[_key] : 0;
+                    const next_v = pre_v + Number(_node.value);
+                    pre[_key] = next_v;
+                    return [_node.time,next_v,pre_v];
+                });
+                return area(_d);
+            });
+
+        //- 차트 생성
+        paintGroup.enter()
+            .append('path')
+            .attr("d",(d)=> {
+                const _d = _.map(d.values,(_node) =>{
+                    const _key = _node.time;
+                    const pre_v =  pre[_key] ? pre[_key] : 0;
+                    const next_v = pre_v + _node.value;
+                    pre[_key] = next_v;
+                    return [_node.time,next_v,pre_v];
+                });
+                return area(_d);
+            })
+            .attr('class',(d)=> `line ${d.key}` )
+            .attr('data-col-name', (d)=> d.key)
+            .style("fill", (d)=> {
+                return color[d.key];
+            })
+            .attr("fill-opacity", this.props.config.graph.fillOpacity)
+            .attr("stroke",(d) =>{
+                return color[d.key];
+            })
+            .style("stroke-width", this.props.config.graph.width)
+            .style("opacity", this.props.config.graph.opacity);
+
+        //- 차트 갱신 후 데이터 삭제
+        paintGroup.exit().remove();
+    };
+    drawLine = (obj, option, counterKey, color,data) => {
+        if (this.props.box.values['chartType'] === "LINE FILL") {
             let valueArea = d3.area().curve(d3[this.props.config.graph.curve])
                 .x((d) =>this.xScale(d.time))
                 .y0(data.options.height)
@@ -120,8 +337,6 @@ class Line extends Component {
                         return this.yScale(0);
                     }
                 });
-
-
             if (data.config.graph.break === "Y") {
                 valueArea.defined((d)=> {
                     let objData = d.data ? d.data[obj.objHash] : null;
@@ -129,54 +344,25 @@ class Line extends Component {
                 })
             }
 
+            let areaClass = "area-" + obj.objHash + "-" + this.replaceName(counterKey);
+            let area = this.line.selectAll("path." + areaClass)
+                                .data([data.counters[counterKey]])
+                                .attr("d",valueArea);
+            area= area.enter()
+                .insert('path')
+                .attr("class",areaClass)
+                .style("stroke", color)
+                .style("fill", color)
+                .style("opacity", !this.props.filterMap[obj.objHash] ? 0 : data.config.graph.fillOpacity);
 
-            if (!this.props.filterMap[obj.objHash]) {
-                area.data([data.counters[counterKey]])
-                    .attr("d", valueArea)
-                    .style("fill", color)
-                    .style("opacity", 0)
-                    .transition()
-                    .delay(100);
-            } else {
-                area.data([data.counters[counterKey]])
-                    .attr("d", valueArea)
-                    .style("fill", color)
-                    .style("opacity", data.config.graph.fillOpacity)
-                    .transition()
-                    .delay(100);
-            }
+            area.exit().remove();
+
+            area.transition()
+                .delay(100)
+
         }
 
-
-
-        let pathClass = `line-${obj.objHash}-${this.replaceName(counterKey)}`;
-        let path = this.line.selectAll("path." + pathClass);
-
-        if (path.size() < 1) {
-            path = this.line.insert("path", ":first-child").attr("class", pathClass).style("stroke", color);
-            if (this.props.config.graph.color === "instance") {
-                if (this.props.config.colorType === "white") {
-                    this.props.setTitle(counterKey, option.title, "#333", option.familyName);
-                } else {
-                    this.props.setTitle(counterKey, option.title, "white", option.familyName);
-                }
-            } else {
-                this.props.setTitle(counterKey, option.title, color, option.familyName);
-            }
-        } else {
-            path.style("stroke", color);
-            if (this.props.config.graph.color === "instance") {
-                if (this.props.config.colorType === "white") {
-                    this.props.setTitle(counterKey, option.title, "#333", option.familyName);
-                } else {
-                    this.props.setTitle(counterKey, option.title, "white", option.familyName);
-                }
-            } else {
-                this.props.setTitle(counterKey, option.title, color, option.familyName);
-            }
-        }
-
-        let valueLine = d3.line().curve(d3[this.props.config.graph.curve]);
+        const valueLine = d3.line().curve(d3[this.props.config.graph.curve]);
 
         if (this.props.config.graph.break === "Y") {
             valueLine.defined((d) => {
@@ -196,18 +382,40 @@ class Line extends Component {
             }
         });
 
-        if (!this.props.filterMap[obj.objHash]) {
-            this.setAnimation(path.data([data.counters[counterKey]])).attr("d", valueLine).style("stroke-width", this.props.config.graph.width).style("opacity", 0);
+        let pathClass = `line-${obj.objHash}-${this.replaceName(counterKey)}`;
+        let path = this.line.selectAll("path." + pathClass)
+                            .data([data.counters[counterKey]])
+                            .attr("d",valueLine);
+
+        path = path.enter()
+            .insert("path")
+            .attr("class",pathClass)
+            .style("stroke", color)
+            .style("stroke-width", this.props.config.graph.width)
+            .style("opacity", !this.props.filterMap[obj.objHash] ? 0 : this.props.config.graph.opacity);
+        this.setAnimation(path)
+
+        path.exit().remove();
+
+
+        if (this.props.config.graph.color === "instance") {
+            if (this.props.config.colorType === "white") {
+                this.props.setTitle(counterKey, option.title, "#333", option.familyName);
+            } else {
+                this.props.setTitle(counterKey, option.title, "white", option.familyName);
+            }
         } else {
-            this.setAnimation(path.data([data.counters[counterKey]])).attr("d", valueLine).style("stroke-width", this.props.config.graph.width).style("opacity", this.props.config.graph.opacity);
+            this.props.setTitle(counterKey, option.title, color, option.familyName);
         }
+
     };
     setAnimation(svg){
         const {realTime} = this.props.range;
         return realTime ? svg : svg.transition().duration(500);
     }
     changedOption(changed,props){
-
+        this.brush.extent([[0, 0], [changed.width, changed.height]]);
+        this.brushG.call(this.brush);
         this.area_clip
             .attr("width", changed.width)
             .attr("height", changed.height);
@@ -251,8 +459,59 @@ class Line extends Component {
     zoomBrush = () => {
         const extent = d3.event.selection;
         const {realTime} = this.props.range;
+
+        // this.focus.selectAll("circle").style("display", "none");
+        // this.focus.select("line.x-hover-line").style("display", "none");
     };
 
+    mouseOverObject = (obj, thisOption, color) => {
+
+        let r = 3;
+
+        let circleKey = "circle-" + obj.objHash + "_" + this.replaceName(thisOption.counterKey);
+        let circle = this.focus.select("circle." + circleKey);
+        if (circle.size() < 1) {
+            circle = this.focus.append("circle").attr("class", circleKey).attr("r", r).attr("stroke", color);
+        }
+
+        if (this.props.filterMap[obj.objHash]) {
+            circle.style("opacity", 1);
+        } else {
+            circle.style("opacity", 0);
+        }
+
+    };
+    mouseMoveObject = (obj, thisOption, counterKey, dataIndex, color, tooltip) => {
+        
+
+        let circleKey = "circle-" + obj.objHash + "_" + this.replaceName(thisOption.counterKey);
+        let unit = this.props.counters[counterKey][dataIndex].data[obj.objHash] ? this.props.counters[counterKey][dataIndex].data[obj.objHash].unit : "";
+
+        let valueOutput = obj.objHash && this.props.counters[counterKey][dataIndex].data[obj.objHash]  ? this.props.counters[counterKey][dataIndex].data[obj.objHash].value : null ;
+        const valueOrigin = obj.objHash && this.props.counters[counterKey][dataIndex].data[obj.objHash]  ? this.props.counters[counterKey][dataIndex].data[obj.objHash].value : null ;
+        if( this.chartType === "STACK AREA" && valueOutput ){
+            valueOutput = this.counterSum + valueOutput;
+            this.counterSum = valueOutput;
+        }
+
+        if (this.props.counters[counterKey][dataIndex].time) {
+            if (this.props.filterMap[obj.objHash]) {
+                tooltip.lines.push({
+                    instanceName: obj.objName,
+                    circleKey: circleKey,
+                    metricName: thisOption.title,
+                    value: valueOutput ? valueOutput : null,
+                    displayValue: valueOrigin ? numeral(valueOrigin).format(this.props.config.numberFormat) + " " + unit : null,
+                    color: color
+                });
+            }
+        } else {
+            this.focus.select("circle." + circleKey).style("display", "none");
+        }
+
+        return true;
+    };
+    
     prepare(g){
 
         const {width,height,margin} = this.props.options;
@@ -262,6 +521,7 @@ class Line extends Component {
         // console.log('',svg,margin,width,height);
 
         this.svg = d3.select(g.parentNode);
+
         this.area_clip = this.svg.append("defs")
                 .append("svg:clipPath")
                 .attr("id", `area-clip${this.props.box.key}`)
@@ -285,9 +545,15 @@ class Line extends Component {
 
         this.brush = d3.brushX()
             .extent([[0, 0], [width, height]])
+            .on("start",()=>{
+                // this.props.hideTooltip();
+                this.focus.selectAll("circle").style("display", "none");
+                this.focus.selectAll("line").style("display", "none");
+            })
             .on("end", this.zoomBrush);
 
-        this.top.append("g").attr("class", "brush").call(this.brush);
+        this.brushG = this.top.append("g").attr("class", "brush")
+            .call(this.brush);
         //
         // //Axis Draw
         this.xScale = d3.scaleTime().range([0, width]);
@@ -345,6 +611,186 @@ class Line extends Component {
                              .style("opacity", options.opacity)
                              .attr("transform", `translate(0,${options.height})`)
                              .call(this.gridTickX);
+// event setting
+
+        this.svg.on("mouseover",  ()=> {
+            let layer = g.parentNode.parentNode.parentNode.parentNode.parentNode.parentNode.parentNode.parentNode;
+            layer.style.zIndex = 9;
+
+            let hoverLine = this.focus.select("line.x-hover-line");
+            if (hoverLine.size() > 0) {
+                hoverLine.style("display", "block");
+            }
+
+            let instanceMetricCount = {};
+            for (let counterKey in this.props.counters) {
+                let thisOption = this.props.box.option.filter((d) => {return d.counterKey === counterKey})[0];
+                if (!thisOption) {
+                    break;
+                }
+
+                for (let i = 0; i < this.props.objects.length; i++) {
+                    const obj = this.props.objects[i];
+                    if (thisOption.familyName === obj.objFamily) {
+                        if (!instanceMetricCount[obj.objHash]) {
+                            instanceMetricCount[obj.objHash] = 0;
+                        }
+                        let color;
+                        if (this.props.config.graph.color === "metric") {
+                            color = InstanceColor.getMetricColor(thisOption.counterKey, this.props.config.colorType);
+                        } else {
+                            color = InstanceColor.getInstanceColors(this.props.config.colorType)[obj.objHash][(instanceMetricCount[obj.objHash]++) % 5];
+                        }
+                        this.mouseOverObject(this.props.objects[i], thisOption, color);
+                    }
+                }
+            }
+
+            this.focus.selectAll("circle").style("display", "block");
+        });
+
+
+
+        this.svg.on("mouseout",() =>{
+
+            let layer = g.parentNode.parentNode.parentNode.parentNode.parentNode.parentNode.parentNode.parentNode;
+            layer.style.zIndex = 5;
+            this.focus.selectAll("circle").style("display", "none");
+            this.focus
+                .select("line.x-hover-line")
+                .style("display", "none");
+
+            this.props.hideTooltip();
+            this.currentTooltipTime = null;
+            // if(!this.props.timeFocus.keep)
+            //     this.props.setTimeFocus(false, null, this.props.box.key);
+
+        });
+        this.bisector = d3.bisector(function (d) {
+            return d.time;
+        }).left;
+        
+        const that = this; 
+        this.svg.on("mousemove", function(){
+            
+            let tooltip = {};
+            tooltip.lines = [];
+            let xPos = d3.mouse(this)[0] - that.props.options.margin.left;
+            let yPos = d3.mouse(this)[1];
+            if (navigator.userAgent.toLowerCase().indexOf('firefox') > -1) {
+                let box = g.parentNode.parentNode.parentNode.parentNode.parentNode.parentNode.parentNode.parentNode;
+                if (window.getComputedStyle) {
+                    let style = getComputedStyle(box);
+                    let transform = style.transform || style.webkitTransform || style.mozTransform;
+                    let mat = transform.match(/^matrix3d\((.+)\)$/);
+                    if (mat) return parseFloat(mat[1].split(', ')[13]);
+                    mat = transform.match(/^matrix\((.+)\)$/);
+                    let transformX = mat ? parseFloat(mat[1].split(', ')[4]) : 0;
+                    let transformY = mat ? parseFloat(mat[1].split(', ')[5]) : 0;
+                    xPos = xPos - transformX;
+                    yPos = yPos - transformY;
+                }
+            }
+
+            let x0 = that.xScale.invert(xPos);
+            let timeFormat = d3.timeFormat(that.props.options.fullTimeFormat);
+
+            let instanceMetricCount = {};
+
+            for (let counterKey in that.props.counters) {
+                let thisOption = that.props.box.option.filter((d) => {return d.counterKey === counterKey})[0];
+                let dataIndex = that.bisector(that.props.counters[counterKey], x0, 0);
+
+                if (!that.props.counters[counterKey][dataIndex]) {
+                    break;
+                }
+
+                if (tooltip.timeValue && (tooltip.timeValue < that.props.counters[counterKey][dataIndex].time)) {
+
+                } else {
+                    tooltip.time = timeFormat(that.props.counters[counterKey][dataIndex].time);
+                    tooltip.timeValue = that.props.counters[counterKey][dataIndex].time;
+                }
+
+                if (!thisOption) {
+                    break;
+                }
+                that.counterSum = 0;
+                for (let i = 0; i < that.props.objects.length; i++) {
+                    const obj = that.props.objects[i];
+                    if (thisOption.familyName === obj.objFamily) {
+
+                        if (!instanceMetricCount[obj.objHash]) {
+                            instanceMetricCount[obj.objHash] = 0;
+                        }
+                        let color;
+                        if (that.props.config.graph.color === "metric") {
+                            color = InstanceColor.getMetricColor(thisOption.counterKey, that.props.config.colorType);
+                        } else {
+                            color = InstanceColor.getInstanceColors(that.props.config.colorType)[obj.objHash][(instanceMetricCount[obj.objHash]++) % 5];
+                        }
+                        that.mouseMoveObject(that.props.objects[i], thisOption, counterKey, dataIndex, color, tooltip);
+                    }
+                }
+            }
+
+            let hoverLine = that.focus.select("line.x-hover-line").style('display','block');
+            if (hoverLine.size() < 1) {
+                hoverLine = that.focus.append("line").attr("class", "x-hover-line hover-line").attr("y1", 0).attr("y2", that.props.options.height);
+            }
+
+            let xPosition = that.xScale(tooltip.timeValue);
+
+            if (tooltip.timeValue) {
+                hoverLine.attr("x1", xPosition);
+                hoverLine.attr("x2", xPosition);
+            }
+
+            if (tooltip && tooltip.lines) {
+                for (let i = 0; i < tooltip.lines.length; i++) {
+
+                    if (!isNaN(tooltip.lines[i].value)) {
+                        let circle = that.focus.select("circle." + tooltip.lines[i].circleKey).style('display','block');
+                        if (circle.size() > 0) {
+                            circle.attr("cx", xPosition);
+                            circle.attr("cy", that.yScale(tooltip.lines[i].value));
+                        }
+                    }
+                }
+            }
+
+            tooltip.chartType = that.props.options.type;
+            tooltip.counterSum = numeral(that.counterSum).format(that.props.config.numberFormat);
+            that.currentTooltipTime = tooltip.timeValue;
+
+            // if(!that.props.timeFocus.keep){
+            //     that.props.setTimeFocus(true,x0.getTime(),that.props.box.key);
+            // }
+
+            that.props.showTooltip(xPos, yPos, that.props.options.margin.left, that.props.options.margin.top, tooltip);
+
+
+        });
+
+        this.svg.on("contextmenu",()=>{
+            // console.log(d3.event.which);
+            d3.event.preventDefault();
+            // e.preventDefault();
+            if(!this.props.timeFocus.keep){
+                //toggle
+                //tooltip hidel
+                this.focus.select("line.x-hover-line").style("display","none");
+                this.focus.selectAll("circle").style("display","none");
+                this.props.hideTooltip();
+            }
+            this.props.setTimeFocus(
+                this.props.timeFocus.active,
+                this.props.timeFocus.time,
+                this.props.timeFocus.id,
+                !this.props.timeFocus.keep
+            );
+        });
+
         this.isInit = true;
     };
     componentDidMount() {
