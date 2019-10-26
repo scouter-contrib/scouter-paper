@@ -10,6 +10,7 @@ import connect from "react-redux/es/connect/connect";
 import {withRouter} from "react-router-dom";
 import * as d3 from "d3";
 import * as _ from "lodash";
+import moment from 'moment';
 import numeral from "numeral";
 import InstanceColor from "../../../common/InstanceColor";
 
@@ -31,7 +32,9 @@ class Line extends Component {
             return;
         }
 //-    realtime <=> search reset
-        if(nextProps.search !== this.props.search){
+        const {type} = nextProps.options;
+        const thisType  = this.props.options.type;
+        if(nextProps.range.realTime !== this.props.range.realTime || type !== thisType){
             switch(this.props.options.type){
                 case "STACK AREA":
                     this.removePathLine(false);
@@ -41,46 +44,35 @@ class Line extends Component {
             }
             this.zoomReset();
         }
-        if(nextProps.search){
-            this.zoomReset();
-        }
-// box option change;
-        const {type} = nextProps.options;
-        const thisType  = this.props.options.type;
-
-        if( type !== thisType){
-            switch(type){
-                case "STACK AREA":
-                    this.removePathLine(false);
-                    break;
-                default:
-                    this.removePathLine(true);
-            }
+//      search reset
+        if(!nextProps.range.realTime){
             this.zoomReset();
         }
 
-        if( nextProps.options !== this.props.options && !this.isZoom){
-            this.changedOption(nextProps.options, nextProps);
-        }
+        const isResize = nextProps.options.width !== this.props.options.width ||
+                         nextProps.options.height !==  this.props.options.height;
+// -    normal
         if(!this.isZoom) {
+            if (nextProps.options !== this.props.options) {
+                this.changedOption(nextProps.options, nextProps);
+            }
             this.paint(nextProps);
-        }
-
-        const isResize = nextProps.options.width !== this.props.options.width || nextProps.options.height !==  this.props.options.height;
-
-        if(this.isZoom && this.zoomData && isResize) {
+// -   zoom state
+        }else if( this.zoomData && isResize) {
             this.changedOption({...this.zoomData.options ,
-               width  :  nextProps.options.width,
-               height :  nextProps.options.height,
+                width  :  nextProps.options.width,
+                height :  nextProps.options.height,
             },this.zoomData);
             this.paint(this.zoomData);
-        }
 
-        if(nextProps.timeFocus.active && !nextProps.noData) {
-            this.drawTimeFocus(nextProps.timeFocus.keep, nextProps);
         }
-        if(!nextProps.timeFocus.active && !nextProps.noData) {
-            this.removeFocus(nextProps);
+        if(!nextProps.noData) {
+            if(nextProps.timeFocus.active) {
+                this.drawTimeFocus(nextProps.timeFocus.keep, nextProps);
+            }
+            if(!nextProps.timeFocus.active) {
+                this.removeFocus(nextProps);
+            }
         }
     };
     removePathLine(isStack){
@@ -493,17 +485,25 @@ class Line extends Component {
 
     zoomBrush = () => {
         const extent = d3.event.selection;
+        const {realTime} = this.props.range;
         if(extent) {
             this.brushG.call(this.brush.move,null);
-            this.isZoom = true;
             const endTime = this.xScale.invert(extent[1]);
             const startTime = this.xScale.invert(extent[0]);
-
-            this.zoomData = {...this.props,startTime : startTime.getTime(),endTime : endTime.getTime()}
-
-            this.changedOption(this.zoomData.options,this.zoomData);
-            this.paint(this.zoomData);
-        }else{
+            if(realTime) {
+                this.isZoom = true;
+                this.zoomData = {...this.props, startTime: startTime.getTime(), endTime: endTime.getTime()}
+                this.changedOption(this.zoomData.options, this.zoomData);
+                this.paint(this.zoomData);
+            }else{
+                const startDate= moment(startTime);
+                this.props.setRealTimeRangeStepValue(false, this.props.range.longTerm,
+                    this.props.range.value,
+                    this.props.config.range.shortHistoryRange, this.props.config.range.shortHistoryStep);
+                this.props.setRangeDateHoursMinutes(startDate, startDate.hours(), startDate.minutes());
+                this.props.setSearchCondition(startTime.valueOf(), endTime.valueOf(), new Date().getTime());
+            }
+        }else if(realTime) {
             this.isZoom = false;
             // restore
             this.changedOption(this.props.options,this.props);
