@@ -78,8 +78,7 @@ class LineChart extends Component {
     componentWillReceiveProps(nextProps) {
         let counters = Object.assign({}, this.state.counters);
 
-
-
+        console.log("------------------>");
         if (nextProps.countersHistory && this.lastCountersHistoryTime !== nextProps.countersHistoryTimestamp) {
 
             this.lastCountersHistoryTime = nextProps.countersHistoryTimestamp;

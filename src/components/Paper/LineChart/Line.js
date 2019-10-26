@@ -56,7 +56,9 @@ class Line extends Component {
             if (nextProps.options !== this.props.options) {
                 this.changedOption(nextProps.options, nextProps);
             }
-            this.paint(nextProps);
+            if (nextProps.counters !== this.props.counters) {
+                this.paint(nextProps);
+            }
 // -   zoom state
         }else if( this.zoomData && isResize) {
             this.changedOption({...this.zoomData.options ,
@@ -439,16 +441,19 @@ class Line extends Component {
 
     changedOption(changed,props){
 
-        // if(changed.width !== this.props.options.width || changed.height !==  this.props.options.height ) {
-        this.brush.extent([[0, 0], [changed.width, changed.height]]);
-        this.brushG.call(this.brush);
-        this.area_clip
-            .attr("width", changed.width)
-            .attr("height", changed.height);
-        this.xScale = this.xScale.range([0, changed.width]);
-        this.yScale = this.yScale.range([changed.height, 0]);
+        if(changed.width !== this.props.options.width || changed.height !==  this.props.options.height ) {
+            this.brush.extent([[0, 0], [changed.width, changed.height]]);
+            this.brushG.call(this.brush);
+            this.area_clip
+                .attr("width", changed.width)
+                .attr("height", changed.height);
+            this.xScale = this.xScale.range([0, changed.width]);
+            this.yScale = this.yScale.range([changed.height, 0]);
+        }
+
         this.xScale.domain([props.startTime, props.endTime]);
         this.yScale.domain([0, props.options.maxY]);
+
         let xAxisCount = Math.floor(changed.width / changed.xAxisWidth);
         if (xAxisCount < 1) {
             xAxisCount = 1;
@@ -457,6 +462,7 @@ class Line extends Component {
         if (yAxisCount < 1) {
             yAxisCount = 1;
         }
+
         // Y축
         this.tickY.ticks(yAxisCount);
 
@@ -820,12 +826,8 @@ class Line extends Component {
         });
 
         this.svg.on("contextmenu",()=>{
-            // console.log(d3.event.which);
             d3.event.preventDefault();
-            // e.preventDefault();
             if(!this.props.timeFocus.keep){
-                //toggle
-                //tooltip hidel
                 this.focus.select("line.x-hover-line").style("display","none");
                 this.focus.selectAll("circle").style("display","none");
                 this.props.hideTooltip();
