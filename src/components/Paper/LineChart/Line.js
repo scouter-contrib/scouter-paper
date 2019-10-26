@@ -792,11 +792,16 @@ class Line extends Component {
                 for (let i = 0; i < tooltip.lines.length; i++) {
 
                     if (!isNaN(tooltip.lines[i].value)) {
-                        let circle = that.focus.select("circle." + tooltip.lines[i].circleKey).style('display','block');
-                        if (circle.size() > 0) {
+                        let circle = that.focus.select("circle." + tooltip.lines[i].circleKey)
                             circle.attr("cx", xPosition);
                             circle.attr("cy", that.yScale(tooltip.lines[i].value));
-                        }
+
+                            circle.data([tooltip.lines[i].value])
+                                .enter()
+                                .style('display','block')
+                                .exit()
+                                .remove();
+
                     }
                 }
             }
