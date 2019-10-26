@@ -43,6 +43,9 @@ class Line extends Component {
                     this.removePathLine(false);
             }
             this.zoomReset();
+
+            this.changedOption(nextProps.options,nextProps);
+            this.paint(nextProps);
         }
         if(!nextProps.range.realTime){
             this.zoomReset();
