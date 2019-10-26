@@ -4,13 +4,6 @@ import {connect} from 'react-redux';
 import {withRouter} from 'react-router-dom';
 import ServerDate from "../../../common/ServerDate";
 import Line from "./Line";
-import {
-    setRangeDateHoursMinutes,
-    setRealTimeRangeStepValue,
-    setRealTimeValue,
-    setSearchCondition,
-    setTimeFocus
-} from "../../../actions";
 
 class LineChart extends Component {
 
@@ -190,8 +183,8 @@ class LineChart extends Component {
                 options : {...this.graph,type : nextProps.box.values['chartType']},
                 search : false
             });
-
         }
+        this.chartType = nextProps.box.values['chartType'];
     }
     removeObject(prevList, currentList){
         const ret = [];
@@ -449,15 +442,6 @@ let mapStateToProps = (state) => {
     };
 };
 
-let mapDispatchToProps = (dispatch) => {
-    return {
-        setTimeFocus: (active, time, boxKey,keep) => dispatch(setTimeFocus(active, time, boxKey,keep)),
-        setRealTimeValue: (realTime, longTerm, value) => dispatch(setRealTimeValue(realTime, longTerm, value)),
-        setRangeDateHoursMinutes: (date, hours, minutes) => dispatch(setRangeDateHoursMinutes(date, hours, minutes)),
-        setRealTimeRangeStepValue: (realTime, longTerm, value, range, step) => dispatch(setRealTimeRangeStepValue(realTime, longTerm, value, range, step)),
-        setSearchCondition: (from, to, time) => dispatch(setSearchCondition(from, to, time)),
-    };
-};
 
-LineChart = connect(mapStateToProps, mapDispatchToProps)(LineChart);
+LineChart = connect(mapStateToProps, null)(LineChart);
 export default withRouter(LineChart);

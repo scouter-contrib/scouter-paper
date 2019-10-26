@@ -109,8 +109,6 @@ class Line extends Component {
     }
     paint (data){
 
-
-
         this.clearLine();
         if (data.objects) {
             let instanceMetricCount = {};
@@ -205,8 +203,7 @@ class Line extends Component {
     drawTimeFocus=(isFixed=false,nextProps)=>{
 
         if( isFixed ){
-            if( Object.keys(this.props.counters).map(k => this.props.counters[k][0] ? this.props.counters[k][0].time : null).filter( t => this.props.timeFocus.time > t ).length ) {
-                let hoverLine = this.focus.selectAll("line.focus-line");
+            let hoverLine = this.focus.selectAll("line.focus-line");
                 hoverLine.attr("x1", (d) => this.xScale(d))
                          .attr("x2", (d) => this.xScale(d));
 
@@ -223,17 +220,13 @@ class Line extends Component {
                     .exit()
                     .remove();
                 hoverLine.style("display","block");
-            }else{
-                // 해제
-                this.props.setTimeFocus(false,null,null,false);
-            }
 
         }else if( nextProps.timeFocus.id !== this.props.box.key) {
             let hoverLine = this.focus.selectAll("line.focus-line");
             hoverLine.attr("x1", (d) =>this.xScale(d))
                 .attr("x2", (d) =>this.xScale(d));
 
-            hoverLine.data([this.props.timeFocus.time])
+            hoverLine.data([nextProps.timeFocus.time])
                 .enter()
                 .append("line")
                 .attr("class", "focus-line focus-hover-line")
