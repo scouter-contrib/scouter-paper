@@ -34,17 +34,16 @@ class Line extends Component {
 //-    realtime <=> search reset
         const {type} = nextProps.options;
         const thisType  = this.props.options.type;
-        if(nextProps.range.realTime !== this.props.range.realTime || type !== thisType){
+        if( type !== thisType){
             switch(this.props.options.type){
                 case "STACK AREA":
-                    this.removePathLine(false);
+                    this.removePathLine(true);
                     break;
                 default:
-                    this.removePathLine(true);
+                    this.removePathLine(false);
             }
             this.zoomReset();
         }
-//      search reset
         if(!nextProps.range.realTime){
             this.zoomReset();
         }
@@ -56,7 +55,8 @@ class Line extends Component {
             if (nextProps.options !== this.props.options) {
                 this.changedOption(nextProps.options, nextProps);
             }
-            if (nextProps.counters !== this.props.counters) {
+            if ((!nextProps.range.realTime && !nextProps.timeFocus.active) ||
+                  nextProps.counters !== this.props.counters) {
                 this.paint(nextProps);
             }
 // -   zoom state
@@ -544,7 +544,7 @@ class Line extends Component {
 
         let valueOutput = obj.objHash && this.props.counters[counterKey][dataIndex].data[obj.objHash]  ? this.props.counters[counterKey][dataIndex].data[obj.objHash].value : null ;
         const valueOrigin = obj.objHash && this.props.counters[counterKey][dataIndex].data[obj.objHash]  ? this.props.counters[counterKey][dataIndex].data[obj.objHash].value : null ;
-        if( this.chartType === "STACK AREA" && valueOutput ){
+        if( this.props.options.type === "STACK AREA" && valueOutput ){
             valueOutput = this.counterSum + valueOutput;
             this.counterSum = valueOutput;
         }
@@ -798,7 +798,7 @@ class Line extends Component {
                 for (let i = 0; i < tooltip.lines.length; i++) {
 
                     if (!isNaN(tooltip.lines[i].value)) {
-                        let circle = that.focus.select("circle." + tooltip.lines[i].circleKey)
+                        let circle = that.focus.select("circle." + tooltip.lines[i].circleKey);
                             circle.attr("cx", xPosition);
                             circle.attr("cy", that.yScale(tooltip.lines[i].value));
 
