@@ -64,12 +64,13 @@ class Box extends Component {
         this.props.objects.filter((d) => {
             return d.objFamily === familyName;
         }).forEach((d, idx, array) => {
-            icon += this.props.counterInfo.objTypesMap[d.objType].icon;
-            if (idx !== array.length - 1) {
-                icon += ",";
+            if(this.props.counterInfo.objTypesMap[d.objType]) {
+                icon += this.props.counterInfo.objTypesMap[d.objType].icon;
+                if (idx !== array.length - 1) {
+                    icon += ",";
+                }
+                this.iconMap[this.props.counterInfo.objTypesMap[d.objType].icon] = true;
             }
-
-            this.iconMap[this.props.counterInfo.objTypesMap[d.objType].icon] = true;
         });
 
         titles[title] = {

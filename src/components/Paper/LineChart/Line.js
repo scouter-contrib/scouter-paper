@@ -18,48 +18,65 @@ class Line extends Component {
         g : null,
     };
     isInit = false;
-    constructor(props) {
-        super(props);
 
-    }
-
+    isZoom = false;
+    zoomData = null;
 
     componentWillReceiveProps(nextProps){
         if(!this.isInit){
             return;
         }
-
+//-    realtime <=> search reset
         if(nextProps.search !== this.props.search){
             switch(this.props.options.type){
-                case "LINE FILL":
-                case "LINE":
-                    this.removePathLine(true);
-                    break;
                 case "STACK AREA":
                     this.removePathLine(false);
                     break;
+                default:
+                    this.removePathLine(true);
             }
+            this.isZoom = false;
+            this.zoomData = null;
         }
-
+// box option change;
         const {type} = nextProps.options;
         const thisType  = this.props.options.type;
 
         if( type !== thisType){
             switch(type){
-                case "LINE FILL":
-                case "LINE":
-                    this.removePathLine(true);
-                    break;
                 case "STACK AREA":
                     this.removePathLine(false);
                     break;
+                default:
+                    this.removePathLine(true);
             }
+            this.isZoom = false;
+            this.zoomData = null;
         }
 
-        if( nextProps.options !== this.props.options){
-            this.changedOption(nextProps.options,nextProps);
+        if( nextProps.options !== this.props.options && !this.isZoom){
+            this.changedOption(nextProps.options, nextProps);
         }
-        this.paint(nextProps);
+        if(!this.isZoom) {
+            this.paint(nextProps);
+        }
+
+        const isResize = nextProps.options.width !== this.props.options.width || nextProps.options.height !==  this.props.options.height;
+
+        if(this.isZoom && this.zoomData && isResize) {
+            this.changedOption({...this.zoomData.options ,
+               width  :  nextProps.options.width,
+               height :  nextProps.options.height,
+            },this.zoomData);
+            this.paint(this.zoomData);
+        }
+
+        if(nextProps.timeFocus.active && !nextProps.noData) {
+            this.drawTimeFocus(nextProps.timeFocus.keep, nextProps);
+        }
+        if(!nextProps.timeFocus.active && !nextProps.noData) {
+            this.removeFocus(nextProps);
+        }
     };
     removePathLine(isStack){
         if(!isStack) {
@@ -86,6 +103,8 @@ class Line extends Component {
         }
     }
     paint (data){
+
+
 
         this.clearLine();
         if (data.objects) {
@@ -122,7 +141,7 @@ class Line extends Component {
             }
         }
         this.moveTooltip();
-        this.drawTimeFocus(data.timeFocus.keep,data);
+
 
     };
 
@@ -173,9 +192,14 @@ class Line extends Component {
         this.props.removeTitle(counterKey);
     };
 
+    removeFocus(nextProps){
+        if(nextProps.timeFocus.id !== this.props.box.key) {
+            this.focus.select("line.focus-line").style('display','none');
+        }
+    }
     drawTimeFocus=(isFixed=false,nextProps)=>{
 
-        if( isFixed && !this.props.noData){
+        if( isFixed ){
             if( Object.keys(this.props.counters).map(k => this.props.counters[k][0] ? this.props.counters[k][0].time : null).filter( t => this.props.timeFocus.time > t ).length ) {
                 let hoverLine = this.focus.selectAll("line.focus-line");
                 hoverLine.attr("x1", (d) => this.xScale(d))
@@ -193,14 +217,13 @@ class Line extends Component {
                     .attr("x2", (d) => this.xScale(d))
                     .exit()
                     .remove();
+                hoverLine.style("display","block");
             }else{
                 // 해제
                 this.props.setTimeFocus(false,null,null,false);
             }
 
-        }else if( !this.props.noData
-            && this.props.active
-            && this.props.timeFocus.id !== this.props.box.key) {
+        }else if( nextProps.timeFocus.id !== this.props.box.key) {
             let hoverLine = this.focus.selectAll("line.focus-line");
             hoverLine.attr("x1", (d) =>this.xScale(d))
                 .attr("x2", (d) =>this.xScale(d));
@@ -217,8 +240,10 @@ class Line extends Component {
                 .attr("x2", (d) =>this.xScale(d))
                 .exit()
                 .remove();
+            hoverLine.style("display","block");
+
         }else{
-            this.focus.select("line.focus-line").remove();
+            this.focus.select("line.focus-line").style("display","none");
         }
     };
     drawStackArea=(thisOption,counterKey,data) => {
@@ -414,19 +439,17 @@ class Line extends Component {
         return realTime ? svg : svg.transition().duration(500);
     }
     changedOption(changed,props){
+
+        // if(changed.width !== this.props.options.width || changed.height !==  this.props.options.height ) {
         this.brush.extent([[0, 0], [changed.width, changed.height]]);
         this.brushG.call(this.brush);
         this.area_clip
             .attr("width", changed.width)
             .attr("height", changed.height);
-
         this.xScale = this.xScale.range([0, changed.width]);
         this.yScale = this.yScale.range([changed.height, 0]);
-
-        this.xScale.domain([props.startTime,props.endTime]);
-        this.yScale.domain([0, changed.maxY]);
-
-
+        this.xScale.domain([props.startTime, props.endTime]);
+        this.yScale.domain([0, props.options.maxY]);
         let xAxisCount = Math.floor(changed.width / changed.xAxisWidth);
         if (xAxisCount < 1) {
             xAxisCount = 1;
@@ -435,33 +458,51 @@ class Line extends Component {
         if (yAxisCount < 1) {
             yAxisCount = 1;
         }
-// Y축
+        // Y축
         this.tickY.ticks(yAxisCount);
 
         this.gridTickY.tickSize(-changed.width)
-                      .ticks(yAxisCount);
+            .ticks(yAxisCount);
 
         this.axisY.transition().duration(500).call(this.tickY);
         this.gridY.transition().duration(500).call(this.gridTickY);
 //- X축
         this.tickX.tickFormat(d3.timeFormat(changed.timeFormat))
-                  .ticks(xAxisCount);
+            .ticks(xAxisCount);
 
         this.gridTickX.tickSize(-changed.height)
-                      .ticks(xAxisCount);
+            .ticks(xAxisCount);
 
         this.axisX.attr("transform", `translate(0,${changed.height})`)
-                  .call(this.tickX);
+            .call(this.tickX);
         this.gridX.attr("transform", `translate(0,${changed.height})`)
-                  .call(this.gridTickX);
-
+            .call(this.gridTickX);
+        this.focus.selectAll("line").attr("y2",changed.height);
+        // if(changed.height !== this.props.options.height ||
+        //    changed.width !== this.props.options.width  ){
+        //    this.paint(this.props);
+        // }
     }
+
     zoomBrush = () => {
         const extent = d3.event.selection;
-        const {realTime} = this.props.range;
+        if(extent) {
+            this.brushG.call(this.brush.move,null);
+            this.isZoom = true;
+            const endTime = this.xScale.invert(extent[1]);
+            const startTime = this.xScale.invert(extent[0]);
 
-        // this.focus.selectAll("circle").style("display", "none");
-        // this.focus.select("line.x-hover-line").style("display", "none");
+            this.zoomData = {...this.props,startTime : startTime.getTime(),endTime : endTime.getTime()}
+
+            this.changedOption(this.zoomData.options,this.zoomData);
+            this.paint(this.zoomData);
+        }else{
+            this.isZoom = false;
+            // restore
+            this.paint(this.props);
+        }
+
+
     };
 
     mouseOverObject = (obj, thisOption, color) => {
@@ -516,10 +557,6 @@ class Line extends Component {
 
         const {width,height,margin} = this.props.options;
         const {options} = this.props;
-        // const {svg}= this.state;
-
-        // console.log('',svg,margin,width,height);
-
         this.svg = d3.select(g.parentNode);
 
         this.area_clip = this.svg.append("defs")
@@ -545,15 +582,10 @@ class Line extends Component {
 
         this.brush = d3.brushX()
             .extent([[0, 0], [width, height]])
-            .on("start",()=>{
-                // this.props.hideTooltip();
-                this.focus.selectAll("circle").style("display", "none");
-                this.focus.selectAll("line").style("display", "none");
-            })
             .on("end", this.zoomBrush);
 
-        this.brushG = this.top.append("g").attr("class", "brush")
-            .call(this.brush);
+        this.brushG = this.top.append("g").attr("class", "brush");
+        this.brushG.call(this.brush);
         //
         // //Axis Draw
         this.xScale = d3.scaleTime().range([0, width]);
@@ -662,8 +694,10 @@ class Line extends Component {
 
             this.props.hideTooltip();
             this.currentTooltipTime = null;
-            // if(!this.props.timeFocus.keep)
-            //     this.props.setTimeFocus(false, null, this.props.box.key);
+            //- 해제
+            if(!this.props.timeFocus.keep) {
+                this.props.setTimeFocus(false, null, this.props.box.key);
+            }
 
         });
         this.bisector = d3.bisector(function (d) {
@@ -763,9 +797,9 @@ class Line extends Component {
             tooltip.counterSum = numeral(that.counterSum).format(that.props.config.numberFormat);
             that.currentTooltipTime = tooltip.timeValue;
 
-            // if(!that.props.timeFocus.keep){
-            //     that.props.setTimeFocus(true,x0.getTime(),that.props.box.key);
-            // }
+            if(!that.props.timeFocus.keep){
+                that.props.setTimeFocus(true,x0.getTime(),that.props.box.key);
+            }
 
             that.props.showTooltip(xPos, yPos, that.props.options.margin.left, that.props.options.margin.top, tooltip);
 
