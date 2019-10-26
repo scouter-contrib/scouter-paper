@@ -18,28 +18,19 @@ class LineChart extends Component {
     lastCountersHistoryTime = null;
     historyInit = {};
     chartType = "LINE";
-    timeFocusId = null;
     graph = {
         margin: {
             top: 15, right: 15, bottom: 25, left: 40
         },
-        svg: null,
-        overlay: null,
         width: 700,
         height: 50,
-        x: null,
-        y: null,
-        path: null,
         startTime: (new ServerDate()).getTime() - (1000 * 60 * 10),
         endTime: (new ServerDate()).getTime(),
         timeFormat: "%H:%M",
-        timeFormatSec: "%H:%M:%S",
         fullTimeFormat: "%Y-%m-%d %H:%M:%S",
         xAxisWidth: 70,
         yAxisHeight: 30,
         noData: true,
-        bisector: null,
-        currentTooltipTime: null,
         opacity : 0.3
     };
 

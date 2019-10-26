@@ -22,6 +22,10 @@ class Line extends Component {
     isZoom = false;
     zoomData = null;
 
+    zoomReset(){
+        this.isZoom = false;
+        this.zoomData = null;
+    }
     componentWillReceiveProps(nextProps){
         if(!this.isInit){
             return;
@@ -35,8 +39,10 @@ class Line extends Component {
                 default:
                     this.removePathLine(true);
             }
-            this.isZoom = false;
-            this.zoomData = null;
+            this.zoomReset();
+        }
+        if(nextProps.search){
+            this.zoomReset();
         }
 // box option change;
         const {type} = nextProps.options;
@@ -50,8 +56,7 @@ class Line extends Component {
                 default:
                     this.removePathLine(true);
             }
-            this.isZoom = false;
-            this.zoomData = null;
+            this.zoomReset();
         }
 
         if( nextProps.options !== this.props.options && !this.isZoom){
@@ -194,7 +199,7 @@ class Line extends Component {
 
     removeFocus(nextProps){
         if(nextProps.timeFocus.id !== this.props.box.key) {
-            this.focus.select("line.focus-line").style('display','none');
+            this.focus.select("line.focus-line").remove();
         }
     }
     drawTimeFocus=(isFixed=false,nextProps)=>{
@@ -243,7 +248,7 @@ class Line extends Component {
             hoverLine.style("display","block");
 
         }else{
-            this.focus.select("line.focus-line").style("display","none");
+            this.focus.select("line.focus-line").remove();
         }
     };
     drawStackArea=(thisOption,counterKey,data) => {
@@ -438,6 +443,15 @@ class Line extends Component {
         const {realTime} = this.props.range;
         return realTime ? svg : svg.transition().duration(500);
     }
+    getTimeFormat(duration){
+
+       if( duration >= (60000 * 5)) {
+           return this.props.config.minuteFormat;
+       }else{
+           return this.props.config.timeFormat;
+       }
+    }
+
     changedOption(changed,props){
 
         // if(changed.width !== this.props.options.width || changed.height !==  this.props.options.height ) {
@@ -467,7 +481,7 @@ class Line extends Component {
         this.axisY.transition().duration(500).call(this.tickY);
         this.gridY.transition().duration(500).call(this.gridTickY);
 //- X축
-        this.tickX.tickFormat(d3.timeFormat(changed.timeFormat))
+        this.tickX.tickFormat(d3.timeFormat(this.getTimeFormat(props.endTime - props.startTime)))
             .ticks(xAxisCount);
 
         this.gridTickX.tickSize(-changed.height)
@@ -499,6 +513,7 @@ class Line extends Component {
         }else{
             this.isZoom = false;
             // restore
+            this.changedOption(this.props.options,this.props);
             this.paint(this.props);
         }
 
