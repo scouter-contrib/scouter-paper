@@ -203,10 +203,20 @@ class XLog extends Component {
 
     drawTimeFocus = (isFixed = false) => {
 
+        const xfuc = (d) => {
+            const x = this.graph.x(d);
+            if(x < 0){
+                return 0;
+            }
+            if(x > this.graph.width){
+                return this.graph.width;
+            }
+            return x;
+        };
         if( isFixed && !this.state.noData){
             let hoverLine = this.graph.focus.selectAll("line.focus-line");
-            hoverLine.attr("x1", (d) =>this.graph.x(d))
-                .attr("x2", (d) =>this.graph.x(d));
+            hoverLine.attr("x1",xfuc)
+                .attr("x2",xfuc);
 
             hoverLine.data([this.props.timeFocus.time])
                 .enter()
@@ -214,17 +224,15 @@ class XLog extends Component {
                 .attr("class", "focus-line focus-hover-line")
                 .attr("y1", 0)
                 .attr("y2", this.graph.height)
-                .attr("x1", (d) =>{
-                    return this.graph.x(d);
-                })
-                .attr("x2", (d) =>this.graph.x(d))
+                .attr("x1",xfuc)
+                .attr("x2",xfuc)
                 .exit()
                 .remove();
 
         } else if( !this.state.noData && this.props.timeFocus.id && this.props.timeFocus.id !== this.props.box.key) {
             let hoverLine = this.graph.focus.selectAll("line.focus-line");
-            hoverLine.attr("x1", (d) =>this.graph.x(d))
-                .attr("x2", (d) =>this.graph.x(d));
+            hoverLine.attr("x1",xfuc)
+                .attr("x2",xfuc);
 
             hoverLine.data([this.props.timeFocus.time])
                 .enter()
@@ -232,10 +240,8 @@ class XLog extends Component {
                 .attr("class", "focus-line focus-hover-line")
                 .attr("y1", 0)
                 .attr("y2", this.graph.height)
-                .attr("x1", (d) =>{
-                    return this.graph.x(d);
-                })
-                .attr("x2", (d) =>this.graph.x(d))
+                .attr("x1",xfuc)
+                .attr("x2",xfuc)
                 .exit()
                 .remove();
 

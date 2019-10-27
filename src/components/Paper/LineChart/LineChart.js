@@ -112,7 +112,7 @@ class LineChart extends Component {
                 startTime: startTime,
                 endTime: endTime,
                 search : true,
-                options : {...this.graph,type : this.chartType},
+                options : {...this.graph,type : nextProps.box.values['chartType']},
             });
         }
 
@@ -181,7 +181,14 @@ class LineChart extends Component {
                 search : false
             });
         }
+
+        if(nextProps.box.values['chartType'] !== this.chartType ) {
+            this.setState({
+                options : {...this.graph,type : nextProps.box.values['chartType']}
+            });
+        }
         this.chartType = nextProps.box.values['chartType'];
+
     }
     removeObject(prevList, currentList){
         const ret = [];
