@@ -59,8 +59,11 @@ class XLog extends Component {
         if (this.props.layoutChangeTime !== nextProps.layoutChangeTime) {
             this.graphResize();
         }
-        if(!this.props.timeFocus.keep) {
+        if(!nextProps.timeFocus.keep) {
             this.drawTimeFocus();
+        }
+        if(!nextProps.timeFocus.active) {
+            this.removeFocus(nextProps);
         }
     }
 
@@ -198,9 +201,11 @@ class XLog extends Component {
             }
         }, 100);
     };
-
-
-
+    removeFocus(nextProps){
+        if(nextProps.timeFocus.id !== this.props.box.key) {
+            this.graph.focus.select("line.focus-line").remove();
+        }
+    }
     drawTimeFocus = (isFixed = false) => {
 
         const xfuc = (d) => {
