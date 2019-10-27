@@ -35,17 +35,17 @@ class Line extends Component {
         const {type} = nextProps.options;
         const thisType  = this.props.options.type;
         if( type !== thisType){
-            switch(this.props.options.type){
-                case "STACK AREA":
-                    this.removePathLine(true);
+            switch(thisType){
+                case 'STACK AREA':
+                    this.stackArea.selectAll('path').remove();
                     break;
                 default:
-                    this.removePathLine(false);
+                    this.line.selectAll('path').remove();
             }
             this.zoomReset();
-
             this.changedOption(nextProps.options,nextProps);
             this.paint(nextProps);
+
         }
         if(!nextProps.range.realTime){
             this.zoomReset();
@@ -80,30 +80,6 @@ class Line extends Component {
             }
         }
     };
-    removePathLine(isStack){
-        if(!isStack) {
-            for (const obj of this.props.objects) {
-
-                for (let counterKey in this.props.counters) {
-                    let areaClass = "area-" + obj.objHash + "-" + this.replaceName(counterKey);
-                    let lineClass = "line-" + obj.objHash + "-" + this.replaceName(counterKey);
-                    this.line.selectAll("path." + areaClass)
-                        .transition()
-                        .delay(100)
-                        .remove();
-                    this.line.selectAll("path." + lineClass)
-                        .transition()
-                        .delay(100)
-                        .remove();
-                }
-            }
-        }else{
-            this.stackArea.selectAll('path.line')
-                    .transition()
-                    .delay(100)
-                    .remove();
-        }
-    }
     paint (data){
 
         this.clearLine();
@@ -197,46 +173,36 @@ class Line extends Component {
             this.focus.select("line.focus-line").remove();
         }
     }
+    focusLine=(time,y2)=>{
+        let hoverLine = this.focus.selectAll("line.focus-line");
+        const xfuc = (d) => {
+            const x = this.xScale(d);
+            if(x < 0){
+                return 0;
+            }
+            if(x > this.props.options.width){
+                return this.props.options.width;
+            }
+            return x;
+        };
+        hoverLine.attr("x1",xfuc)
+            .attr("x2",xfuc);
+
+        hoverLine.data([time])
+            .enter()
+            .append("line")
+            .attr("class", "focus-line focus-hover-line")
+            .attr("y1", 0)
+            .attr("y2", y2)
+            .attr("x1", xfuc)
+            .attr("x2",xfuc)
+            .exit()
+            .remove();
+        hoverLine.style("display","block");
+    };
     drawTimeFocus=(isFixed=false,nextProps)=>{
-
-        if( isFixed ){
-            let hoverLine = this.focus.selectAll("line.focus-line");
-                hoverLine.attr("x1", (d) => this.xScale(d))
-                         .attr("x2", (d) => this.xScale(d));
-
-                hoverLine.data([this.props.timeFocus.time])
-                    .enter()
-                    .append("line")
-                    .attr("class", "focus-line focus-hover-line")
-                    .attr("y1", 0)
-                    .attr("y2", nextProps.options.height)
-                    .attr("x1", (d) => {
-                        return this.xScale(d);
-                    })
-                    .attr("x2", (d) => this.xScale(d))
-                    .exit()
-                    .remove();
-                hoverLine.style("display","block");
-
-        }else if( nextProps.timeFocus.id !== this.props.box.key) {
-            let hoverLine = this.focus.selectAll("line.focus-line");
-            hoverLine.attr("x1", (d) =>this.xScale(d))
-                .attr("x2", (d) =>this.xScale(d));
-
-            hoverLine.data([nextProps.timeFocus.time])
-                .enter()
-                .append("line")
-                .attr("class", "focus-line focus-hover-line")
-                .attr("y1", 0)
-                .attr("y2", nextProps.options.height)
-                .attr("x1", (d) =>{
-                    return this.xScale(d);
-                })
-                .attr("x2", (d) =>this.xScale(d))
-                .exit()
-                .remove();
-            hoverLine.style("display","block");
-
+        if( isFixed || nextProps.timeFocus.id !== this.props.box.key) {
+            this.focusLine(this.props.timeFocus.time,nextProps.options.height);
         }else{
             this.focus.select("line.focus-line").remove();
         }
