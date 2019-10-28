@@ -42,13 +42,16 @@ class Line extends Component {
                 default:
                     this.line.selectAll('path').remove();
             }
+            this.focus.selectAll("circle").remove();
             this.zoomReset();
             this.changedOption(nextProps.options,nextProps);
             this.paint(nextProps);
 
         }
+
         if(!nextProps.range.realTime){
             this.zoomReset();
+
         }
 
         const isResize = nextProps.options.width !== this.props.options.width ||
