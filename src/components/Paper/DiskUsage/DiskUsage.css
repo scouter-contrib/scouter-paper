@@ -14,9 +14,11 @@
 .disk-usage-list > div.row.table-title {
     display: table;
     background-color: #26466d;
-    color: white;
+    background-color: #F2F2F2;
     text-align: left;
     font-size: 10px;
+    position: sticky;
+    top: 0;
 }
 
 .disk-usage-list > div > span {
