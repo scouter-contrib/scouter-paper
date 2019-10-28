@@ -1,0 +1,58 @@
+.xlog-flow {
+  position: relative;
+}
+.xlog-flow .title {
+  padding: 8px;
+  background-color: #333;
+  color: #fff;
+  height: 36px;
+  box-sizing: border-box;
+}
+.xlog-flow .title span {
+  display: inline-block;
+  padding: 4px;
+}
+.xlog-flow .close-btn {
+  position: absolute;
+  top: 7px;
+  right: 5px;
+  display: inline-block !important;
+}
+.xlog-flow .contents {
+  width: 100%;
+  height: calc(100% - 36px);
+  overflow-y: hidden;
+}
+.xlog-flow .frame-xlog-flow-content {
+  position: absolute;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  background-color: rgba(0,0,0,0.6);
+  display: table;
+  width: 100%;
+  height: 100%;
+  z-index: 3;
+}
+.xlog-flow .frame-xlog-flow-content > div {
+  display: table-cell;
+  width: 100%;
+  height: 100%;
+  vertical-align: middle;
+  padding: 0;
+  position: relative;
+  box-sizing: border-box;
+}
+.xlog-flow .frame-xlog-flow-content > div > div {
+  background-color: #fff;
+  height: 80%;
+  margin: 0 40px;
+}
+
+@media screen and (max-width: 800px) {
+  .xlog-flow .frame-xlog-flow-content > div > div {
+    height: 80%;
+    margin: 0;
+  }
+}

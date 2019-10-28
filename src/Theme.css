@@ -78,6 +78,10 @@ html.theme-gray {
     stroke: #deffba;
 }
 
+/* THEME, topology-chart.css */
+.theme-gray .topology-wrapper .tooltip-group{
+    color: #111;
+}
 
 /* THEME, Login.css */
 .theme-gray .login-wrapper .login-box {
@@ -346,3 +350,21 @@ html.theme-gray, .theme-gray body {
     background-color: #111;
 }
 
+.theme-gray div.xlog-flow > div.contents {
+    background-color: #666;
+}
+.theme-gray div.xlog-flow-content > div.contents > div.flow-data span{
+    color : #333;
+}
+.theme-gray div.xlog-flow-content > div.contents > div.flow-data span.data.txid {
+    color : #7B3E81;
+}
+.theme-gray div.xlog-flow-content > div.contents > div.type > div.info{
+    color : #333;
+}
+.theme-gray div.xlog-flow-content > div.contents > div.error > div.info{
+    color : red;
+}
+.theme-gray div.active-speed-content > div.row:hover{
+    color : #333;
+}

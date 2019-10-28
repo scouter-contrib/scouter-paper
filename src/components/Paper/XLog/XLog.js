@@ -59,8 +59,11 @@ class XLog extends Component {
         if (this.props.layoutChangeTime !== nextProps.layoutChangeTime) {
             this.graphResize();
         }
-        if(!this.props.timeFocus.keep) {
+        if(!nextProps.timeFocus.keep) {
             this.drawTimeFocus();
+        }
+        if(!nextProps.timeFocus.active) {
+            this.removeFocus(nextProps);
         }
     }
 
@@ -196,17 +199,29 @@ class XLog extends Component {
                     this.graphInit();
                 }
             }
-        }, 300);
+        }, 100);
     };
-
-
-
+    removeFocus(nextProps){
+        if(nextProps.timeFocus.id !== this.props.box.key) {
+            this.graph.focus.select("line.focus-line").remove();
+        }
+    }
     drawTimeFocus = (isFixed = false) => {
 
+        const xfuc = (d) => {
+            const x = this.graph.x(d);
+            if(x < 0){
+                return 0;
+            }
+            if(x > this.graph.width){
+                return this.graph.width;
+            }
+            return x;
+        };
         if( isFixed && !this.state.noData){
             let hoverLine = this.graph.focus.selectAll("line.focus-line");
-            hoverLine.attr("x1", (d) =>this.graph.x(d))
-                .attr("x2", (d) =>this.graph.x(d));
+            hoverLine.attr("x1",xfuc)
+                .attr("x2",xfuc);
 
             hoverLine.data([this.props.timeFocus.time])
                 .enter()
@@ -214,17 +229,15 @@ class XLog extends Component {
                 .attr("class", "focus-line focus-hover-line")
                 .attr("y1", 0)
                 .attr("y2", this.graph.height)
-                .attr("x1", (d) =>{
-                    return this.graph.x(d);
-                })
-                .attr("x2", (d) =>this.graph.x(d))
+                .attr("x1",xfuc)
+                .attr("x2",xfuc)
                 .exit()
                 .remove();
 
         } else if( !this.state.noData && this.props.timeFocus.id && this.props.timeFocus.id !== this.props.box.key) {
             let hoverLine = this.graph.focus.selectAll("line.focus-line");
-            hoverLine.attr("x1", (d) =>this.graph.x(d))
-                .attr("x2", (d) =>this.graph.x(d));
+            hoverLine.attr("x1",xfuc)
+                .attr("x2",xfuc);
 
             hoverLine.data([this.props.timeFocus.time])
                 .enter()
@@ -232,10 +245,8 @@ class XLog extends Component {
                 .attr("class", "focus-line focus-hover-line")
                 .attr("y1", 0)
                 .attr("y2", this.graph.height)
-                .attr("x1", (d) =>{
-                    return this.graph.x(d);
-                })
-                .attr("x2", (d) =>this.graph.x(d))
+                .attr("x1",xfuc)
+                .attr("x2",xfuc)
                 .exit()
                 .remove();
 
@@ -415,10 +426,10 @@ class XLog extends Component {
         }).ticks(yAxisCount));
 
         // X축 단위 그리드 그리기
-        svg.append("g").attr("class", "grid-x").style("stroke-dasharray", "5 5").style("opacity", this.graph.opacity).attr("transform", "translate(0," + this.graph.height + ")").call(d3.axisBottom(this.graph.x).tickSize(-this.graph.height).tickFormat("").ticks(xAxisCount));
+        svg.append("g").attr("class", "grid-x").style("stroke-dasharray", "5 2").style("opacity", this.graph.opacity).attr("transform", "translate(0," + this.graph.height + ")").call(d3.axisBottom(this.graph.x).tickSize(-this.graph.height).tickFormat("").ticks(xAxisCount));
 
         // Y축 단위 그리드 그리기
-        svg.append("g").attr("class", "grid-y").style("stroke-dasharray", "5 5").style("opacity", this.graph.opacity).call(d3.axisLeft(this.graph.y).tickSize(-this.graph.width).tickFormat("").ticks(yAxisCount));
+        svg.append("g").attr("class", "grid-y").style("stroke-dasharray", "5 2").style("opacity", this.graph.opacity).call(d3.axisLeft(this.graph.y).tickSize(-this.graph.width).tickFormat("").ticks(yAxisCount));
 
 
         this.graph.focus = svg.append("g").attr("class", "tooltip-focus");

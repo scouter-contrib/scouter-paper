@@ -1,0 +1,13 @@
+.node text {
+  font: 12px sans-serif;
+}
+.tree-link {
+  fill: none;
+  stroke: rgba(0,0,0,0.1);
+  stroke-width: 2px;
+}
+.error-link {
+  fill: none;
+  stroke: #ce1126;
+  stroke-width: 2px;
+}

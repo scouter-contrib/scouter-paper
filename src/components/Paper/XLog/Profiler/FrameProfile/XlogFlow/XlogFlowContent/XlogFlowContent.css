@@ -1,0 +1,83 @@
+.xlog-flow-content {
+  position: relative;
+}
+.xlog-flow-content .title {
+  padding: 8px;
+  background-color: #444;
+  color: #fff;
+  height: 36px;
+  box-sizing: border-box;
+}
+.xlog-flow-content .title span {
+  display: inline-block;
+  padding: 4px;
+}
+.xlog-flow-content .close-btn {
+  position: absolute;
+  top: 7px;
+  right: 5px;
+  display: inline-block !important;
+}
+.xlog-flow-content .contents {
+  position: relative;
+  width: calc(100% - 12px);
+  height: calc(100% - 50px);
+  margin: 10px 10px;
+  overflow-y: auto;
+}
+.xlog-flow-content .contents::-webkit-scrollbar {
+  width: 7px;
+  height: 7px;
+}
+.xlog-flow-content .contents .sub-title {
+  background-color: #333;
+  color: #fff;
+  border: 1px solid #333;
+}
+.xlog-flow-content .contents .flow-data {
+  margin-bottom: 20px;
+}
+.xlog-flow-content .contents .flow-data > div {
+  white-space: nowrap;
+  display: table;
+  table-layout: fixed;
+  width: 100%;
+}
+.xlog-flow-content .contents .flow-data span {
+  padding: 7px 10px;
+  box-sizing: border-box !important;
+  display: table-cell;
+}
+.xlog-flow-content .contents .flow-data .label {
+  width: 100px;
+  background-color: #eee;
+}
+.xlog-flow-content .contents .flow-data .data {
+  white-space: nowrap;
+}
+.xlog-flow-content .contents .flow-data .txid {
+  cursor: pointer;
+  color: #7b3e81;
+  text-decoration: underline;
+}
+.xlog-flow-content .contents .type {
+  position: relative;
+  margin-top: 10px;
+  display: block !important;
+}
+.xlog-flow-content .contents .type > span {
+  display: inline-block;
+  padding: 4px;
+  background-color: #333;
+  color: #fff;
+  background-color: #eee;
+  color: #333;
+  border-radius: 2px;
+}
+.xlog-flow-content .contents .type .info {
+  margin-top: 10px;
+}
+.xlog-flow-content .contents .error {
+  color: #f00;
+  display: block !important;
+}

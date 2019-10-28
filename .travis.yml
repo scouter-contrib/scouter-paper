@@ -1,0 +1,31 @@
+addons:
+  ssh_known_hosts:
+  - demo.scouterapm.com
+dist: xenial
+language: node_js
+node_js:
+  - "stable"
+before_install:
+  - echo -e "Host $DEMO_SERVER_NODE\n\tStrictHostKeyChecking no\n" >> ~/.ssh/config
+  - openssl aes-256-cbc -K $encrypted_d662ab6492f2_key -iv $encrypted_d662ab6492f2_iv -in .deploy.enc -out $DEMO_DELOY_FILE -d
+  - chmod 600 $DEMO_DELOY_FILE
+  - npm install
+script :
+  - npm run-script build
+after_success:
+  - tar cvf $SCOUTER_PAPER_COMPRESS_NAME build/
+  - echo "scp -i $DEMO_DELOY_FILE $SCOUTER_PAPER_COMPRESS_NAME $DEMO_SERVER_USER@$DEMO_SERVER_NODE:/home/$DEMO_SERVER_USER"
+  - scp -i $DEMO_DELOY_FILE $SCOUTER_PAPER_COMPRESS_NAME $DEMO_SERVER_USER@$DEMO_SERVER_NODE:/home/$DEMO_SERVER_USER
+  - ssh -i $DEMO_DELOY_FILE -T $DEMO_SERVER_USER@$DEMO_SERVER_NODE "/home/ec2-user/deploy.sh $SCOUTER_PAPER_COMPRESS_NAME"
+cache:
+  directories:
+    - "node_modules"
+branches:
+  only:
+    - development
+notifications:
+  slack: scouterapm:fJndRYgbQA0uTLXiEqxZJhUU
+
+#: construction_worker:
+# job life cycle explain : https://docs.travis-ci.com/user/job-lifecycle/
+# https://docs.travis-ci.com/user/encrypting-files

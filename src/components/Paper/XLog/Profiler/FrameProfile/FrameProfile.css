@@ -53,6 +53,16 @@
     color: #FF030D;
 }
 
+.frame-profile div.xlog-data span.data.tx-link {
+    cursor:pointer;
+    color:#7B3E81;
+    text-decoration:underline;
+}
+.frame-profile div.xlog-data span.data.tx-link:hover {
+    text-decoration:none;
+}
+
+
 .frame-profile div.xlog-data.wrap span.data {
     white-space: normal;
     word-break: break-all;
@@ -442,4 +452,41 @@
 .frame-profile-step-detail pre {
     font-family: 'Righteous', 'Nanum Gothic', cursive !important;
     margin: 0;
+}
+
+.frame-profile .frame-xlog-flow {
+    position: fixed;
+    top: 0;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    background-color: rgba(0, 0, 0, 0.6);
+    display: table;
+    width: 100%;
+    height: 100%;
+    z-index: 2;
+}
+
+.frame-profile .frame-xlog-flow > div {
+    display: table-cell;
+    width: 100%;
+    height: 100%;
+    vertical-align: middle;
+    padding: 0 10px;
+    position: relative;
+    box-sizing: border-box;
+}
+
+
+.frame-profile .frame-xlog-flow > div > div {
+    background-color: white;
+    height: calc(100% - 80px);
+    margin: 40px 30px;
+}
+
+@media screen and (max-width: 800px) {
+    .frame-profile .frame-xlog-flow > div > div {
+        height: calc(100% - 20px);
+        margin: 10px 0;
+    }
 }

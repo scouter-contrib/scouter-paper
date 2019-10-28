@@ -1,0 +1,74 @@
+// XLogDataController.java
+// SingleXLogRequest
+GET http://demo.scouterapm.com:6188/scouter/v1/xlog-data/{yyyymmdd}/{txid}
+#
+###
+#"result": [
+#    {
+#      "endTime": "1571082075636",
+#      "objHash": "1026166527",
+#      "service": "http:/traceability/cross-service/simple2",
+#      "txid": "6990900342269582982",
+#      "threadName": "",
+#      "caller": "899870199175109144",
+#      "gxid": "899870199175109144",
+#      "elapsed": "578",
+#      "error": "",
+#      "cpu": "0",
+#      "sqlCount": "0",
+#      "sqlTime": "0",
+#      "ipAddr": "0.0.0.0",
+#      "allocatedMemory": "0",
+#      "internalId": "0",
+#      "userAgent": "",
+#      "referrer": "",
+#      "group": "",
+#      "apicallCount": "0",
+#      "apicallTime": "0",
+#      "countryCode": "",
+#      "city": "",
+#      "login": "",
+#      "desc": "",
+#      "hasDump": "0",
+#      "text1": "ip-172-31-21-206.ap-northeast-2.compute.internal:ScouterDemoWeb",
+#      "text2": "",
+#      "text3": "",
+#      "text4": "",
+#      "text5": "",
+#      "queuingHost": "",
+#      "queuingTime": "0",
+#      "queuing2ndHost": "",
+#      "queuing2ndTime": "0",
+#      "xlogType": "ZIPKIN_SPAN"
+#    },
+GET http://demo.scouterapm.com:6188/scouter/v1/profile-data/20191017/6506185853545897725
+###
+#"result": [
+#    {
+#      "mainValue": "[driving thread] http-nio-8080-exec-21",
+#      "additionalValueList": [],
+#      "step": {
+#        "parent": "-1",
+#        "index": "0",
+#        "start_time": "0",
+#        "start_cpu": "0",
+#        "spanPack": null,
+#        "hash": "1712797862",
+#        "time": "-1",
+#        "value": "0",
+#        "stepType": "9",
+#        "order": "0",
+#        "stepTypeName": "HASHED_MESSAGE"
+#      }
+#    },
+
+GET http://demo.scouterapm.com:6188/scouter/v1/xlog/20191017/374225541302635030
+
+###
+
+GET http://demo.scouterapm.com:6188/scouter/v1/xlog-data/20191017/-854231684852475423
+
+###
+GET http://demo.scouterapm.com:6188/scouter/v1/dictionary/20191020?dictKeys=[table:566700965]
+
+###

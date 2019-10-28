@@ -1,0 +1,43 @@
+.xlog-flow
+  position: relative
+  .title
+    padding: 8px
+    background-color: #333
+    color: white
+    height: 36px
+    box-sizing: border-box
+    & span
+      display: inline-block
+      padding: 4px
+  .close-btn
+    position: absolute
+    top : 7px
+    right : 5px
+    display: inline-block !important
+  .contents
+    width: 100%
+    height: calc(100% - 36px)
+    overflow-y : hidden
+  .frame-xlog-flow-content
+    position: absolute
+    top: 0
+    left: 0
+    right: 0
+    bottom: 0
+    background-color: rgba(0, 0, 0, 0.6)
+    display: table
+    width: 100%
+    height: 100%
+    z-index: 3
+    & > div
+      display: table-cell
+      width: 100%
+      height: 100%
+      vertical-align: middle
+      padding: 0 10px
+      position: relative
+      box-sizing: border-box
+      & > div
+        background-color: white
+        height: calc(100% - 60px)
+        width: 100%

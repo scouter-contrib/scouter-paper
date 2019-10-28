@@ -1,0 +1,83 @@
+.xlog-flow-content
+  position: relative
+  .title
+    padding: 8px
+    background-color: #444
+    color: white
+    height: 36px
+    box-sizing: border-box
+    & span
+      display: inline-block
+      padding: 4px
+
+  .close-btn
+    position: absolute
+    top : 7px
+    right : 5px
+    display: inline-block !important
+  .contents
+    position: relative
+    width: calc(100% - 12px)
+    height: calc(100% - 50px)
+    margin: 10px 10px
+    overflow-y : auto
+    &::-webkit-scrollbar
+      width: 7px
+      height: 7px
+    .sub-title
+      //padding: 10px !important;
+      background-color: #333
+      color: white
+      //display:
+      border: 1px solid #333
+    .flow-data
+      margin-bottom: 20px
+      & > div
+        white-space: nowrap
+        display: table
+        table-layout: fixed
+        width: 100%
+      & span
+        padding: 7px 10px
+        box-sizing: border-box !important
+        display: table-cell
+      .label
+        width: 100px
+        background-color: #EEE
+      .data
+        white-space: nowrap
+      .txid
+        cursor:pointer
+        color:#7B3E81
+        text-decoration:underline
+    .type
+      position: relative
+      margin-top : 10px
+      display: block !important
+      & > span
+        display: inline-block
+        padding: 4px
+        background-color: #333
+        color: white
+        background-color: #EEE
+        color: #333
+        border-radius: 2px
+      .info
+        margin-top : 10px
+    .error
+      color: red
+      display : block !important
+    //
+    //
+    //.xlog-flow-btn
+    //  position: relative
+    //  margin:0px auto 5px
+    //  border-radius : 5px
+    //  font-size : 11px
+    //  cursor : pointer
+    //  background : yellow
+    //  padding  : 6px 8px
+    //  display: inline-block !important
+
+
+
