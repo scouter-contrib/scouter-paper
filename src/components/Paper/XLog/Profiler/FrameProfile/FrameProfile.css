@@ -455,7 +455,7 @@
 }
 
 .frame-profile .frame-xlog-flow {
-    position: absolute;
+    position: fixed;
     top: 0;
     left: 0;
     right: 0;
@@ -477,8 +477,16 @@
     box-sizing: border-box;
 }
 
+
 .frame-profile .frame-xlog-flow > div > div {
     background-color: white;
-    height: calc(100% - 400px);
-    width: 100%;
+    height: calc(100% - 80px);
+    margin: 40px 30px;
+}
+
+@media screen and (max-width: 800px) {
+    .frame-profile .frame-xlog-flow > div > div {
+        height: calc(100% - 20px);
+        margin: 10px 0;
+    }
 }
