@@ -1,7 +1,12 @@
 version: '3.2'
 services:
   scouter-paper:
-    image : scouterapm/scouter-paper:2.5.0
+    build :
+      context : .
+      dockerfile: Dockerfile
+      args:
+        - PAPER_VERSION=${PAPER_VERSION}
+    image : scouterapm/scouter-paper:${PAPER_VERSION}
     restart : always
     ports:
       - 8080:80
