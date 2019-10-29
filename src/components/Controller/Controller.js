@@ -270,7 +270,9 @@ class Controller extends Component {
         common.setTargetServerToUrl(this.props, config);
         common.replaceAllLocalSettingsForServerChange(currentServer, this.props, config);
         common.clearAllUrlParamOfPaper(this.props, config);
+        localStorage.removeItem("selectedObjects");
         window.location.reload();
+
     };
 
     setObjects = () => {
