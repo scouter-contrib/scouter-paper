@@ -4,15 +4,18 @@ import './DiskUsage.css';
 const layout = [
     {
         key: "objName",
-        name: "OBJECT"
+        name: "OBJECT",
+        type: "string"
     },
     {
         key: "diskDevice",
-        name: "DEVICE"
+        name: "DEVICE",
+        type: "string"
     },
     {
         key: "diskMount",
-        name: "MOUNT"
+        name: "MOUNT",
+        type: "string"
     },
     {
         key: "diskUsed",
@@ -33,12 +36,15 @@ const layout = [
 
 class DiskUsage extends Component {
 
+    lastSort=null;
+
     constructor(props) {
         super(props);
         this.state = {
             allInstance: null,
             boxHeight: 150,
-            boxWidth : 499
+            boxWidth : 499,
+            sort : layout.map(d=>({...d, order:"auto"}))
         };
     }
 
@@ -105,13 +111,16 @@ class DiskUsage extends Component {
         });
     };
 
+    onSort(headerKey){
+
+    }
     getHeader = () => {
         return layout.map((meta, j) => {
 
             if(meta.key === 'objName') {
-                return <span className={meta.key} key={j}>{meta.name} (Total : {this.state.allInstance.length})</span>
+                return <span className={meta.key} key={j} onClick={()=>this.onSort(meta.key)}>{meta.name} (Total : {this.state.allInstance.length})<i className="fa fa-sort" style={{color:"#a0a0a0"}}></i></span>
             }else{
-                return <span className={meta.key} key={j}>{meta.name}</span>
+                return <span className={meta.key} key={j} onClick={()=>this.onSort(meta.key)}>{meta.name}<i className="fa fa-sort" style={{color:"#a0a0a0"}}></i></span>
             }
 
         });
