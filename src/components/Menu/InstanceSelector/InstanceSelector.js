@@ -123,12 +123,10 @@ class InstanceSelector extends Component {
 
     render() {
 
-        let iconMap = {"all" : 0,"active":0,"inactive":0};
+        let iconMap = {"all" : 0};
         let selectedIconMap = {"all" : 0};
 
         let all = 0;
-        let active = 0;
-        let inactive = 0;
         this.props.selectedObjects && this.props.objects && this.props.objects.forEach((instance) => {
             let icon = this.getIconOrObjectType(instance);
             if (iconMap[icon] === undefined) {
@@ -143,17 +141,10 @@ class InstanceSelector extends Component {
                 selectedIconMap[icon] ++;
                 selectedIconMap["all"] ++;
             }
-            if( instance.alive ){
-                active++;
-            }else{
-                inactive++;
-            }
             all++;
         });
 
         iconMap["all"] = all;
-        iconMap["active"] =active;
-        iconMap["inactive"] =inactive;
 
         return (
             <div className="instance-selector-bg" onClick={this.cancelClick}>
@@ -180,7 +171,15 @@ class InstanceSelector extends Component {
                             <div className="instance-list">
                                 <div>
                                     <div className={"filter " + (this.props.filter && this.props.filter.length > 1 ? 'filtered' : '')}>
-                                        <span className="filter-tag">OBJECT</span><span className="filter-separator"></span><span className="filter-icon" onClick={this.props.clearFilter}><i className="fa fa-filter" aria-hidden="true"></i></span><input type="search" onChange={this.onFilterChange.bind(this)} value={this.props.filter}/><span className="check-btn" onClick={this.props.selectAll}>ALL</span>
+                                        <span className="filter-tag">OBJECT</span><span className="filter-separator"></span>
+                                        <span className="filter-icon" onClick={this.props.clearFilter}>
+                                            <i className="fa fa-filter" aria-hidden="true"></i>
+                                        </span>
+                                        <input type="search" onChange={this.onFilterChange.bind(this)} value={this.props.filter}/>
+                                        <span className="check-btn" onClick={this.props.selectAll}>ALL</span>
+                                        <span className="check-btn" onClick={()=>this.props.quickSelectByTypeClick('active')}>ACTIVE</span>
+                                        <span className="check-btn" onClick={()=>this.props.quickSelectByTypeClick('inactive')}>INACTIVE</span>
+
                                     </div>
                                     <div className="icon-type-map">
                                         {(this.props.objects && this.props.objects.length > 0) && (Object.keys(iconMap).sort((a, b) => {

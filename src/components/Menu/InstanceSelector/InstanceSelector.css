@@ -175,7 +175,7 @@
 
 .instance-selector .instance-selector-content .filter .check-btn {
     display: inline-block;
-    width: 30px;
+    /*width: 30px;*/
     padding: 3px 0;
     margin-left: 4px;
     text-align: center;
@@ -218,7 +218,7 @@
 }
 
 .instance-selector .instance-selector-content .filter input {
-    width: calc(100% - 53px - 60px);
+    width: calc(100% - 53px - 135px);
     font-size: 10px;
     padding: 3px 5px;
     border-radius: 2px;
