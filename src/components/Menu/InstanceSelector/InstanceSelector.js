@@ -105,6 +105,7 @@ class InstanceSelector extends Component {
     };
 
     onFilterChange = (event) => {
+
         this.props.onFilterChange(event.target.value);
     };
 
@@ -122,10 +123,12 @@ class InstanceSelector extends Component {
 
     render() {
 
-        let iconMap = {"all" : 0};
+        let iconMap = {"all" : 0,"active":0,"inactive":0};
         let selectedIconMap = {"all" : 0};
 
         let all = 0;
+        let active = 0;
+        let inactive = 0;
         this.props.selectedObjects && this.props.objects && this.props.objects.forEach((instance) => {
             let icon = this.getIconOrObjectType(instance);
             if (iconMap[icon] === undefined) {
@@ -140,10 +143,17 @@ class InstanceSelector extends Component {
                 selectedIconMap[icon] ++;
                 selectedIconMap["all"] ++;
             }
+            if( instance.alive ){
+                active++;
+            }else{
+                inactive++;
+            }
             all++;
         });
 
         iconMap["all"] = all;
+        iconMap["active"] =active;
+        iconMap["inactive"] =inactive;
 
         return (
             <div className="instance-selector-bg" onClick={this.cancelClick}>

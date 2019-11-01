@@ -32,6 +32,14 @@ class Line extends Component {
             return;
         }
 //-    realtime <=> search reset
+        if(nextProps.removeObject !== this.props.removeObject){
+            _.forEach(nextProps.removeObject, d=>this.removeCounterLine(d.key,d.counter));
+        }
+        if(nextProps.removeCounter !== this.props.removeCounter){
+            _.forEach(nextProps.removeCounter,d=>this.removeCounterLine(d.key,d.counter,true));
+        }
+
+
         const {type} = nextProps.options;
         const thisType  = this.props.options.type;
         if( type !== thisType){
@@ -46,7 +54,6 @@ class Line extends Component {
             this.zoomReset();
             this.changedOption(nextProps.options,nextProps);
             this.paint(nextProps);
-
         }
 
         if(!nextProps.range.realTime){
@@ -85,8 +92,37 @@ class Line extends Component {
     };
     paint (data){
 
-        this.clearLine();
         if (data.objects) {
+            this.xScale.domain([data.startTime, data.endTime]);
+            this.yScale.domain([0, data.options.maxY]);
+// Y축
+            let xAxisCount = Math.floor(data.options.width / data.options.xAxisWidth);
+            if (xAxisCount < 1) {
+                xAxisCount = 1;
+            }
+
+            let yAxisCount = Math.floor(data.options.height / data.options.yAxisHeight);
+            if (yAxisCount < 1) {
+                yAxisCount = 1;
+            }
+            this.tickY.ticks(yAxisCount);
+            this.gridTickY.tickSize(-data.options.width)
+                .ticks(yAxisCount);
+            this.axisY.transition().duration(500).call(this.tickY);
+            this.gridY.transition().duration(500).call(this.gridTickY);
+//- X축
+            this.tickX.tickFormat(d3.timeFormat(this.getTimeFormat(data.endTime - data.startTime)))
+                .ticks(xAxisCount);
+
+            this.gridTickX.tickSize(-data.options.height)
+                .ticks(xAxisCount);
+
+            this.axisX.attr("transform", `translate(0,${data.options.height})`)
+                .call(this.tickX);
+            this.gridX.attr("transform", `translate(0,${data.options.height})`)
+                .call(this.gridTickX);
+            this.focus.selectAll("line").attr("y2",data.options.height);
+
             let instanceMetricCount = {};
             for (let counterKey in data.counters) {
                 let thisOption = data.box.option.filter((d) => {return d.counterKey === counterKey})[0];
@@ -135,10 +171,7 @@ class Line extends Component {
         }
     };
 
-    clearLine(){
-        _.forEach(this.props.removeCounter,d=>this.removeCounterLine(d.key,d.counter));
-        _.forEach(this.props.removeObject, d=>this.removeCounterLine(d.key,d.counter));
-    }
+
 
     replaceAll(str, searchStr, replaceStr) {
         return str.split(searchStr).join(replaceStr);
@@ -151,10 +184,9 @@ class Line extends Component {
         }
         return name;
     }
-    removeCounterLine(objHash, counterKey) {
+    removeCounterLine(objHash, counterKey,isRemoveTitle=false) {
         let pathClass = "line-" + objHash + "-" + this.replaceName(counterKey);
         let path = this.line.selectAll("path." + pathClass);
-
         // 라인 그래프 삭제
         if (path && path.size() > 0) {
             path.remove();
@@ -168,7 +200,9 @@ class Line extends Component {
             circle.remove();
         }
         // 제목 삭제
-        this.props.removeTitle(counterKey);
+        if(isRemoveTitle) {
+            this.props.removeTitle(counterKey);
+        }
     };
 
     removeFocus(nextProps){
@@ -283,21 +317,14 @@ class Line extends Component {
                     return [_node.time,next_v,pre_v];
                 });
                 return area(_d);
+            })
+            .style("opacity",(d) =>{
+                return data.filterMap[d.key] ?  data.config.graph.opacity : 0;
             });
 
         //- 차트 생성
         paintGroup.enter()
             .append('path')
-            .attr("d",(d)=> {
-                const _d = _.map(d.values,(_node) =>{
-                    const _key = _node.time;
-                    const pre_v =  pre[_key] ? pre[_key] : 0;
-                    const next_v = pre_v + _node.value;
-                    pre[_key] = next_v;
-                    return [_node.time,next_v,pre_v];
-                });
-                return area(_d);
-            })
             .attr('class',(d)=> `line ${d.key}` )
             .attr('data-col-name', (d)=> d.key)
             .style("fill", (d)=> {
@@ -307,8 +334,7 @@ class Line extends Component {
             .attr("stroke",(d) =>{
                 return color[d.key];
             })
-            .style("stroke-width", this.props.config.graph.width)
-            .style("opacity", this.props.config.graph.opacity);
+            .style("stroke-width", this.props.config.graph.width);
 
         //- 차트 갱신 후 데이터 삭제
         paintGroup.exit().remove();
@@ -336,13 +362,14 @@ class Line extends Component {
             let areaClass = "area-" + obj.objHash + "-" + this.replaceName(counterKey);
             let area = this.line.selectAll("path." + areaClass)
                                 .data([data.counters[counterKey]])
-                                .attr("d",valueArea);
+                                .attr("d",valueArea)
+                                .style("opacity", data.filterMap[obj.objHash] ?  data.config.graph.opacity : 0);
             area= area.enter()
                 .insert('path')
                 .attr("class",areaClass)
                 .style("stroke", color)
                 .style("fill", color)
-                .style("opacity", !this.props.filterMap[obj.objHash] ? 0 : data.config.graph.fillOpacity);
+                .attr("fill-opacity", this.props.config.graph.fillOpacity);
 
             area.exit().remove();
 
@@ -374,15 +401,15 @@ class Line extends Component {
         let pathClass = `line-${obj.objHash}-${this.replaceName(counterKey)}`;
         let path = this.line.selectAll("path." + pathClass)
                             .data([data.counters[counterKey]])
-                            .attr("d",valueLine);
-
+                            .attr("d",valueLine)
+                            .style("opacity", data.filterMap[obj.objHash] ?  data.config.graph.opacity : 0);
         path = path.enter()
             .insert("path")
             .attr("class",pathClass)
             .style("stroke", color)
-            .style("stroke-width", this.props.config.graph.width)
-            .style("opacity", !this.props.filterMap[obj.objHash] ? 0 : this.props.config.graph.opacity);
-        this.setAnimation(path)
+            .style("stroke-width", data.config.graph.width);
+
+        this.setAnimation(path);
 
         path.exit().remove();
 
@@ -413,6 +440,7 @@ class Line extends Component {
 
     changedOption(changed,props){
 
+        let repaint=false;
         if(changed.width !== this.props.options.width || changed.height !==  this.props.options.height ) {
             this.brush.extent([[0, 0], [changed.width, changed.height]]);
             this.brushG.call(this.brush);
@@ -421,44 +449,16 @@ class Line extends Component {
                 .attr("height", changed.height);
             this.xScale = this.xScale.range([0, changed.width]);
             this.yScale = this.yScale.range([changed.height, 0]);
+            repaint=true;
         }
 
-        this.xScale.domain([props.startTime, props.endTime]);
-        this.yScale.domain([0, props.options.maxY]);
-
-        let xAxisCount = Math.floor(changed.width / changed.xAxisWidth);
-        if (xAxisCount < 1) {
-            xAxisCount = 1;
-        }
-        let yAxisCount = Math.floor(changed.height / changed.yAxisHeight);
-        if (yAxisCount < 1) {
-            yAxisCount = 1;
-        }
-
-        // Y축
-        this.tickY.ticks(yAxisCount);
-
-        this.gridTickY.tickSize(-changed.width)
-            .ticks(yAxisCount);
-
-        this.axisY.transition().duration(500).call(this.tickY);
-        this.gridY.transition().duration(500).call(this.gridTickY);
-//- X축
-        this.tickX.tickFormat(d3.timeFormat(this.getTimeFormat(props.endTime - props.startTime)))
-            .ticks(xAxisCount);
-
-        this.gridTickX.tickSize(-changed.height)
-            .ticks(xAxisCount);
-
-        this.axisX.attr("transform", `translate(0,${changed.height})`)
-            .call(this.tickX);
-        this.gridX.attr("transform", `translate(0,${changed.height})`)
-            .call(this.gridTickX);
-        this.focus.selectAll("line").attr("y2",changed.height);
         // if(changed.height !== this.props.options.height ||
         //    changed.width !== this.props.options.width  ){
         //    this.paint(this.props);
         // }
+        if(repaint){
+            this.paint(this.props);
+        }
     }
 
     zoomBrush = () => {
@@ -771,14 +771,16 @@ class Line extends Component {
 
                     if (!isNaN(tooltip.lines[i].value)) {
                         let circle = that.focus.select("circle." + tooltip.lines[i].circleKey);
+                        if(circle) {
                             circle.attr("cx", xPosition);
                             circle.attr("cy", that.yScale(tooltip.lines[i].value));
 
                             circle.data([tooltip.lines[i].value])
                                 .enter()
-                                .style('display','block')
+                                .style('display', 'block')
                                 .exit()
                                 .remove();
+                        }
 
                     }
                 }

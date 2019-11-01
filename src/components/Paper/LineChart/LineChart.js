@@ -107,11 +107,13 @@ class LineChart extends Component {
                 endTime = nextProps.countersHistoryTo;
                 startTime = nextProps.countersHistoryFrom;
             }
-
+            const removeCounter = this.removeCounter(this.props.box.option,counters);
+            removeCounter.forEach(d=> delete counters[d.counter]);
             this.setState({
                 startTime: startTime,
                 endTime: endTime,
                 search : true,
+                removeCounter : removeCounter.length > 0 ? removeCounter : null,
                 options : {...this.graph,type : nextProps.box.values['chartType']},
             });
         }
@@ -170,12 +172,12 @@ class LineChart extends Component {
             //- object remove , couter remove
             const removeCounter = this.removeCounter(this.props.box.option,counters);
             removeCounter.forEach(d=> delete counters[d.counter]);
+
             this.setState({
                 startTime: startTime,
                 endTime: endTime,
                 counters: noData ? [] : counters,
-                removeCounter : removeCounter,
-                removeObject  : this.removeObject(nextProps.objects,this.props.objects),
+                removeCounter : removeCounter.length > 0 ? removeCounter : null,
                 noData: noData,
                 options : {...this.graph,type : nextProps.box.values['chartType']},
                 search : false
@@ -188,6 +190,7 @@ class LineChart extends Component {
             });
         }
         this.chartType = nextProps.box.values['chartType'];
+
 
     }
     removeObject(prevList, currentList){
@@ -381,16 +384,12 @@ class LineChart extends Component {
         if(this.isChangedSize()){
             this.resize();
         }
-
-        // if (prevProps.layoutChangeTime !== this.props.layoutChangeTime) {
-        //   if(this.isChangedSize()){
-        //       this.resize();
-        //   }
-        // }else{
-        //     // this.graphResize();
-        //  //      this.removeObjLine(prevProps.objects, this.props.objects);
-        //
-        // }
+        const removeObject = this.removeObject(prevProps.objects,this.props.objects);
+        if(removeObject.length > 0){
+            this.setState({
+                removeObject : removeObject
+            });
+        };
     };
 
     isChangedSize(){

@@ -1,5 +1,7 @@
 import React, {Component} from 'react';
 import './DiskUsage.css';
+import connect from "react-redux/es/connect/connect";
+import {withRouter} from "react-router-dom";
 
 const layout = [
     {
@@ -68,12 +70,15 @@ class DiskUsage extends Component {
             let box = this.refs.listBox.parentNode.parentNode.parentNode.parentNode;
 
             // used & total 사이즈가 0 보다 큰 데이터만 정리
+            const objects = this.props.objects.filter(d=> d.objFamily === "host");
             arrDiskUsage.map((data, index) => {
 
                 if (data !== null) {
                     JSON.stringify((data).map((instance) => {
                         if (instance.used > 0 && instance.total > 0) {
                             instance.objName = arrObjName[index];
+                            objects.filter(d => d.objName === instance.objName)
+                                   .forEach(d=> instance.objHash = d.objHash);
                             instance.diskUsage = Math.round((instance.used / instance.total) * 100);
                             instance.diskUsed = instance.used;
                             instance.diskTotal = instance.total;
@@ -109,7 +114,13 @@ class DiskUsage extends Component {
 
     }
     shouldComponentUpdate(nextProps, nextState){
+        if(nextProps.realTime !== this.props.realtime){
+            return true;
+        }
         if(nextProps.diskUsage !== this.props.diskUsage){
+            return true;
+        }
+        if(nextProps.filterMap !== this.props.filterMap){
             return true;
         }
 
@@ -123,7 +134,7 @@ class DiskUsage extends Component {
         return false;
 
     }
-    getRow = (row, i) => {
+    getRow = (row) => {
         return layout.map((meta, j) => {
 
             let className = meta.key;
@@ -150,11 +161,11 @@ class DiskUsage extends Component {
         if(type === "string"){
              switch(_orderBy) {
                  case "desc":
-                     data.sort((a, b) => a[key].localeCompare(b[key]));
+                     data.sort((a, b) => b[key].localeCompare(a[key]));
                      _orderData = data;
                      break;
                  case "asc":
-                     data.sort((a, b) => b[key].localeCompare(a[key]));
+                     data.sort((a, b) => a[key].localeCompare(b[key]));
                      _orderData = data;
                      break;
                  default:
@@ -163,11 +174,11 @@ class DiskUsage extends Component {
         }else if( type === "percent"){
             switch(_orderBy) {
                 case "desc":
-                    data.sort((a, b) => String(a[key]).localeCompare(String(b[key]), 'en-US', { numeric: true, sensitivity: 'base' }));
+                    data.sort((a, b) => String(b[key]).localeCompare(String(a[key]), 'en-US', { numeric: true, sensitivity: 'base' }));
                     _orderData = data;
                     break;
                 case "asc":
-                    data.sort((a, b) => String(b[key]).localeCompare(String(a[key]), 'en-US', { numeric: true, sensitivity: 'base' }));
+                    data.sort((a, b) => String(a[key]).localeCompare(String(b[key]), 'en-US', { numeric: true, sensitivity: 'base' }));
                     _orderData = data;
                     break;
                 default:
@@ -177,11 +188,11 @@ class DiskUsage extends Component {
 
             switch(_orderBy) {
                 case "desc":
-                    data.sort((a, b) => a[key].localeCompare(b[key], 'en-US', { numeric: true, sensitivity: 'base' }));
+                    data.sort((a, b) => b[key].localeCompare(a[key], 'en-US', { numeric: true, sensitivity: 'base' }));
                     _orderData = data;
                     break;
                 case "asc":
-                    data.sort((a, b) => b[key].localeCompare(a[key], 'en-US', { numeric: true, sensitivity: 'base' }));
+                    data.sort((a, b) => a[key].localeCompare(b[key], 'en-US', { numeric: true, sensitivity: 'base' }));
                     _orderData = data;
                     break;
                 default:
@@ -244,16 +255,34 @@ class DiskUsage extends Component {
     render() {
         return (
            <div className="disk-usage-list scrollbar" ref="listBox" style={{width: this.state.boxWidth + "px"}}>
-             <div className="row table-title">{this.state.allInstance && this.getHeader()}</div>
-                {this.state.allInstance && this.state.allInstance.data.map((data, i) => {
-                    return <div className="row" key={i}>{this.getRow(data, i)}</div>;
-                })}
-                {(!this.state.allInstance) && <div className="no-data">
-                   <div>NO DATA RECEIVED</div> </div>}
+           { !this.props.realtime && <div className="no-data"><div>REALTIME ONLY</div></div>}
+           { (this.props.realtime && this.state.allInstance) && <div className="row table-title">{this.getHeader()}</div>}
+
+           { (this.props.realtime && this.state.allInstance) &&
+                this.state.allInstance.data.map((data,i)=>{
+                         return this.props.filterMap[data.objHash]  ? <div className="row" key={i}>{this.getRow(data)}</div>:"";
+                      })
+           }
+           {!this.state.allInstance && <div className="no-data">
+               <div>NO DATA RECEIVED</div> </div>
+           }
            </div>
         );
+
+
     }
 
 }
 
-export default DiskUsage;
+
+let mapStateToProps = (state) => {
+    return {
+        objects: state.target.objects,
+        config: state.config,
+        filterMap: state.target.filterMap
+    };
+};
+
+
+DiskUsage = connect(mapStateToProps)(DiskUsage);
+export default withRouter(DiskUsage);
