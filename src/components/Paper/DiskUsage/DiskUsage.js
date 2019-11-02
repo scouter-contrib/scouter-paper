@@ -52,6 +52,7 @@ class DiskUsage extends Component {
             allInstance: null,
             boxHeight: 150,
             boxWidth : 499,
+            time : new Date().getTime(),
             sort : layout.map(d=>({...d, order:"auto"}))
         };
     }
@@ -62,9 +63,6 @@ class DiskUsage extends Component {
     componentWillReceiveProps(nextProps) {
         if(nextProps.diskUsage !== this.props.diskUsage) {
             const  {diskUsage,time} = nextProps.diskUsage;
-            const color = this.props.config.colorType === "white" ? "#333" : "white";
-            const title = `DISK Usage (RETRIEVE TIME : ${d3.timeFormat(this.fullTimeFormat)(new Date(time))})`;
-            this.props.setTitle('disk_usage',title,color,'host');
 
             let box = this.refs.listBox.parentNode.parentNode.parentNode.parentNode;
 
@@ -87,6 +85,7 @@ class DiskUsage extends Component {
             if (allInstance.length > 0) {
 
                 this.setState({
+                    time : time,
                     allInstance: {
                         data: allInstance,
                         origin: [...allInstance]
@@ -213,9 +212,7 @@ class DiskUsage extends Component {
 
 
         return sort.map((meta, j) => {
-            const isObject =  meta.key === 'objName';
             let iconClass ="";
-
             switch(meta.order){
                 case "asc":
                     iconClass = "fa fa-sort-up";
@@ -226,8 +223,7 @@ class DiskUsage extends Component {
                 default:
                     iconClass = "fa fa-sort";
             }
-            return <span className={meta.key} key={j} onClick={()=>this.onSort(meta)}>
-                    {meta.name} {isObject ? `(Total : ${this.getHostTotal()})` : ""}
+            return <span className={meta.key} key={j} onClick={()=>this.onSort(meta)}>{meta.name}
                     <i className={iconClass} style={{color:"#a0a0a0", cursor: "pointer"}}></i>
             </span>
 
@@ -246,6 +242,11 @@ class DiskUsage extends Component {
     render() {
         return (
            <div className="disk-usage-list scrollbar" ref="listBox" style={{width: this.state.boxWidth + "px"}}>
+           {this.state.allInstance &&
+                <div className="disk-retrieve">
+                   { `TOTAL HOST : ${this.getHostTotal()} , RETRIEVE TIME : ${d3.timeFormat(this.fullTimeFormat)(new Date(this.state.time))}`}
+               </div>
+            }
            { !this.props.realtime && <div className="no-data"><div>REALTIME ONLY</div></div>}
            { (this.props.realtime && this.state.allInstance) && <div className="row table-title">{this.getHeader()}</div>}
 
