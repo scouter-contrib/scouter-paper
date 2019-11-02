@@ -379,6 +379,9 @@
 .instance-selector .instance-list div.instance div.instance-text-info {
     position: relative;
 }
+.instance-selector .instance-list div.instance div.instance-text-info div.instance-text-default{
+    display: block;
+}
 
 .instance-selector .instance-list div.instance div.instance-text-info .broken-instance-label {
     background-color: #E3170D;
@@ -389,6 +392,44 @@
     top : 13px;
     right : 6px;
     border-radius: 2px;
+}
+.instance-selector .instance-list div.instance div.instance-text-info div.instance-text-btn-group{
+    display: inline-block;
+    position: absolute;
+    padding : 2px 4px;
+    top : 10px;
+    right : 4px;
+}
+.instance-selector .instance-list div.instance div.instance-text-info div.broken-instance-btn {
+    display: inline-block;
+    cursor: pointer;
+    text-align: center;
+    box-sizing: border-box;
+    border-radius: 2px;
+    padding: 2px 4px;
+}
+.instance-selector .instance-list div.instance div.instance-text-info div.broken-instance-btn:hover  {
+    background-color: #FFCC11;
+    color: #333;
+    border-radius: 2px;
+}
+.instance-selector .instance-list div.instance div.instance-text-info div.broken-instance-btn.half{
+
+}
+.instance-selector .instance-list div.instance div.instance-text-info div.broken-instance-btn.half:first-child {
+    border-radius: 2px 0 0 2px;
+}
+
+.instance-selector .instance-list div.instance div.instance-text-info duv,.broken-instance-btn.half:last-child {
+    border-radius: 0 2px 2px 0;
+}
+
+.instance-selector .instance-list div.instance div.instance-text-info div.broken-instance-btn.warning{
+    background-color: #E3170D;
+    color: white;
+}
+.instance-selector .instance-list div.instance div.instance-text-info .broken-instance-btn.warning:hover {
+    background-color: #8b0000;
 }
 
 .instance-selector .instance-list div.instance div.type-icon .type-icon-wrapper {

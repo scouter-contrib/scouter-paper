@@ -19,6 +19,10 @@ import InnerLoading from "../../InnerLoading/InnerLoading";
 
 class InstanceSelector extends Component {
 
+    state = {
+      deleteObject : {}
+    };
+
     savePreset = () => {
         let that = this;
         let objects = [];
@@ -120,7 +124,28 @@ class InstanceSelector extends Component {
     showPresetManager = () => {
         this.props.togglePresetManager();
     };
-
+    deleteChange =(object) =>{
+        this.setState({
+            deleteObject : object
+        });
+    };
+    onDeleteObject=()=>{
+        // const {deleteObject}= this.state;
+        jQuery.ajax({
+            method: "GET",
+            async: true,
+            url: `${getHttpProtocol(this.props.config)}/scouter/v1/object/remove/inactive`,
+            xhrFields: getWithCredentials(this.props.config),
+            dataType : "json",
+            beforeSend: (xhr)=>{
+                setAuthHeader(xhr, this.props.config, getCurrentUser(this.props.config, this.props.user));
+            }
+        }).done((msg) => {
+            if(msg.status ==="200") {
+                this.props.onServerClick(this.props.activeServerId);
+            }
+        });
+    };
     render() {
 
         let iconMap = {"all" : 0};
@@ -214,6 +239,9 @@ class InstanceSelector extends Component {
 
 
                                             let iconInfo = PaperIcons.getObjectIcon(icon);
+                                            const {objHash} = this.state.deleteObject;
+
+                                            const isDeleteTarget = objHash ? instance.objHash === objHash : false;
                                             return (
                                                 <div key={i} className={"instance " + (i === 0 ? 'first ' : ' ') + (!(!(this.props.selectedObjects && this.props.selectedObjects[instance.objHash])) ? "selected" : " ")} onClick={this.instanceClick.bind(this, instance)}>
                                                     <div>
@@ -224,9 +252,18 @@ class InstanceSelector extends Component {
                                                             </div>
                                                         </div>
                                                         <div className="instance-text-info">
+                                                            <div className="instance-text-default">
                                                             <div className={`instance-name ${instance.alive ? 'alive' : 'down'}`} >{instance.objName}</div>
                                                             <div className={`instance-other ${instance.alive ? 'alive' : 'down'}`} ><span>{instance.address}</span><span className="instance-objtype">{displayName}</span></div>
-                                                            {!instance.alive && <div className="broken-instance-label">INACTIVE</div>}
+                                                            { (!instance.alive && !isDeleteTarget) && <div className="broken-instance-label" onClick={() => this.deleteChange(instance)}>INACTIVE</div>}
+                                                            </div>
+
+                                                            { isDeleteTarget &&
+                                                                <div className="instance-text-btn-group">
+                                                                    <div className="broken-instance-btn half" onClick={()=>this.deleteChange({})}><i className="fa fa-trash-o" aria-hidden="true"></i><span>CANCEL</span></div>
+                                                                    <div className="broken-instance-btn half warning" onClick={()=>this.onDeleteObject()}><i className="fa fa-trash-o" aria-hidden="true"></i><span>REMOVE</span></div>
+                                                                </div>
+                                                            }
                                                         </div>
                                                     </div>
                                                 </div>)
