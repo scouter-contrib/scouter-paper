@@ -57,41 +57,23 @@ class DiskUsage extends Component {
 
     componentWillReceiveProps(nextProps) {
         if(nextProps.diskUsage !== this.props.diskUsage) {
-            let allDisk = nextProps.diskUsage;
-
-            if (!allDisk || !allDisk.time || !allDisk.diskUsage) {
-                return;
-            }
-
-            let allInstance = [];
-            let arrDiskUsage = allDisk.diskUsage;
-            let arrObjName = allDisk.objName;
-
+            const  {diskUsage} = nextProps.diskUsage;
             let box = this.refs.listBox.parentNode.parentNode.parentNode.parentNode;
 
-            // used & total 사이즈가 0 보다 큰 데이터만 정리
-            const objects = this.props.objects.filter(d=> d.objFamily === "host");
-            arrDiskUsage.map((data, index) => {
-
-                if (data !== null) {
-                    JSON.stringify((data).map((instance) => {
-                        if (instance.used > 0 && instance.total > 0) {
-                            instance.objName = arrObjName[index];
-                            objects.filter(d => d.objName === instance.objName)
-                                   .forEach(d=> instance.objHash = d.objHash);
-                            instance.diskUsage = Math.round((instance.used / instance.total) * 100);
-                            instance.diskUsed = instance.used;
-                            instance.diskTotal = instance.total;
-                            instance.diskMount = instance.mount;
-                            instance.diskDevice = instance.device;
-                            allInstance.push(instance);
+            const allInstance = diskUsage.map(obj => obj.disk.map(dk=>{
+                        return {
+                            objHash: obj.objHash,
+                            objName: obj.objName,
+                            diskUsage: Number(dk.pct),
+                            diskUsed: Number(dk.used),
+                            diskTotal: Number(dk.total),
+                            diskMount: dk.mount,
+                            diskDevice: dk.device
                         }
-                        return null;
-                    }));
-                }
-                return null;
-            });
-
+                    })
+                )
+                .flatMap(d=>d)
+                .filter(d=>d.diskUsed > 0 && d.diskTotal > 0)
             if (allInstance.length > 0) {
 
                 this.setState({
@@ -106,11 +88,16 @@ class DiskUsage extends Component {
             }
         }
         let box = this.refs.listBox.parentNode.parentNode.parentNode.parentNode;
+        const {boxWidth,boxHeight} = this.state;
 
-        this.setState({
+        if( box.offsetHeight !== boxHeight || box.offsetWidth !== boxWidth){
+            this.setState({
                 boxHeight: box.offsetHeight,
                 boxWidth: box.offsetWidth
-        });
+            });
+        }
+
+
 
     }
     shouldComponentUpdate(nextProps, nextState){
@@ -171,7 +158,7 @@ class DiskUsage extends Component {
                  default:
                      _orderData = origin;
              }
-        }else if( type === "percent"){
+        }else{
             switch(_orderBy) {
                 case "desc":
                     data.sort((a, b) => String(b[key]).localeCompare(String(a[key]), 'en-US', { numeric: true, sensitivity: 'base' }));
@@ -184,22 +171,7 @@ class DiskUsage extends Component {
                 default:
                     _orderData = origin;
             }
-        }else{
-
-            switch(_orderBy) {
-                case "desc":
-                    data.sort((a, b) => b[key].localeCompare(a[key], 'en-US', { numeric: true, sensitivity: 'base' }));
-                    _orderData = data;
-                    break;
-                case "asc":
-                    data.sort((a, b) => a[key].localeCompare(b[key], 'en-US', { numeric: true, sensitivity: 'base' }));
-                    _orderData = data;
-                    break;
-                default:
-                    _orderData = origin;
-            }
         }
-        this.lastSort =
 
         this.setState({
             allInstance: {
