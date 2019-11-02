@@ -119,7 +119,7 @@ class XLog extends Component {
 
     componentDidUpdate = (prevProps, prevState) => {
         this.resize();
-
+        this.countXLogData();
         // 시간이 변경되는 경우, 축 및 축 그리드 변경
         if (this.lastStartTime !== this.props.data.startTime || this.lastEndTime !== this.props.data.endTime) {
             this.lastStartTime = this.props.data.startTime;
@@ -159,7 +159,7 @@ class XLog extends Component {
             this.clear();
             this.redraw(this.props.filter);
         }
-        this.countXLogData();
+
     };
 
     countXLogData = () => {
@@ -167,6 +167,9 @@ class XLog extends Component {
         this.callCount = 0;
         let datas = common.getFilteredData(this.props.data.xlogs, this.props.filter);
         datas.forEach((d, i) => {
+            if(!this.props.filterMap[d.objHash]){
+                return;
+            }
             let x = this.graph.x(d.endTime);
             if (Number(d.error)) {
                 if (x < 0) this.errorCount--;
@@ -291,6 +294,7 @@ class XLog extends Component {
                     }
                 }
             });
+            d3.select(this.refs.xlogViewer).select(".text-right").html(()=>`<p>Total : ${this.callCount} (<span class="text-error">${this.errorCount}</span>)</p>`);
 
         }
     };
@@ -662,7 +666,7 @@ class XLog extends Component {
                 }
                 <div>
                     <div className="axis-button axis-up noselect" onClick={this.axisUp} onMouseDown={this.stopPropagation}>+</div>
-                    <div className="text-right"><p>Total : {this.callCount} (<span className="text-error">{this.errorCount}</span>)</p></div>
+                    <div className="text-right"></div>
                 </div>
                 <div className="axis-button axis-down noselect" onClick={this.axisDown} onMouseDown={this.stopPropagation}>-</div>
                 {this.props.box.values.showPreview === "Y" &&
