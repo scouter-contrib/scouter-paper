@@ -44,35 +44,6 @@ class Box extends Component {
 
     }
 
-    setModify = (counterKey, title, color, familyName) => {
-        const titles = {};
-        const familyNameMap = {};
-
-        let icon = "";
-        this.props.objects.filter((d) => {
-            return d.objFamily === familyName;
-        }).forEach((d, idx, array) => {
-            if(this.props.counterInfo.objTypesMap[d.objType]) {
-                icon += this.props.counterInfo.objTypesMap[d.objType].icon;
-                if (idx !== array.length - 1) {
-                    icon += ",";
-                }
-                this.iconMap[this.props.counterInfo.objTypesMap[d.objType].icon] = true;
-            }
-        });
-        titles[counterKey] = {
-            counterKey : counterKey,
-            title : title,
-            color : color,
-            icon : icon,
-            familyName : familyName
-        };
-        familyNameMap[familyName] = this.props.counterInfo.familyNameIcon[familyName];
-        this.setState({
-            titles : titles,
-            familyNameMap : familyNameMap
-        });
-    };
 
     setTitle = (counterKey, title, color, familyName) => {
         let titles = Object.assign({}, this.state.titles);
@@ -223,7 +194,7 @@ class Box extends Component {
                             {type === "xlogBar" && <XLogBar visible={this.props.visible} layoutChangeTime={this.props.layoutChangeTime} box={this.props.box} data={this.props.data} interval={this.props.config.interval} filterMap={this.props.filterMap} />}
                             {type === "xlog" && <XLog visible={this.props.visible} layoutChangeTime={this.props.layoutChangeTime} box={this.props.box} filter={this.props.filter} pastTimestamp={this.props.pastTimestamp} pageCnt={this.props.pageCnt} data={this.props.data} config={this.props.config} startTime={this.props.data.startTime} longTerm={this.props.longTerm} xlogHistoryDoing={this.props.xlogHistoryDoing} xlogHistoryRequestCnt={this.props.xlogHistoryRequestCnt} setStopXlogHistory={this.props.setStopXlogHistory} xlogNotSupportedInRange={this.props.xlogNotSupportedInRange}/>}
                             {type === "visitor" && <Visitor visible={this.props.visible} layoutChangeTime={this.props.layoutChangeTime} visitor={this.props.visitor} box={this.props.box} realtime={this.props.realtime} />}
-                            {type === "diskUsage" && <DiskUsage visible={this.props.visible} layoutChangeTime={this.props.layoutChangeTime} diskUsage={this.props.diskUsage} box={this.props.box} realtime={this.props.realtime}  setTitle={this.setModify} />}
+                            {type === "diskUsage" && <DiskUsage visible={this.props.visible} layoutChangeTime={this.props.layoutChangeTime} diskUsage={this.props.diskUsage} box={this.props.box} realtime={this.props.realtime}/>}
                             {type === "counter" && <LineChart visible={this.props.visible} layoutChangeTime={this.props.layoutChangeTime} time={this.props.counters.time} box={this.props.box} counters={this.props.counters.data} countersHistory={this.props.countersHistory} countersHistoryTimestamp={this.props.countersHistoryTimestamp} countersHistoryFrom={this.props.countersHistoryFrom} countersHistoryTo={this.props.countersHistoryTo} longTerm={this.props.longTerm} setTitle={this.setTitle} removeTitle={this.removeTitle} showTooltip={this.showTooltip} hideTooltip={this.hideTooltip} />}
                             {type === "ActiveSpeed" && <ActiveSpeed visible={this.props.visible} layoutChangeTime={this.props.layoutChangeTime} time={this.props.counters.time} box={this.props.box} counters={this.props.counters.data} setTitle={this.setTitle} removeTitle={this.removeTitle} realtime={this.props.realtime} />}
                             {this.state.tooltip.show && <Tooltip tooltip={this.state.tooltip}/>}
