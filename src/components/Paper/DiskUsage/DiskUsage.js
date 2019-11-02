@@ -2,6 +2,7 @@ import React, {Component} from 'react';
 import './DiskUsage.css';
 import connect from "react-redux/es/connect/connect";
 import {withRouter} from "react-router-dom";
+import * as d3 from "d3";
 
 const layout = [
     {
@@ -54,26 +55,35 @@ class DiskUsage extends Component {
             sort : layout.map(d=>({...d, order:"auto"}))
         };
     }
-
+    componentDidMount() {
+        this.dateFormat = this.props.config.dateFormat;
+        this.fullTimeFormat = this.props.config.dateFormat + " " + this.props.config.timeFormat;
+    }
     componentWillReceiveProps(nextProps) {
         if(nextProps.diskUsage !== this.props.diskUsage) {
-            const  {diskUsage} = nextProps.diskUsage;
+            const  {diskUsage,time} = nextProps.diskUsage;
+            const color = this.props.config.colorType === "white" ? "#333" : "white";
+            const title = `DISK Usage (RETRIEVE TIME : ${d3.timeFormat(this.fullTimeFormat)(new Date(time))})`;
+            this.props.setTitle('disk_usage',title,color,'host');
+
             let box = this.refs.listBox.parentNode.parentNode.parentNode.parentNode;
 
-            const allInstance = diskUsage.map(obj => obj.disk.map(dk=>{
-                        return {
-                            objHash: obj.objHash,
-                            objName: obj.objName,
-                            diskUsage: Number(dk.pct),
-                            diskUsed: Number(dk.used),
-                            diskTotal: Number(dk.total),
-                            diskMount: dk.mount,
-                            diskDevice: dk.device
-                        }
-                    })
-                )
-                .flatMap(d=>d)
-                .filter(d=>d.diskUsed > 0 && d.diskTotal > 0)
+                const allInstance = diskUsage.filter(obj => obj.disk)
+                            .map(obj => obj.disk.map(dk=>{
+                            return {
+                                objHash: obj.objHash,
+                                objName: obj.objName,
+                                diskUsage: Number(dk.pct),
+                                diskUsed: Number(dk.used),
+                                diskTotal: Number(dk.total),
+                                diskMount: dk.mount,
+                                diskDevice: dk.device
+                            }
+                        })
+                    )
+                    .flatMap(d=>d)
+                    .filter(d=>d.diskUsed > 0 && d.diskTotal > 0)
+
             if (allInstance.length > 0) {
 
                 this.setState({
@@ -86,6 +96,7 @@ class DiskUsage extends Component {
                     sort : layout.map(d=>({...d, order:"auto"}))
                 });
             }
+
         }
         let box = this.refs.listBox.parentNode.parentNode.parentNode.parentNode;
         const {boxWidth,boxHeight} = this.state;
@@ -189,9 +200,17 @@ class DiskUsage extends Component {
         });
 
     }
+    getHostTotal=() =>{
+        const { diskUsage } = this.props.diskUsage;
+        if(diskUsage){
+            return diskUsage.filter(obj => this.props.filterMap[obj.objHash])
+                  .length;
+        }
+        return 0;
+    };
     getHeader = () => {
         const {sort} = this.state;
-        const {data} = this.state.allInstance;
+
 
         return sort.map((meta, j) => {
             const isObject =  meta.key === 'objName';
@@ -208,7 +227,7 @@ class DiskUsage extends Component {
                     iconClass = "fa fa-sort";
             }
             return <span className={meta.key} key={j} onClick={()=>this.onSort(meta)}>
-                    {meta.name} {isObject ? `(Total : ${data.length})` : ""}
+                    {meta.name} {isObject ? `(Total : ${this.getHostTotal()})` : ""}
                     <i className={iconClass} style={{color:"#a0a0a0", cursor: "pointer"}}></i>
             </span>
 
