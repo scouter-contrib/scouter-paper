@@ -242,12 +242,12 @@ class DiskUsage extends Component {
     render() {
         return (
            <div className="disk-usage-list scrollbar" ref="listBox" style={{width: this.state.boxWidth + "px"}}>
-           {this.state.allInstance &&
-                <div className="disk-retrieve">
-                   { `TOTAL HOST : ${this.getHostTotal()} , RETRIEVE TIME : ${d3.timeFormat(this.fullTimeFormat)(new Date(this.state.time))}`}
-               </div>
-            }
            { !this.props.realtime && <div className="no-data"><div>REALTIME ONLY</div></div>}
+           { (this.props.realtime && this.state.allInstance) &&
+                <div className="disk-retrieve">
+                   { `HOST TOTAL:${this.getHostTotal()}, RETRIEVE TIME:${d3.timeFormat(this.fullTimeFormat)(new Date(this.state.time))}`}
+               </div>
+           }
            { (this.props.realtime && this.state.allInstance) && <div className="row table-title">{this.getHeader()}</div>}
 
            { (this.props.realtime && this.state.allInstance) &&
@@ -255,7 +255,7 @@ class DiskUsage extends Component {
                          return this.props.filterMap[data.objHash]  ? <div className="row" key={i}>{this.getRow(data)}</div>:"";
                       })
            }
-           {!this.state.allInstance && <div className="no-data">
+           { (this.props.realtime &&  !this.state.allInstance) && <div className="no-data">
                <div>NO DATA RECEIVED</div> </div>
            }
            </div>
