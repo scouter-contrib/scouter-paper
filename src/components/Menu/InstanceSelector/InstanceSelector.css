@@ -242,8 +242,8 @@
 }
 
 .instance-selector .instance-selector-content .instance-list .list-content {
-    top: 49px;
-    height: calc(100% - 49px);
+    top: 83px;
+    height: calc(100% - 83px);
 }
 
 .instance-selector .instance-selector-content .list-content .no-instance {
@@ -379,10 +379,6 @@
 .instance-selector .instance-list div.instance div.instance-text-info {
     position: relative;
 }
-.instance-selector .instance-list div.instance div.instance-text-info div.instance-text-default{
-    display: block;
-}
-
 .instance-selector .instance-list div.instance div.instance-text-info .broken-instance-label {
     background-color: #E3170D;
     color: white;
@@ -393,45 +389,6 @@
     right : 6px;
     border-radius: 2px;
 }
-.instance-selector .instance-list div.instance div.instance-text-info div.instance-text-btn-group{
-    display: inline-block;
-    position: absolute;
-    padding : 2px 4px;
-    top : 10px;
-    right : 4px;
-}
-.instance-selector .instance-list div.instance div.instance-text-info div.broken-instance-btn {
-    display: inline-block;
-    cursor: pointer;
-    text-align: center;
-    box-sizing: border-box;
-    border-radius: 2px;
-    padding: 2px 4px;
-}
-.instance-selector .instance-list div.instance div.instance-text-info div.broken-instance-btn:hover  {
-    background-color: #FFCC11;
-    color: #333;
-    border-radius: 2px;
-}
-.instance-selector .instance-list div.instance div.instance-text-info div.broken-instance-btn.half{
-
-}
-.instance-selector .instance-list div.instance div.instance-text-info div.broken-instance-btn.half:first-child {
-    border-radius: 2px 0 0 2px;
-}
-
-.instance-selector .instance-list div.instance div.instance-text-info duv,.broken-instance-btn.half:last-child {
-    border-radius: 0 2px 2px 0;
-}
-
-.instance-selector .instance-list div.instance div.instance-text-info div.broken-instance-btn.warning{
-    background-color: #E3170D;
-    color: white;
-}
-.instance-selector .instance-list div.instance div.instance-text-info .broken-instance-btn.warning:hover {
-    background-color: #8b0000;
-}
-
 .instance-selector .instance-list div.instance div.type-icon .type-icon-wrapper {
     border-radius: 3px;
     display: inline-block;
@@ -543,4 +500,51 @@
     font-size: 10px;
     width: 100%;
     outline: none;
+}
+.instance-selector .instance-remove-group{
+    position: sticky;
+    top: 0px;
+    background-color: rgba(0, 0, 0, 0.3);
+    border: 1px solid rgba(0, 0, 0, 0.1);
+}
+
+.instance-selector .instance-remove-group .instance-remove-btn-group {
+    display: flex;
+    flex-direction: row;
+    cursor: pointer;
+
+}
+.instance-selector .instance-remove-group .half{
+    width: 50%;
+}
+.instance-selector .instance-remove-group .instance-remove-btn-group .instance-remove-btn{
+    align-content: center;
+    width: 100%;
+    padding: 9px 10px;
+}
+
+.instance-selector .instance-remove-group .instance-remove-btn-group .instance-remove-btn:hover{
+    background-color: #FFCC11;
+    color: #333;
+    border-radius: 2px;
+}
+
+.instance-selector .instance-remove-group .instance-remove-btn-group .remove-cancel-btn{
+    align-content: center;
+    padding: 9px 10px;
+}
+.instance-selector .instance-remove-group .instance-remove-btn-group .remove-cancel-btn:hover{
+    background-color: #FFCC11;
+    color: #333;
+    border-radius: 2px;
+}
+.instance-selector .instance-remove-group .instance-remove-btn-group .remove-ok-btn{
+    align-content: center;
+    padding: 9px 10px;
+}
+
+.instance-selector .instance-remove-group .instance-remove-btn-group .remove-ok-btn:hover{
+    background-color: #E3170D;
+    color: #333;
+    border-radius: 2px;
 }

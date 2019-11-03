@@ -20,7 +20,8 @@ import InnerLoading from "../../InnerLoading/InnerLoading";
 class InstanceSelector extends Component {
 
     state = {
-      deleteObject : {}
+      deleteObject : false
+
     };
 
     savePreset = () => {
@@ -124,7 +125,7 @@ class InstanceSelector extends Component {
     showPresetManager = () => {
         this.props.togglePresetManager();
     };
-    deleteChange =(object) =>{
+    deleteChange =(object = false) =>{
         this.setState({
             deleteObject : object
         });
@@ -170,7 +171,6 @@ class InstanceSelector extends Component {
         });
 
         iconMap["all"] = all;
-
         return (
             <div className="instance-selector-bg" onClick={this.cancelClick}>
                 <div>
@@ -213,6 +213,27 @@ class InstanceSelector extends Component {
                                             return <span className={iconMap[icon] === selectedIconMap[icon] ? "selected" : ""} key={i} onClick={this.quickSelectByTypeClick.bind(this, icon)}>{icon} {iconMap[icon]}</span>
                                         }))}
                                     </div>
+                                    <div className="instance-remove-group">
+                                        <div className="instance-remove-btn-group">
+                                            {!this.state.deleteObject &&
+                                            <div className="instance-remove-btn" onClick={()=>this.deleteChange(true)}>
+                                                <div className="items">
+                                                    <i className="fa fa-trash-o"></i> <span>REMOVE INACTIVE AGENT</span>
+                                                </div>
+                                            </div>
+                                            }
+                                            { this.state.deleteObject &&
+                                            <div className="remove-cancel-btn half" onClick={() => this.deleteChange(false)}>
+                                                <i className="fa fa-trash-o" aria-hidden="true"></i><span>CANCEL</span>
+                                            </div>
+                                            }
+                                            { this.state.deleteObject &&
+                                            <div className="remove-ok-btn half warning" onClick={() => this.onDeleteObject()}>
+                                                <i className="fa fa-trash-o" aria-hidden="true"></i><span>REMOVE</span>
+                                            </div>
+                                            }
+                                        </div>
+                                    </div>
                                     <div className="list-content scrollbar">
                                         {(this.props.objects && this.props.objects.length > 0) && this.props.objects.filter((instance) => {
 
@@ -239,9 +260,6 @@ class InstanceSelector extends Component {
 
 
                                             let iconInfo = PaperIcons.getObjectIcon(icon);
-                                            const {objHash} = this.state.deleteObject;
-
-                                            const isDeleteTarget = objHash ? instance.objHash === objHash : false;
                                             return (
                                                 <div key={i} className={"instance " + (i === 0 ? 'first ' : ' ') + (!(!(this.props.selectedObjects && this.props.selectedObjects[instance.objHash])) ? "selected" : " ")} onClick={this.instanceClick.bind(this, instance)}>
                                                     <div>
@@ -252,18 +270,9 @@ class InstanceSelector extends Component {
                                                             </div>
                                                         </div>
                                                         <div className="instance-text-info">
-                                                            <div className="instance-text-default">
                                                             <div className={`instance-name ${instance.alive ? 'alive' : 'down'}`} >{instance.objName}</div>
                                                             <div className={`instance-other ${instance.alive ? 'alive' : 'down'}`} ><span>{instance.address}</span><span className="instance-objtype">{displayName}</span></div>
-                                                            { (!instance.alive && !isDeleteTarget) && <div className="broken-instance-label" onClick={() => this.deleteChange(instance)}>INACTIVE</div>}
-                                                            </div>
-
-                                                            { isDeleteTarget &&
-                                                                <div className="instance-text-btn-group">
-                                                                    <div className="broken-instance-btn half" onClick={()=>this.deleteChange({})}><i className="fa fa-trash-o" aria-hidden="true"></i><span>CANCEL</span></div>
-                                                                    <div className="broken-instance-btn half warning" onClick={()=>this.onDeleteObject()}><i className="fa fa-trash-o" aria-hidden="true"></i><span>REMOVE</span></div>
-                                                                </div>
-                                                            }
+                                                            { !instance.alive && <div className="broken-instance-label">INACTIVE</div>}
                                                         </div>
                                                     </div>
                                                 </div>)
