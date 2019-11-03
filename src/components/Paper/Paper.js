@@ -1055,67 +1055,46 @@ class Paper extends Component {
     };
 
     getDiskUsage = (props) => {
-        let that = this;
+        if(!this.mounted){
+            return;
+        }
         let time = (new ServerDate()).getTime();
         let refreshTime = 1000 * 60 * 15; // 15min
         let diffTime = time - (!this.state.diskRefreshTime ? time-refreshTime: this.state.diskRefreshTime);
 
         if (props.objects && props.objects.length > 0 && diffTime >= refreshTime) {
-
-            this.setState({
-                diskRefreshTime: time,
+            const filterdObjects = props.objects.filter(instance => {
+                return instance.objFamily === "host" && instance.alive
             });
-
-            let filterdObjects = props.objects.filter((instance) => {
-                return props.filterMap[instance.objHash]
-            }).filter((data) => {
-                return JSON.parse(JSON.stringify(data)).objFamily === 'host'
-            });
-
-            if (filterdObjects.length > 0) {
-
-                props.addRequest();
-
-                let arrTime = [];
-                let arrDiskUsage = [];
-                let arrObjName = [];
-
-                filterdObjects.forEach(function (data) {
-
-                    jQuery.ajax({
-                        method: "GET",
-                        async: false,
-                        url: getHttpProtocol(props.config) + '/scouter/v1/object/host/realTime/disk/ofObject/'+ JSON.parse(JSON.stringify(data)).objHash,
-                        xhrFields: getWithCredentials(props.config),
-                            beforeSend: function (xhr) {
-                            setAuthHeader(xhr, props.config, getCurrentUser(props.config, props.user));
-                        }
-                    }).done((msg) => {
-                        if (!that.mounted) {
-                            return null;
-                        }
-
-                        let time = (new ServerDate()).getTime();
-                        arrTime.push(time);
-                        arrDiskUsage.push(msg.result);
-                        arrObjName.push(JSON.parse(JSON.stringify(data)).objName)
-
-                    }).fail((xhr, textStatus, errorThrown) => {
-                    });
-
-                });
-
-                if(arrTime.length > 0) {
-                    arrObjName.sort();
-                    this.setState({
-                        diskUsage: {
-                            time: arrTime,
-                            objName: arrObjName,
-                            diskUsage: arrDiskUsage
-                        }
-                    });
-                }
+            if(filterdObjects.length === 0){
+                return;
             }
+            props.addRequest();
+            const _promoise = filterdObjects.map((data)=>{
+                  return jQuery.ajax({
+                    method: "GET",
+                    async: true,
+                    dataType: "json",
+                    url: getHttpProtocol(props.config) + '/scouter/v1/object/host/realTime/disk/ofObject/'+ JSON.parse(JSON.stringify(data)).objHash,
+                    xhrFields: getWithCredentials(props.config),
+                    beforeSend: function (xhr) {
+                        setAuthHeader(xhr, props.config, getCurrentUser(props.config, props.user));
+                    }
+                });
+            });
+            jQuery.when(..._promoise)
+                .done((...get)=>{
+                    const disk= filterdObjects.map((obj,ix)=>{
+                       return {...obj,disk : (Array.isArray(get[ix]) ? get[ix][0].result : get[ix].result ) }
+                    });
+                    this.setState({
+                            diskRefreshTime: time,
+                            diskUsage: {
+                                time: (new ServerDate()).getTime(),
+                                diskUsage: disk
+                            }});
+
+                })
         }
     };
 

@@ -7,7 +7,7 @@
 .disk-usage-list > div.row {
     display: table;
     text-align: left;
-    font-size: 1px;
+    font-size: 9px;
     width: 100%;
 }
 
@@ -30,7 +30,13 @@
     padding: 10px;
     border-bottom: 1px solid #CCC;
 }
-
+.disk-usage-list > div.disk-retrieve{
+    padding: 4px 4px 4px 10px;
+    background-color: #26466d;
+    background-color: #F2F2F2;
+    border-bottom: 1px solid #CCC;
+    font-size: 10px;
+}
 .disk-usage-list > div > span.objName {
     width: 30%;
 }

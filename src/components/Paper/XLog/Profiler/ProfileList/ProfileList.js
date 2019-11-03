@@ -198,7 +198,7 @@ class ProfileList extends Component {
         const isDesc = this.sortTemp !== sortKey;
         this.setState({data, layoutOrder: layoutOrder.map(
             d => d.key === sortKey
-            ? { ...d, order: isDesc ? "asc" : "desc"}
+            ? { ...d, order: isDesc ? "desc" : "asc"}
             : { ...d, order: "no"}
         )});
     }

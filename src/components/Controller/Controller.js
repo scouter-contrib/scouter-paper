@@ -270,7 +270,9 @@ class Controller extends Component {
         common.setTargetServerToUrl(this.props, config);
         common.replaceAllLocalSettingsForServerChange(currentServer, this.props, config);
         common.clearAllUrlParamOfPaper(this.props, config);
+        localStorage.removeItem("selectedObjects");
         window.location.reload();
+
     };
 
     setObjects = () => {
@@ -725,9 +727,12 @@ class Controller extends Component {
     quickSelectByTypeClick = (type) => {
         let filteredObjects;
         if (type === "all") {
-            filteredObjects = this.state.objects.filter((object) => {
-                return true;
-            });
+            filteredObjects = this.state.objects.filter(()=>true);
+        }
+        else if(type === "inactive"){
+            filteredObjects = this.state.objects.filter((d)=> !d.alive);
+        }else if(type === "active"){
+            filteredObjects = this.state.objects.filter((d)=> d.alive);
         } else {
             filteredObjects = this.state.objects.filter((object) => {
                 return type === this.getIconOrObjectType(object);

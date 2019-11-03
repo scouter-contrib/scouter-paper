@@ -1,18 +1,24 @@
 import React, {Component} from 'react';
 import './DiskUsage.css';
+import connect from "react-redux/es/connect/connect";
+import {withRouter} from "react-router-dom";
+import * as d3 from "d3";
 
 const layout = [
     {
         key: "objName",
-        name: "OBJECT"
+        name: "OBJECT",
+        type: "string"
     },
     {
         key: "diskDevice",
-        name: "DEVICE"
+        name: "DEVICE",
+        type: "string"
     },
     {
         key: "diskMount",
-        name: "MOUNT"
+        name: "MOUNT",
+        type: "string"
     },
     {
         key: "diskUsed",
@@ -30,68 +36,106 @@ const layout = [
         type: "percent"
     }
 ];
+const orderBy ={
+  auto : "asc",
+  asc  : "desc",
+  desc : "auto"
+};
+
 
 class DiskUsage extends Component {
+
 
     constructor(props) {
         super(props);
         this.state = {
             allInstance: null,
             boxHeight: 150,
-            boxWidth : 499
+            boxWidth : 499,
+            time : new Date().getTime(),
+            sort : layout.map(d=>({...d, order:"auto"}))
         };
     }
+    componentDidMount() {
+        this.dateFormat = this.props.config.dateFormat;
+        this.fullTimeFormat = this.props.config.dateFormat + " " + this.props.config.timeFormat;
+    }
+    componentWillReceiveProps(nextProps) {
+        if(nextProps.diskUsage !== this.props.diskUsage) {
+            const  {diskUsage,time} = nextProps.diskUsage;
 
-    componentWillReceiveProps() {
+            let box = this.refs.listBox.parentNode.parentNode.parentNode.parentNode;
 
-        let allDisk = this.props.diskUsage;
+                const allInstance = diskUsage.filter(obj => obj.disk)
+                            .map(obj => obj.disk.map(dk=>{
+                            return {
+                                objHash: obj.objHash,
+                                objName: obj.objName,
+                                diskUsage: Number(dk.pct),
+                                diskUsed: Number(dk.used),
+                                diskTotal: Number(dk.total),
+                                diskMount: dk.mount,
+                                diskDevice: dk.device
+                            }
+                        })
+                    )
+                    .flatMap(d=>d)
+                    .filter(d=>d.diskUsed > 0 && d.diskTotal > 0)
 
-        if (!allDisk || !allDisk.time || !allDisk.diskUsage) {
-            return;
-        }
+            if (allInstance.length > 0) {
 
-        let allInstance = [];
-        let arrDiskUsage = allDisk.diskUsage;
-        let arrObjName = allDisk.objName;
-
-        let box = this.refs.listBox.parentNode.parentNode.parentNode.parentNode;
-
-        // used & total 사이즈가 0 보다 큰 데이터만 정리
-        arrDiskUsage.map((data, index) => {
-
-            if(data !== null) {
-                 JSON.stringify((data).map((instance) => {
-                    if(instance.used > 0 && instance.total > 0) {
-                        instance.objName = arrObjName[index];
-                        instance.diskUsage = Math.round((instance.used / instance.total) * 100)
-                        instance.diskUsed = instance.used;
-                        instance.diskTotal = instance.total;
-                        instance.diskMount = instance.mount;
-                        instance.diskDevice = instance.device;
-                        allInstance.push(instance);
-                    }
-                    return null;
-                }));
+                this.setState({
+                    time : time,
+                    allInstance: {
+                        data: allInstance,
+                        origin: [...allInstance]
+                    },
+                    boxHeight: box.offsetHeight,
+                    boxWidth: box.offsetWidth,
+                    sort : layout.map(d=>({...d, order:"auto"}))
+                });
             }
-            return null;
-        });
 
-        if(allInstance.length > 0) {
+        }
+        let box = this.refs.listBox.parentNode.parentNode.parentNode.parentNode;
+        const {boxWidth,boxHeight} = this.state;
+
+        if( box.offsetHeight !== boxHeight || box.offsetWidth !== boxWidth){
             this.setState({
-                allInstance : allInstance,
-                boxHeight : box.offsetHeight,
-                boxWidth : box.offsetWidth
+                boxHeight: box.offsetHeight,
+                boxWidth: box.offsetWidth
             });
         }
+
+
+
     }
+    shouldComponentUpdate(nextProps, nextState){
+        if(nextProps.realTime !== this.props.realtime){
+            return true;
+        }
+        if(nextProps.diskUsage !== this.props.diskUsage){
+            return true;
+        }
+        if(nextProps.filterMap !== this.props.filterMap){
+            return true;
+        }
 
-    getRow = (row, i) => {
+        if(nextState.sort !== this.state.sort){
+            return true;
+        }
+        if(nextState.boxHeight !== this.state.boxHeight
+        || nextState.boxWidth !== this.state.boxWidth){
+            return true;
+        }
+        return false;
 
+    }
+    getRow = (row) => {
         return layout.map((meta, j) => {
 
             let className = meta.key;
             let data = row[className];
-
             if(data !== undefined){
                 if (meta.type === "bytes") {
                     return <span className={meta.key} key={j}>{this.bytesToSize(data)}</span>
@@ -105,14 +149,83 @@ class DiskUsage extends Component {
         });
     };
 
-    getHeader = () => {
-        return layout.map((meta, j) => {
+    onSort(meta){
 
-            if(meta.key === 'objName') {
-                return <span className={meta.key} key={j}>{meta.name} (Total : {this.state.allInstance.length})</span>
-            }else{
-                return <span className={meta.key} key={j}>{meta.name}</span>
+        const {data,origin} = this.state.allInstance;
+        const {order,key,type} = meta;
+        const _orderBy = orderBy[order];
+        let _orderData;
+        if(type === "string"){
+             switch(_orderBy) {
+                 case "desc":
+                     data.sort((a, b) => b[key].localeCompare(a[key]));
+                     _orderData = data;
+                     break;
+                 case "asc":
+                     data.sort((a, b) => a[key].localeCompare(b[key]));
+                     _orderData = data;
+                     break;
+                 default:
+                     _orderData = origin;
+             }
+        }else{
+            switch(_orderBy) {
+                case "desc":
+                    data.sort((a, b) => String(b[key]).localeCompare(String(a[key]), 'en-US', { numeric: true, sensitivity: 'base' }));
+                    _orderData = data;
+                    break;
+                case "asc":
+                    data.sort((a, b) => String(a[key]).localeCompare(String(b[key]), 'en-US', { numeric: true, sensitivity: 'base' }));
+                    _orderData = data;
+                    break;
+                default:
+                    _orderData = origin;
             }
+        }
+
+        this.setState({
+            allInstance: {
+                data: [..._orderData],
+                origin: origin
+            },
+            sort: layout.map(d=> {
+                if( d.key === key){
+                    d.order = _orderBy;
+                }else {
+                    d.order = "auto";
+                }
+                return d;
+            })
+        });
+
+    }
+    getHostTotal=() =>{
+        const { diskUsage } = this.props.diskUsage;
+        if(diskUsage){
+            return diskUsage.filter(obj => this.props.filterMap[obj.objHash])
+                  .length;
+        }
+        return 0;
+    };
+    getHeader = () => {
+        const {sort} = this.state;
+
+
+        return sort.map((meta, j) => {
+            let iconClass ="";
+            switch(meta.order){
+                case "asc":
+                    iconClass = "fa fa-sort-up";
+                    break;
+                case "desc":
+                    iconClass = "fa fa-sort-desc";
+                    break;
+                default:
+                    iconClass = "fa fa-sort";
+            }
+            return <span className={meta.key} key={j} onClick={()=>this.onSort(meta)}>{meta.name}
+                    <i className={iconClass} style={{color:"#a0a0a0", cursor: "pointer"}}></i>
+            </span>
 
         });
     };
@@ -129,16 +242,39 @@ class DiskUsage extends Component {
     render() {
         return (
            <div className="disk-usage-list scrollbar" ref="listBox" style={{width: this.state.boxWidth + "px"}}>
-             <div className="row table-title">{this.state.allInstance && this.getHeader()}</div>
-                {this.state.allInstance && this.state.allInstance.map((data, i) => {
-                    return <div className="row" key={i}>{this.getRow(data, i)}</div>;
-                })}
-                {(!this.state.allInstance) && <div className="no-data">
-                   <div>NO DATA RECEIVED</div> </div>}
+           { !this.props.realtime && <div className="no-data"><div>REALTIME ONLY</div></div>}
+           { (this.props.realtime && this.state.allInstance) &&
+                <div className="disk-retrieve">
+                   { `HOST TOTAL:${this.getHostTotal()}, RETRIEVE TIME:${d3.timeFormat(this.fullTimeFormat)(new Date(this.state.time))}`}
+               </div>
+           }
+           { (this.props.realtime && this.state.allInstance) && <div className="row table-title">{this.getHeader()}</div>}
+
+           { (this.props.realtime && this.state.allInstance) &&
+                this.state.allInstance.data.map((data,i)=>{
+                         return this.props.filterMap[data.objHash]  ? <div className="row" key={i}>{this.getRow(data)}</div>:"";
+                      })
+           }
+           { (this.props.realtime &&  !this.state.allInstance) && <div className="no-data">
+               <div>NO DATA RECEIVED</div> </div>
+           }
            </div>
         );
+
+
     }
 
 }
 
-export default DiskUsage;
+
+let mapStateToProps = (state) => {
+    return {
+        objects: state.target.objects,
+        config: state.config,
+        filterMap: state.target.filterMap
+    };
+};
+
+
+DiskUsage = connect(mapStateToProps)(DiskUsage);
+export default withRouter(DiskUsage);

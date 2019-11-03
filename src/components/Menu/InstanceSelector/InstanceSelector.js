@@ -19,6 +19,11 @@ import InnerLoading from "../../InnerLoading/InnerLoading";
 
 class InstanceSelector extends Component {
 
+    state = {
+      deleteObject : false
+
+    };
+
     savePreset = () => {
         let that = this;
         let objects = [];
@@ -105,6 +110,7 @@ class InstanceSelector extends Component {
     };
 
     onFilterChange = (event) => {
+
         this.props.onFilterChange(event.target.value);
     };
 
@@ -119,7 +125,28 @@ class InstanceSelector extends Component {
     showPresetManager = () => {
         this.props.togglePresetManager();
     };
-
+    deleteChange =(object = false) =>{
+        this.setState({
+            deleteObject : object
+        });
+    };
+    onDeleteObject=()=>{
+        // const {deleteObject}= this.state;
+        jQuery.ajax({
+            method: "GET",
+            async: true,
+            url: `${getHttpProtocol(this.props.config)}/scouter/v1/object/remove/inactive`,
+            xhrFields: getWithCredentials(this.props.config),
+            dataType : "json",
+            beforeSend: (xhr)=>{
+                setAuthHeader(xhr, this.props.config, getCurrentUser(this.props.config, this.props.user));
+            }
+        }).done((msg) => {
+            if(msg.status ==="200") {
+                this.props.onServerClick(this.props.activeServerId);
+            }
+        });
+    };
     render() {
 
         let iconMap = {"all" : 0};
@@ -144,7 +171,6 @@ class InstanceSelector extends Component {
         });
 
         iconMap["all"] = all;
-
         return (
             <div className="instance-selector-bg" onClick={this.cancelClick}>
                 <div>
@@ -170,7 +196,15 @@ class InstanceSelector extends Component {
                             <div className="instance-list">
                                 <div>
                                     <div className={"filter " + (this.props.filter && this.props.filter.length > 1 ? 'filtered' : '')}>
-                                        <span className="filter-tag">OBJECT</span><span className="filter-separator"></span><span className="filter-icon" onClick={this.props.clearFilter}><i className="fa fa-filter" aria-hidden="true"></i></span><input type="search" onChange={this.onFilterChange.bind(this)} value={this.props.filter}/><span className="check-btn" onClick={this.props.selectAll}>ALL</span>
+                                        <span className="filter-tag">OBJECT</span><span className="filter-separator"></span>
+                                        <span className="filter-icon" onClick={this.props.clearFilter}>
+                                            <i className="fa fa-filter" aria-hidden="true"></i>
+                                        </span>
+                                        <input type="search" onChange={this.onFilterChange.bind(this)} value={this.props.filter}/>
+                                        <span className="check-btn" onClick={this.props.selectAll}>ALL</span>
+                                        <span className="check-btn" onClick={()=>this.props.quickSelectByTypeClick('active')}>ACTIVE</span>
+                                        <span className="check-btn" onClick={()=>this.props.quickSelectByTypeClick('inactive')}>INACTIVE</span>
+
                                     </div>
                                     <div className="icon-type-map">
                                         {(this.props.objects && this.props.objects.length > 0) && (Object.keys(iconMap).sort((a, b) => {
@@ -178,6 +212,27 @@ class InstanceSelector extends Component {
                                         }).map((icon, i) => {
                                             return <span className={iconMap[icon] === selectedIconMap[icon] ? "selected" : ""} key={i} onClick={this.quickSelectByTypeClick.bind(this, icon)}>{icon} {iconMap[icon]}</span>
                                         }))}
+                                    </div>
+                                    <div className="instance-remove-group">
+                                        <div className="instance-remove-btn-group">
+                                            {!this.state.deleteObject &&
+                                            <div className="instance-remove-btn" onClick={()=>this.deleteChange(true)}>
+                                                <div className="items">
+                                                    <i className="fa fa-trash-o"></i> <span>REMOVE INACTIVE AGENT</span>
+                                                </div>
+                                            </div>
+                                            }
+                                            { this.state.deleteObject &&
+                                            <div className="remove-cancel-btn half" onClick={() => this.deleteChange(false)}>
+                                                <i className="fa fa-trash-o" aria-hidden="true"></i><span>CANCEL</span>
+                                            </div>
+                                            }
+                                            { this.state.deleteObject &&
+                                            <div className="remove-ok-btn half warning" onClick={() => this.onDeleteObject()}>
+                                                <i className="fa fa-trash-o" aria-hidden="true"></i><span>REMOVE</span>
+                                            </div>
+                                            }
+                                        </div>
                                     </div>
                                     <div className="list-content scrollbar">
                                         {(this.props.objects && this.props.objects.length > 0) && this.props.objects.filter((instance) => {
@@ -217,7 +272,7 @@ class InstanceSelector extends Component {
                                                         <div className="instance-text-info">
                                                             <div className={`instance-name ${instance.alive ? 'alive' : 'down'}`} >{instance.objName}</div>
                                                             <div className={`instance-other ${instance.alive ? 'alive' : 'down'}`} ><span>{instance.address}</span><span className="instance-objtype">{displayName}</span></div>
-                                                            {!instance.alive && <div className="broken-instance-label">INACTIVE</div>}
+                                                            { !instance.alive && <div className="broken-instance-label">INACTIVE</div>}
                                                         </div>
                                                     </div>
                                                 </div>)
