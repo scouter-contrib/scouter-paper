@@ -541,6 +541,7 @@
 .instance-selector .instance-remove-group .instance-remove-btn-group .remove-ok-btn{
     align-content: center;
     padding: 9px 10px;
+    background-color: #E3170D;
 }
 
 .instance-selector .instance-remove-group .instance-remove-btn-group .remove-ok-btn:hover{
