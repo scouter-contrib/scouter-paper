@@ -68,6 +68,10 @@ class Line extends Component {
             if (nextProps.options !== this.props.options) {
                 this.changedOption(nextProps.options, nextProps);
             }
+
+            if( nextProps.filterMap !== this.props.filterMap){
+                this.paint(nextProps);
+            }
             if ((!nextProps.range.realTime && !nextProps.timeFocus.active) ||
                   nextProps.counters !== this.props.counters) {
                 this.paint(nextProps);
@@ -457,7 +461,7 @@ class Line extends Component {
         //    this.paint(this.props);
         // }
         if(repaint){
-            this.paint(this.props);
+            this.paint(props);
         }
     }
 
