@@ -4,6 +4,7 @@ import {connect} from 'react-redux';
 import {withRouter} from 'react-router-dom';
 import ServerDate from "../../../common/ServerDate";
 import Line from "./Line";
+import * as _ from "lodash";
 
 class LineChart extends Component {
 
@@ -237,7 +238,7 @@ class LineChart extends Component {
                 }));
             }
         }
-        return ret.flatMap(d=>d);
+        return ret.length > 0 ? _.flattenDeep(ret,d=>d) : [];
     }
 
     loadHistoryCounter(countersHistory, counterKey, longTerm) {
