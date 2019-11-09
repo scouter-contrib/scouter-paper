@@ -22,7 +22,15 @@ class Menu extends Component {
             showAlert: false
         };
     }
-
+    componentWillReceiveProps(nextProps) {
+        const {pathname}= nextProps.location;
+        if( pathname !== this.props.pathname){
+            this.setState({
+                menu: pathname
+            });
+            this.props.setMenu(pathname);
+        }
+    }
     componentDidMount() {
         this.setState({
             menu: this.props.location.pathname
