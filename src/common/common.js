@@ -796,3 +796,11 @@ export function updateQueryStringParameter(uri, key, value) {
         return uri + separator + key + "=" + value;
     }
 }
+export function confBuilder(addr,conf,user,serverId){
+    return {
+        addr  : addr,
+        conf  : conf,
+        user  : user,
+        serverId : serverId
+    }
+}
