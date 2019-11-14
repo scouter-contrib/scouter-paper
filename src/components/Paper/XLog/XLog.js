@@ -8,6 +8,7 @@ import * as common from "../../../common/common";
 import {connect} from 'react-redux';
 import {setSelection, setTimeFocus} from '../../../actions';
 import {withRouter} from 'react-router-dom';
+import InstanceColor from "../../../common/InstanceColor";
 
 const XLOG_ELAPSED = 'xlogElapsed';
 
@@ -65,6 +66,16 @@ class XLog extends Component {
         if(!nextProps.timeFocus.active) {
             this.removeFocus(nextProps);
         }
+        if( nextProps.box.values.showClassMode !== this.nextShowClassMode){
+            if(nextProps.box.values.showClassMode === 'N') {
+                this.originBrush();
+                this.clear();
+                this.redraw(this.props.filter);
+            }else{
+                this.redraw(this.props.filter);
+            }
+        }
+        this.nextShowClassMode = nextProps.box.values.showClassMode;
     }
 
     shouldComponentUpdate(nextProps, nextState) {
@@ -268,6 +279,7 @@ class XLog extends Component {
 
             //let datas = common.getFilteredData(xlogs, filter);
             let datas = await common.getFilteredData0(xlogs, filter, this.props);
+
             datas.forEach((d, i) => {
                 if (!this.props.filterMap[d.objHash]) {
                     return;
@@ -288,6 +300,10 @@ class XLog extends Component {
                         if (asyncXLog) {
                             context.drawImage(this.graph.asyncBrush, x - this.graph.asyncBrush.gabX, y - this.graph.asyncBrush.gabY, this.graph.asyncBrush.width, this.graph.asyncBrush.height);
                         } else {
+
+                            if(this.props.box.values.showClassMode === 'Y') {
+                                this.classBrush(this.graph.normalBrush, d.objHash);
+                            }
                             context.drawImage(this.graph.normalBrush, x - this.graph.normalBrush.gabX, y - this.graph.normalBrush.gabY, this.graph.normalBrush.width, this.graph.normalBrush.height);
                         }
 
@@ -297,6 +313,62 @@ class XLog extends Component {
             d3.select(this.refs.xlogViewer).select(".text-right").html(()=>`<p>Total : ${this.callCount} (<span class="text-error">${this.errorCount}</span>)</p>`);
 
         }
+    };
+
+    classBrush=(brush,hash) =>{
+
+        let normalContext = brush.getContext("2d");
+        normalContext.globalAlpha = Number(this.props.config.xlog.classMode.opacity);
+        for (let i = 0; i < this.props.config.xlog.classMode.rows; i++) {
+            for (let j = 0; j < this.props.config.xlog.classMode.columns; j++) {
+                if (this.props.config.xlog.classMode.fills["D_" + i + "_" + j]) {
+                    normalContext.fillStyle = this.getColor(hash);
+                    normalContext.fillRect(j, i, 1, 1);
+                }
+            }
+        }
+
+    };
+    originBrush = () =>{
+
+        let normalContext = this.graph.normalBrush.getContext("2d");
+
+        normalContext.globalAlpha = Number(this.props.config.xlog.normal.opacity);
+        for (let i = 0; i < this.props.config.xlog.normal.rows; i++) {
+            for (let j = 0; j < this.props.config.xlog.normal.columns; j++) {
+                if (this.props.config.xlog.normal.fills["D_" + i + "_" + j] && this.props.config.xlog.normal.fills["D_" + i + "_" + j].color !== "transparent") {
+                    normalContext.fillStyle = this.props.config.xlog.normal.fills["D_" + i + "_" + j].color;
+                    normalContext.fillRect(j, i, 1, 1);
+                }
+            }
+        }
+        let asyncContext = this.graph.asyncBrush.getContext("2d");
+
+        asyncContext.globalAlpha = Number(this.props.config.xlog.async.opacity);
+        for (let i = 0; i < this.props.config.xlog.async.rows; i++) {
+            for (let j = 0; j < this.props.config.xlog.async.columns; j++) {
+                if (this.props.config.xlog.async.fills["D_" + i + "_" + j] && this.props.config.xlog.async.fills["D_" + i + "_" + j].color !== "transparent") {
+                    asyncContext.fillStyle = this.props.config.xlog.async.fills["D_" + i + "_" + j].color;
+                    asyncContext.fillRect(j, i, 1, 1);
+                }
+            }
+        }
+
+        let errorContext = this.graph.errorBrush.getContext("2d");
+
+        errorContext.globalAlpha = Number(this.props.config.xlog.error.opacity);
+        for (let i = 0; i < this.props.config.xlog.error.rows; i++) {
+            for (let j = 0; j < this.props.config.xlog.error.columns; j++) {
+                if (this.props.config.xlog.error.fills["D_" + i + "_" + j] && this.props.config.xlog.error.fills["D_" + i + "_" + j].color !== "transparent") {
+                    errorContext.fillStyle = this.props.config.xlog.error.fills["D_" + i + "_" + j].color;
+                    errorContext.fillRect(j, i, 1, 1);
+                }
+            }
+        }
+    };
+
+    getColor=(hash)=>{
+        return InstanceColor.getInstanceColors()[hash][0];
     };
 
     updateXAxis = (clear) => {
@@ -317,17 +389,19 @@ class XLog extends Component {
     };
 
     clear = () => {
-        let canvas = d3.select(this.refs.xlogViewer).select("canvas").node();
-        let context = canvas.getContext("2d");
+        if(this.refs.xlogViewer && this.graph._tempCanvas) {
+            let canvas = d3.select(this.refs.xlogViewer).select("canvas").node();
+            let context = canvas.getContext("2d");
 
-        this.graph._tempCanvas.width = canvas.width;
-        this.graph._tempCanvas.height = canvas.height;
+            this.graph._tempCanvas.width = canvas.width;
+            this.graph._tempCanvas.height = canvas.height;
 
-        let tempContext = this.graph._tempCanvas.getContext("2d");
-        this.graph.last = 0;
+            let tempContext = this.graph._tempCanvas.getContext("2d");
+            this.graph.last = 0;
 
-        tempContext.clearRect(0, 0, canvas.width, canvas.height);
-        context.clearRect(0, 0, canvas.width, canvas.height);
+            tempContext.clearRect(0, 0, canvas.width, canvas.height);
+            context.clearRect(0, 0, canvas.width, canvas.height);
+        }
     };
 
     redraw = (filter) => {
@@ -682,7 +756,8 @@ let mapStateToProps = (state) => {
         config: state.config,
         user: state.user,
         filterMap: state.target.filterMap,
-        timeFocus: state.timeFocus
+        timeFocus: state.timeFocus,
+        objects : state.target.objects
     };
 };
 
