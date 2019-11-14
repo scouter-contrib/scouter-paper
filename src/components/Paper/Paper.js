@@ -241,7 +241,7 @@ class Paper extends Component {
                         boxes[key].values[attr] =  boxes[key].advancedOption[attr].value;
                     }
                 }
-                if(boxes[key].option.type ==='xlog' && !boxes[key].option.config['showClassMode']){
+                if(boxes[key].option && boxes[key].option.type ==='xlog' && !boxes[key].option.config['showClassMode']){
                     boxes[key].option.config['showClassMode'] = Options.options().xlog.config.showClassMode;
                 }
             }
