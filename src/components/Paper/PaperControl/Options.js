@@ -59,7 +59,7 @@ export function options() {
                     name :'CLASS MODE',
                     type: "selector",
                     data: ["Y", "N"],
-                    value: "Y"
+                    value: "N"
                 }
 
             }

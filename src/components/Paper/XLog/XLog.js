@@ -166,10 +166,8 @@ class XLog extends Component {
             this.redraw(this.props.filter);
         }
         if( this.props.box.values.showClassMode !== this.beforeShowClassMode){
-            // console.log('changed...',this.props.box.values.showClassMode)
             if(this.props.box.values.showClassMode === 'N') {
-                this.moveCanvas();
-                this.originBrush();
+                this.graphInit();
                 this.redraw(this.props.filter);
             }else{
                 this.redraw(this.props.filter);
@@ -355,43 +353,6 @@ class XLog extends Component {
 
     };
 
-    originBrush = () =>{
-        if(this.graph.normalBrush) {
-            let normalContext = this.graph.normalBrush.getContext("2d");
-            normalContext.globalAlpha = Number(this.props.config.xlog.normal.opacity);
-            for (let i = 0; i < this.props.config.xlog.normal.rows; i++) {
-                for (let j = 0; j < this.props.config.xlog.normal.columns; j++) {
-                    if (this.props.config.xlog.normal.fills["D_" + i + "_" + j] && this.props.config.xlog.normal.fills["D_" + i + "_" + j].color !== "transparent") {
-                        normalContext.fillStyle = this.props.config.xlog.normal.fills["D_" + i + "_" + j].color;
-                        normalContext.fillRect(j, i, 1, 1);
-                    }
-                }
-            }
-            let asyncContext = this.graph.asyncBrush.getContext("2d");
-
-            asyncContext.globalAlpha = Number(this.props.config.xlog.async.opacity);
-            for (let i = 0; i < this.props.config.xlog.async.rows; i++) {
-                for (let j = 0; j < this.props.config.xlog.async.columns; j++) {
-                    if (this.props.config.xlog.async.fills["D_" + i + "_" + j] && this.props.config.xlog.async.fills["D_" + i + "_" + j].color !== "transparent") {
-                        asyncContext.fillStyle = this.props.config.xlog.async.fills["D_" + i + "_" + j].color;
-                        asyncContext.fillRect(j, i, 1, 1);
-                    }
-                }
-            }
-
-            let errorContext = this.graph.errorBrush.getContext("2d");
-
-            errorContext.globalAlpha = Number(this.props.config.xlog.error.opacity);
-            for (let i = 0; i < this.props.config.xlog.error.rows; i++) {
-                for (let j = 0; j < this.props.config.xlog.error.columns; j++) {
-                    if (this.props.config.xlog.error.fills["D_" + i + "_" + j] && this.props.config.xlog.error.fills["D_" + i + "_" + j].color !== "transparent") {
-                        errorContext.fillStyle = this.props.config.xlog.error.fills["D_" + i + "_" + j].color;
-                        errorContext.fillRect(j, i, 1, 1);
-                    }
-                }
-            }
-        }
-    };
 
     getColor=(hash)=>{
         return InstanceColor.getInstanceColors()[hash][0];
