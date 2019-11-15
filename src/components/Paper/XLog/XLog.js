@@ -9,6 +9,7 @@ import {connect} from 'react-redux';
 import {setSelection, setTimeFocus} from '../../../actions';
 import {withRouter} from 'react-router-dom';
 import InstanceColor from "../../../common/InstanceColor";
+import _ from 'lodash';
 
 const XLOG_ELAPSED = 'xlogElapsed';
 
@@ -153,10 +154,10 @@ class XLog extends Component {
         } else if (this.lastPastTimestamp === this.props.pastTimestamp && this.lastPageCnt !== this.props.pageCnt) {
             this.lastPageCnt = this.props.pageCnt;
             this.draw(this.props.data.newXLogs, this.props.filter);
-        } else {
+        } else{
             this.draw(this.props.data.newXLogs, this.props.filter);
         }
-        
+
         if (this.props.filter && JSON.stringify(prevProps.filter) !== JSON.stringify(this.props.filter)) {
             this.clear();
             this.redraw(this.props.filter);
@@ -166,8 +167,10 @@ class XLog extends Component {
             this.clear();
             this.redraw(this.props.filter);
         }
+
         if( this.props.box.values.showClassMode !== this.beforeShowClassMode){
             this.graphInit();
+
             this.redraw(this.props.filter);
         }
         this.beforeShowClassMode = prevProps.box.values.showClassMode;
@@ -279,36 +282,69 @@ class XLog extends Component {
         }
         if (this.refs.xlogViewer && xlogs) {
             let context = d3.select(this.refs.xlogViewer).select("canvas").node().getContext("2d");
-
-            //let datas = common.getFilteredData(xlogs, filter);
             let datas = await common.getFilteredData0(xlogs, filter, this.props);
-
-            datas.forEach((d, i) => {
-                if (!this.props.filterMap[d.objHash]) {
-                    return;
-                }
-                let x = this.graph.x(d.endTime);
-                let y = this.graph.y(d.elapsed);
-
-                if (y < 0) {
-                    y = 0;
-                }
-
-                if (x > 0) {
-                    if(this.props.box.values.showClassMode === 'Y'){
-                        const xtype = Number(d.xtype);
-                        const asyncXLog = xtype >= 2 && xtype <= 4; //@see scouter.lang.pack.XLogTypes.class (scouter.common)
-                        if (Number(d.error)) {
-                            this.classBrush(this.graph.clazzBrush, d.objHash, 'error',asyncXLog);
-                        }else{
-                            if(asyncXLog){
-                                this.classBrush(this.graph.clazzBrush, d.objHash,'async');
-                            }else{
-                                this.classBrush(this.graph.clazzBrush, d.objHash);
-                            }
+            if(this.props.box.values.showClassMode === 'Y'){
+                const _grpDatas = _.groupBy(datas,d => d.objHash);
+                Object.keys(_grpDatas)
+                    .forEach(_key => {
+                        if(!this.props.filterMap[_key]){
+                            return;
                         }
-                         context.drawImage(this.graph.clazzBrush, x - this.graph.clazzBrush.gabX, y -this.graph.clazzBrush.gabY, this.graph.clazzBrush.width, this.graph.clazzBrush.height);
-                    }else{
+                        //- 이벤트 발생시 brush 패턴을 적게 사용해야 더블버퍼 렌더링 속도가 올라감
+                        let prevVType = 0;
+                        _grpDatas[_key].forEach(d => {
+                            let x = this.graph.x(d.endTime);
+                            let dy = this.graph.dy(d.elapsed);
+                            if (dy < 0) {
+                                dy = 3;
+                            }
+                            if (x > 0) {
+                                let xtype = Number(d.xtype);
+                                let viewType = 1;
+                                const asyncXLog = xtype >= 2 && xtype <= 4; //@see scouter.lang.pack.XLogTypes.class (scouter.common)
+                                switch(xtype){
+                                    case 2:
+                                    case 3:
+                                    case 4:
+                                        viewType = 2;
+                                        if(Number(d.error)){
+                                          viewType = 3;
+                                        }
+                                        break;
+                                    default :
+                                        if(Number(d.error)){
+                                          viewType = 3;
+                                        }
+                                }
+                                if(prevVType !== viewType) {
+                                    switch (viewType) {
+                                        case 3:
+                                            this.classBrush(d.objHash, 'error', asyncXLog);
+                                            break;
+                                        case 2:
+                                            this.classBrush(d.objHash, 'async');
+                                            break;
+                                        default :
+                                            this.classBrush(d.objHash);
+                                            break;
+                                    }
+                                }
+                                context.drawImage(this.graph.clazzBrush, x - this.graph.clazzBrush.gabX, dy - this.graph.clazzBrush.gabY, this.graph.clazzBrush.width, this.graph.clazzBrush.height);
+                                prevVType = viewType;
+                            }
+                        })
+                    })
+            }else{
+                datas.forEach((d, i) => {
+                    if (!this.props.filterMap[d.objHash]) {
+                        return;
+                    }
+                    let x = this.graph.x(d.endTime);
+                    if (x > 0) {
+                        let y = this.graph.y(d.elapsed);
+                        if (y < 0) {
+                            y = 0;
+                        }
                         if (Number(d.error)) {
                             context.drawImage(this.graph.errorBrush, x - this.graph.errorBrush.gabX, y - this.graph.errorBrush.gabY, this.graph.errorBrush.width, this.graph.errorBrush.height);
                         } else {
@@ -321,8 +357,11 @@ class XLog extends Component {
                             }
                         }
                     }
-                }
-            });
+                });
+
+            }
+
+
 
             d3.select(this.refs.xlogViewer).select(".text-right").html(()=>`<p>Total : ${this.callCount} (<span class="text-error">${this.errorCount}</span>)</p>`);
 
@@ -339,32 +378,28 @@ class XLog extends Component {
         ctx.fillStyle=`rgba(255,255,255,${alpha})`;
         ctx.fillRect(3,4,1,1);
     }
-    classBrush=(brush, hash, state='normal',isAysnc=false) =>{
+    classBrush=(hash, state='normal',isAysnc=false) =>{
 
-        let ctx = brush.getContext("2d");
         // 전체 사각형 그리기
         switch(state) {
             case 'async':
-                // normalContext.globalAlpha=0.2;
-                // ctx.fillStyle='rgba(106,115,123,0.2)';
-                ctx.fillStyle='#BBBBBB';
-                ctx.fillRect(0,0,5,5);
-                this.classBrushFillline(ctx,1);
+                this.clazzContext.fillStyle='#BBBBBB';
+                this.clazzContext.fillRect(0,0,5,5);
+                this.classBrushFillline(this.clazzContext,1);
                 break;
             case 'error':
                 if(isAysnc) {
-                    // ctx.fillStyle=`rgba(255,0,0,${isAysnc ? 0.7 : 1})`;
-                    ctx.fillStyle = `#F2B8B8`;
+                    this.clazzContext.fillStyle = `#F2B8B8`;
                 }else{
-                    ctx.fillStyle = `#E33733`;
+                    this.clazzContext.fillStyle = `#E33733`;
                 }
-                ctx.fillRect(0,0,5,5);
-                this.classBrushFillline(ctx,1);
+                this.clazzContext.fillRect(0,0,5,5);
+                this.classBrushFillline(this.clazzContext,1);
                 break;
             default :
-                ctx.fillStyle = this.getColor(hash);
-                ctx.fillRect(0,0,5,5);
-                this.classBrushFillline(ctx,1);
+                this.clazzContext.fillStyle = this.getColor(hash);
+                this.clazzContext.fillRect(0,0,5,5);
+                this.classBrushFillline(this.clazzContext,1);
                 break;
         }
 
@@ -422,12 +457,10 @@ class XLog extends Component {
         }
 
         let svg = d3.select(this.refs.xlogViewer).select("svg");
-        if(this.props.box.values.showClassMode === "Y"){
-            console.log('--change..',this.state.elapsed);
-            this.graph.y.domain([0, this.state.elapsed]);
-        }else{
-            this.graph.y.domain([0, this.state.elapsed]);
-        }
+
+        this.graph.y.domain([0, this.state.elapsed]);
+        this.graph.dy.domain([0, this.state.elapsed]);
+
 
         svg.select(".axis-y").transition().duration(500).call(d3.axisLeft(this.graph.y).tickFormat((e) => {
             if (this.state && (this.state.elapsed < 1000)) {
@@ -496,18 +529,11 @@ class XLog extends Component {
 
         this.graph.x = d3.scaleTime().range([0, this.graph.width]).domain([this.props.data.startTime, this.props.data.endTime]);
         if (this.state.elapsed) {
-            if(this.isClassMode()){
-                this.graph.y = d3.scaleLinear().range([this.graph.height-1, 0]).domain([0, this.state.elapsed]);
-            }else {
-                this.graph.y = d3.scaleLinear().range([this.graph.height, 0]).domain([0, this.state.elapsed]);
-            }
+            this.graph.y = d3.scaleLinear().range([this.graph.height, 0]).domain([0, this.state.elapsed]);
+            this.graph.dy = d3.scaleLinear().range([this.graph.height-3, 0]).domain([0, this.state.elapsed]);
         } else {
-            if(this.isClassMode()){
-                this.graph.y = d3.scaleLinear().range([this.graph.height-1, 0]).domain([0, this.props.data.maxElapsed]);
-            }else{
-                this.graph.y = d3.scaleLinear().range([this.graph.height, 0]).domain([0, this.props.data.maxElapsed]);
-            }
-
+            this.graph.y = d3.scaleLinear().range([this.graph.height, 0]).domain([0, this.props.data.maxElapsed]);
+            this.graph.dy = d3.scaleLinear().range([this.graph.height-3, 0]).domain([0, this.props.data.maxElapsed]);
         }
 
         // X축 단위 그리기
@@ -674,7 +700,7 @@ class XLog extends Component {
         this.graph.clazzBrush.gabX = Math.floor(this.graph.clazzBrush.width /2);
         this.graph.clazzBrush.gabY = Math.floor(this.graph.clazzBrush.height/2);
 
-        // let clazzContext = this.graph.clazzBrush.getContext("2d");
+        this.clazzContext = this.graph.clazzBrush.getContext("2d");
        //
         // for (let i = 0; i < this.props.config.xlog.classMode.rows; i++) {
         //     for (let j = 0; j < this.props.config.xlog.classMode.columns; j++) {
