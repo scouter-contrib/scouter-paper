@@ -243,6 +243,7 @@ class Paper extends Component {
                 }
                 if(boxes[key].option && boxes[key].option.type ==='xlog' && !boxes[key].option.config['showClassMode']){
                     boxes[key].option.config['showClassMode'] = Options.options().xlog.config.showClassMode;
+                    boxes[key].values['showClassMode'] = 'N';
                 }
             }
         }
@@ -330,6 +331,7 @@ class Paper extends Component {
                         }
                         if(boxes[key].option.type ==='xlog' && !boxes[key].option.config['showClassMode']){
                             boxes[key].option.config['showClassMode'] = Options.options().xlog.config.showClassMode;
+                            boxes[key].values['showClassMode'] = 'N';
                         }
                     }
                 }
