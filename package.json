@@ -82,7 +82,7 @@
   "scripts": {
     "start": "node scripts/start.js",
     "build": "node scripts/build.js",
-    "postbuild": "zip -r scouter-paper.zip build",
+    "postbuild": "cd build; zip -r ../scouter-paper.zip *",
     "test": "node scripts/test.js --env=jsdom"
   },
   "jest": {
