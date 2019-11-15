@@ -307,7 +307,7 @@ class XLog extends Component {
                                 this.classBrush(this.graph.clazzBrush, d.objHash);
                             }
                         }
-                        context.drawImage(this.graph.clazzBrush, x - this.graph.clazzBrush.gabX, y - this.graph.clazzBrush.gabY, this.graph.clazzBrush.width, this.graph.clazzBrush.height);
+                         context.drawImage(this.graph.clazzBrush, x - this.graph.clazzBrush.gabX, y -this.graph.clazzBrush.gabY, this.graph.clazzBrush.width, this.graph.clazzBrush.height);
                     }else{
                         if (Number(d.error)) {
                             context.drawImage(this.graph.errorBrush, x - this.graph.errorBrush.gabX, y - this.graph.errorBrush.gabY, this.graph.errorBrush.width, this.graph.errorBrush.height);
@@ -422,7 +422,13 @@ class XLog extends Component {
         }
 
         let svg = d3.select(this.refs.xlogViewer).select("svg");
-        this.graph.y.domain([0, this.state.elapsed]);
+        if(this.props.box.values.showClassMode === "Y"){
+            console.log('--change..',this.state.elapsed);
+            this.graph.y.domain([0, this.state.elapsed]);
+        }else{
+            this.graph.y.domain([0, this.state.elapsed]);
+        }
+
         svg.select(".axis-y").transition().duration(500).call(d3.axisLeft(this.graph.y).tickFormat((e) => {
             if (this.state && (this.state.elapsed < 1000)) {
                 return (e / 1000).toFixed(2) + "s";
@@ -468,7 +474,9 @@ class XLog extends Component {
         context.clearRect(0, 0, canvas.width, canvas.height);
         context.drawImage(this.graph._tempCanvas, -pixel, 0, canvas.width, canvas.height);
     };
-
+    isClassMode =()=>{
+        return this.props.box.values.showClassMode === "Y";
+    };
     graphInit = () => {
         let that = this;
         let box = this.refs.xlogViewer.parentNode.parentNode.parentNode;
@@ -488,9 +496,18 @@ class XLog extends Component {
 
         this.graph.x = d3.scaleTime().range([0, this.graph.width]).domain([this.props.data.startTime, this.props.data.endTime]);
         if (this.state.elapsed) {
-            this.graph.y = d3.scaleLinear().range([this.graph.height, 0]).domain([0, this.state.elapsed]);
+            if(this.isClassMode()){
+                this.graph.y = d3.scaleLinear().range([this.graph.height-1, 0]).domain([0, this.state.elapsed]);
+            }else {
+                this.graph.y = d3.scaleLinear().range([this.graph.height, 0]).domain([0, this.state.elapsed]);
+            }
         } else {
-            this.graph.y = d3.scaleLinear().range([this.graph.height, 0]).domain([0, this.props.data.maxElapsed]);
+            if(this.isClassMode()){
+                this.graph.y = d3.scaleLinear().range([this.graph.height-1, 0]).domain([0, this.props.data.maxElapsed]);
+            }else{
+                this.graph.y = d3.scaleLinear().range([this.graph.height, 0]).domain([0, this.props.data.maxElapsed]);
+            }
+
         }
 
         // X축 단위 그리기
@@ -655,7 +672,7 @@ class XLog extends Component {
         this.graph.clazzBrush.width = this.props.config.xlog.classMode.columns;
         this.graph.clazzBrush.height = this.props.config.xlog.classMode.rows;
         this.graph.clazzBrush.gabX = Math.floor(this.graph.clazzBrush.width /2);
-        this.graph.clazzBrush.gabY = Math.floor(this.graph.clazzBrush.height);
+        this.graph.clazzBrush.gabY = Math.floor(this.graph.clazzBrush.height/2);
 
         // let clazzContext = this.graph.clazzBrush.getContext("2d");
        //
@@ -672,7 +689,8 @@ class XLog extends Component {
         this.graph.normalBrush.width = this.props.config.xlog.normal.columns;
         this.graph.normalBrush.height = this.props.config.xlog.normal.rows;
         this.graph.normalBrush.gabX = Math.floor(this.graph.normalBrush.width /2);
-        this.graph.normalBrush.gabY = Math.floor(this.graph.normalBrush.height);
+        this.graph.normalBrush.gabY = Math.floor(this.graph.normalBrush.height/2);
+        this.graph.normalBrush.gabMin = Math.floor(this.graph.normalBrush.height);
 
         let normalContext = this.graph.normalBrush.getContext("2d");
 
@@ -690,7 +708,7 @@ class XLog extends Component {
         this.graph.asyncBrush.width = this.props.config.xlog.async.columns;
         this.graph.asyncBrush.height = this.props.config.xlog.async.rows;
         this.graph.asyncBrush.gabX = Math.floor(this.graph.asyncBrush.width / 2);
-        this.graph.asyncBrush.gabY = Math.floor(this.graph.asyncBrush.height);
+        this.graph.asyncBrush.gabY = Math.floor(this.graph.asyncBrush.height/ 2);
         let asyncContext = this.graph.asyncBrush.getContext("2d");
 
         asyncContext.globalAlpha = Number(this.props.config.xlog.async.opacity);
@@ -707,7 +725,7 @@ class XLog extends Component {
         this.graph.errorBrush.height = this.props.config.xlog.error.rows;
         this.graph.errorBrush.width = this.props.config.xlog.error.columns;
         this.graph.errorBrush.gabX = Math.floor(this.graph.errorBrush.width / 2);
-        this.graph.errorBrush.gabY = Math.floor(this.graph.errorBrush.height);
+        this.graph.errorBrush.gabY = Math.floor(this.graph.errorBrush.height/ 2);
         let errorContext = this.graph.errorBrush.getContext("2d");
 
         errorContext.globalAlpha = Number(this.props.config.xlog.error.opacity);
