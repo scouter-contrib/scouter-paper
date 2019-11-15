@@ -241,6 +241,9 @@ class Paper extends Component {
                         boxes[key].values[attr] =  boxes[key].advancedOption[attr].value;
                     }
                 }
+                if(boxes[key].option && boxes[key].option.type ==='xlog' && !boxes[key].option.config['showClassMode']){
+                    boxes[key].option.config['showClassMode'] = Options.options().xlog.config.showClassMode;
+                }
             }
         }
         this.props.setBoxesLayouts(boxes, layouts);
@@ -315,7 +318,7 @@ class Paper extends Component {
 
         if (JSON.stringify(nextProps.template) !== JSON.stringify(this.props.template)) {
             if (JSON.stringify(nextProps.template.boxes) !== JSON.stringify(this.state.boxes) || JSON.stringify(nextProps.template.layouts) !== JSON.stringify(this.state.layouts)) {
-                // 초기화 : 만약 라인 차트 타입 설정이 없는 경우
+                // 초기화 : 로드한 차트에 만약 라인 차트 타입 설정이 없는 경우
                 const boxes = nextProps.template.boxes;
                 if( boxes ){
                     for (const key in boxes) {
@@ -324,6 +327,9 @@ class Paper extends Component {
                             for(const attr in boxes[key].advancedOption ){
                                 boxes[key].values[attr] =  boxes[key].advancedOption[attr].value;
                             }
+                        }
+                        if(boxes[key].option.type ==='xlog' && !boxes[key].option.config['showClassMode']){
+                            boxes[key].option.config['showClassMode'] = Options.options().xlog.config.showClassMode;
                         }
                     }
                 }

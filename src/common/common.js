@@ -1,7 +1,7 @@
 // local storage access
 import moment from "moment";
 import {Dictionary, DictType} from "./dictionary";
-export const version = "2.6.1";
+export const version = "2.6.2";
 
 export function getData(key) {
     let ls = null;
@@ -794,5 +794,13 @@ export function updateQueryStringParameter(uri, key, value) {
     }
     else {
         return uri + separator + key + "=" + value;
+    }
+}
+export function confBuilder(addr,conf,user,serverId){
+    return {
+        addr  : addr,
+        conf  : conf,
+        user  : user,
+        serverId : serverId
     }
 }

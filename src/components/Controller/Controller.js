@@ -792,6 +792,7 @@ class Controller extends Component {
     };
 
     toggleFilteredObject = (objHash) => {
+
         if (this.props.filterMap[objHash]) {
             this.props.removeFilteredObject(objHash);
         } else {

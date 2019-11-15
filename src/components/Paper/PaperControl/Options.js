@@ -54,7 +54,14 @@ export function options() {
                     type: "selector",
                     data: ["Y", "N"],
                     value: "N"
+                },
+                showClassMode : {
+                    name :'CLASS MODE',
+                    type: "selector",
+                    data: ["Y", "N"],
+                    value: "N"
                 }
+
             }
         },
         visitor: {
