@@ -283,7 +283,7 @@ class XLog extends Component {
         if (this.refs.xlogViewer && xlogs) {
             let context = d3.select(this.refs.xlogViewer).select("canvas").node().getContext("2d");
             let datas = await common.getFilteredData0(xlogs, filter, this.props);
-            if(this.props.box.values.showClassMode === 'Y'){
+            if(this.isClassMode()){
                 const _grpDatas = _.groupBy(datas,d => d.objHash);
                 Object.keys(_grpDatas)
                     .forEach(_key => {
@@ -333,8 +333,6 @@ class XLog extends Component {
                                         context.drawImage(this.graph.clazzBrush, x - this.graph.clazzBrush.gabX, dy - this.graph.clazzBrush.gabY, this.graph.clazzBrush.width, this.graph.clazzBrush.height);
                                         break;
                                 }
-
-
                             }
                         })
                     })
@@ -364,8 +362,6 @@ class XLog extends Component {
                 });
 
             }
-
-
 
             d3.select(this.refs.xlogViewer).select(".text-right").html(()=>`<p>Total : ${this.callCount} (<span class="text-error">${this.errorCount}</span>)</p>`);
 

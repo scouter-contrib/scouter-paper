@@ -720,7 +720,12 @@ export function getFilteredData (xlogs, filter) {
         if (filter.startHmsFrom && filter.startHmsTo) {
             let dm = dateMillis(filter.startHmsFrom, filter.startHmsTo);
             if(dm !== null) {
-                   datas = datas.filter((d) => (((Number(d.endTime) - Number(d.elapsed)) >= dm[0]) && ((Number(d.endTime) - Number(d.elapsed)) <= dm[1])));
+                  const [startFilter,endFilter] = dm.split(':');
+                   datas = datas.filter((d) => {
+                       const _startTime = Number(d.endTime) - Number(d.elapsed);
+                       return _startTime >= Number(startFilter) && _startTime <= Number(endFilter);
+                   });
+
             }
         }
 
