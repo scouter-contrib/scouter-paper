@@ -290,8 +290,7 @@ class XLog extends Component {
                         if(!this.props.filterMap[_key]){
                             return;
                         }
-                        //- 이벤트 발생시 brush 패턴을 적게 사용해야 더블버퍼 렌더링 속도가 올라감
-                        let prevVType = 0;
+                        this.classBrush(this.graph.clazzBrush,_key);
                         _grpDatas[_key].forEach(d => {
                             let x = this.graph.x(d.endTime);
                             let dy = this.graph.dy(d.elapsed);
@@ -301,14 +300,14 @@ class XLog extends Component {
                             if (x > 0) {
                                 let xtype = Number(d.xtype);
                                 let viewType = 1;
-                                const asyncXLog = xtype >= 2 && xtype <= 4; //@see scouter.lang.pack.XLogTypes.class (scouter.common)
+                                // const asyncXLog = xtype >= 2 && xtype <= 4; //@see scouter.lang.pack.XLogTypes.class (scouter.common)
                                 switch(xtype){
                                     case 2:
                                     case 3:
                                     case 4:
                                         viewType = 2;
                                         if(Number(d.error)){
-                                          viewType = 3;
+                                          viewType = 4;
                                         }
                                         break;
                                     default :
@@ -316,21 +315,26 @@ class XLog extends Component {
                                           viewType = 3;
                                         }
                                 }
-                                if(prevVType !== viewType) {
-                                    switch (viewType) {
-                                        case 3:
-                                            this.classBrush(d.objHash, 'error', asyncXLog);
-                                            break;
-                                        case 2:
-                                            this.classBrush(d.objHash, 'async');
-                                            break;
-                                        default :
-                                            this.classBrush(d.objHash);
-                                            break;
-                                    }
+                                switch (viewType) {
+                                    case 4:
+                                        // async+error
+                                        context.drawImage(this.graph.asyncBrush, x - this.graph.clazzBrush.gabX, dy - this.graph.clazzBrush.gabY, this.graph.clazzBrush.width, this.graph.clazzBrush.height);
+                                        break;
+                                    case 3:
+                                        // error
+                                        context.drawImage(this.graph.errorBrush, x - this.graph.clazzBrush.gabX, dy - this.graph.clazzBrush.gabY, this.graph.clazzBrush.width, this.graph.clazzBrush.height);
+                                        break;
+                                    case 2:
+                                        // async
+                                        context.drawImage(this.graph.normalBrush, x - this.graph.clazzBrush.gabX, dy - this.graph.clazzBrush.gabY, this.graph.clazzBrush.width, this.graph.clazzBrush.height);
+                                        break;
+                                    default :
+                                        // normal
+                                        context.drawImage(this.graph.clazzBrush, x - this.graph.clazzBrush.gabX, dy - this.graph.clazzBrush.gabY, this.graph.clazzBrush.width, this.graph.clazzBrush.height);
+                                        break;
                                 }
-                                context.drawImage(this.graph.clazzBrush, x - this.graph.clazzBrush.gabX, dy - this.graph.clazzBrush.gabY, this.graph.clazzBrush.width, this.graph.clazzBrush.height);
-                                prevVType = viewType;
+
+
                             }
                         })
                     })
@@ -367,7 +371,7 @@ class XLog extends Component {
 
         }
     };
-    classBrushFillline(ctx,alpha){
+    classBrushEmptyFill(ctx,alpha){
         // 나머지 white 로 변경
         ctx.fillStyle=`rgba(255,255,255,${alpha})`;
         ctx.fillRect(1,0,1,1);
@@ -378,28 +382,29 @@ class XLog extends Component {
         ctx.fillStyle=`rgba(255,255,255,${alpha})`;
         ctx.fillRect(3,4,1,1);
     }
-    classBrush=(hash, state='normal',isAysnc=false) =>{
+    classBrush=(brush,hash, state='normal',isAysnc=false) =>{
 
+        const ctx = brush.getContext('2d');
         // 전체 사각형 그리기
         switch(state) {
             case 'async':
-                this.clazzContext.fillStyle='#BBBBBB';
-                this.clazzContext.fillRect(0,0,5,5);
-                this.classBrushFillline(this.clazzContext,1);
+                ctx.fillStyle='#BBBBBB';
+                ctx.fillRect(0,0,5,5);
+                this.classBrushEmptyFill(ctx,1);
                 break;
             case 'error':
                 if(isAysnc) {
-                    this.clazzContext.fillStyle = `#F2B8B8`;
+                    ctx.fillStyle = `#F2B8B8`;
                 }else{
-                    this.clazzContext.fillStyle = `#E33733`;
+                    ctx.fillStyle = `#E33733`;
                 }
-                this.clazzContext.fillRect(0,0,5,5);
-                this.classBrushFillline(this.clazzContext,1);
+                ctx.fillRect(0,0,5,5);
+                this.classBrushEmptyFill(ctx,1);
                 break;
             default :
-                this.clazzContext.fillStyle = this.getColor(hash);
-                this.clazzContext.fillRect(0,0,5,5);
-                this.classBrushFillline(this.clazzContext,1);
+                ctx.fillStyle = this.getColor(hash);
+                ctx.fillRect(0,0,5,5);
+                this.classBrushEmptyFill(ctx,1);
                 break;
         }
 
@@ -764,6 +769,11 @@ class XLog extends Component {
             }
         }
 
+        if(this.isClassMode()){
+            this.classBrush(this.graph.asyncBrush,"", 'error',true);
+            this.classBrush(this.graph.errorBrush,"", 'error',false);
+            this.classBrush(this.graph.normalBrush,"", 'async');
+        }
         this.redraw(this.props.filter);
     };
 
