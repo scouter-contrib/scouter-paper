@@ -421,7 +421,7 @@ class XLog extends Component {
         if (xAxisCount < 1) {
             xAxisCount = 1;
         }
-        svg.select(".axis-x").call(d3.axisBottom(this.graph.x).tickFormat(d3.timeFormat(this.graph.timeFormat)).ticks(xAxisCount));
+        svg.select(".axis-x").call(d3.axisBottom(this.graph.x).tickFormat(d3.timeFormat(this.isClassMode() ? this.props.config.timeFormat : this.graph.timeFormat)).ticks(xAxisCount));
         svg.select(".grid-x").call(d3.axisBottom(this.graph.x).tickSize(-this.graph.height).tickFormat("").ticks(xAxisCount));
 
         if (clear) {
