@@ -9,7 +9,6 @@ import {connect} from 'react-redux';
 import {setSelection, setTimeFocus} from '../../../actions';
 import {withRouter} from 'react-router-dom';
 import InstanceColor from "../../../common/InstanceColor";
-import _ from 'lodash';
 
 const XLOG_ELAPSED = 'xlogElapsed';
 
