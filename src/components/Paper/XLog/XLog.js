@@ -534,7 +534,7 @@ class XLog extends Component {
         if (xAxisCount < 1) {
             xAxisCount = 1;
         }
-        svg.append("g").attr("class", "axis-x").attr("transform", "translate(0," + this.graph.height + ")").call(d3.axisBottom(this.graph.x).tickFormat(d3.timeFormat(this.graph.timeFormat)).ticks(xAxisCount));
+        svg.append("g").attr("class", "axis-x").attr("transform", "translate(0," + this.graph.height + ")").call(d3.axisBottom(this.graph.x).tickFormat(d3.timeFormat(this.isClassMode() ? this.props.config.timeFormat : this.graph.timeFormat)).ticks(xAxisCount));
         // Y축 단위 그리기
         let yAxisCount = Math.floor(this.graph.height / this.graph.yAxisHeight);
         if (yAxisCount < 1) {
