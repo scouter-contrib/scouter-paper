@@ -84,7 +84,7 @@ const configState = {
         longHistoryStep : 60
     },
     xlog: {
-        classMode: {
+        classicMode: {
             rows: 5,
             columns: 5,
             opacity : 1.0,

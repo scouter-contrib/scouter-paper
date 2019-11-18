@@ -55,8 +55,8 @@ export function options() {
                     data: ["Y", "N"],
                     value: "N"
                 },
-                showClassMode : {
-                    name :'CLASS MODE',
+                showClassicMode : {
+                    name :'CLASSIC MODE',
                     type: "selector",
                     data: ["Y", "N"],
                     value: "N"

@@ -106,7 +106,7 @@ class XLog extends Component {
         if (nextProps.filterMap && JSON.stringify(nextProps.filterMap) !== JSON.stringify(this.props.filterMap)) {
             return true;
         }
-        if( nextProps.box.values.showClassMode !== this.beforeShowClassMode){
+        if( nextProps.box.values.showClassicMode !== this.beforeShowClassicModeMode){
 
             return true;
         }
@@ -168,12 +168,12 @@ class XLog extends Component {
             this.redraw(this.props.filter);
         }
 
-        if( this.props.box.values.showClassMode !== this.beforeShowClassMode){
+        if( this.props.box.values.showClassicMode !== this.beforeShowClassMode){
             this.graphInit();
 
             this.redraw(this.props.filter);
         }
-        this.beforeShowClassMode = prevProps.box.values.showClassMode;
+        this.beforeShowClassicModeMode = prevProps.box.values.showClassicMode;
 
 
 
@@ -284,58 +284,54 @@ class XLog extends Component {
             let context = d3.select(this.refs.xlogViewer).select("canvas").node().getContext("2d");
             let datas = await common.getFilteredData0(xlogs, filter, this.props);
             if(this.isClassMode()){
-                const _grpDatas = _.groupBy(datas,d => d.objHash);
-                Object.keys(_grpDatas)
-                    .forEach(_key => {
-                        if(!this.props.filterMap[_key]){
-                            return;
+                datas.forEach(d => {
+                    if (!this.props.filterMap[d.objHash]) {
+                        return;
+                    }
+                    let x = this.graph.x(d.endTime);
+                    let dy = this.graph.dy(d.elapsed);
+                    if (dy < 0) {
+                        dy = 3;
+                    }
+                    if (x > 0) {
+                        let xtype = Number(d.xtype);
+                        let viewType = 1;
+                        // const asyncXLog = xtype >= 2 && xtype <= 4; //@see scouter.lang.pack.XLogTypes.class (scouter.common)
+                        switch(xtype){
+                            case 2:
+                            case 3:
+                            case 4:
+                                viewType = 2;
+                                if(Number(d.error)){
+                                  viewType = 4;
+                                }
+                                break;
+                            default :
+                                if(Number(d.error)){
+                                  viewType = 3;
+                                }
                         }
-                        this.classBrush(this.graph.clazzBrush,_key);
-                        _grpDatas[_key].forEach(d => {
-                            let x = this.graph.x(d.endTime);
-                            let dy = this.graph.dy(d.elapsed);
-                            if (dy < 0) {
-                                dy = 3;
-                            }
-                            if (x > 0) {
-                                let xtype = Number(d.xtype);
-                                let viewType = 1;
-                                // const asyncXLog = xtype >= 2 && xtype <= 4; //@see scouter.lang.pack.XLogTypes.class (scouter.common)
-                                switch(xtype){
-                                    case 2:
-                                    case 3:
-                                    case 4:
-                                        viewType = 2;
-                                        if(Number(d.error)){
-                                          viewType = 4;
-                                        }
-                                        break;
-                                    default :
-                                        if(Number(d.error)){
-                                          viewType = 3;
-                                        }
-                                }
-                                switch (viewType) {
-                                    case 4:
-                                        // async+error
-                                        context.drawImage(this.graph.asyncBrush, x - this.graph.clazzBrush.gabX, dy - this.graph.clazzBrush.gabY, this.graph.clazzBrush.width, this.graph.clazzBrush.height);
-                                        break;
-                                    case 3:
-                                        // error
-                                        context.drawImage(this.graph.errorBrush, x - this.graph.clazzBrush.gabX, dy - this.graph.clazzBrush.gabY, this.graph.clazzBrush.width, this.graph.clazzBrush.height);
-                                        break;
-                                    case 2:
-                                        // async
-                                        context.drawImage(this.graph.normalBrush, x - this.graph.clazzBrush.gabX, dy - this.graph.clazzBrush.gabY, this.graph.clazzBrush.width, this.graph.clazzBrush.height);
-                                        break;
-                                    default :
-                                        // normal
-                                        context.drawImage(this.graph.clazzBrush, x - this.graph.clazzBrush.gabX, dy - this.graph.clazzBrush.gabY, this.graph.clazzBrush.width, this.graph.clazzBrush.height);
-                                        break;
-                                }
-                            }
-                        })
-                    })
+                        switch (viewType) {
+                            case 4:
+                                // async+error
+                                context.drawImage(this.graph.asyncBrush, x - this.graph.clazzBrush.gabX, dy - this.graph.clazzBrush.gabY, this.graph.clazzBrush.width, this.graph.clazzBrush.height);
+                                break;
+                            case 3:
+                                // error
+                                context.drawImage(this.graph.errorBrush, x - this.graph.clazzBrush.gabX, dy - this.graph.clazzBrush.gabY, this.graph.clazzBrush.width, this.graph.clazzBrush.height);
+                                break;
+                            case 2:
+                                // async
+                                context.drawImage(this.graph.normalBrush, x - this.graph.clazzBrush.gabX, dy - this.graph.clazzBrush.gabY, this.graph.clazzBrush.width, this.graph.clazzBrush.height);
+                                break;
+                            default :
+                                // normal
+                                context.drawImage(this._objBrush[d.objHash], x - this.graph.clazzBrush.gabX, dy - this.graph.clazzBrush.gabY, this.graph.clazzBrush.width, this.graph.clazzBrush.height);
+                                break;
+                        }
+                    }
+                })
+
             }else{
                 datas.forEach((d, i) => {
                     if (!this.props.filterMap[d.objHash]) {
@@ -403,9 +399,6 @@ class XLog extends Component {
                 this.classBrushEmptyFill(ctx,1);
                 break;
         }
-
-
-
     };
 
 
@@ -509,7 +502,7 @@ class XLog extends Component {
         context.drawImage(this.graph._tempCanvas, -pixel, 0, canvas.width, canvas.height);
     };
     isClassMode =()=>{
-        return this.props.box.values.showClassMode === "Y";
+        return this.props.box.values.showClassicMode === "Y";
     };
     graphInit = () => {
         let that = this;
@@ -696,8 +689,8 @@ class XLog extends Component {
         // 브러쉬 (XLOG)
 
         this.graph.clazzBrush = document.createElement("canvas");
-        this.graph.clazzBrush.width = this.props.config.xlog.classMode.columns;
-        this.graph.clazzBrush.height = this.props.config.xlog.classMode.rows;
+        this.graph.clazzBrush.width = this.props.config.xlog.classicMode.columns;
+        this.graph.clazzBrush.height = this.props.config.xlog.classicMode.rows;
         this.graph.clazzBrush.gabX = Math.floor(this.graph.clazzBrush.width /2);
         this.graph.clazzBrush.gabY = Math.floor(this.graph.clazzBrush.height/2);
 
@@ -764,7 +757,20 @@ class XLog extends Component {
                 }
             }
         }else{
+            this.graph.errorBrush.width = this.props.config.xlog.classicMode.columns;
+            this.graph.errorBrush.height = this.props.config.xlog.classicMode.rows;
             this.classBrush(this.graph.errorBrush,"", 'error',false);
+        }
+        if(this.isClassMode()){
+            this._objBrush = [];
+            this.props.objects.filter(_d => _d.objFamily === 'javaee' || _d.objFamily === 'tracing')
+                .forEach(_d =>{
+                    const objBrush= document.createElement("canvas");
+                    objBrush.width = this.props.config.xlog.classicMode.columns;
+                    objBrush.height = this.props.config.xlog.classicMode.rows;
+                    this.classBrush(objBrush, _d.objHash);
+                    this._objBrush[_d.objHash] = objBrush;
+                })
         }
 
         this.redraw(this.props.filter);
@@ -832,6 +838,7 @@ let mapStateToProps = (state) => {
         config: state.config,
         user: state.user,
         filterMap: state.target.filterMap,
+        objects : state.target.objects,
         timeFocus: state.timeFocus,
     };
 };
