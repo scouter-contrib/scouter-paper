@@ -167,9 +167,8 @@ class XLog extends Component {
             this.redraw(this.props.filter);
         }
 
-        if( this.props.box.values.showClassicMode !== this.beforeShowClassMode){
+        if( this.props.box.values.showClassicMode !== this.beforeShowClassicModeMode){
             this.graphInit();
-
             this.redraw(this.props.filter);
         }
         this.beforeShowClassicModeMode = prevProps.box.values.showClassicMode;
