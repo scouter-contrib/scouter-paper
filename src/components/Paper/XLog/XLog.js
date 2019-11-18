@@ -361,18 +361,28 @@ class XLog extends Component {
 
         }
     };
-    classBrushEmptyFill(ctx,alpha){
+    classicBrushEmptyFill(ctx, alpha){
         // 나머지 white 로 변경
-        ctx.fillStyle=`rgba(255,255,255,${alpha})`;
+        const color = this.props.config.theme === 'theme-gray' ? '35,35,35':'238,239,239';
+        ctx.fillStyle=`rgba(${color},${alpha})`;
         ctx.fillRect(1,0,1,1);
-        ctx.fillStyle=`rgba(255,255,255,${alpha})`;
+        ctx.fillStyle=`rgba(${color},${alpha})`;
         ctx.fillRect(4,1,1,1);
-        ctx.fillStyle=`rgba(255,255,255,${alpha})`;
+        ctx.fillStyle=`rgba(${color},${alpha})`;
         ctx.fillRect(0,3,1,1);
-        ctx.fillStyle=`rgba(255,255,255,${alpha})`;
+        ctx.fillStyle=`rgba(${color},${alpha})`;
         ctx.fillRect(3,4,1,1);
-    }
-    classBrush=(brush,hash, state='normal',isAysnc=false) =>{
+    };
+    clssicWindmillFill(ctx){
+        for (let r = 0; r < this.props.config.xlog.classicMode.rows; r++) {
+            for (let c = 0; c < this.props.config.xlog.classicMode.columns; c++) {
+                if (this.props.config.xlog.classicMode.fills[`D_${r}_${c}`]) {
+                    ctx.fillRect(r, c, 1, 1);
+                }
+            }
+        }
+    };
+    classicBrush=(brush, hash, state='normal', isAysnc=false) =>{
 
         const ctx = brush.getContext('2d');
         // 전체 사각형 그리기
@@ -380,7 +390,7 @@ class XLog extends Component {
             case 'async':
                 ctx.fillStyle='#BBBBBB';
                 ctx.fillRect(0,0,5,5);
-                this.classBrushEmptyFill(ctx,1);
+                this.classicBrushEmptyFill(ctx,1);
                 break;
             case 'error':
                 if(isAysnc) {
@@ -389,12 +399,13 @@ class XLog extends Component {
                     ctx.fillStyle = `#E33733`;
                 }
                 ctx.fillRect(0,0,5,5);
-                this.classBrushEmptyFill(ctx,1);
+                this.classicBrushEmptyFill(ctx,1);
                 break;
             default :
                 ctx.fillStyle = this.getColor(hash);
+                // this.clssicWindmillFill(ctx);
                 ctx.fillRect(0,0,5,5);
-                this.classBrushEmptyFill(ctx,1);
+                this.classicBrushEmptyFill(ctx,1);
                 break;
         }
     };
@@ -711,7 +722,7 @@ class XLog extends Component {
                 }
             }
         }else{
-            this.classBrush(this.graph.normalBrush,"", 'async');
+            this.classicBrush(this.graph.normalBrush,"", 'async');
         }
 
         this.graph.asyncBrush = document.createElement("canvas");
@@ -733,7 +744,7 @@ class XLog extends Component {
                 }
             }
         }else{
-            this.classBrush(this.graph.asyncBrush,"", 'error',true);
+            this.classicBrush(this.graph.asyncBrush,"", 'error',true);
         }
 
         this.graph.errorBrush = document.createElement("canvas");
@@ -757,7 +768,7 @@ class XLog extends Component {
         }else{
             this.graph.errorBrush.width = this.props.config.xlog.classicMode.columns;
             this.graph.errorBrush.height = this.props.config.xlog.classicMode.rows;
-            this.classBrush(this.graph.errorBrush,"", 'error',false);
+            this.classicBrush(this.graph.errorBrush,"", 'error',false);
         }
         if(this.isClassMode()){
             this._objBrush = [];
@@ -766,7 +777,7 @@ class XLog extends Component {
                     const objBrush= document.createElement("canvas");
                     objBrush.width = this.props.config.xlog.classicMode.columns;
                     objBrush.height = this.props.config.xlog.classicMode.rows;
-                    this.classBrush(objBrush, _d.objHash);
+                    this.classicBrush(objBrush, _d.objHash);
                     this._objBrush[_d.objHash] = objBrush;
                 })
         }
