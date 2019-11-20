@@ -760,6 +760,18 @@ class Settings extends Component {
                             </div>
                             <div className="row">
                                 <div className="label">
+                                    <div>CHART AXIS FONT SIZE</div>
+                                </div>
+                                <div className="input">
+                                    <select value={this.state.config.fontSetting.axisFontSize} onChange={this.onChangeFont.bind(this, "axisFontSize")} disabled={!this.state.edit}>
+                                        {[8,9,10,11,12].map((d, i) => {
+                                            return <option key={i} value={d}>{d}</option>
+                                        })}
+                                    </select>
+                                </div>
+                            </div>
+                            <div className="row">
+                                <div className="label">
                                     <div>CHART TOOLTIP FONT</div>
                                 </div>
                                 <div className="input">

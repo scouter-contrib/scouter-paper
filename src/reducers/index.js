@@ -277,6 +277,7 @@ const configState = {
         basic : "NanumSquare",
         menu : "Bungee",
         axis : "Bungee",
+        axisFontSize : "8px",
         tooltip : "NanumSquare",
         profiler : "NanumSquare"
     },
