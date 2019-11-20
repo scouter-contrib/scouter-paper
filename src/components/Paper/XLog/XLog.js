@@ -324,7 +324,11 @@ class XLog extends Component {
                                 break;
                             default :
                                 // normal
-                                context.drawImage(this._objBrush[d.objHash], x - this.graph.clazzBrush.gabX, dy - this.graph.clazzBrush.gabY, this.graph.clazzBrush.width, this.graph.clazzBrush.height);
+                                if(this._objBrush[d.objHash]) {
+                                    context.drawImage(this._objBrush[d.objHash], x - this.graph.clazzBrush.gabX, dy - this.graph.clazzBrush.gabY, this.graph.clazzBrush.width, this.graph.clazzBrush.height);
+                                }else{
+                                    console.log('warning..');
+                                }
                                 break;
                         }
                     }
@@ -363,13 +367,14 @@ class XLog extends Component {
     };
     classBrushEmptyFill(ctx,alpha){
         // 나머지 white 로 변경
-        ctx.fillStyle=`rgba(255,255,255,${alpha})`;
+        const backGroundColor = this.props.config.colorType === 'white' ? '255,255,255' : '0,0,0' ;
+        ctx.fillStyle=`rgba(${backGroundColor},${alpha})`;
         ctx.fillRect(1,0,1,1);
-        ctx.fillStyle=`rgba(255,255,255,${alpha})`;
+        ctx.fillStyle=`rgba(${backGroundColor},${alpha})`;
         ctx.fillRect(4,1,1,1);
-        ctx.fillStyle=`rgba(255,255,255,${alpha})`;
+        ctx.fillStyle=`rgba(${backGroundColor},${alpha})`;
         ctx.fillRect(0,3,1,1);
-        ctx.fillStyle=`rgba(255,255,255,${alpha})`;
+        ctx.fillStyle=`rgba(${backGroundColor},${alpha})`;
         ctx.fillRect(3,4,1,1);
     }
     classBrush=(brush,hash, state='normal',isAysnc=false) =>{
