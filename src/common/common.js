@@ -809,3 +809,8 @@ export function confBuilder(addr,conf,user,serverId){
         serverId : serverId
     }
 }
+
+export function timeMiToMs(min){
+    return min * 60 * 1000;
+
+}

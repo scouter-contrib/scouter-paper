@@ -16,6 +16,7 @@ import moment from "moment";
 import * as Options from "./PaperControl/Options"
 import OldVersion from "../OldVersion/OldVersion";
 import ScouterPatternMatcher from "../../common/ScouterPatternMatcher";
+import {timeMiToMs} from "../../common/common";
 
 
 const ResponsiveReactGridLayout = WidthProvider(Responsive);
@@ -63,7 +64,7 @@ class Paper extends Component {
             boxes = [];
         }
 
-        let range = 1000 * 60 * 10;
+        let range = timeMiToMs(this.props.config.realTimeXLogLastRange);
         let endTime = (new ServerDate()).getTime();
         let startTime = endTime - range;
 
@@ -294,7 +295,7 @@ class Paper extends Component {
         if (JSON.stringify(prevCounterKeyMap) !== JSON.stringify(counterKeyMap)) {
             if (this.props.range.realTime) {
                 let now = (new ServerDate()).getTime();
-                let ten = (this.props.config.preload === "Y") ? 1000 * 60 * 10 : 1000;
+                let ten = (this.props.config.preload === "Y") ? timeMiToMs(this.props.config.realTimeLastRange) : 1000;
                 this.getCounterHistory(this.props.objects, now - ten, now, false);
                 this.getLatestData(true, this.props.objects);
             } else {
@@ -342,7 +343,7 @@ class Paper extends Component {
         if (JSON.stringify(this.props.objects) !== JSON.stringify(nextProps.objects)) {
             if (this.props.range.realTime) {
                 let now = (new ServerDate()).getTime();
-                let ten = (this.props.config.preload === "Y") ? 1000 * 60 * 10 : 1000;
+                let ten = (this.props.config.preload === "Y") ? timeMiToMs(this.props.config.realTimeLastRange) : 1000;
                 this.getCounterHistory(nextProps.objects, now - ten, now, false);
                 this.getLatestData(true, nextProps.objects);
             } else {
@@ -381,7 +382,7 @@ class Paper extends Component {
                 this.dataRefreshTimer = null;
 
                 let now = (new ServerDate()).getTime();
-                let ten = (this.props.config.preload === "Y") ? 1000 * 60 * 10 : 1000;
+                let ten = (this.props.config.preload === "Y") ? timeMiToMs(this.props.config.realTimeLastRange) : 1000;
                 this.getCounterHistory(this.props.objects, now - ten, now, false);
                 this.getLatestData(true, this.props.objects);
             } else {
@@ -421,7 +422,7 @@ class Paper extends Component {
 
         if (this.props.objects && this.props.objects.length > 0) {
             let now = (new ServerDate()).getTime();
-            let ten = (this.props.config.preload === "Y") ? 1000 * 60 * 10 : 1000;
+            let ten = (this.props.config.preload === "Y") ? timeMiToMs(this.props.config.realTimeLastRange) : 1000;
             this.getCounterHistory(this.props.objects, now - ten, now, false);
             if (this.props.range.realTime) {
                 this.getLatestData(false, this.props.objects);
@@ -566,7 +567,7 @@ class Paper extends Component {
                 });
             } else {
                 let now = (new ServerDate()).getTime();
-                let ten = (this.props.config.preload === "Y") ? 1000 * 60 * 10 : 1000;
+                let ten = (this.props.config.preload === "Y") ? timeMiToMs(this.props.config.realTimeLastRange) : 1000;
                 this.getCounterHistory(this.props.objects, now - ten, now, false);
             }
         }
@@ -580,7 +581,7 @@ class Paper extends Component {
     // load specific box data
     getSingleCounterHistory = (box) => {
         let now = (new ServerDate()).getTime();
-        let ten = 1000 * 60 * 10;
+        let ten = timeMiToMs(this.props.config.realTimeLastRange);
         let longTerm = false;
         let objects = this.props.objects;
         this.getPaperCounterHistory(objects, now - ten, now, longTerm, box);

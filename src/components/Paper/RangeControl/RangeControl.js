@@ -188,7 +188,14 @@ class RangeControl extends Component {
                     }
                 </div>
                 {this.props.range.realTime &&
-                <div className="time-controller-reatime-msg">LAST 10 MINUTES</div>
+                    <div className="time-controller-reatime-msg">
+                        <div key="time-realtime-counter">
+                            COUNTER - LAST {this.props.config.realTimeLastRange} MINUTES
+                        </div>
+                        <div key="time-realtime-xlog">
+                            XLOG - LAST {this.props.config.realTimeXLogLastRange} MINUTES
+                        </div>
+                    </div>
                 }
                 {!this.props.range.realTime &&
                 <div className="time-controller">

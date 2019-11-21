@@ -522,6 +522,30 @@ class Settings extends Component {
                         <div className="setting-box">
                             <div className="row">
                                 <div className="label">
+                                    <div>REALTIME LAST RANGE (minute)</div>
+                                </div>
+                                <div className="input">
+                                    <select value={this.state.config.realTimeLastRange} onChange={this.onChange.bind(this, "realTimeLastRange")} disabled={!this.state.edit}>
+                                        {[1,2,3,4,5,6,7,8,9,10].map((d, i) => {
+                                            return <option key={i} value={d}>{d}</option>
+                                        })}
+                                    </select>
+                                </div>
+                            </div>
+                            <div className="row">
+                                <div className="label">
+                                    <div>REALTIME XLOG LAST RANGE (minute)</div>
+                                </div>
+                                <div className="input">
+                                    <select value={this.state.config.realTimeXLogLastRange} onChange={this.onChange.bind(this, "realTimeXLogLastRange")} disabled={!this.state.edit}>
+                                        {[1,2,3,4,5,6,7,8,9,10,15,30,60,120].map((d, i) => {
+                                            return <option key={i} value={d}>{d}</option>
+                                        })}
+                                    </select>
+                                </div>
+                            </div>
+                            <div className="row">
+                                <div className="label">
                                     <div>REALTIME DATA INTERVAL (milliseconds)</div>
                                 </div>
                                 <div className="input">

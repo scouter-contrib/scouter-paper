@@ -56,6 +56,8 @@ const configState = {
         }
     ],
     interval: 2000,
+    realTimeLastRange : 10,
+    realTimeXLogLastRange : 10,
     preload: "Y",
     alertInterval : 60,
     numberFormat: "0,0.0",
