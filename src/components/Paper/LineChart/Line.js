@@ -33,7 +33,9 @@ class Line extends Component {
         }
 //-    realtime <=> search reset
         if(nextProps.removeObject !== this.props.removeObject){
+            this.peakClear();
             _.forEach(nextProps.removeObject, d=>this.removeCounterLine(d.key,d.counter));
+
         }
         if(nextProps.removeCounter !== this.props.removeCounter){
             _.forEach(nextProps.removeCounter,d=>this.removeCounterLine(d.key,d.counter,true));
@@ -43,6 +45,7 @@ class Line extends Component {
         const {type} = nextProps.options;
         const thisType  = this.props.options.type;
         if( type !== thisType){
+            this.peakClear();
             switch(thisType){
                 case 'STACK AREA':
                     this.stackArea.selectAll('path').remove();
@@ -128,12 +131,13 @@ class Line extends Component {
             this.focus.selectAll("line").attr("y2",data.options.height);
 
             let instanceMetricCount = {};
+            let peakData = [];
             for (let counterKey in data.counters) {
                 let thisOption = data.box.option.filter((d) => {return d.counterKey === counterKey})[0];
                 if(thisOption){
                     switch(data.options.type){
                         case 'STACK AREA':
-                            this.drawStackArea(thisOption,counterKey,data);
+                            this.stackAreaPaint(thisOption,counterKey,data);
                             break;
                         default :
                             //- LINE,LINEFILL
@@ -150,17 +154,71 @@ class Line extends Component {
                                         color = InstanceColor.getInstanceColors(data.config.colorType)[obj.objHash][(instanceMetricCount[obj.objHash]++) % 5];
                                     }
                                     this.drawLine(obj, thisOption, counterKey, color,data);
+                                    // console.log(data.counters[counterKey]);
+                                    const _maxBy= _.maxBy(data.counters[counterKey],d => {
+                                        const _valueObj = d.data[obj.objHash];
+                                        if(_valueObj){
+                                            return Number(_valueObj.value);
+                                        }
+                                    });
+
+                                    if(_maxBy) {
+                                        peakData.push({
+                                            time : _maxBy.time,
+                                            color: color,
+                                            counter: Number(_maxBy.data[obj.objHash].value)
+                                        })
+                                    }
+
                                 }
                             }
-
-
-
                     }
                 }
             }
+            //-peakpaint
+            this.peakPaint(data.options.type,peakData);
         }
         this.moveTooltip();
 
+
+    };
+    peakClear(){
+        this.peakBrush.selectAll('circle').remove();
+        this.peakBrush.selectAll('text').remove();
+    };
+    peakPaint = (chartType,peakData) =>{
+      if(peakData.length === 0){
+            return;
+      }
+      if(chartType === 'STACK AREA'){
+          return;
+      }
+
+      const _peak =  _.maxBy(peakData,d => d.counter);
+      const _paintC = this.peakBrush.selectAll("circle")
+          .attr('cx',d => this.xScale(d.time))
+          .attr('cy',d => this.yScale(d.counter))
+          .data([_peak]);
+
+        _paintC.enter()
+                .append('circle')
+                .attr('r',3)
+                .attr('fill',d => d.color)
+                .exit()
+              .remove();
+
+        const _paintT = this.peakBrush.selectAll("text")
+            .attr('y',d => this.yScale(d.counter)-7)
+            .attr('x',d => this.xScale(d.time))
+            .text(d => numeral(d.counter).format('0.0a'))
+            .data([_peak]);
+
+        _paintT.enter()
+            .append('text')
+            .style('text-anchor', 'middle')
+            .style('font-size','10px')
+            .exit()
+            .remove();
 
     };
 
@@ -248,7 +306,7 @@ class Line extends Component {
             this.focus.select("line.focus-line").remove();
         }
     };
-    drawStackArea=(thisOption,counterKey,data) => {
+    stackAreaPaint=(thisOption, counterKey, data) => {
         let instanceMetricCount = {};
         const color = {};
         //- instance color making
@@ -344,7 +402,7 @@ class Line extends Component {
         paintGroup.exit().remove();
     };
     drawLine = (obj, option, counterKey, color,data) => {
-        if (this.props.box.values['chartType'] === "LINE FILL") {
+        if (this.props.config.graph.fill === 'Y' || this.props.box.values['chartType'] === "LINE FILL") {
             let valueArea = d3.area().curve(d3[this.props.config.graph.curve])
                 .x((d) =>this.xScale(d.time))
                 .y0(data.options.height)
@@ -633,6 +691,7 @@ class Line extends Component {
                              .style("opacity", options.opacity)
                              .attr("transform", `translate(0,${options.height})`)
                              .call(this.gridTickX);
+        this.peakBrush = this.top.append("g").attr("class", "peak").attr("clip-path",`url(#area-clip${this.props.box.key})`);
 // event setting
 
         this.svg.on("mouseover",  ()=> {

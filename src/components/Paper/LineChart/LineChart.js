@@ -351,11 +351,11 @@ class LineChart extends Component {
 
 
         if (!this.graph.maxY) {
-            this.graph.maxY = maxY * 1.2;
+            this.graph.maxY = maxY * 1.5;
         }
 
         if (this.graph.autoMaxY > this.graph.maxY) {
-            this.graph.maxY = this.graph.autoMaxY * 1.2;
+            this.graph.maxY = this.graph.autoMaxY * 1.5;
         }
 
 
