@@ -97,6 +97,39 @@ class Line extends Component {
             }
         }
     };
+    linePlot(data,thisOption,counterKey,metricCount,peakData){
+        for (let i = 0; i < data.objects.length; i++) {
+            const obj = data.objects[i];
+            if (obj.objFamily === thisOption.familyName ) {
+                if (!metricCount[obj.objHash]) {
+                    metricCount[obj.objHash] = 0;
+                }
+                let color;
+                if (data.config.graph.color === "metric") {
+                    color = InstanceColor.getMetricColor(thisOption.counterKey, data.config.colorType);
+                } else {
+                    color = InstanceColor.getInstanceColors(data.config.colorType)[obj.objHash][(metricCount[obj.objHash]++) % 5];
+                }
+                this.drawLine(obj, thisOption, counterKey, color, data);
+                const _maxBy = _.maxBy(data.counters[counterKey], d => {
+                    const _valueObj = d.data[obj.objHash];
+                    if (_valueObj) {
+                        return Number(_valueObj.value);
+                    }
+                });
+                if(data.filterMap[obj.objHash]) {
+                    if (_maxBy) {
+                        peakData.push({
+                            time: _maxBy.time,
+                            color: color,
+                            counter: Number(_maxBy.data[obj.objHash].value)
+                        })
+                    }
+                }
+
+            }
+        }
+    };
     paint (data){
 
         if (data.objects) {
@@ -141,37 +174,7 @@ class Line extends Component {
                             break;
                         default :
                             //- LINE,LINEFILL
-                            for (let i = 0; i < data.objects.length; i++) {
-                                const obj = data.objects[i];
-                                if (obj.objFamily === thisOption.familyName) {
-                                    if (!instanceMetricCount[obj.objHash]) {
-                                        instanceMetricCount[obj.objHash] = 0;
-                                    }
-                                    let color;
-                                    if (data.config.graph.color === "metric") {
-                                        color = InstanceColor.getMetricColor(thisOption.counterKey, data.config.colorType);
-                                    } else {
-                                        color = InstanceColor.getInstanceColors(data.config.colorType)[obj.objHash][(instanceMetricCount[obj.objHash]++) % 5];
-                                    }
-                                    this.drawLine(obj, thisOption, counterKey, color,data);
-                                    // console.log(data.counters[counterKey]);
-                                    const _maxBy= _.maxBy(data.counters[counterKey],d => {
-                                        const _valueObj = d.data[obj.objHash];
-                                        if(_valueObj){
-                                            return Number(_valueObj.value);
-                                        }
-                                    });
-
-                                    if(_maxBy) {
-                                        peakData.push({
-                                            time : _maxBy.time,
-                                            color: color,
-                                            counter: Number(_maxBy.data[obj.objHash].value)
-                                        })
-                                    }
-
-                                }
-                            }
+                            this.linePlot(data,thisOption,counterKey,instanceMetricCount,peakData);
                     }
                 }
             }
@@ -183,11 +186,16 @@ class Line extends Component {
 
     };
     peakClear(){
-        this.peakBrush.selectAll('circle').remove();
-        this.peakBrush.selectAll('text').remove();
+        try {
+            this.peakBrush.selectAll('circle').remove();
+            this.peakBrush.selectAll('text').remove();
+        }catch (e) {
+            console.log(e);
+        }
     };
     peakPaint = (chartType,peakData) =>{
       if(peakData.length === 0){
+            this.peakClear();
             return;
       }
       if(chartType === 'STACK AREA'){
