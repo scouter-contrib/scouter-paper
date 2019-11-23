@@ -501,10 +501,10 @@ class Line extends Component {
     }
     getTimeFormat(duration){
 
-       if( duration >= (60000 * 5)) {
-           return this.props.config.minuteFormat;
-       }else{
+       if( duration <= (1000 * 60 * 5)) {
            return this.props.config.timeFormat;
+       }else{
+           return this.props.config.minuteFormat;
        }
     }
 
