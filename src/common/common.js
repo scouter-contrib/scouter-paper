@@ -1,7 +1,7 @@
 // local storage access
 import moment from "moment";
 import {Dictionary, DictType} from "./dictionary";
-export const version = "2.6.1";
+export const version = "2.6.2";
 
 export function getData(key) {
     let ls = null;
@@ -720,7 +720,12 @@ export function getFilteredData (xlogs, filter) {
         if (filter.startHmsFrom && filter.startHmsTo) {
             let dm = dateMillis(filter.startHmsFrom, filter.startHmsTo);
             if(dm !== null) {
-                   datas = datas.filter((d) => (((Number(d.endTime) - Number(d.elapsed)) >= dm[0]) && ((Number(d.endTime) - Number(d.elapsed)) <= dm[1])));
+                  const [startFilter,endFilter] = dm.split(':');
+                   datas = datas.filter((d) => {
+                       const _startTime = Number(d.endTime) - Number(d.elapsed);
+                       return _startTime >= Number(startFilter) && _startTime <= Number(endFilter);
+                   });
+
             }
         }
 
@@ -795,4 +800,17 @@ export function updateQueryStringParameter(uri, key, value) {
     else {
         return uri + separator + key + "=" + value;
     }
+}
+export function confBuilder(addr,conf,user,serverId){
+    return {
+        addr  : addr,
+        conf  : conf,
+        user  : user,
+        serverId : serverId
+    }
+}
+
+export function timeMiToMs(min){
+    return min * 60 * 1000;
+
 }

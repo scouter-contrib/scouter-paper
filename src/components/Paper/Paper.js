@@ -16,6 +16,7 @@ import moment from "moment";
 import * as Options from "./PaperControl/Options"
 import OldVersion from "../OldVersion/OldVersion";
 import ScouterPatternMatcher from "../../common/ScouterPatternMatcher";
+import {timeMiToMs} from "../../common/common";
 
 
 const ResponsiveReactGridLayout = WidthProvider(Responsive);
@@ -63,7 +64,7 @@ class Paper extends Component {
             boxes = [];
         }
 
-        let range = 1000 * 60 * 10;
+        let range = timeMiToMs(this.props.config.realTimeXLogLastRange);
         let endTime = (new ServerDate()).getTime();
         let startTime = endTime - range;
 
@@ -241,6 +242,10 @@ class Paper extends Component {
                         boxes[key].values[attr] =  boxes[key].advancedOption[attr].value;
                     }
                 }
+                if(boxes[key].option && boxes[key].option.type ==='xlog' && !boxes[key].option.config['showClassicMode']){
+                    boxes[key].option.config['showClassicMode'] = Options.options().xlog.config.showClassicMode;
+                    boxes[key].values['showClassicMode'] = 'N';
+                }
             }
         }
         this.props.setBoxesLayouts(boxes, layouts);
@@ -290,7 +295,7 @@ class Paper extends Component {
         if (JSON.stringify(prevCounterKeyMap) !== JSON.stringify(counterKeyMap)) {
             if (this.props.range.realTime) {
                 let now = (new ServerDate()).getTime();
-                let ten = (this.props.config.preload === "Y") ? 1000 * 60 * 10 : 1000;
+                let ten = (this.props.config.preload === "Y") ? timeMiToMs(this.props.config.realTimeLastRange) : 1000;
                 this.getCounterHistory(this.props.objects, now - ten, now, false);
                 this.getLatestData(true, this.props.objects);
             } else {
@@ -315,7 +320,7 @@ class Paper extends Component {
 
         if (JSON.stringify(nextProps.template) !== JSON.stringify(this.props.template)) {
             if (JSON.stringify(nextProps.template.boxes) !== JSON.stringify(this.state.boxes) || JSON.stringify(nextProps.template.layouts) !== JSON.stringify(this.state.layouts)) {
-                // 초기화 : 만약 라인 차트 타입 설정이 없는 경우
+                // 초기화 : 로드한 차트에 만약 라인 차트 타입 설정이 없는 경우
                 const boxes = nextProps.template.boxes;
                 if( boxes ){
                     for (const key in boxes) {
@@ -324,6 +329,10 @@ class Paper extends Component {
                             for(const attr in boxes[key].advancedOption ){
                                 boxes[key].values[attr] =  boxes[key].advancedOption[attr].value;
                             }
+                        }
+                        if(boxes[key].option.type ==='xlog' && !boxes[key].option.config['showClassicMode']){
+                            boxes[key].option.config['showClassicMode'] = Options.options().xlog.config.showClassicMode;
+                            boxes[key].values['showClassicMode'] = 'N';
                         }
                     }
                 }
@@ -334,7 +343,7 @@ class Paper extends Component {
         if (JSON.stringify(this.props.objects) !== JSON.stringify(nextProps.objects)) {
             if (this.props.range.realTime) {
                 let now = (new ServerDate()).getTime();
-                let ten = (this.props.config.preload === "Y") ? 1000 * 60 * 10 : 1000;
+                let ten = (this.props.config.preload === "Y") ? timeMiToMs(this.props.config.realTimeLastRange) : 1000;
                 this.getCounterHistory(nextProps.objects, now - ten, now, false);
                 this.getLatestData(true, nextProps.objects);
             } else {
@@ -373,7 +382,7 @@ class Paper extends Component {
                 this.dataRefreshTimer = null;
 
                 let now = (new ServerDate()).getTime();
-                let ten = (this.props.config.preload === "Y") ? 1000 * 60 * 10 : 1000;
+                let ten = (this.props.config.preload === "Y") ? timeMiToMs(this.props.config.realTimeLastRange) : 1000;
                 this.getCounterHistory(this.props.objects, now - ten, now, false);
                 this.getLatestData(true, this.props.objects);
             } else {
@@ -413,7 +422,7 @@ class Paper extends Component {
 
         if (this.props.objects && this.props.objects.length > 0) {
             let now = (new ServerDate()).getTime();
-            let ten = (this.props.config.preload === "Y") ? 1000 * 60 * 10 : 1000;
+            let ten = (this.props.config.preload === "Y") ? timeMiToMs(this.props.config.realTimeLastRange) : 1000;
             this.getCounterHistory(this.props.objects, now - ten, now, false);
             if (this.props.range.realTime) {
                 this.getLatestData(false, this.props.objects);
@@ -558,7 +567,7 @@ class Paper extends Component {
                 });
             } else {
                 let now = (new ServerDate()).getTime();
-                let ten = (this.props.config.preload === "Y") ? 1000 * 60 * 10 : 1000;
+                let ten = (this.props.config.preload === "Y") ? timeMiToMs(this.props.config.realTimeLastRange) : 1000;
                 this.getCounterHistory(this.props.objects, now - ten, now, false);
             }
         }
@@ -572,7 +581,7 @@ class Paper extends Component {
     // load specific box data
     getSingleCounterHistory = (box) => {
         let now = (new ServerDate()).getTime();
-        let ten = 1000 * 60 * 10;
+        let ten = timeMiToMs(this.props.config.realTimeLastRange);
         let longTerm = false;
         let objects = this.props.objects;
         this.getPaperCounterHistory(objects, now - ten, now, longTerm, box);

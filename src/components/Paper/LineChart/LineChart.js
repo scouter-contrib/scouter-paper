@@ -4,6 +4,8 @@ import {connect} from 'react-redux';
 import {withRouter} from 'react-router-dom';
 import ServerDate from "../../../common/ServerDate";
 import Line from "./Line";
+import * as _ from "lodash";
+import {timeMiToMs} from "../../../common/common";
 
 class LineChart extends Component {
 
@@ -123,7 +125,7 @@ class LineChart extends Component {
             this.lastCountersTime = nextProps.time;
 
             let endTime = nextProps.time;
-            let startTime = nextProps.time - (1000 * 60 * 10); //- realtime
+            let startTime = nextProps.time - timeMiToMs(this.props.config.realTimeLastRange); //- realtime
 
             for (let i = 0; i < nextProps.box.option.length; i++) {
                 let counterKey = nextProps.box.option[i].counterKey;
@@ -237,7 +239,7 @@ class LineChart extends Component {
                 }));
             }
         }
-        return ret.flatMap(d=>d);
+        return ret.length > 0 ? _.flattenDeep(ret,d=>d) : [];
     }
 
     loadHistoryCounter(countersHistory, counterKey, longTerm) {
@@ -349,11 +351,11 @@ class LineChart extends Component {
 
 
         if (!this.graph.maxY) {
-            this.graph.maxY = maxY * 1.2;
+            this.graph.maxY = maxY * 1.5;
         }
 
         if (this.graph.autoMaxY > this.graph.maxY) {
-            this.graph.maxY = this.graph.autoMaxY * 1.2;
+            this.graph.maxY = this.graph.autoMaxY * 1.5;
         }
 
 

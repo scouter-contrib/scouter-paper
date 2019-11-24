@@ -55,9 +55,9 @@
     opacity: 0.5;
 }
 
-.line-chart-wrapper text {
-    font-size: 8px;
-}
+/*.line-chart-wrapper text {*/
+    /*font-size: 8px;*/
+/*}*/
 
 .line-chart-wrapper .axis-button {
     position: absolute;

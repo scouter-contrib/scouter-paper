@@ -33,7 +33,9 @@ class Line extends Component {
         }
 //-    realtime <=> search reset
         if(nextProps.removeObject !== this.props.removeObject){
+            this.peakClear();
             _.forEach(nextProps.removeObject, d=>this.removeCounterLine(d.key,d.counter));
+
         }
         if(nextProps.removeCounter !== this.props.removeCounter){
             _.forEach(nextProps.removeCounter,d=>this.removeCounterLine(d.key,d.counter,true));
@@ -43,6 +45,7 @@ class Line extends Component {
         const {type} = nextProps.options;
         const thisType  = this.props.options.type;
         if( type !== thisType){
+            this.peakClear();
             switch(thisType){
                 case 'STACK AREA':
                     this.stackArea.selectAll('path').remove();
@@ -68,6 +71,10 @@ class Line extends Component {
             if (nextProps.options !== this.props.options) {
                 this.changedOption(nextProps.options, nextProps);
             }
+
+            if( nextProps.filterMap !== this.props.filterMap){
+                this.paint(nextProps);
+            }
             if ((!nextProps.range.realTime && !nextProps.timeFocus.active) ||
                   nextProps.counters !== this.props.counters) {
                 this.paint(nextProps);
@@ -87,6 +94,39 @@ class Line extends Component {
             }
             if(!nextProps.timeFocus.active) {
                 this.removeFocus(nextProps);
+            }
+        }
+    };
+    linePlot(data,thisOption,counterKey,metricCount,peakData){
+        for (let i = 0; i < data.objects.length; i++) {
+            const obj = data.objects[i];
+            if (obj.objFamily === thisOption.familyName ) {
+                if (!metricCount[obj.objHash]) {
+                    metricCount[obj.objHash] = 0;
+                }
+                let color;
+                if (data.config.graph.color === "metric") {
+                    color = InstanceColor.getMetricColor(thisOption.counterKey, data.config.colorType);
+                } else {
+                    color = InstanceColor.getInstanceColors(data.config.colorType)[obj.objHash][(metricCount[obj.objHash]++) % 5];
+                }
+                this.drawLine(obj, thisOption, counterKey, color, data);
+                const _maxBy = _.maxBy(data.counters[counterKey], d => {
+                    const _valueObj = d.data[obj.objHash];
+                    if (_valueObj) {
+                        return Number(_valueObj.value);
+                    }
+                });
+                if(data.filterMap[obj.objHash]) {
+                    if (_maxBy) {
+                        peakData.push({
+                            time: _maxBy.time,
+                            color: color,
+                            counter: Number(_maxBy.data[obj.objHash].value)
+                        })
+                    }
+                }
+
             }
         }
     };
@@ -124,39 +164,69 @@ class Line extends Component {
             this.focus.selectAll("line").attr("y2",data.options.height);
 
             let instanceMetricCount = {};
+            let peakData = [];
             for (let counterKey in data.counters) {
                 let thisOption = data.box.option.filter((d) => {return d.counterKey === counterKey})[0];
                 if(thisOption){
                     switch(data.options.type){
                         case 'STACK AREA':
-                            this.drawStackArea(thisOption,counterKey,data);
+                            this.stackAreaPaint(thisOption,counterKey,data);
                             break;
                         default :
                             //- LINE,LINEFILL
-                            for (let i = 0; i < data.objects.length; i++) {
-                                const obj = data.objects[i];
-                                if (obj.objFamily === thisOption.familyName) {
-                                    if (!instanceMetricCount[obj.objHash]) {
-                                        instanceMetricCount[obj.objHash] = 0;
-                                    }
-                                    let color;
-                                    if (data.config.graph.color === "metric") {
-                                        color = InstanceColor.getMetricColor(thisOption.counterKey, data.config.colorType);
-                                    } else {
-                                        color = InstanceColor.getInstanceColors(data.config.colorType)[obj.objHash][(instanceMetricCount[obj.objHash]++) % 5];
-                                    }
-                                    this.drawLine(obj, thisOption, counterKey, color,data);
-                                }
-                            }
-
-
-
+                            this.linePlot(data,thisOption,counterKey,instanceMetricCount,peakData);
                     }
                 }
             }
+            //-peakpaint
+            this.peakPaint(data.options.type,peakData);
         }
         this.moveTooltip();
 
+
+    };
+    peakClear(){
+        try {
+            this.peakBrush.selectAll('circle').remove();
+            this.peakBrush.selectAll('text').remove();
+        }catch (e) {
+            console.log(e);
+        }
+    };
+    peakPaint = (chartType,peakData) =>{
+      if(peakData.length === 0){
+            this.peakClear();
+            return;
+      }
+      if(chartType === 'STACK AREA'){
+          return;
+      }
+
+      const _peak =  _.maxBy(peakData,d => d.counter);
+      const _paintC = this.peakBrush.selectAll("circle")
+          .attr('cx',d => this.xScale(d.time))
+          .attr('cy',d => this.yScale(d.counter))
+          .data([_peak]);
+
+        _paintC.enter()
+                .append('circle')
+                .attr('r',3)
+                .attr('fill',d => d.color)
+                .exit()
+              .remove();
+
+        const _paintT = this.peakBrush.selectAll("text")
+            .attr('y',d => this.yScale(d.counter)-7)
+            .attr('x',d => this.xScale(d.time))
+            .text(d => numeral(d.counter).format('0.0a'))
+            .data([_peak]);
+
+        _paintT.enter()
+            .append('text')
+            .style('text-anchor', 'middle')
+            .style('font-size','10px')
+            .exit()
+            .remove();
 
     };
 
@@ -244,7 +314,7 @@ class Line extends Component {
             this.focus.select("line.focus-line").remove();
         }
     };
-    drawStackArea=(thisOption,counterKey,data) => {
+    stackAreaPaint=(thisOption, counterKey, data) => {
         let instanceMetricCount = {};
         const color = {};
         //- instance color making
@@ -340,7 +410,7 @@ class Line extends Component {
         paintGroup.exit().remove();
     };
     drawLine = (obj, option, counterKey, color,data) => {
-        if (this.props.box.values['chartType'] === "LINE FILL") {
+        if (this.props.config.graph.fill === 'Y' || this.props.box.values['chartType'] === "LINE FILL") {
             let valueArea = d3.area().curve(d3[this.props.config.graph.curve])
                 .x((d) =>this.xScale(d.time))
                 .y0(data.options.height)
@@ -431,10 +501,10 @@ class Line extends Component {
     }
     getTimeFormat(duration){
 
-       if( duration >= (60000 * 5)) {
-           return this.props.config.minuteFormat;
-       }else{
+       if( duration <= (1000 * 60 * 5)) {
            return this.props.config.timeFormat;
+       }else{
+           return this.props.config.minuteFormat;
        }
     }
 
@@ -457,7 +527,7 @@ class Line extends Component {
         //    this.paint(this.props);
         // }
         if(repaint){
-            this.paint(this.props);
+            this.paint(props);
         }
     }
 
@@ -629,6 +699,7 @@ class Line extends Component {
                              .style("opacity", options.opacity)
                              .attr("transform", `translate(0,${options.height})`)
                              .call(this.gridTickX);
+        this.peakBrush = this.top.append("g").attr("class", "peak").attr("clip-path",`url(#area-clip${this.props.box.key})`);
 // event setting
 
         this.svg.on("mouseover",  ()=> {

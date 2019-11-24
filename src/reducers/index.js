@@ -56,6 +56,8 @@ const configState = {
         }
     ],
     interval: 2000,
+    realTimeLastRange : 10,
+    realTimeXLogLastRange : 10,
     preload: "Y",
     alertInterval : 60,
     numberFormat: "0,0.0",
@@ -67,8 +69,8 @@ const configState = {
     colorType : "white",
     graph : {
         color : "instance",
-        width : 1,
-        opacity : 0.7,
+        width : 2,
+        opacity : 1,
         fill : "N",
         fillOpacity : 0.4,
         curve : "curveCatmullRom",
@@ -84,6 +86,77 @@ const configState = {
         longHistoryStep : 60
     },
     xlog: {
+        classicMode: {
+            rows: 5,
+            columns: 5,
+            opacity : 1.0,
+            sampling : 100,
+            fills: {
+                D_0_0: {
+                    color: "#0062B1"
+                },
+                D_0_2: {
+                    color: "#0062B1"
+                },
+                D_0_3: {
+                    color: "#0062B1"
+                },
+                D_0_4: {
+                    color: "#0062B1"
+                },
+                D_1_0: {
+                    color: "#0062B1"
+                },
+                D_1_1: {
+                    color: "#0062B1"
+                },
+                D_1_2: {
+                    color: "#0062B1"
+                },
+                D_1_3: {
+                    color: "#0062B1"
+                },
+                D_2_0: {
+                    color: "#0062B1"
+                },
+                D_2_1: {
+                    color: "#0062B1"
+                },
+                D_2_2: {
+                    color: "#0062B1"
+                },
+                D_2_3: {
+                    color: "#0062B1"
+                },
+                D_2_4: {
+                    color: "#0062B1"
+                },
+                D_3_1: {
+                    color: "#0062B1"
+                },
+                D_3_2: {
+                    color: "#0062B1"
+                },
+                D_3_3: {
+                    color: "#0062B1"
+                },
+                D_3_4: {
+                    color: "#0062B1"
+                },
+                D_4_0: {
+                    color: "#0062B1"
+                },
+                D_4_1: {
+                    color: "#0062B1"
+                },
+                D_4_2: {
+                    color: "#0062B1"
+                },
+                D_4_4: {
+                    color: "#0062B1"
+                }
+            }
+        },
         normal: {
             rows: 5,
             columns: 5,
@@ -206,6 +279,7 @@ const configState = {
         basic : "NanumSquare",
         menu : "Bungee",
         axis : "Bungee",
+        axisFontSize : "8px",
         tooltip : "NanumSquare",
         profiler : "NanumSquare"
     },

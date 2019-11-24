@@ -270,7 +270,10 @@ class Controller extends Component {
         common.setTargetServerToUrl(this.props, config);
         common.replaceAllLocalSettingsForServerChange(currentServer, this.props, config);
         common.clearAllUrlParamOfPaper(this.props, config);
+        //- server가 바뀌어 쓰므로 해당 설정이 같이 삭제 되어야함
         localStorage.removeItem("selectedObjects");
+        localStorage.removeItem("topologyOptions");
+        localStorage.removeItem("topologyPosition");
         window.location.reload();
 
     };
@@ -789,6 +792,7 @@ class Controller extends Component {
     };
 
     toggleFilteredObject = (objHash) => {
+
         if (this.props.filterMap[objHash]) {
             this.props.removeFilteredObject(objHash);
         } else {

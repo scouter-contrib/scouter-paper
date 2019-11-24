@@ -73,9 +73,9 @@
     bottom: 0;
 }
 
-.xlog-viewer text {
-    font-size: 8px;
-}
+/*.xlog-viewer text {*/
+    /*font-size: 8px;*/
+/*}*/
 
 .xlog-viewer .text-right {
     position: absolute;

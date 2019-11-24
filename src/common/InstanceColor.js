@@ -1,22 +1,49 @@
 import * as d3 from "d3";
-import {schemeSet3} from "d3-scale-chromatic";
+import {schemeSet3,interpolateViridis} from "d3-scale-chromatic";
 import Color from "color-js";
 
 let instanceColors = {};
 let metricColors = {};
+let xlogColors = {};
+const defaultRgbMapBlue10=[
+    "#1E90FF"
+    ,"#2E8B57"
+    ,"#8B4513"
+    ,"#66CDAA"
+    ,"#0064CD"
+    ,"#698AA3"
+    ,"#5A5AFF"
+    ,"#ADA893"
+    ,"#006400"
+    ,"#6D7270"
+];
+
+
 class InstanceColor {
+
+
+
     static setInstances(instances, colorType) {
         instanceColors = {};
+        const _xlogFamilly = instances.filter(_in=> _in.objFamily === 'javaee' || _in.objFamily === 'tracing');
+        const _total = _xlogFamilly.length;
+        _xlogFamilly.forEach((instance, n) => {
+            xlogColors[instance.objHash] = interpolateViridis(n/_total);
+        });
+
         instances.forEach((instance, n) => {
             instanceColors[instance.objHash] = [];
             let instanceBaseColor;
-            if (n > 9) {
+
+            if (n > 10) {
                 let cnt = Math.floor(n / 10);
-                instanceBaseColor = Color(d3.schemeCategory10[n % 10]).shiftHue(20 * cnt);
+                instanceBaseColor = Color(defaultRgbMapBlue10[n % 10]).shiftHue(20 * cnt);
             } else {
-                instanceBaseColor = d3.schemeCategory10[n]; // 10
+                instanceBaseColor = defaultRgbMapBlue10[n]; // 10
             }
+
             instanceColors[instance.objHash].push(instanceBaseColor);
+
             for (let i=0; i<4; i++) {
                 let color = Color(instanceBaseColor);
                 if (colorType === "white") {
@@ -26,10 +53,15 @@ class InstanceColor {
                 }
             }
         });
+
+
     }
 
     static getInstanceColors() {
         return instanceColors;
+    }
+    static getXlogColors() {
+        return xlogColors;
     }
 
     static getMetricColor(metric, colorType) {

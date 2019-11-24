@@ -6,6 +6,9 @@ import {withRouter} from 'react-router-dom';
 import * as d3 from "d3";
 import sqlFormatter from "sql-formatter";
 import JSONPretty from 'react-json-pretty';
+import jQuery from "jquery";
+import {getCurrentUser, getHttpProtocol, getWithCredentials, setAuthHeader} from "../../../../../../common/common";
+import moment from "moment/moment";
 
 class FrameStepDetail extends Component {
 
@@ -102,11 +105,31 @@ class FrameStepDetail extends Component {
 
         return sql;
     };
-
+    getError(error){
+        let ret = '';
+        const {endTime} = this.props.profile;
+        jQuery.ajax({
+            method: "GET",
+            async: false,
+            dataType: "json",
+            url: `${getHttpProtocol(this.props.config)}/scouter/v1/dictionary/${moment(new Date(Number(endTime))).format("YYYYMMDD")}?dictKeys=[error:${error}]`,
+            xhrFields: getWithCredentials(this.props.config),
+            beforeSend: (xhr)=>{
+                setAuthHeader(xhr, this.props.config, getCurrentUser(this.props.config, this.props.user));
+            }
+        }).done(data=>{
+            const res = data.result[0];
+            if(res) {
+                ret = res.text
+            }
+        });
+        return ret ? ret : 'HAS ERROR (DISPLAY ERROR MESSAGE IS NOT YET SUPPORTED)';
+    }
     render() {
 
         let selectedIndex = this.props.selectedIndex;
         let info = this.props.steps[selectedIndex];
+
         let stepLength = this.props.steps.length;
         let startTime = this.props.profile.endTime - this.props.profile.elapsed;
         let timeFormatter = d3.timeFormat(this.props.config.dateFormat + " " + this.props.config.timeFormat + " %L");
@@ -166,7 +189,7 @@ class FrameStepDetail extends Component {
                     {(info.step.error && Number(info.step.error) !== 0) &&
                     <div className="frame-row">
                         <div className="sub-detail-title"><span>ERROR</span></div>
-                        <div className="main-value error">{/*info.step.error*/}HAS ERROR (DISPLAY ERROR MESSAGE IS NOT YET SUPPORTED)</div>
+                        <div className="main-value error">{this.getError(info.step.error)}</div>
                     </div>
                     }
                     {info.step.stepType === "12" &&  // DUMP라면
@@ -293,7 +316,8 @@ class FrameStepDetail extends Component {
 
 let mapStateToProps = (state) => {
     return {
-        config: state.config
+        config: state.config,
+        user: state.user
     };
 };
 

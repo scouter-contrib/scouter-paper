@@ -456,7 +456,7 @@ class App extends Component {
         css.innerHTML += "html,body,svg text,input,select,button { font-family: '" + fontSetting.basic + "','Nanum Gothic'," + this.getFontGeneric(fontSetting.basic) + "; }";
         css.innerHTML += ".layout-manager .content-ilst { font-family: '" + fontSetting.basic + "','Nanum Gothic'," + this.getFontGeneric(fontSetting.basic) + "; }";
         css.innerHTML += ".instance-selector .list-content { font-family: '" + fontSetting.basic + "','Nanum Gothic'," + this.getFontGeneric(fontSetting.basic) + "; }";
-        css.innerHTML += "svg text { font-family: '" + fontSetting.axis + "','Nanum Gothic'," + this.getFontGeneric(fontSetting.axis) + "; }";
+        css.innerHTML += `svg text { font-family: '${fontSetting.axis}','Nanum Gothic',${this.getFontGeneric(fontSetting.axis)}; font-size: ${fontSetting.axisFontSize}; }`;
         css.innerHTML += ".tooltip { font-family: '" + fontSetting.tooltip + "','Nanum Gothic'," + this.getFontGeneric(fontSetting.tooltip) + "; }";
         css.innerHTML += ".xlog-profiler { font-family: '" + fontSetting.profiler + "','Nanum Gothic'," + this.getFontGeneric(fontSetting.profiler) + "; }";
         css.innerHTML += ".menu-div { font-family: '" + fontSetting.menu + "','Nanum Gothic'," + this.getFontGeneric(fontSetting.menu) + "; }";

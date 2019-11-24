@@ -72,3 +72,6 @@ GET http://demo.scouterapm.com:6188/scouter/v1/xlog-data/20191017/-8542316848524
 GET http://demo.scouterapm.com:6188/scouter/v1/dictionary/20191020?dictKeys=[table:566700965]
 
 ###
+GET http://demo.scouterapm.com:6188/scouter/v1/dictionary/20191106?dictKeys=[error:305445213]
+
+###

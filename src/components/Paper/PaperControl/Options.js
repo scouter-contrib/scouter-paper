@@ -54,7 +54,14 @@ export function options() {
                     type: "selector",
                     data: ["Y", "N"],
                     value: "N"
+                },
+                showClassicMode : {
+                    name :'CLASSIC MODE',
+                    type: "selector",
+                    data: ["Y", "N"],
+                    value: "N"
                 }
+
             }
         },
         visitor: {
