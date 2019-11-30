@@ -165,21 +165,27 @@ class Line extends Component {
 
             let instanceMetricCount = {};
             let peakData = [];
-            for (let counterKey in data.counters) {
-                let thisOption = data.box.option.filter((d) => {return d.counterKey === counterKey})[0];
-                if(thisOption){
-                    switch(data.options.type){
-                        case 'STACK AREA':
-                            this.stackAreaPaint(thisOption,counterKey,data);
-                            break;
-                        default :
-                            //- LINE,LINEFILL
-                            this.linePlot(data,thisOption,counterKey,instanceMetricCount,peakData);
+            try {
+                for (let counterKey in data.counters) {
+                    let thisOption = data.box.option.filter((d) => {
+                        return d.counterKey === counterKey
+                    })[0];
+                    if (thisOption) {
+                        switch (data.options.type) {
+                            case 'STACK AREA':
+                                this.stackAreaPaint(thisOption, counterKey, data);
+                                break;
+                            default :
+                                //- LINE,LINEFILL
+                                this.linePlot(data, thisOption, counterKey, instanceMetricCount, peakData);
+                        }
                     }
                 }
+                //-peakpaint
+                this.peakPaint(data.options.type, peakData);
+            }catch (e) {
+                console.error(e);
             }
-            //-peakpaint
-            this.peakPaint(data.options.type,peakData);
         }
         this.moveTooltip();
 
