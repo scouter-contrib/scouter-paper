@@ -285,7 +285,8 @@ const configState = {
     },
     others : {
         checkUpdate : "Y",
-        errorReport : "Y"
+        errorReport : "Y",
+        xlogClassicMode : "N",
     },
 };
 
