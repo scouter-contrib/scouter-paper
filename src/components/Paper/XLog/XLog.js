@@ -157,6 +157,11 @@ class XLog extends Component {
             this.draw(this.props.data.newXLogs, this.props.filter);
         }
 
+        if(this.props.objects && JSON.stringify(prevProps.objects) !== JSON.stringify(this.props.objects)){
+            if(this.isClassMode()){
+                this.xlogBrushCreate();
+            }
+        }
         if (this.props.filter && JSON.stringify(prevProps.filter) !== JSON.stringify(this.props.filter)) {
             this.clear();
             this.redraw(this.props.filter);
@@ -765,18 +770,21 @@ class XLog extends Component {
             this.classBrush(this.graph.errorBrush,"", 'error',false);
         }
         if(this.isClassMode()){
-            this._objBrush = [];
-            this.props.objects.filter(_d => _d.objFamily === 'javaee' || _d.objFamily === 'tracing')
-                .forEach(_d =>{
-                    const objBrush= document.createElement("canvas");
-                    objBrush.width = this.props.config.xlog.classicMode.columns;
-                    objBrush.height = this.props.config.xlog.classicMode.rows;
-                    this.classBrush(objBrush, _d.objHash);
-                    this._objBrush[_d.objHash] = objBrush;
-                })
+            this.xlogBrushCreate();
         }
 
         this.redraw(this.props.filter);
+    };
+    xlogBrushCreate= () =>{
+        this._objBrush = [];
+        this.props.objects.filter(_d => _d.objFamily === 'javaee' || _d.objFamily === 'tracing')
+            .forEach(_d =>{
+                const objBrush= document.createElement("canvas");
+                objBrush.width = this.props.config.xlog.classicMode.columns;
+                objBrush.height = this.props.config.xlog.classicMode.rows;
+                this.classBrush(objBrush, _d.objHash);
+                this._objBrush[_d.objHash] = objBrush;
+            })
     };
 
     axisUp = (e) => {
