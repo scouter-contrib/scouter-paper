@@ -358,7 +358,7 @@ class App extends Component {
             });
         }
         const paramXlogClassicMode = common.getParam(this.props,"xlogClassicMode");
-        if(paramXlogClassicMode){
+        if(paramXlogClassicMode && ( paramXlogClassicMode === 'Y' ||  paramXlogClassicMode === 'N')){
             config.others.xlogClassicMode = paramXlogClassicMode;
         }
 
