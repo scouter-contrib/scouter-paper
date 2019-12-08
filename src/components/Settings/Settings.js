@@ -1043,6 +1043,7 @@ class Settings extends Component {
                                         </div>
                                     </div>
                                 </div>
+
                             </div>
                         </div>
 
@@ -1072,6 +1073,19 @@ class Settings extends Component {
                                     </select>
                                 </div>
                             </div>
+                            <div className="row">
+                                <div className="label">
+                                    <div>XLOG CLASSIC MODE</div>
+                                </div>
+                                <div className="input">
+                                    <select value={this.state.config.others.xlogClassicMode} onChange={this.onChangeOthers.bind(this, "xlogClassicMode")} disabled={!this.state.edit}>
+                                        {["Y","N"].map((d, i) => {
+                                            return <option key={i} value={d}>{d}</option>
+                                        })}
+                                    </select>
+                                </div>
+                            </div>
+
                         </div>
                     </div>
                     {this.state.edit &&

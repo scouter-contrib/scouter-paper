@@ -3,7 +3,7 @@ services:
   scouter-paper:
     build :
       context : .
-      dockerfile: Dockerfile
+      dockerfile: Dockerfile-Dev
       args:
         - PAPER_VERSION=${PAPER_VERSION}
     image : scouterapm/scouter-paper:${PAPER_VERSION}

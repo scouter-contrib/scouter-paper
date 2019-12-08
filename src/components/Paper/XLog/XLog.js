@@ -505,7 +505,7 @@ class XLog extends Component {
         context.drawImage(this.graph._tempCanvas, -pixel, 0, canvas.width, canvas.height);
     };
     isClassMode =()=>{
-        return this.props.box.values.showClassicMode === "Y";
+        return this.props.config.others.xlogClassicMode === "Y" || this.props.box.values.showClassicMode === "Y";
     };
     graphInit = () => {
         let that = this;

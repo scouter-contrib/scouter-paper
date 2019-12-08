@@ -357,6 +357,11 @@ class App extends Component {
                 server.name = server.protocol + "://" + server.address + ":" + server.port
             });
         }
+        const paramXlogClassicMode = common.getParam(this.props,"xlogClassicMode");
+        if(paramXlogClassicMode && ( paramXlogClassicMode === 'Y' ||  paramXlogClassicMode === 'N')){
+            config.others.xlogClassicMode = paramXlogClassicMode;
+        }
+
 
         this.props.setConfig(config);
         if (localStorage) {

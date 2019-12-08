@@ -7,4 +7,4 @@ RUN mkdir -p /var/www;
 COPY default.conf /etc/nginx/conf.d/default.conf
 ## install
 WORKDIR /var/www
-RUN apk add -U tzdata wget unzip;cp /usr/share/zoneinfo/Asia/Seoul /etc/localtime; wget ${INSTALL_URL};unzip scouter-paper-v${PAPER_VERSION}.zip
+RUN apk add -U tzdata wget unzip;cp /usr/share/zoneinfo/Asia/Seoul /etc/localtime; wget ${INSTALL_URL};unzip scouter-paper-v${PAPER_VERSION}.zip;rm -f scouter-paper-v${PAPER_VERSION}.zip
