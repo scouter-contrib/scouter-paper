@@ -287,7 +287,7 @@ const configState = {
         checkUpdate : "Y",
         errorReport : "Y",
         xlogClassicMode : "N",
-    },
+    }
 };
 
 const config = (state = configState, action) => {
