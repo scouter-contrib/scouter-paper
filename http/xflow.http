@@ -75,3 +75,6 @@ GET http://demo.scouterapm.com:6188/scouter/v1/dictionary/20191020?dictKeys=[tab
 GET http://demo.scouterapm.com:6188/scouter/v1/dictionary/20191106?dictKeys=[error:305445213]
 
 ###
+GET http://registry.irexnet.co.kr:6188/scouter/v1/info/server
+
+###

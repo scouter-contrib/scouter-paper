@@ -3,12 +3,39 @@ import "./Paper.css";
 import "./Resizable.css";
 import {connect} from "react-redux";
 import {withRouter} from "react-router-dom";
-import {addRequest, pushMessage, setBoxes, setBoxesLayouts, setLayoutChangeTime, setControlVisibility, setLayouts, setRangeDateHoursMinutesValue, setRealTime, setTemplate, setBreakpoint, setTemplateName, setLayoutName, setTimeFocus} from "../../actions";
+import {
+    addRequest,
+    pushMessage,
+    setBoxes,
+    setBoxesLayouts,
+    setBreakpoint,
+    setControlVisibility,
+    setLayoutChangeTime,
+    setLayoutName,
+    setLayouts,
+    setRangeDateHoursMinutesValue,
+    setRealTime,
+    setTemplate,
+    setTemplateName,
+    setTimeFocus
+} from "../../actions";
 import {Responsive, WidthProvider} from "react-grid-layout";
 import {Box, BoxConfig, XLogFilter} from "../../components";
 import jQuery from "jquery";
 import * as common from "../../common/common";
-import {errorHandler, getCurrentUser, getData, getDivideDays, getHttpProtocol, getSearchDays, getWithCredentials, setAuthHeader, setData} from "../../common/common";
+import {
+    errorHandler,
+    getCurrentUser,
+    getData,
+    getDefaultServerId,
+    getDivideDays,
+    getHttpProtocol,
+    getSearchDays,
+    getWithCredentials,
+    setAuthHeader,
+    setData,
+    timeMiToMs
+} from "../../common/common";
 import Profiler from "./XLog/Profiler/Profiler";
 import ActiveService from "./ActiveService/ActiveService";
 import ServerDate from "../../common/ServerDate";
@@ -16,8 +43,7 @@ import moment from "moment";
 import * as Options from "./PaperControl/Options"
 import OldVersion from "../OldVersion/OldVersion";
 import ScouterPatternMatcher from "../../common/ScouterPatternMatcher";
-import {timeMiToMs} from "../../common/common";
-
+import ScouterApi from "../../common/ScouterApi";
 
 const ResponsiveReactGridLayout = WidthProvider(Responsive);
 
@@ -78,15 +104,9 @@ class Paper extends Component {
         //URL로부터 layout 세팅
         let layoutFromParam = common.getParam(this.props, "layout");
         if ((layoutFromParam && layoutFromParam !== layoutOnLocal) || Object.keys(layouts).length === 0) {
-            jQuery.ajax({
-                method: "GET",
-                async: true,
-                url: getHttpProtocol(this.props.config) + "/scouter/v1/kv/__scouter_paper_layout",
-                xhrFields: getWithCredentials(this.props.config),
-                beforeSend: (xhr) => {
-                    setAuthHeader(xhr, this.props.config, getCurrentUser(this.props.config, this.props.user));
-                }
-            }).done((msg) => {
+            const _load = common.confBuilder(getHttpProtocol(this.props.config),this.props.config,this.props.user,getDefaultServerId(this.props.config));
+            ScouterApi.getPaperPreset(_load)
+            .done((msg) => {
                 if (msg && Number(msg.status) === 200) {
                     let isSet = false;
                     let layouts = JSON.parse(msg.result);
@@ -722,6 +742,8 @@ class Paper extends Component {
             }
         })
     };
+
+
 
     getXLog = (clear, objects) => {
         let that = this;

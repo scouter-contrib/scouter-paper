@@ -29,7 +29,8 @@ import {
     getWithCredentials,
     getHttpProtocol,
     getDefaultServerConfig,
-    getCurrentUser
+    getCurrentUser,
+    getDefaultServerId
 } from './common/common';
 
 import Home from "./components/Home/Home";
@@ -39,6 +40,7 @@ import Debug from "./components/Debug/Debug";
 import Controller from "./components/Controller/Controller";
 import _ from "lodash";
 import notificationIcon from './img/notification.png';
+import ScouterApi from "./common/ScouterApi";
 
 const browser = detect();
 const support = (browser.name !== "ie" && browser.name !== "edge");
@@ -64,15 +66,9 @@ class App extends Component {
         this.props.addRequest();
 
         let origin = getHttpProtocol(config);
-        jQuery.ajax({
-            method: "GET",
-            async: true,
-            url: origin + "/scouter/v1/kv/a",
-            xhrFields: getWithCredentials(config),
-            beforeSend: function (xhr) {
-                setAuthHeader(xhr, config, user);
-            }
-        }).done((msg) => {
+        const conf = common.confBuilder(getHttpProtocol(config),config,user,getDefaultServerId(config));
+       ScouterApi.isAuthentification(conf)
+           .done((msg) => {
             if (msg && Number(msg.status) === 200) {
                 if (getDefaultServerConfig(config).authentification === "bearer") {
                     if (user) {
@@ -254,30 +250,44 @@ class App extends Component {
     };
 
     getCounterModel = (config, user, handleError) => {
-        jQuery.ajax({
-            method: "GET",
-            async: true,
-            url: getHttpProtocol(config) + "/scouter/v1/info/counter-model",
-            xhrFields: getWithCredentials(config),
-            beforeSend: function (xhr) {
-                setAuthHeader(xhr, config, getCurrentUser(config, user));
-            }
-        }).done((msg) => {
-            if (Number(msg.status) === 200) {
-                this.props.setSupported(true);
-                this.props.setCounterInfo(msg.result.families, msg.result.objTypes);
-            }
-        }).fail((xhr, textStatus, errorThrown) => {
-            if (handleError) {
-                if (xhr.status === 404) {
-                    this.props.setSupported(false);
-                    this.props.pushMessage("error", "Not Supported", "failed to get matrix information. paper 2.0 is available only on scouter 2.0 and later.");
-                    this.props.setControlVisibility("Message", true);
-                } else {
+
+        const _conf = common.confBuilder(getHttpProtocol(config),config,user,getDefaultServerId(config));
+        ScouterApi.getSyncConnectedServer(_conf)
+            .done(msg =>{
+                if (Number(msg.status) === 200) {
+                    Promise.all(msg.result.map(ser =>{
+                        const _serConfig = common.confBuilder(getHttpProtocol(config),config,user,ser.id);
+                        return ScouterApi.getCounterModel(_serConfig)
+                    }))
+                    .then(msg =>{
+                            const _f = [];
+                            const _o = [];
+                            _.forEach(msg,iter => {
+                                _f.push(iter.result.families);
+                                _o.push(iter.result.objTypes);
+
+                            });
+                            //- family info merge
+                            const _rf = _.flatMapDeep(_f);
+                            //- objectType merge
+                            const _ro = _.flatMapDeep(_o);
+                            this.props.setSupported(true);
+                            this.props.setCounterInfo(_rf, _ro);
+                    }).catch(_err =>{
+                        if(handleError) {
+                            this.props.setSupported(false);
+                            this.props.pushMessage("error", "Not Supported", "failed to get matrix information. paper 2.0 is available only on scouter 2.0 and later.");
+                            this.props.setControlVisibility("Message", true);
+                        }
+                        console.error(_err);
+                    })
+                }
+            })
+            .fail((xhr, textStatus, errorThrown)=>{
+                if(handleError) {
                     errorHandler(xhr, textStatus, errorThrown, this.props, "getCounterModel", true);
                 }
-            }
-        });
+            });
     };
 
     getNotice = () => {

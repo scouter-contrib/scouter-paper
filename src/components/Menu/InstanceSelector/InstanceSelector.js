@@ -1,21 +1,14 @@
 import React, {Component} from 'react';
 import './InstanceSelector.css';
-import {
-    addRequest,
-    pushMessage,
-    setTarget,
-    clearAllMessage,
-    setControlVisibility,
-    setConfig
-} from '../../../actions';
+import {addRequest, clearAllMessage, pushMessage, setConfig, setControlVisibility, setTarget} from '../../../actions';
 import {connect} from 'react-redux';
-import jQuery from "jquery";
 import {withRouter} from 'react-router-dom';
-import {getHttpProtocol, errorHandler, getWithCredentials, setAuthHeader, getCurrentUser} from '../../../common/common';
+import {confBuilder, errorHandler, getDefaultServerId, getHttpProtocol} from '../../../common/common';
 import 'url-search-params-polyfill';
 import * as PaperIcons from '../../../common/PaperIcons'
 
 import InnerLoading from "../../InnerLoading/InnerLoading";
+import ScouterApi from "../../../common/ScouterApi";
 
 class InstanceSelector extends Component {
 
@@ -32,16 +25,9 @@ class InstanceSelector extends Component {
             objects.push(this.props.selectedObjects[hash]);
             iconMap[this.props.counterInfo.objTypesMap[this.props.selectedObjects[hash].objType].icon] = true;
         }
-
-        jQuery.ajax({
-            method: "GET",
-            async: true,
-            url: getHttpProtocol(this.props.config) + "/scouter/v1/kv/__scouter_paper_preset",
-            xhrFields: getWithCredentials(this.props.config),
-            beforeSend: function (xhr) {
-                setAuthHeader(xhr, that.props.config, getCurrentUser(that.props.config, that.props.user));
-            }
-        }).done((msg) => {
+        const _conf = confBuilder(getHttpProtocol(this.props.config),this.props.config,this.props.user,getDefaultServerId(this.props.config));
+        ScouterApi.getPaperPreset(_conf)
+        .done((msg) => {
             if (msg && Number(msg.status) === 200) {
                 let presetList = [];
                 if (msg.result) {
@@ -61,17 +47,8 @@ class InstanceSelector extends Component {
                     value : JSON.stringify(presetList)
                 };
 
-                jQuery.ajax({
-                    method: "PUT",
-                    async: true,
-                    url: getHttpProtocol(this.props.config) + "/scouter/v1/kv",
-                    xhrFields: getWithCredentials(this.props.config),
-                    contentType : "application/json",
-                    data : JSON.stringify(data),
-                    beforeSend: function (xhr) {
-                        setAuthHeader(xhr, that.props.config, getCurrentUser(that.props.config, that.props.user));
-                    }
-                }).done((msg) => {
+                ScouterApi.setPaperPreset(_conf,data)
+                .done((msg) => {
                     if (msg && Number(msg.status) === 200) {
                         this.props.pushMessage("info", "DONE", "SAVED SUCCESSFULLY");
                         this.props.setControlVisibility("Message", true);
@@ -94,11 +71,8 @@ class InstanceSelector extends Component {
 
 
     instanceClick = (instance) => {
-        this.props.instanceClick(instance);
+        this.props.instanceClick({...instance, serverId: this.props.activeServerId});
     };
-
-
-
     getIconOrObjectType = (instance) => {
         let objType = this.props.counterInfo.objTypesMap[instance.objType];
         let icon;
@@ -110,7 +84,6 @@ class InstanceSelector extends Component {
     };
 
     onFilterChange = (event) => {
-
         this.props.onFilterChange(event.target.value);
     };
 
@@ -132,16 +105,9 @@ class InstanceSelector extends Component {
     };
     onDeleteObject=()=>{
         // const {deleteObject}= this.state;
-        jQuery.ajax({
-            method: "GET",
-            async: true,
-            url: `${getHttpProtocol(this.props.config)}/scouter/v1/object/remove/inactive`,
-            xhrFields: getWithCredentials(this.props.config),
-            dataType : "json",
-            beforeSend: (xhr)=>{
-                setAuthHeader(xhr, this.props.config, getCurrentUser(this.props.config, this.props.user));
-            }
-        }).done((msg) => {
+        const _conf = confBuilder(getHttpProtocol(this.props.config),this.props.config,this.props.user,getDefaultServerId(this.props.config));
+        ScouterApi.allInactiveRemove(_conf)
+       .done((msg) => {
             if(msg.status ==="200") {
                 this.props.onServerClick(this.props.activeServerId);
             }

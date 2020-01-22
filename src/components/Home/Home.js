@@ -6,7 +6,7 @@ import {connect} from 'react-redux';
 import jQuery from "jquery";
 import * as common from '../../common/common';
 
-const git = "https://github.com/mindplates/scouter-paper";
+const git = "https://github.com/scouter-contrib/scouter-paper";
 const version = common.version;
 
 class Home extends Component {
@@ -23,7 +23,7 @@ class Home extends Component {
         let that = this;
 
         if(this.props.config.others.checkUpdate === "Y") {
-            var url = 'https://api.github.com/repos/mindplates/scouter-paper/releases/latest';
+            var url = 'https://api.github.com/repos/scouter-contrib/scouter-paper/releases/latest';
             jQuery.get(url).done(function (data) {
                 if (data.tag_name > version) {
 

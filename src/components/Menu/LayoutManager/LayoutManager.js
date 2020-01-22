@@ -6,8 +6,9 @@ import {withRouter} from 'react-router-dom';
 import {getData, setData} from '../../../common/common';
 import 'url-search-params-polyfill';
 import jQuery from "jquery";
-import {errorHandler, setAuthHeader, getWithCredentials, getHttpProtocol, getCurrentUser} from '../../../common/common';
+import {errorHandler, setAuthHeader, getWithCredentials, getHttpProtocol, getCurrentUser,confBuilder,getDefaultServerId} from '../../../common/common';
 import ReactTooltip from 'react-tooltip'
+import ScouterApi from "../../../common/ScouterApi";
 
 class LayoutManager extends Component {
 
@@ -67,20 +68,12 @@ class LayoutManager extends Component {
 
     loadTemplates = (config, user) => {
 
-        jQuery.ajax({
-            method: "GET",
-            async: true,
-            url: getHttpProtocol(config) + "/scouter/v1/kv/__scouter_paper_layout",
-            xhrFields: getWithCredentials(config),
-            beforeSend: function (xhr) {
-                setAuthHeader(xhr, config, getCurrentUser(config, user));
-            }
-        }).done((msg) => {
-
+        const _conf = confBuilder(getHttpProtocol(config),config,user,getDefaultServerId(config));
+        ScouterApi.getLayoutTemplate(_conf)
+        .done((msg) => {
             if (msg && Number(msg.status) === 200) {
                 if (msg.result) {
                     let list = JSON.parse(msg.result);
-
                     list.forEach((template) => {
 
                         delete template.layouts.sm;

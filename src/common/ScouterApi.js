@@ -1,9 +1,30 @@
 import jQuery from "jquery";
-import {getCurrentUser, getWithCredentials, setAuthHeader} from "./common";
+import {getCurrentUser, getHttpProtocol, getWithCredentials, setAuthHeader} from "./common";
 
 export default class ScouterApi {
 //- Default Api
 //  App, Control API List
+    static objBuilder(objects){
+        return Object.keys(objects).map(_id => {
+            return {
+                id: _id,
+                objects: JSON.stringify(objects[_id].map(instance =>Number(instance.objHash)))
+            }
+        })
+    }
+    static getRealTimeXLOG(config,objectInfo,clear,offset1,offset2){
+        const {addr,conf,user} = config;
+        const {id,objects} = objectInfo;
+
+       return jQuery.ajax({
+            method: "GET",
+            async: true,
+            dataType: 'json',
+            url: `${addr}/scouter/v1/xlog/realTime/${clear ? 0 : offset1}/${clear ? 0 : offset2}?objHashes=${objects}&serverId=${id}`,
+            xhrFields: getWithCredentials(conf),
+            beforeSend: (xhr)=> setAuthHeader(xhr, conf, user)
+        })
+    }
     static isAuthentification(config) {
         const {addr,conf,user,serverId} = config;
 
@@ -11,17 +32,44 @@ export default class ScouterApi {
             method: "GET",
             async: true,
             url: `${addr}/scouter/v1/kv/a?serverId=${serverId}`,
+            dataType:"JSON",
             xhrFields: getWithCredentials(conf),
             beforeSend: (xhr)=> setAuthHeader(xhr, conf, user)
         });
     }
-    static getObjectPreset(config) {
+    static getPaperPreset(config) {
         const {addr,conf,user,serverId} = config;
 
         return jQuery.ajax({
             method: "GET",
             async: true,
+            dataType:"JSON",
             url: `${addr}/scouter/v1/kv/__scouter_paper_preset?serverId=${serverId}`,
+            xhrFields: getWithCredentials(conf),
+            beforeSend: (xhr)=> setAuthHeader(xhr, conf, getCurrentUser(conf,user))
+        });
+    }
+    static setPaperPreset(config,data) {
+        const {addr,conf,user,serverId} = config;
+        return jQuery.ajax({
+            method: "PUT",
+            async: true,
+            dataType:"JSON",
+            url: `${addr}/scouter/v1/kv?serverId=${serverId}`,
+            contentType : "application/json",
+            data : JSON.stringify(data),
+            xhrFields: getWithCredentials(conf),
+            beforeSend: (xhr)=> setAuthHeader(xhr, conf, getCurrentUser(conf,user))
+        });
+    }
+    static getLayoutTemplate(config) {
+        const {addr,conf,user,serverId} = config;
+
+        return jQuery.ajax({
+            method: "GET",
+            async: true,
+            dataType:"JSON",
+            url: `${addr}/scouter/v1/kv/__scouter_paper_layout?serverId=${serverId}`,
             xhrFields: getWithCredentials(conf),
             beforeSend: (xhr)=> setAuthHeader(xhr, conf, getCurrentUser(conf,user))
         });
@@ -37,7 +85,7 @@ export default class ScouterApi {
             beforeSend: (xhr)=> setAuthHeader(xhr, conf, getCurrentUser(conf,user))
         });
     }
-    static getConterModel(config){
+    static getCounterModel(config){
         const {addr,conf,user,serverId} = config;
         return jQuery.ajax({
             method: "GET",
@@ -47,24 +95,37 @@ export default class ScouterApi {
             beforeSend: (xhr)=> setAuthHeader(xhr, conf, getCurrentUser(conf,user))
         });
     }
-
-    static getMonitoringObjects(config){
+    static getInstanceObjects(config){
         const {addr,conf,user,serverId} = config;
         return jQuery.ajax({
             method: "GET",
             async: true,
-            url: `${addr}scouter/v1/object?serverId=${serverId}`,
+            dataType:"JSON",
+            url: `${addr}/scouter/v1/object?serverId=${serverId}`,
             xhrFields: getWithCredentials(conf),
             beforeSend: (xhr)=> setAuthHeader(xhr, conf, getCurrentUser(conf,user))
         });
 
     }
-    static getConnectedServer(config){
+    static getSyncInstanceObjects(config){
+        const {addr,conf,user,serverId} = config;
+        return jQuery.ajax({
+            method: "GET",
+            async: false,
+            dataType:"JSON",
+            url: `${addr}/scouter/v1/object?serverId=${serverId}`,
+            xhrFields: getWithCredentials(conf),
+            beforeSend: (xhr)=> setAuthHeader(xhr, conf, getCurrentUser(conf,user))
+        });
+
+    }
+    static getSyncConnectedServer(config){
         const {addr,conf,user} = config;
         return jQuery.ajax({
             method: "GET",
-            async: true,
-            url: `${addr}scouter/v1/info/server`,
+            async: false,
+            dataType:"JSON",
+            url: `${addr}/scouter/v1/info/server`,
             xhrFields: getWithCredentials(conf),
             beforeSend: (xhr)=> setAuthHeader(xhr, conf, getCurrentUser(conf,user))
         });
@@ -81,4 +142,17 @@ export default class ScouterApi {
             beforeSend: (xhr)=> setAuthHeader(xhr, conf, getCurrentUser(conf,user))
         });
     }
+    //- agent 관리
+    static allInactiveRemove(config){
+        const {addr,conf,user,serverId} = config;
+        return jQuery.ajax({
+            method: "GET",
+            async: true,
+            dataType:"json",
+            url: `${addr}/scouter/v1/object/remove/inactive?serverId=${serverId}`,
+            xhrFields: getWithCredentials(conf),
+            beforeSend: (xhr)=> setAuthHeader(xhr, conf, getCurrentUser(conf,user))
+        });
+    }
+
 }

@@ -66,6 +66,18 @@ export function getHttpProtocol(config) {
         return null;
     }
 }
+export function getDefaultServerId(config) {
+    if (config.servers && config.servers.length > 0) {
+        let server = config.servers.filter((server) => server.default);
+        if (server && server.length > 0) {
+            return server[0].id;
+        } else {
+            return null;
+        }
+    } else {
+        return null;
+    }
+}
 
 export function getServerInfo(config) {
     if (config.servers && config.servers.length > 0) {
