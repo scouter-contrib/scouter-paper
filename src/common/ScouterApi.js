@@ -1,5 +1,5 @@
 import jQuery from "jquery";
-import {getCurrentUser, getHttpProtocol, getWithCredentials, setAuthHeader} from "./common";
+import {getCurrentUser, getWithCredentials, setAuthHeader} from "./common";
 
 export default class ScouterApi {
 //- Default Api
