@@ -475,7 +475,7 @@ class Settings extends Component {
                                 return (
                                     <div className="server-row" key={inx}>
                                         <div className="row server-row-no">
-                                            <span>{inx + 1}</span>
+                                            <div>{inx + 1}</div>
                                         </div>
                                         <div className="row server-row-protocol">
                                             <div className="input">

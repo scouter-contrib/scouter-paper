@@ -105,14 +105,15 @@
 }
 
 .settings .forms .server-row {
-    display: table;
-    table-layout: fixed;
+    display: flex;
+    /*table-layout: fixed;*/
+    /*justify-items: center;*/
     width: 100%;
 }
 
 .settings .forms .server-row .row {
-    display: table-cell;
-    vertical-align: middle;
+    display: block;
+    /*vertical-align: middle;*/
     padding: 0;
     width: calc((100% - 100px) / 4);
     padding: 5px;
@@ -125,8 +126,10 @@
 
 .settings .forms .row.server-row-no {
     width: 40px;
+    display: flex;
+    justify-content: center;
+    align-items: center;
 }
-
 .settings .forms .row.server-row-default {
     width: 40px;
 }
