@@ -17,6 +17,8 @@ SCOUTER PAPER is a dashboard software that utilizes the SCOUTER WEB API, an open
 - Outstanding extendable
   - You can add performance information of various software through interworking with Telegraph, including metric of SCOUTER which is basically provided, and it is possible to configure tens of thousands of combinations of dashboards by combining them.
 
+This project is licensed under the terms of the apache-2.0 license.
+
 ## How to build
 For build, npm must be installed first. 
  1. clone https://github.com/scouter-contrib/scouter-paper.git
@@ -33,6 +35,9 @@ You can download the latest version from the page below.
 
 ## DockerHub
 - [scouter-paper](https://hub.docker.com/r/scouterapm/scouter-paper)
+
+## DEMO
+- [live-demo](http://demo.scouterapm.com:6188/extweb/index.html)
  
 ## Screenshots
 - HOME
