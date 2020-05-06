@@ -46,7 +46,7 @@ import {
 import jQuery from "jquery";
 import PaperControl from "../Paper/PaperControl/PaperControl";
 import * as common from "../../common/common";
-
+import ScouterApi from "../../common/ScouterApi";
 
 class Controller extends Component {
 
@@ -67,13 +67,14 @@ class Controller extends Component {
     }
 
     componentDidMount() {
+
         if (getDefaultServerConfig(this.props.config).authentification !== "bearer") {
-            this.setTargetFromUrl(this.props);
+            this.setTargetFromUrl();
         } else {
             let defaultServerConfig = getDefaultServerConfig(this.props.config);
             let origin = defaultServerConfig.protocol + "://" + defaultServerConfig.address + ":" + defaultServerConfig.port;
             if (this.props.config || (this.props.user[origin] && this.props.user[origin].id)) {
-                this.setTargetFromUrl(this.props);
+                this.setTargetFromUrl();
             }
         }
         common.setTargetServerToUrl(this.props, this.props.config);
@@ -87,7 +88,7 @@ class Controller extends Component {
             }
         }
 
-        this.getConfigServerName(this.props)
+        this.getConfigServerName();
 
     }
 
@@ -192,51 +193,38 @@ class Controller extends Component {
         });
     };
 
-    getConfigServerName = (props) => {
-        let allServerList = buildHttpProtocol(props.config);
-        let allCount = allServerList.length;
-        let doneCount = 0;
-        let serverNameMap = {};
+    getConfigServerName = () => {
+        let allServerList = buildHttpProtocol(this.props.config);
+        let serverNames = {};
 
         if (allServerList) {
             allServerList.forEach((server) => {
-                jQuery.ajax({
-                    method: "GET",
-                    async: true,
-                    url: `${server.addr}/scouter/v1/info/server`,
-                    xhrFields: server.authentification === "cookie",
-                    timeout: 3000,
-                    beforeSend: function (xhr) {
-                        const _tokenInfo = props.user[server.addr];
-                        if (server.authentication === "bearer" && _tokenInfo) {
-                            xhr.setRequestHeader('Authorization', ['bearer ', _tokenInfo.token].join(''));
-                        }
-                    }
-                }).done((msg) => {
-                    doneCount++;
-
+                const  _server = common.confBuilder(server.addr,this.props.config,this.props.user,null);
+                ScouterApi.getSyncConnectedServer(_server)
+                .done(msg => {
                     if (msg.result && msg.result.length > 0) {
-                        serverNameMap[server.key] = { info : msg.result[0]};
+                        serverNames[server.key] = { info : msg.result[0]};
 
                     } else {
-                        serverNameMap[server.key] = {};
+                        serverNames[server.key] =  {
+                            info : { name : "FAILED TO GET NAME", id : "-1"}
+                        };
                     }
                 }).fail(() => {
-                    doneCount++;
-                    serverNameMap[server.key] = {
+                    serverNames[server.key] = {
                         info : { name : "FAILED TO GET NAME", id : "-1"}
                     };
                 }).always(() => {
-                    if (doneCount >= allCount) {
-                        let _conf = _.clone(props.config);
-                        _conf.servers.forEach((server, idx) => {
-                            if (serverNameMap[idx]) {
-                                server.name = `${serverNameMap[idx].info.name} (${server.name})`;
-                                server.id = serverNameMap[idx].info.id;
-                            }
-                        });
-                        props.setConfig(_conf);
-                    }
+                    let _conf = _.clone(this.props.config);
+                    _conf.servers.forEach((server, idx) => {
+                        if (serverNames[idx]) {
+
+                            server.name = `${serverNames[idx].info.name} (${server.protocol}://${server.address}:${server.port})`;
+                            server.id = serverNames[idx].info.id;
+                        }
+                    });
+                    this.props.setConfig(_conf);
+
                 });
 
             })
@@ -246,7 +234,6 @@ class Controller extends Component {
     onChangeScouterServer = (inx) => {
         const config = JSON.parse(JSON.stringify(this.props.config));
         const currentServer = common.getServerInfo(config);
-
         for (let i = 0; i < config.servers.length; i++) {
             if (i === inx) {
                 config.servers[i].default = true;
@@ -333,15 +320,9 @@ class Controller extends Component {
     onServerClick = (serverId) => {
         let that = this;
         this.props.addRequest();
-        jQuery.ajax({
-            method: "GET",
-            async: true,
-            url: getHttpProtocol(this.props.config) + '/scouter/v1/object?serverId=' + serverId,
-            xhrFields: getWithCredentials(that.props.config),
-            beforeSend: function (xhr) {
-                setAuthHeader(xhr, that.props.config, getCurrentUser(that.props.config, that.props.user));
-            },
-        }).done((msg) => {
+        const _conf = common.confBuilder(getHttpProtocol(this.props.config),this.props.config,this.props.user,serverId);
+       ScouterApi.getInstanceObjects(_conf)
+           .done((msg) => {
             if (msg.result) {
                 that.setState({
                     activeServerId: serverId
@@ -363,39 +344,27 @@ class Controller extends Component {
 
     applyPreset = (preset) => {
         let that = this;
-        let props = this.props;
+
 
         this.props.addRequest();
-        jQuery.ajax({
-            method: "GET",
-            async: true,
-            url: getHttpProtocol(props.config) + '/scouter/v1/info/server',
-            xhrFields: getWithCredentials(props.config),
-            beforeSend: function (xhr) {
-                setAuthHeader(xhr, props.config, getCurrentUser(props.config, props.user));
-            }
-        }).done((msg) => {
+        const _conf = common.confBuilder(getHttpProtocol(this.props.config),this.props.config,this.props.user,null);
+        ScouterApi.getSyncConnectedServer(_conf)
+        .done(msg => {
 
             if (msg && msg.result) {
-
                 let servers = msg.result;
-
                 if (servers.length > 0) {
                     if (!servers[0].version) {
-                        props.pushMessage("error", "Not Supported", "Paper 2.0 is available only on Scout Server 2.0 and later.");
-                        props.setControlVisibility("Message", true);
+                        this.props.pushMessage("error", "Not Supported", "Paper 2.0 is available only on Scout Server 2.0 and later.");
+                        this.props.setControlVisibility("Message", true);
                         return;
                     }
                 }
-
                 //현재 멀티서버와 연결된 scouter webapp은 지원하지 않으므로 일단 단일 서버로 가정하고 마지막 서버 시간과 맞춘다.
                 servers.forEach((server) => {
                     setServerTimeGap(Number(server.serverTime) - new Date().valueOf());
                 });
-
-
                 // GET INSTANCES INFO FROM URL IF EXISTS
-
                 let urlObjectHashes = preset.objects.map((d) => {
                     return Number(d)
                 });
@@ -407,20 +376,11 @@ class Controller extends Component {
                     servers.forEach((server) => {
                         //일단 단일 서버로 가정하고 서버 시간과 맞춘다.
                         setServerTimeGap(Number(server.serverTime) - new Date().valueOf());
-
-                        jQuery.ajax({
-                            method: "GET",
-                            async: false,
-                            url: getHttpProtocol(this.props.config) + '/scouter/v1/object?serverId=' + server.id,
-                            xhrFields: getWithCredentials(props.config),
-                            beforeSend: function (xhr) {
-                                setAuthHeader(xhr, props.config, getCurrentUser(props.config, props.user));
-                            }
-                        }).done(function (msg) {
+                        const _sconf = common.confBuilder(getHttpProtocol(this.props.config),this.props.config,this.props.user,server.id);
+                        ScouterApi.getSyncInstanceObjects(_sconf)
+                        .done(msg => {
                             objects = msg.result;
-
                             if (objects && objects.length > 0) {
-
                                 objects.forEach((instance) => {
                                     urlObjectHashes.forEach((objHash) => {
                                         if (objHash === Number(instance.objHash)) {
@@ -436,7 +396,7 @@ class Controller extends Component {
                                 })
                             }
                         }).fail(function (xhr, textStatus, errorThrown) {
-                            errorHandler(xhr, textStatus, errorThrown, that.props, "applyPreset_1", true);
+                            errorHandler(xhr, textStatus, errorThrown, this.props, "applyPreset_1", true);
                         });
                     });
 
@@ -478,28 +438,19 @@ class Controller extends Component {
 
     };
 
-    setTargetFromUrl = (props) => {
-
-        let that = this;
+    setTargetFromUrl = () => {
         if (!this.init) {
             this.props.addRequest();
-            jQuery.ajax({
-                method: "GET",
-                async: true,
-                url: getHttpProtocol(props.config) + '/scouter/v1/info/server',
-                xhrFields: getWithCredentials(props.config),
-                beforeSend: function (xhr) {
-                    setAuthHeader(xhr, props.config, getCurrentUser(props.config, props.user));
-                }
-            }).done((msg) => {
-
+            const conf = common.confBuilder(getHttpProtocol(this.props.config),this.props.config,this.props.user,null);
+            ScouterApi.getSyncConnectedServer(conf)
+            .done((msg) => {
                 if (msg && msg.result) {
-                    that.init = true;
+                    this.init = true;
                     let servers = msg.result;
                     if (servers.length > 0) {
                         if (!servers[0].version) {
-                            props.pushMessage("error", "Not Supported", "Paper 2.0 is available only on Scout Server 2.0 and later.");
-                            props.setControlVisibility("Message", true);
+                            this.props.pushMessage("error", "Not Supported", "Paper 2.0 is available only on Scout Server 2.0 and later.");
+                            this.props.setControlVisibility("Message", true);
                             return;
                         }
                     }
@@ -529,23 +480,16 @@ class Controller extends Component {
                         let selectedObjects = [];
                         let objects = [];
                         let activeServerId = null;
-                        servers.forEach((server) => {
+                        servers.forEach(server => {
                             //일단 단일 서버로 가정하고 서버 시간과 맞춘다.
                             setServerTimeGap(Number(server.serverTime) - new Date().valueOf());
-
+                            const _sconf = common.confBuilder(getHttpProtocol(this.props.config),this.props.config,this.props.user,server.id);
                             if (presetName) {
-                                jQuery.ajax({
-                                    method: "GET",
-                                    async: true,
-                                    url: getHttpProtocol(props.config) + "/scouter/v1/kv/__scouter_paper_preset",
-                                    xhrFields: getWithCredentials(props.config),
-                                    beforeSend: function (xhr) {
-                                        setAuthHeader(xhr, props.config, getCurrentUser(props.config, props.user));
-                                    }
-                                }).done((msg) => {
-                                    if (msg && Number(msg.status) === 200) {
+                                ScouterApi.getPaperPreset(_sconf)
+                                .done((msg) => {
+                                    if (msg && msg.status === "200") {
                                         if (msg.result) {
-                                            let presets = JSON.parse(msg.result);
+                                            let presets = msg.result;
                                             if (presets && presets.length > 0) {
                                                 presets.forEach(serverPreset => {
                                                     if (serverPreset.name === presetName) {
@@ -562,19 +506,10 @@ class Controller extends Component {
                                 });
 
                             } else {
-                                jQuery.ajax({
-                                    method: "GET",
-                                    async: false,
-                                    url: getHttpProtocol(this.props.config) + '/scouter/v1/object?serverId=' + server.id,
-                                    xhrFields: getWithCredentials(props.config),
-                                    beforeSend: function (xhr) {
-                                        setAuthHeader(xhr, props.config, getCurrentUser(props.config, props.user));
-                                    }
-                                }).done(function (msg) {
+                                ScouterApi.getSyncInstanceObjects(_sconf)
+                                .done(msg => {
                                     objects = msg.result;
-
                                     if (objects && objects.length > 0) {
-
                                         objects.forEach((instance) => {
                                             urlObjectHashes.forEach((objHash) => {
                                                 if (objHash === Number(instance.objHash)) {
@@ -590,7 +525,7 @@ class Controller extends Component {
                                         })
                                     }
                                 }).fail(function (xhr, textStatus, errorThrown) {
-                                    errorHandler(xhr, textStatus, errorThrown, that.props, "setTargetFromUrl_1", true);
+                                    errorHandler(xhr, textStatus, errorThrown, this.props, "load Instance Object", true);
                                 });
                             }
                         });
@@ -627,7 +562,7 @@ class Controller extends Component {
                 }
 
             }).fail((xhr, textStatus, errorThrown) => {
-                errorHandler(xhr, textStatus, errorThrown, that.props, "setTargetFromUrl_2", false);
+                errorHandler(xhr, textStatus, errorThrown, this.props, "setTargetFromUrl_2", false);
             });
         }
     };
@@ -640,11 +575,9 @@ class Controller extends Component {
             loading: true
         });
 
-        jQuery.ajax({
-            method: "GET",
-            async: true,
-            url: getHttpProtocol(config) + '/scouter/v1/info/server'
-        }).done((msg) => {
+        const conf = common.confBuilder(getHttpProtocol(config),config,this.props.user,null);
+        ScouterApi.getSyncConnectedServer(conf)
+        .done(msg => {
 
             let servers = msg.result;
 
@@ -720,7 +653,11 @@ class Controller extends Component {
                 servers[i].selectedObjectCount = selectedObjectCount;
             }
         }
-
+        Object.keys(selectedObjects).forEach(_key =>{
+            if(!selectedObjects[_key].serverId){
+                selectedObjects[_key].serverId = this.state.activeServerId;
+            }
+        });
         this.setState({
             servers: servers,
             selectedObjects: selectedObjects

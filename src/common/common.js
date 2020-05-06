@@ -1,7 +1,7 @@
 // local storage access
 import moment from "moment";
 import {Dictionary, DictType} from "./dictionary";
-export const version = "2.6.3";
+export const version = "2.6.4";
 
 export function getData(key) {
     let ls = null;
@@ -59,6 +59,18 @@ export function getHttpProtocol(config) {
         let server = config.servers.filter((server) => server.default);
         if (server && server.length > 0) {
             return server[0].protocol + "://" + server[0].address + ":" + server[0].port;
+        } else {
+            return null;
+        }
+    } else {
+        return null;
+    }
+}
+export function getDefaultServerId(config) {
+    if (config.servers && config.servers.length > 0) {
+        let server = config.servers.filter((server) => server.default);
+        if (server && server.length > 0) {
+            return server[0].id;
         } else {
             return null;
         }
