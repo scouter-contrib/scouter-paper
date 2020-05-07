@@ -232,8 +232,8 @@ class PresetManager extends Component {
             <div className="preset-manager-bg"  onClick={this.cancelClick}>
                 <div>
                     <div className="selector-type-btns" onClick={(e) => e.stopPropagation()}>
-                        <div onClick={this.showSelector}>SERVER NAVIGATOR</div>
-                        <div  className="selected">PRESET MANAGER</div>
+                        <div onClick={this.showSelector} className="none">SERVER NAVIGATOR</div>
+                        <div  className="selected" >PRESET MANAGER</div>
                     </div>
                     <div className="preset-manager popup-div" onClick={(e) => e.stopPropagation()}>
                         <div className="title">

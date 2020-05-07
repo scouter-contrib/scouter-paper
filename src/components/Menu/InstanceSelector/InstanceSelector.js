@@ -142,7 +142,7 @@ class InstanceSelector extends Component {
                 <div>
                     <div className="selector-type-btns" onClick={(e) => e.stopPropagation()}>
                         <div className="selected">SERVER NAVIGATOR</div>
-                        <div onClick={this.showPresetManager}>PRESET MANAGER</div>
+                        <div onClick={this.showPresetManager} className="none">PRESET MANAGER</div>
                     </div>
                     <div className="instance-selector popup-div" onClick={(e) => e.stopPropagation()}>
                         <div className="instance-selector-content">

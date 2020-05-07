@@ -964,6 +964,7 @@ class Controller extends Component {
     render() {
         let menu = this.props.menu.replace("/", "");
         return (
+            <div>
             <article className={"controller-wrapper scrollbar noselect " + this.props.control.Controller + " " + menu + "-menu"}>
                 <Logo></Logo>
                 <div className="controller-tabs">
@@ -1108,6 +1109,7 @@ class Controller extends Component {
                     <PaperControl addPaper={this.addPaper} addPaperAndAddMetric={this.addPaperAndAddMetric} clearLayout={this.clearLayout} fixedControl={this.state.fixedControl} toggleRangeControl={this.toggleRangeControl} realtime={this.props.range.realTime} alert={this.state.alert} clearAllAlert={this.clearAllAlert} clearOneAlert={this.clearOneAlert} setRewind={this.setRewind} showAlert={this.state.showAlert} toggleShowAlert={this.toggleShowAlert}/>
                 </div>
                 }
+            </article>
                 {this.state.selector &&
                 <InstanceSelector onFilterChange={this.onFilterChange}
                                   clearFilter={this.clearFilter}
@@ -1136,8 +1138,7 @@ class Controller extends Component {
                                setObjects={this.setObjects}
                                applyPreset={this.applyPreset}/>
                 }
-
-            </article>
+            </div>
         );
     }
 }
