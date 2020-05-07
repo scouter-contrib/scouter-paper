@@ -331,12 +331,13 @@ class App extends Component {
         }
 
         // URL로부터 스카우터 서버 정보를 세팅
-        let params = getParam(this.props, "address,port,protocol,authentification");
+        let params = getParam(this.props, "address,port,protocol,authentification,serverid");
         if (params[0] && params[1]) {
             let paramAddress = params[0];
             let paramPort = params[1];
             let paramProtocol = params[2] ? params[2] : "http";
             let paramAuthentification = params[3] ? params[3] : "none";
+            let paramServerId = params[4] ? params[4] : "none";
 
             let found = false;
             for (let i=0; i<config.servers.length; i++) {
@@ -357,6 +358,7 @@ class App extends Component {
                     address: paramAddress,
                     port: paramPort,
                     authentification :paramAuthentification,
+                    serverid: paramServerId,
                     default : true
                 });
             }
