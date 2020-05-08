@@ -66,6 +66,7 @@ export function getHttpProtocol(config) {
         return null;
     }
 }
+
 export function getDefaultServerId(config) {
     if (config.servers && config.servers.length > 0) {
         let server = config.servers.filter((server) => server.default);
@@ -409,6 +410,7 @@ export function setRangePropsToUrl (props, pathname, objects) {
     search.set("to", to.format("YYYYMMDDHHmmss"));
     search.set("fromPast", props.range.fromPast);
 
+
     if (props.location.search !== ("?" + search.toString())) {
         if (pathname) {
             props.history.push({
@@ -422,6 +424,10 @@ export function setRangePropsToUrl (props, pathname, objects) {
             });
         }
     }
+}
+export function setServerIdPropsToUrl (props, activeServerId) {
+    const search = new URLSearchParams(props.location.search);
+    search.set("activesid", activeServerId);
 }
 
 export function setTxidPropsToUrl (props, txiddate, txid) {
@@ -813,6 +819,7 @@ export function updateQueryStringParameter(uri, key, value) {
         return uri + separator + key + "=" + value;
     }
 }
+
 export function confBuilder(addr,conf,user,serverId){
     return {
         addr  : addr,

@@ -41,10 +41,11 @@ import {
     SET_TEMPLATE_NAME,
     SET_PRESET_NAME,
     SET_LAYOUT_NAME,
-    SET_TIME_FOCUS,
+    SET_TIME_FOCUS, SET_SERVER_ID,
 } from '../actions';
 import {combineReducers} from 'redux';
 import moment from 'moment';
+import * as _ from "lodash";
 const configState = {
     servers : [
         {
@@ -738,6 +739,20 @@ const timeFocus =(state=timeFocusState, action ) =>{
             return state;
     }
 };
+
+const serverIdState = {
+    server: null,
+}
+const serverId =(state=serverIdState, action ) =>{
+    switch (action.type) {
+        case SET_SERVER_ID:
+            serverIdState.server = _.cloneDeep(action.serverId);
+
+            return serverIdState;
+        default:
+            return state;
+    }
+};
 const scouterApp = combineReducers({
     supported,
     target,
@@ -755,7 +770,8 @@ const scouterApp = combineReducers({
     topologyOption,
     alert,
     templateName,
-    timeFocus
+    timeFocus,
+    serverId
 });
 
 export default scouterApp;

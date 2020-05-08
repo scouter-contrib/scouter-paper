@@ -15,6 +15,7 @@ import {
     setFilterMap,
     setLayouts,
     setPresetName,
+    setServerId,
     setTarget
 } from "../../actions";
 import {connect} from "react-redux";
@@ -40,7 +41,7 @@ import {
     getWithCredentials,
     setAuthHeader,
     setData,
-    setRangePropsToUrl,
+    setRangePropsToUrl, setServerIdPropsToUrl,
     setServerTimeGap
 } from "../../common/common";
 import jQuery from "jquery";
@@ -267,6 +268,7 @@ class Controller extends Component {
 
     setObjects = () => {
         let objects = [];
+
         for (let hash in this.state.selectedObjects) {
             objects.push(this.state.selectedObjects[hash]);
         }
@@ -275,12 +277,13 @@ class Controller extends Component {
             this.props.pushMessage("info", "NO MONITORING TARGET", "At least one object must be selected");
             this.props.setControlVisibility("Message", true);
         }
-
         objects.sort((a, b) => a.objName < b.objName ? -1 : 1);
         AgentColor.setInstances(objects, this.props.config.colorType);
         this.props.setTarget(objects);
+        this.props.setServerId( [ {id: this.state.activeServerId, obj: objects} ] );
         this.props.setControlVisibility("TargetSelector", false);
         setRangePropsToUrl(this.props, undefined, objects);
+        setServerIdPropsToUrl(this.props,this.state.activeServerId);
         localStorage.setItem("selectedObjects", JSON.stringify(objects));
         this.closeSelectorPopup();
     };
@@ -1180,6 +1183,10 @@ let mapDispatchToProps = (dispatch) => {
         setPresetName: (preset) => {
             localStorage.setItem("preset", JSON.stringify(preset));
             return dispatch(setPresetName(preset));
+        },
+        setServerId:(activeServer) => {
+            localStorage.setItem("active_server_id", JSON.stringify(activeServer));
+            return dispatch(setServerId(activeServer));
         }
     };
 };
