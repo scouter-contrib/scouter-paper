@@ -49,6 +49,7 @@ import PaperControl from "../Paper/PaperControl/PaperControl";
 import * as common from "../../common/common";
 import ScouterApi from "../../common/ScouterApi";
 
+
 class Controller extends Component {
 
     constructor(props) {
@@ -259,11 +260,74 @@ class Controller extends Component {
         common.replaceAllLocalSettingsForServerChange(currentServer, this.props, config);
         common.clearAllUrlParamOfPaper(this.props, config);
         //- server가 바뀌어 쓰므로 해당 설정이 같이 삭제 되어야함
+        const {selectedObjects} = this.state;
+
+        const lastServerId = this.loadActiveServerItem(selectedObjects);
+        if( lastServerId ) {
+            const lastUserSetting = {
+                selectedObjects: localStorage.getItem("selectedObjects"),
+                topologyOptions: localStorage.getItem("topologyOptions"),
+                topologyPosition: localStorage.getItem("topologyPosition"),
+                active_server_id: localStorage.getItem("active_server_id")
+            };
+            const save = {};
+            save[lastServerId] = lastUserSetting;
+
+            const existws = localStorage.getItem("workspace");
+            if( existws ){
+                const restore = JSON.parse(existws);
+                const merge = {...save, restore }
+                localStorage.setItem("workspace", JSON.stringify(merge));
+            }else {
+                localStorage.setItem("workspace", JSON.stringify(save));
+            }
+        }
+
         localStorage.removeItem("selectedObjects");
         localStorage.removeItem("topologyOptions");
         localStorage.removeItem("topologyPosition");
+        localStorage.removeItem("active_server_id");
         window.location.reload();
 
+    };
+    loadActiveServerItem = (selectObjects) => {
+        const serverIds = JSON.parse(localStorage.getItem("active_server_id"));
+
+        if(serverIds){
+            return serverIds[0].id;
+        }else{
+            const _conf = common.confBuilder(getHttpProtocol(this.props.config),this.props.config,this.props.user,null);
+            let servers = null;
+            ScouterApi.getSyncConnectedServer(_conf)
+                .done(msg => {
+                    if (msg && msg.result) {
+                        servers = msg.result;
+                    }
+                });
+            if(servers){
+                const [server] = servers.filter(server => {
+                    const _sconf = common.confBuilder(getHttpProtocol(this.props.config),this.props.config,this.props.user,server.id);
+                    let matchingCnt = 0;
+                    ScouterApi.getSyncInstanceObjects(_sconf)
+                        .done(msg => {
+                            const objects = msg.result;
+                            if (objects && objects.length > 0) {
+                                objects.forEach((instance) => {
+                                    selectObjects.forEach((obj) => {
+                                        if ( obj.objHash === instance.objHash) {
+                                            matchingCnt++;
+                                        }
+                                    });
+                                })
+                            }
+                        });
+                    return matchingCnt === selectObjects.length;
+                });
+                return server ? server.id : null;
+            }else{
+                return null
+            }
+        }
     };
 
     setObjects = () => {
@@ -280,10 +344,16 @@ class Controller extends Component {
         objects.sort((a, b) => a.objName < b.objName ? -1 : 1);
         AgentColor.setInstances(objects, this.props.config.colorType);
         this.props.setTarget(objects);
-        this.props.setServerId( [ {id: this.state.activeServerId, obj: objects} ] );
+        const {activeServerId } = this.state;
+        const defaultServerId = activeServerId ? activeServerId : this.loadActiveServerItem(objects);
+
+        if(defaultServerId) {
+            this.props.setServerId([{id: defaultServerId, obj: objects}]);
+            setServerIdPropsToUrl(this.props, defaultServerId );
+        }
         this.props.setControlVisibility("TargetSelector", false);
         setRangePropsToUrl(this.props, undefined, objects);
-        setServerIdPropsToUrl(this.props,this.state.activeServerId);
+
         localStorage.setItem("selectedObjects", JSON.stringify(objects));
         this.closeSelectorPopup();
     };
@@ -421,6 +491,8 @@ class Controller extends Component {
                         AgentColor.setInstances(selectedObjects, this.props.config.colorType);
                         this.props.setTarget(selectedObjects);
 
+                        this.props.setServerId( [ {id: activeServerId, obj: objects} ] );
+                        setServerIdPropsToUrl(this.props, activeServerId );
                     } else {
                         this.setState({
                             servers: servers

@@ -426,8 +426,14 @@ export function setRangePropsToUrl (props, pathname, objects) {
     }
 }
 export function setServerIdPropsToUrl (props, activeServerId) {
-    const search = new URLSearchParams(props.location.search);
+    let search = new URLSearchParams(props.location.search);
     search.set("activesid", activeServerId);
+    if (props.location.search !== ("?" + search.toString())) {
+            props.history.replace({
+                pathname: props.location.pathname,
+                search: "?" + search.toString()
+            });
+    }
 }
 
 export function setTxidPropsToUrl (props, txiddate, txid) {
