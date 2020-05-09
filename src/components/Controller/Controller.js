@@ -34,7 +34,7 @@ import * as _ from "lodash";
 import {
     buildHttpProtocol,
     errorHandler,
-    getCurrentUser,
+    getCurrentUser, getData,
     getDefaultServerConfig,
     getDefaultServerConfigIndex,
     getHttpProtocol,
@@ -259,39 +259,13 @@ class Controller extends Component {
         common.setTargetServerToUrl(this.props, config);
         common.replaceAllLocalSettingsForServerChange(currentServer, this.props, config);
         common.clearAllUrlParamOfPaper(this.props, config);
-        //- server가 바뀌어 쓰므로 해당 설정이 같이 삭제 되어야함
-        const {selectedObjects} = this.state;
 
-        const lastServerId = this.loadActiveServerItem(selectedObjects);
-        if( lastServerId ) {
-            const lastUserSetting = {
-                selectedObjects: localStorage.getItem("selectedObjects"),
-                topologyOptions: localStorage.getItem("topologyOptions"),
-                topologyPosition: localStorage.getItem("topologyPosition"),
-                active_server_id: localStorage.getItem("active_server_id")
-            };
-            const save = {};
-            save[lastServerId] = lastUserSetting;
 
-            const existws = localStorage.getItem("workspace");
-            if( existws ){
-                const restore = JSON.parse(existws);
-                const merge = {...save, restore }
-                localStorage.setItem("workspace", JSON.stringify(merge));
-            }else {
-                localStorage.setItem("workspace", JSON.stringify(save));
-            }
-        }
-
-        localStorage.removeItem("selectedObjects");
-        localStorage.removeItem("topologyOptions");
-        localStorage.removeItem("topologyPosition");
-        localStorage.removeItem("active_server_id");
         window.location.reload();
 
     };
     loadActiveServerItem = (selectObjects) => {
-        const serverIds = JSON.parse(localStorage.getItem("active_server_id"));
+        const serverIds = getData("active_server_id");
 
         if(serverIds){
             return serverIds[0].id;
@@ -397,17 +371,20 @@ class Controller extends Component {
        ScouterApi.getInstanceObjects(_conf)
            .done((msg) => {
             if (msg.result) {
-                that.setState({
-                    activeServerId: serverId
-                });
-
                 const objects = msg.result;
+
+                this.setState({
+                    activeServerId: serverId,
+                    servers: this.state.servers.map(host => ({...host,selectedObjectCount: null}) ),
+                    selectedObjects: {}
+                });
                 if (objects) {
                     objects.sort((a, b) => a.objName < b.objName ? -1 : 1);
                     this.setState({
-                        objects: msg.result
+                        objects: msg.result,
                     });
                 }
+
             }
         }).fail((xhr, textStatus, errorThrown) => {
             errorHandler(xhr, textStatus, errorThrown, that.props, "onServerClick", true);
@@ -1161,7 +1138,7 @@ class Controller extends Component {
                         </div>
                         <div className="row control">
                             <div>
-                                <LayoutManager visible={true}></LayoutManager>
+                                <LayoutManager visible={this.props.control.Controller === "max"}></LayoutManager>
                             </div>
                         </div>
                     </div>

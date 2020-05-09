@@ -6,7 +6,14 @@ import logo from "../../img/scouter.png";
 import logoBlack from "../../img/scouter_black.png";
 import {addRequest, pushMessage, setControlVisibility, setTopologyOption} from "../../actions";
 import jQuery from "jquery";
-import {errorHandler, getCurrentUser, getHttpProtocol, getWithCredentials, setAuthHeader} from "../../common/common";
+import {
+    errorHandler,
+    getCurrentUser,
+    getDefaultServerId,
+    getHttpProtocol,
+    getWithCredentials,
+    setAuthHeader
+} from "../../common/common";
 import * as d3 from "d3";
 import _ from "lodash";
 import numeral from "numeral";
@@ -450,7 +457,9 @@ class Topology extends Component {
         }
         return result;
     };
-
+    getScouterApiServerId = () => {
+        return this.props.serverId.server ? this.props.serverId.server[0].id : getDefaultServerId(this.props);
+    };
     getTopology = (config, filterMap, user, grouping) => {
 
         let that = this;
@@ -462,7 +471,7 @@ class Topology extends Component {
             jQuery.ajax({
                 method: "GET",
                 async: true,
-                url: getHttpProtocol(config) + '/scouter/v1/interactionCounter/realTime?objHashes=' + JSON.stringify(objects.map((instance) => {
+                url: getHttpProtocol(config) + `/scouter/v1/interactionCounter/realTime?serverId=${this.getScouterApiServerId()}&objHashes=` + JSON.stringify(objects.map((instance) => {
                     return Number(instance);
                 })),
                 xhrFields: getWithCredentials(config),
@@ -1460,7 +1469,8 @@ let mapStateToProps = (state) => {
         counterInfo: state.counterInfo,
         supported: state.supported,
         filterMap: state.target.filterMap,
-        topologyOption: state.topologyOption
+        topologyOption: state.topologyOption,
+        serverId: state.serverId
     };
 };
 

@@ -96,6 +96,9 @@ class Line extends Component {
                 this.removeFocus(nextProps);
             }
         }
+
+
+
     };
     linePlot(data,thisOption,counterKey,metricCount,peakData){
         for (let i = 0; i < data.objects.length; i++) {
@@ -130,8 +133,12 @@ class Line extends Component {
             }
         }
     };
-    paint (data){
 
+
+    paint (data){
+        if(data.noData){
+            return
+        }
         if (data.objects) {
             this.xScale.domain([data.startTime, data.endTime]);
             this.yScale.domain([0, data.options.maxY]);

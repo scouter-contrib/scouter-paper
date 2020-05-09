@@ -1,51 +1,53 @@
 import {
-    SET_ACTIVE_SERVICE,
-    SET_MENU,
-    SET_BOXES_LAYOUTS,
-    SET_LAYOUTS,
-    SET_BOXES,
-    SET_LAYOUT_CHANGETIME,
-    SET_SUPPORTED,
+    ADD_FILTERED_OBJECT,
     ADD_REQUEST,
-    SET_CONFIG,
-    SET_USER_ID,
-    SET_USER_DATA,
-    SET_TARGET,
-    PUSH_MESSAGE,
-    SET_CONTROL_VISIBILITY,
     CLEAR_ALL_MESSAGE,
+    PUSH_MESSAGE,
+    REMOVE_FILTERED_OBJECT,
+    SET_ACTIVE_SERVICE,
+    SET_ALERT,
     SET_BG_COLOR,
-    SET_SELECTION,
-    SET_TEMPLATE,
-    SET_REAL_TIME,
+    SET_BOXES,
+    SET_BOXES_LAYOUTS,
+    SET_BREAKPOINT,
+    SET_CONFIG,
+    SET_CONTROL_VISIBILITY,
+    SET_CONTROLLER_PIN,
+    SET_CONTROLLER_STATE,
+    SET_COUNTER_INFO,
+    SET_FILTER_MAP,
+    SET_FROM_PAST,
+    SET_LAYOUT_CHANGETIME,
+    SET_LAYOUT_NAME,
+    SET_LAYOUTS,
+    SET_MENU,
+    SET_PRESET_NAME,
+    SET_RANGE_ALL,
     SET_RANGE_DATE,
+    SET_RANGE_DATE_HOURS_MINUTES,
+    SET_RANGE_DATE_HOURS_MINUTES_VALUE,
     SET_RANGE_HOURS,
     SET_RANGE_MINUTES,
     SET_RANGE_VALUE,
-    SET_REAL_TIME_VALUE,
-    SET_FROM_PAST,
-    SET_RANGE_DATE_HOURS_MINUTES,
+    SET_REAL_TIME,
     SET_REAL_TIME_RANGE_STEP_VALUE,
-    SET_RANGE_DATE_HOURS_MINUTES_VALUE,
-    SET_RANGE_ALL,
-    SET_COUNTER_INFO,
-    SET_CONTROLLER_STATE,
-    SET_CONTROLLER_PIN,
-    SET_FILTER_MAP,
-    ADD_FILTERED_OBJECT,
-    REMOVE_FILTERED_OBJECT,
+    SET_REAL_TIME_VALUE,
     SET_SEARCH_CONDITION,
-    SET_TOPOLOGY_OPTION,
-    SET_ALERT,
-    SET_BREAKPOINT,
+    SET_SELECTION,
+    SET_SERVER_ID,
+    SET_SUPPORTED,
+    SET_TARGET,
+    SET_TEMPLATE,
     SET_TEMPLATE_NAME,
-    SET_PRESET_NAME,
-    SET_LAYOUT_NAME,
-    SET_TIME_FOCUS, SET_SERVER_ID,
+    SET_TIME_FOCUS,
+    SET_TOPOLOGY_OPTION,
+    SET_USER_DATA,
+    SET_USER_ID,
 } from '../actions';
 import {combineReducers} from 'redux';
 import moment from 'moment';
-import * as _ from "lodash";
+import {getData} from "../common/common";
+
 const configState = {
     servers : [
         {
@@ -640,7 +642,7 @@ const supported = (state = supportedState, action) => {
     }
 };
 
-let topologyOptionState = {
+let topologyOptionState = getData("topologyOptions") ? getData("topologyOptions") : {
     tpsToLineSpeed : true,
     speedLevel : "fast",
     redLine : true,
@@ -655,12 +657,12 @@ let topologyOptionState = {
     linkCount : 0
 };
 
-if (localStorage) {
-    let storageTopologyOptionState = localStorage.getItem("topologyOptions");
-    if (storageTopologyOptionState) {
-        topologyOptionState = JSON.parse(storageTopologyOptionState);
-    }
-}
+// if (localStorage) {
+//     let storageTopologyOptionState = localStorage.getItem("topologyOptions");
+//     if (storageTopologyOptionState) {
+//         topologyOptionState = JSON.parse(storageTopologyOptionState);
+//     }
+// }
 
 const topologyOption = (state = topologyOptionState, action) => {
     switch (action.type) {
@@ -741,14 +743,13 @@ const timeFocus =(state=timeFocusState, action ) =>{
 };
 
 const serverIdState = {
-    server: null,
+    server: getData("active_server_id") ? getData("active_server_id") : null
 }
 const serverId =(state=serverIdState, action ) =>{
     switch (action.type) {
         case SET_SERVER_ID:
-            serverIdState.server = _.cloneDeep(action.serverId);
-
-            return serverIdState;
+            // state.server = _.cloneDeep(action.serverId);
+            return Object.assign({}, state, {server: action.serverId});
         default:
             return state;
     }

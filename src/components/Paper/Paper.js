@@ -44,6 +44,7 @@ import * as Options from "./PaperControl/Options"
 import OldVersion from "../OldVersion/OldVersion";
 import ScouterPatternMatcher from "../../common/ScouterPatternMatcher";
 import ScouterApi from "../../common/ScouterApi";
+import {confBuilder} from "../../common/common";
 
 const ResponsiveReactGridLayout = WidthProvider(Responsive);
 
@@ -512,8 +513,13 @@ class Paper extends Component {
         }, this.props.config.interval);
 
     }
+    getScouterApiconf = () => {
+        return confBuilder(getHttpProtocol(this.props.config),this.props.config,this.props.user, this.getScouterApiServerId());
+    };
+    getScouterApiServerId = () => {
 
-
+        return this.props.serverId.server? this.props.serverId.server[0].id : getData("active_server_id")[0].id
+    };
     getRealTimeCounter = () => {
         const that = this;
 
@@ -549,17 +555,8 @@ class Paper extends Component {
                 let params = JSON.stringify(counterKeys.map((key) => encodeURI(key)));
                 params = params.replace(/"/gi, "");
                 this.props.addRequest();
-                jQuery.ajax({
-                    method: "GET",
-                    async: true,
-                    url: getHttpProtocol(this.props.config) + '/scouter/v1/counter/realTime/' + params + '?objHashes=' + JSON.stringify(this.props.objects.map((obj) => {
-                        return Number(obj.objHash);
-                    })),
-                    xhrFields: getWithCredentials(that.props.config),
-                    beforeSend: function (xhr) {
-                        setAuthHeader(xhr, that.props.config, getCurrentUser(that.props.config, that.props.user));
-                    }
-                }).done((msg) => {
+                ScouterApi.getRealTimeCounter(this.getScouterApiconf(),params,this.props.objects)
+                .done((msg) => {
                     if (!that.mounted) {
                         return;
                     }
@@ -610,7 +607,6 @@ class Paper extends Component {
     tempBox = "";
 
     getPaperCounterHistory = (objects, from, to, longTerm, box) => {
-
         if (objects && objects.length > 0) {
 
             let counterKeyMap = {};
@@ -675,16 +671,18 @@ class Paper extends Component {
                     }).map((obj) => {
                             return Number(obj.objHash);
                     })) +"&startYmd=" + moment(startTime).format("YYYYMMDD")
-                        + "&endYmd=" + moment(endTime).format("YYYYMMDD");
+                        +"&endYmd=" + moment(endTime).format("YYYYMMDD")
+                        +`&serverId=${this.getScouterApiServerId()}`;
                     this.getCounterHistoryData(url, counterKey, from, to, now, false);
 
                 } else {
                     url = getHttpProtocol(this.props.config) + '/scouter/v1/counter/' + encodeURI(counterKey) + '?objHashes=' + JSON.stringify(objects.filter((d) => {
                             return d.objFamily === familyName;
-                }).map((obj) => {
-                        return Number(obj.objHash);
-                })) +"&startTimeMillis=" + startTime + "&endTimeMillis="
-                    + endTime;
+                    }).map((obj) => {
+                            return Number(obj.objHash);
+                    })) +"&startTimeMillis=" + startTime
+                        +"&endTimeMillis=" + endTime
+                        +`&serverId=${this.getScouterApiServerId()}`;
                     this.getCounterHistoryData(url, counterKey, from, to, now, false);
                 }
             }
@@ -753,7 +751,7 @@ class Paper extends Component {
                 method: "GET",
                 async: true,
                 dataType: 'text',
-                url: getHttpProtocol(this.props.config) + '/scouter/v1/xlog/realTime/' + (clear ? 0 : this.state.data.offset1) + '/' + (clear ? 0 : this.state.data.offset2) + '?objHashes=' + JSON.stringify(objects.map((instance) => {
+                url: getHttpProtocol(this.props.config) + '/scouter/v1/xlog/realTime/' + (clear ? 0 : this.state.data.offset1) + '/' + (clear ? 0 : this.state.data.offset2) + `?serverId=${this.getScouterApiServerId()}&objHashes=` + JSON.stringify(objects.map((instance) => {
                     return Number(instance.objHash);
                 })),
                 xhrFields: getWithCredentials(that.props.config),
@@ -970,7 +968,7 @@ class Paper extends Component {
                 method: "GET",
                 async: true,
                 dataType: 'text',
-                url: getHttpProtocol(this.props.config) + "/scouter/v1/xlog/" + moment(from).format("YYYYMMDD") + "?startTimeMillis=" + from + '&endTimeMillis=' + to + (lastTxid ? '&lastTxid=' + lastTxid : "") + (lastXLogTime ? '&lastXLogTime=' + lastXLogTime : "") + '&objHashes=' +
+                url: getHttpProtocol(this.props.config) + "/scouter/v1/xlog/" + moment(from).format("YYYYMMDD") + `?serverId=${this.getScouterApiServerId()}&startTimeMillis=` + from + '&endTimeMillis=' + to + (lastTxid ? '&lastTxid=' + lastTxid : "") + (lastXLogTime ? '&lastXLogTime=' + lastXLogTime : "") + '&objHashes=' +
                 JSON.stringify(objects.map((instance) => {
                     return Number(instance.objHash);
                 })),
@@ -1051,7 +1049,7 @@ class Paper extends Component {
                 jQuery.ajax({
                     method: "GET",
                     async: true,
-                    url: getHttpProtocol(props.config) + '/scouter/v1/visitor/realTime?objHashes=' + JSON.stringify(filterdObjects.map((instance) => {
+                    url: getHttpProtocol(props.config) + `/scouter/v1/visitor/realTime?serverId=${this.getScouterApiServerId()}&objHashes=` + JSON.stringify(filterdObjects.map((instance) => {
                         return Number(instance.objHash);
                     })),
                     xhrFields: getWithCredentials(props.config),
@@ -1106,7 +1104,7 @@ class Paper extends Component {
                     method: "GET",
                     async: true,
                     dataType: "json",
-                    url: getHttpProtocol(props.config) + '/scouter/v1/object/host/realTime/disk/ofObject/'+ JSON.parse(JSON.stringify(data)).objHash,
+                    url: getHttpProtocol(props.config) + '/scouter/v1/object/host/realTime/disk/ofObject/'+ JSON.parse(JSON.stringify(data)).objHash+`?serverId=${this.getScouterApiServerId()}`,
                     xhrFields: getWithCredentials(props.config),
                     beforeSend: function (xhr) {
                         setAuthHeader(xhr, props.config, getCurrentUser(props.config, props.user));
@@ -1663,7 +1661,8 @@ let mapStateToProps = (state) => {
         layouts: state.paper.layouts,
         layoutChangeTime: state.paper.layoutChangeTime,
         searchCondition: state.searchCondition,
-        timeFocus : state.timeFocus
+        timeFocus : state.timeFocus,
+        serverId: state.serverId
     };
 };
 

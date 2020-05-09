@@ -1,12 +1,21 @@
 import React, {Component} from 'react';
 import './LayoutManager.css';
-import {setTemplate, setControlVisibility, pushMessage, setLayoutName} from '../../../actions';
+import {pushMessage, setControlVisibility, setLayoutName, setTemplate} from '../../../actions';
 import {connect} from 'react-redux';
 import {withRouter} from 'react-router-dom';
-import {getData, setData} from '../../../common/common';
+import {
+    confBuilder,
+    errorHandler,
+    getCurrentUser,
+    getData,
+    getDefaultServerId,
+    getHttpProtocol,
+    getWithCredentials,
+    setAuthHeader,
+    setData
+} from '../../../common/common';
 import 'url-search-params-polyfill';
 import jQuery from "jquery";
-import {errorHandler, setAuthHeader, getWithCredentials, getHttpProtocol, getCurrentUser,confBuilder,getDefaultServerId} from '../../../common/common';
 import ReactTooltip from 'react-tooltip'
 import ScouterApi from "../../../common/ScouterApi";
 
@@ -25,18 +34,29 @@ class LayoutManager extends Component {
     }
 
     componentDidMount() {
-        this.loadTemplates(this.props.config, this.props.user);
+        this.loadTemplates(this.props.config, this.props.user,this.props.serverId);
     }
 
     componentWillReceiveProps(nextProps) {
+
         if (!this.props.visible && nextProps.visible) {
-            this.loadTemplates(nextProps.config, nextProps.user);
+            this.loadTemplates(nextProps.config, nextProps.user,nextProps.serverId);
+        }
+
+        if (this.props.serverId.server) {
+            if( this.props.serverId.server[0].id !== nextProps.serverId.server[0].id) {
+                this.loadTemplates(nextProps.config, nextProps.user,nextProps.serverId);
+            }
         }
     }
 
     componentDidUpdate(prevProps, prevState) {
         ReactTooltip.rebuild();
     }
+
+    getScouterApiServerId = (serverId) => {
+        return serverId.server ? serverId.server[0].id : getDefaultServerId(this.props);
+    };
 
     saveTemplate = (templates) => {
         let that = this;
@@ -48,7 +68,7 @@ class LayoutManager extends Component {
         jQuery.ajax({
             method: "PUT",
             async: true,
-            url: getHttpProtocol(this.props.config) + "/scouter/v1/kv",
+            url: getHttpProtocol(this.props.config) + `/scouter/v1/kv?serverId=${this.getScouterApiServerId()}`,
             xhrFields: getWithCredentials(this.props.config),
             contentType: "application/json",
             data: JSON.stringify(data),
@@ -66,9 +86,8 @@ class LayoutManager extends Component {
         });
     };
 
-    loadTemplates = (config, user) => {
-
-        const _conf = confBuilder(getHttpProtocol(config),config,user,getDefaultServerId(config));
+    loadTemplates = (config, user ,serverId) => {
+        const _conf = confBuilder(getHttpProtocol(config),config,user,this.getScouterApiServerId(serverId));
         ScouterApi.getLayoutTemplate(_conf)
         .done((msg) => {
             if (msg && Number(msg.status) === 200) {
@@ -348,7 +367,8 @@ let mapStateToProps = (state) => {
     return {
         objects: state.target.objects,
         config: state.config,
-        user: state.user
+        user: state.user,
+        serverId: state.serverId
     };
 };
 

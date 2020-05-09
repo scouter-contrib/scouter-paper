@@ -161,7 +161,9 @@ class App extends Component {
             }, seconds * 1000);
         }
     };
-
+    getScouterApiServerId = () => {
+        return this.props.serverId.server ? this.props.serverId.server[0].id : getDefaultServerId(this.props);
+    };
     getRealTimeAlert = (objects) => {
         const that = this;
 
@@ -180,7 +182,7 @@ class App extends Component {
                 jQuery.ajax({
                     method: "GET",
                     async: true,
-                    url: getHttpProtocol(this.props.config) + "/scouter/v1/alert/realTime/" + offset1 + "/" + offset2 + "?objType=" + objType,
+                    url: getHttpProtocol(this.props.config) + "/scouter/v1/alert/realTime/" + offset1 + "/" + offset2 + `?serverId=${this.getScouterApiServerId()}&objType=` + objType,
                     xhrFields: getWithCredentials(that.props.config),
                     beforeSend: function (xhr) {
                         setAuthHeader(xhr, that.props.config, getCurrentUser(that.props.config, that.props.user));
@@ -536,7 +538,8 @@ let mapStateToProps = (state) => {
         user: state.user,
         supported : state.supported,
         objects: state.target.objects,
-        alert: state.alert
+        alert: state.alert,
+        serverId: state.serverId
     };
 };
 

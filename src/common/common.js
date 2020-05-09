@@ -491,7 +491,8 @@ export function saveCurrentAllLocalSettings (currentServer, config) {
             profileOptions : getData("profileOptions"),
             topologyPosition : getData("topologyPosition"),
             topologyOptions : getData("topologyOptions"),
-            alert : getData("alert")
+            alert : getData("alert"),
+            active_server_id : getData("active_server_id")
         }
     };
 
@@ -519,6 +520,7 @@ export function reloadAllLocalSettingsOfServer (props, config) {
             setData("topologyPosition", option[0].options["topologyPosition"]);
             setData("topologyOptions", option[0].options["topologyOptions"]);
             setData("alert", option[0].options["alert"]);
+            setData("active_server_id", option[0].options["active_server_id"]);
         }
     }
 }

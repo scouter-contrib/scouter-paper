@@ -137,7 +137,7 @@ export default class ScouterApi {
         return jQuery.ajax({
             method: "GET",
             async: true,
-            url: `${addr}/scouter/v1/counter/realTime/${params}?objHashes=${JSON.stringify(objects.map(obj=>Number(obj.objHash)))}?serverId=${serverId}`,
+            url: `${addr}/scouter/v1/counter/realTime/${params}?objHashes=${JSON.stringify(objects.map(obj=>Number(obj.objHash)))}&serverId=${serverId}`,
             xhrFields: getWithCredentials(conf),
             beforeSend: (xhr)=> setAuthHeader(xhr, conf, getCurrentUser(conf,user))
         });
