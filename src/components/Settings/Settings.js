@@ -414,7 +414,7 @@ class Settings extends Component {
             .then(d => {
                 try {
                     importAllLocalSetting(d,this.props.config);
-                    this.props.pushMessage("info", "Import Job", "The import file was successful. Please refresh the screen if you need to confirm");
+                    this.props.pushMessage("info", "Import Confirm", "The import file was successful. Please refresh the screen if you need to confirm");
                     this.props.setControlVisibility("Message", true);
                 }catch (e) {
                     console.error(e);
