@@ -9,7 +9,13 @@ import XlogFlowContent from './XlogFlowContent/XlogFlowContent'
 import FlowElement from "./FlowElement";
 
 
-import {getCurrentUser, getHttpProtocol, getWithCredentials, setAuthHeader} from "../../../../../../common/common";
+import {
+    getCurrentUser,
+    getDefaultServerId,
+    getHttpProtocol,
+    getWithCredentials,
+    setAuthHeader
+} from "../../../../../../common/common";
 import ElementType from "../../../../../../common/ElementType";
 import {addRequest, setControlVisibility} from "../../../../../../actions";
 import * as _ from "lodash";
@@ -399,7 +405,7 @@ class XlogFlow extends Component {
         const {config, user} = this.props;
         const _allofTrace = globalTracing.map(_tx =>{
             const yyyymmdd = moment(new Date(Number(_tx.endTime))).format("YYYYMMDD");
-            const _url = `${getHttpProtocol(config)}/scouter/v1/profile-data/${yyyymmdd}/${_tx.txid}`;
+            const _url = `${getHttpProtocol(config)}/scouter/v1/profile-data/${yyyymmdd}/${_tx.txid}?serverId=${this.getScouterApiServerId()}`;
             return jQuery.ajax({
                 method: "GET",
                 async: true,
@@ -494,14 +500,16 @@ class XlogFlow extends Component {
 
            });
     }
-
+    getScouterApiServerId = () => {
+        return this.props.serverId.server ? this.props.serverId.server[0].id : getDefaultServerId(this.props);
+    };
     loadFlow(){
         this.props.setControlVisibility("Loading", true);
         this.props.addRequest();
         const {config, user,flow } = this.props;
         // console.log("loadByGxId",flow,user);
-        const _gx_url = `${getHttpProtocol(config)}/scouter/v1/xlog-data/${flow.parameter.yyyymmdd}/gxid/${flow.parameter.gxid}`;
-        const _tx_url = `${getHttpProtocol(config)}/scouter/v1/xlog-data/${flow.parameter.yyyymmdd}/${flow.parameter.txid}`;
+        const _gx_url = `${getHttpProtocol(config)}/scouter/v1/xlog-data/${flow.parameter.yyyymmdd}/gxid/${flow.parameter.gxid}?serverId=${this.getScouterApiServerId()}`;
+        const _tx_url = `${getHttpProtocol(config)}/scouter/v1/xlog-data/${flow.parameter.yyyymmdd}/${flow.parameter.txid}?serverId=${this.getScouterApiServerId()}`;
         jQuery.ajax({
             method: "GET",
             async: true,
@@ -591,7 +599,8 @@ const mapStateToProps = (state) => {
     return {
         config: state.config,
         user: state.user,
-        objects: state.target.objects
+        objects: state.target.objects,
+        serverId: state.serverId
     };
 };
 let mapDispatchToProps = (dispatch) => {

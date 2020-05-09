@@ -14,7 +14,7 @@ import {
     getDivideDays,
     getParam,
     getCurrentUser,
-    getFilteredData0
+    getFilteredData0, getDefaultServerId
 } from '../../../../common/common';
 import FrameProfile from "./FrameProfile/FrameProfile";
 import ProfileList from "./ProfileList/ProfileList";
@@ -249,7 +249,9 @@ class Profiler extends Component {
             this.getListData(x1, x2, y1, y2, false, filter, filterMap);
         }
     };
-
+    getScouterApiServerId = () => {
+        return this.props.serverId.server ? this.props.serverId.server[0].id : getDefaultServerId(this.props);
+    };
 
     // search의 경우, 마지막 newXLogs가 allXLogs에 들어 있는 문제 있음
     getListData = async (x1, x2, y1, y2, append, filter, filterMap) => {
@@ -311,7 +313,7 @@ class Profiler extends Component {
         jQuery.ajax({
             method: "GET",
             async: true,
-            url: getHttpProtocol(this.props.config) + '/scouter/v1/xlog-data/' + date + '/multi/' + strTxid,
+            url: getHttpProtocol(this.props.config) + '/scouter/v1/xlog-data/' + date + '/multi/' + strTxid + `?serverId=${this.getScouterApiServerId()}`,
             xhrFields: getWithCredentials(that.props.config),
             beforeSend: function (xhr) {
                 setAuthHeader(xhr, that.props.config, getCurrentUser(that.props.config, that.props.user));
@@ -417,7 +419,7 @@ class Profiler extends Component {
         jQuery.ajax({
             method: "GET",
             async: true,
-            url: getHttpProtocol(this.props.config) + '/scouter/v1/xlog-data/' + tdate + "/" + xlog.txid,
+            url: getHttpProtocol(this.props.config) + '/scouter/v1/xlog-data/' + tdate + "/" + xlog.txid + `?serverId=${this.getScouterApiServerId()}`,
             xhrFields: getWithCredentials(that.props.config),
             beforeSend: function (xhr) {
                 setAuthHeader(xhr, that.props.config, getCurrentUser(that.props.config, that.props.user));
@@ -436,7 +438,7 @@ class Profiler extends Component {
                 jQuery.ajax({
                     method: "GET",
                     async: true,
-                    url: getHttpProtocol(this.props.config) + '/scouter/v1/profile-data/' + (txiddate ? txiddate : moment(new Date(Number(xlog.endTime))).format("YYYYMMDD")) + "/" + xlog.txid,
+                    url: getHttpProtocol(this.props.config) + '/scouter/v1/profile-data/' + (txiddate ? txiddate : moment(new Date(Number(xlog.endTime))).format("YYYYMMDD")) + "/" + xlog.txid +`?serverId=${this.getScouterApiServerId()}`,
                     xhrFields: getWithCredentials(that.props.config),
                     beforeSend: function (xhr) {
                         setAuthHeader(xhr, that.props.config, getCurrentUser(that.props.config, that.props.user));
@@ -627,7 +629,8 @@ let mapStateToProps = (state) => {
         objects: state.target.objects,
         config: state.config,
         user: state.user,
-        filterMap: state.target.filterMap
+        filterMap: state.target.filterMap,
+        serverId: state.serverId
     };
 };
 
