@@ -476,7 +476,40 @@ export function replaceAllLocalSettingsForServerChange (currentServer, props, co
         reloadAllLocalSettingsOfServer(props, config);
     }
 }
+export function importAllLocalSetting(importTxt,thisConfig) {
+    const read = JSON.parse(importTxt);
+    setData("config", read["config"]);
+    setData(ALL_OPTIONS_OF_SERVER_KEY, read[ALL_OPTIONS_OF_SERVER_KEY]);
+    reloadAllLocalSettingsOfServer(null,thisConfig)
+}
+export function exportAllLocalSettings (currentServer, config) {
+    const serverKey = currentServer.address + ":" + currentServer.port;
 
+    const option = {
+        server: serverKey,
+        options: {
+            selectedObjects : getData("selectedObjects"),
+            templateName : getData("templateName"),
+            layouts : getData("layouts"),
+            boxes : getData("boxes"),
+            preset : getData("preset"),
+            profileOptions : getData("profileOptions"),
+            topologyPosition : getData("topologyPosition"),
+            topologyOptions : getData("topologyOptions"),
+            alert : getData("alert"),
+            active_server_id : getData("active_server_id")
+        }
+    };
+
+    const allOptionsOfServer = getData(ALL_OPTIONS_OF_SERVER_KEY) || [];
+    let allOptions = allOptionsOfServer.filter(option => option.server !== serverKey);
+    allOptions.push(option);
+    const result = {};
+    result[ALL_OPTIONS_OF_SERVER_KEY] = allOptionsOfServer;
+    result['config'] = config;
+    return result;
+
+}
 export function saveCurrentAllLocalSettings (currentServer, config) {
     const serverKey = currentServer.address + ":" + currentServer.port;
 
@@ -840,4 +873,29 @@ export function confBuilder(addr,conf,user,serverId){
 export function timeMiToMs(min){
     return min * 60 * 1000;
 
+}
+// 브라우저 내에서 object 파일 다운로드 파일 방법 참고
+// https://stackoverflow.com/questions/19721439/download-json-object-as-a-file-from-browser
+export function saveJSON(data, filename){
+
+    if(!data) {
+        console.error('No data');
+        return;
+    }
+
+    if(!filename) filename = 'console.json';
+
+    if(typeof data === "object"){
+        data = JSON.stringify(data, undefined, 4);
+    }
+
+    const blob = new Blob([data], {type: 'text/json'});
+    const  e   = document.createEvent('MouseEvents');
+    const  a   = document.createElement('a');
+
+    a.download = filename;
+    a.href = window.URL.createObjectURL(blob);
+    a.dataset.downloadurl =  ['text/json', a.download, a.href].join(':');
+    e.initMouseEvent('click', true, false, window, 0, 0, 0, 0, 0, false, false, false, false, 0, null);
+    a.dispatchEvent(e);
 }
