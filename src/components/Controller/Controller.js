@@ -31,22 +31,24 @@ import * as PaperIcons from "../../common/PaperIcons";
 import LayoutManager from "../Menu/LayoutManager/LayoutManager";
 import PresetManager from "../Menu/PresetManager/PresetManager";
 import * as _ from "lodash";
+import * as common from "../../common/common";
 import {
     buildHttpProtocol,
     errorHandler,
-    getCurrentUser, getData,
+    getCurrentUser,
+    getData,
     getDefaultServerConfig,
     getDefaultServerConfigIndex,
     getHttpProtocol,
     getWithCredentials,
     setAuthHeader,
     setData,
-    setRangePropsToUrl, setServerIdPropsToUrl,
+    setRangePropsToUrl,
+    setServerIdPropsToUrl,
     setServerTimeGap
 } from "../../common/common";
 import jQuery from "jquery";
 import PaperControl from "../Paper/PaperControl/PaperControl";
-import * as common from "../../common/common";
 import ScouterApi from "../../common/ScouterApi";
 
 
@@ -107,6 +109,11 @@ class Controller extends Component {
             this.setState({
                 currentTab: "CONTROL"
             });
+        }
+        if (this.props.serverId.server) {
+            if( this.props.serverId.server[0].id !== nextProps.serverId.server[0].id) {
+                this.changeServerName(nextProps.serverId)
+            }
         }
     }
 
@@ -194,7 +201,26 @@ class Controller extends Component {
             selector: !this.state.preset ? false : this.state.preset
         });
     };
-
+    changeServerName = (serverId) =>{
+       const  _server = common.confBuilder(getHttpProtocol(this.props.config),this.props.config,this.props.user,serverId.server[0].id);
+       const _searchServerId = serverId.server[0].id;
+       ScouterApi.getSyncConnectedServer(_server)
+            .done(msg => {
+                if (msg.result && msg.result.length > 0) {
+                    msg.result.filter(server => server.id === _searchServerId)
+                               .forEach( server =>{
+                                    const name = `${server.name} (${getHttpProtocol(this.props.config)})`;
+                                    const _conf = _.clone(this.props.config);
+                                    _conf.servers.filter(_server => _server.default)
+                                        .forEach(_server => {
+                                            _server.name = name;
+                                            _server.id = _searchServerId;
+                                        });
+                                    this.props.setConfig(_conf);
+                                });
+                }
+            })
+    };
     getConfigServerName = () => {
         let allServerList = buildHttpProtocol(this.props.config);
         let serverNames = {};
@@ -205,7 +231,9 @@ class Controller extends Component {
                 ScouterApi.getSyncConnectedServer(_server)
                 .done(msg => {
                     if (msg.result && msg.result.length > 0) {
-                        serverNames[server.key] = { info : msg.result[0]};
+                        const _filter = msg.result.filter(s => s.id === this.props.serverId.server[0].id)
+                        const _info = _filter.length > 0 ? _filter[0] : msg.result[0];
+                        serverNames[server.key] = { info : _info};
 
                     } else {
                         serverNames[server.key] =  {
@@ -1184,6 +1212,7 @@ class Controller extends Component {
 
                 {this.state.preset &&
                 <PresetManager visible={this.state.preset}
+                               activeServerId={this.state.activeServerId}
                                togglePresetManager={this.togglePresetManager}
                                closeSelectorPopup={this.closeSelectorPopup}
                                toggleSelectorVisible={this.toggleSelectorVisible}
@@ -1209,7 +1238,8 @@ let mapStateToProps = (state) => {
         layouts: state.paper.layouts,
         layoutChangeTime: state.paper.layoutChangeTime,
         topologyOption: state.topologyOption,
-        presetName: state.presetName
+        presetName: state.presetName,
+        serverId: state.serverId
     };
 };
 

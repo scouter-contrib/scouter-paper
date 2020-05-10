@@ -480,7 +480,8 @@ export function importAllLocalSetting(importTxt,thisConfig) {
     const read = JSON.parse(importTxt);
     setData("config", read["config"]);
     setData(ALL_OPTIONS_OF_SERVER_KEY, read[ALL_OPTIONS_OF_SERVER_KEY]);
-    reloadAllLocalSettingsOfServer(null,thisConfig)
+    reloadAllLocalSettingsOfServer(null,thisConfig);
+    return read["config"];
 }
 export function exportAllLocalSettings (currentServer, config) {
     const serverKey = currentServer.address + ":" + currentServer.port;
