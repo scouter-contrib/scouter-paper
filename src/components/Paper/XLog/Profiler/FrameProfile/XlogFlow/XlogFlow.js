@@ -251,7 +251,7 @@ class XlogFlow extends Component {
                 if(step.threaded === "0") break;
                //- other thread call checking
                 const yyyymmdd = moment(new Date(Number(thisElement.endTime))).format("YYYYMMDD");
-                const _url = `${getHttpProtocol(this.props.config)}/scouter/v1/xlog/${yyyymmdd}/${step.txid}`;
+                const _url = `${getHttpProtocol(this.props.config)}/scouter/v1/xlog-data/${yyyymmdd}/${step.txid}?serverId=${thisElement.serverId}`;
                 jQuery.ajax({
                         method: "GET",
                         async: false,
@@ -299,7 +299,7 @@ class XlogFlow extends Component {
                     method: "GET",
                     async: false,
                     dataType: "json",
-                    url: `${getHttpProtocol(this.props.config)}/scouter/v1/dictionary/${moment(new Date(Number(thisElement.endTime))).format("YYYYMMDD")}?dictKeys=[table:${step.hash}]`,
+                    url: `${getHttpProtocol(this.props.config)}/scouter/v1/dictionary/${moment(new Date(Number(thisElement.endTime))).format("YYYYMMDD")}?dictKeys=[table:${step.hash}]&serverId=${thisElement.serverId}`,
                     xhrFields: getWithCredentials(this.props.config),
                     beforeSend: (xhr)=>{
                         setAuthHeader(xhr, this.props.config, getCurrentUser(this.props.config, this.props.user));
@@ -333,7 +333,7 @@ class XlogFlow extends Component {
                 break;
             case Steps.THREAD_SUBMIT:
                 const sub_yyyymmdd = moment(new Date(Number(thisElement.endTime))).format("YYYYMMDD");
-                const sub_url = `${getHttpProtocol(this.props.config)}/scouter/v1/profile-data/${sub_yyyymmdd}/${step.txid}`;
+                const sub_url = `${getHttpProtocol(this.props.config)}/scouter/v1/profile-data/${sub_yyyymmdd}/${step.txid}?serverId=${thisElement.serverId}`;
                 try {
                     jQuery.ajax({
                         method: "GET",
@@ -384,6 +384,8 @@ class XlogFlow extends Component {
             serviceElement.threadName     = _global.threadName;
             serviceElement.xtype          = _global.xlogType;
             serviceElement.endTime        = _global.endTime;
+            serviceElement.serverId       = this.getScouterApiServerId();
+
             serviceElement.tags = {
                 caller: _global.caller,
                 ip: _global.ipAddr
@@ -424,7 +426,7 @@ class XlogFlow extends Component {
                                                 method: "GET",
                                                 async: true,
                                                 dataType: "json",
-                                                url: `${getHttpProtocol(this.props.config)}/scouter/v1/object?serverId=${_server.id}`,
+                                                url: `${getHttpProtocol(this.props.config)}/scouter/v1/object?serverId=${this.getScouterApiServerId()}`,
                                                 xhrFields: getWithCredentials(this.props.config),
                                                 beforeSend: (xhr) =>{
                                                     setAuthHeader(xhr, this.props.config, getCurrentUser(this.props.config, this.props.user));

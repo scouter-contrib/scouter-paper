@@ -734,12 +734,12 @@ const timeFocusState = {
 const timeFocus =(state=timeFocusState, action ) =>{
     switch (action.type) {
         case SET_TIME_FOCUS:
-            return {
+            return Object.assign({},state,{
                 active : action.active,
                 time: action.time,
                 id: action.id,
                 keep : action.keep
-            };
+            });
         default:
             return state;
     }

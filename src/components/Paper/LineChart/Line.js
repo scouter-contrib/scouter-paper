@@ -333,7 +333,7 @@ class Line extends Component {
     getLimitDisplayObject=(data,thisOption)=>{
         return this.props.config.graph.limit === "-1" ? data.objects.filter(d => d.objFamily === thisOption.familyName)
                         : _.take(data.objects.filter(d => d.objFamily === thisOption.familyName),this.props.config.graph.limit );
-    }
+    };
     stackAreaPaint=(thisOption, counterKey, data) => {
         let instanceMetricCount = {};
         const color = {};
@@ -753,6 +753,9 @@ class Line extends Component {
                     this.mouseOverObject(obj, thisOption, color);
                 }
             }
+            if(!this.props.timeFocus.keep) {
+                this.props.setTimeFocus(true, this.props.timeFocus.time, this.props.box.key);
+            }
             this.focus.selectAll("circle").style("display", "block");
         });
 
@@ -772,9 +775,8 @@ class Line extends Component {
 
             this.props.hideTooltip();
             this.currentTooltipTime = null;
-            //- 해제
             if(!this.props.timeFocus.keep) {
-                this.props.setTimeFocus(false, null, this.props.box.key);
+                this.props.setTimeFocus(false, this.props.timeFocus.time, this.props.box.key);
             }
 
         });
@@ -827,8 +829,10 @@ class Line extends Component {
                 if (!thisOption) {
                     break;
                 }
+
                 that.counterSum = 0;
                 const target = that.getLimitDisplayObject(that.props,thisOption);
+
                 for (const obj of target) {
                         if (!instanceMetricCount[obj.objHash]) {
                             instanceMetricCount[obj.objHash] = 0;
@@ -877,7 +881,6 @@ class Line extends Component {
             tooltip.chartType = that.props.options.type;
             tooltip.counterSum = numeral(that.counterSum).format(that.props.config.numberFormat);
             that.currentTooltipTime = tooltip.timeValue;
-
             if(!that.props.timeFocus.keep){
                 that.props.setTimeFocus(true,x0.getTime(),that.props.box.key);
             }
