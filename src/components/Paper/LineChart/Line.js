@@ -95,42 +95,44 @@ class Line extends Component {
             if(!nextProps.timeFocus.active) {
                 this.removeFocus(nextProps);
             }
+        }else{
+            this.focus.select("line.focus-line").style("display","none");
         }
 
 
 
     };
-    linePlot(data,thisOption,counterKey,metricCount,peakData){
-        for (let i = 0; i < data.objects.length; i++) {
-            const obj = data.objects[i];
-            if (obj.objFamily === thisOption.familyName ) {
-                if (!metricCount[obj.objHash]) {
-                    metricCount[obj.objHash] = 0;
-                }
-                let color;
-                if (data.config.graph.color === "metric") {
-                    color = InstanceColor.getMetricColor(thisOption.counterKey, data.config.colorType);
-                } else {
-                    color = InstanceColor.getInstanceColors(data.config.colorType)[obj.objHash][(metricCount[obj.objHash]++) % 5];
-                }
-                this.drawLine(obj, thisOption, counterKey, color, data);
-                const _maxBy = _.maxBy(data.counters[counterKey], d => {
-                    const _valueObj = d.data[obj.objHash];
-                    if (_valueObj) {
-                        return Number(_valueObj.value);
-                    }
-                });
-                if(data.filterMap[obj.objHash]) {
-                    if (_maxBy) {
-                        peakData.push({
-                            time: _maxBy.time,
-                            color: color,
-                            counter: Number(_maxBy.data[obj.objHash].value)
-                        })
-                    }
-                }
 
+    linePlot(data,thisOption,counterKey,metricCount,peakData){
+        const target = this.getLimitDisplayObject(data,thisOption);
+        for (let obj of target) {
+            if (!metricCount[obj.objHash]) {
+                metricCount[obj.objHash] = 0;
             }
+            let color;
+            if (data.config.graph.color === "metric") {
+                color = InstanceColor.getMetricColor(thisOption.counterKey, data.config.colorType);
+            } else {
+                color = InstanceColor.getInstanceColors(data.config.colorType)[obj.objHash][(metricCount[obj.objHash]++) % 5];
+            }
+            this.drawLine(obj, thisOption, counterKey, color, data);
+            const _maxBy = _.maxBy(data.counters[counterKey], d => {
+                const _valueObj = d.data[obj.objHash];
+                if (_valueObj) {
+                    return Number(_valueObj.value);
+                }
+            });
+            if(data.filterMap[obj.objHash]) {
+                if (_maxBy) {
+                    peakData.push({
+                        time: _maxBy.time,
+                        color: color,
+                        counter: Number(_maxBy.data[obj.objHash].value)
+                    })
+                }
+            }
+
+
         }
     };
 
@@ -328,12 +330,17 @@ class Line extends Component {
             this.focus.select("line.focus-line").style("display","none");
         }
     };
+    getLimitDisplayObject=(data,thisOption)=>{
+        return this.props.config.graph.limit === "-1" ? data.objects.filter(d => d.objFamily === thisOption.familyName)
+                        : _.take(data.objects.filter(d => d.objFamily === thisOption.familyName),this.props.config.graph.limit );
+    }
     stackAreaPaint=(thisOption, counterKey, data) => {
         let instanceMetricCount = {};
         const color = {};
         //- instance color making
-        for (const attr  in this.props.objects) {
-            const _obj = this.props.objects[attr];
+        const target = this.getLimitDisplayObject(data,thisOption);
+        for (const attr  in target) {
+            const _obj = target[attr];
             if (_obj.objFamily === thisOption.familyName) {
                 if (!instanceMetricCount[_obj.objHash]) {
                     instanceMetricCount[_obj.objHash] = 0;
@@ -732,24 +739,20 @@ class Line extends Component {
                 if (!thisOption) {
                     break;
                 }
-
-                for (let i = 0; i < this.props.objects.length; i++) {
-                    const obj = this.props.objects[i];
-                    if (thisOption.familyName === obj.objFamily) {
-                        if (!instanceMetricCount[obj.objHash]) {
-                            instanceMetricCount[obj.objHash] = 0;
-                        }
-                        let color;
-                        if (this.props.config.graph.color === "metric") {
-                            color = InstanceColor.getMetricColor(thisOption.counterKey, this.props.config.colorType);
-                        } else {
-                            color = InstanceColor.getInstanceColors(this.props.config.colorType)[obj.objHash][(instanceMetricCount[obj.objHash]++) % 5];
-                        }
-                        this.mouseOverObject(this.props.objects[i], thisOption, color);
+                const target = this.getLimitDisplayObject(this.props,thisOption);
+                for (const obj of target) {
+                    if (!instanceMetricCount[obj.objHash]) {
+                        instanceMetricCount[obj.objHash] = 0;
                     }
+                    let color;
+                    if (this.props.config.graph.color === "metric") {
+                        color = InstanceColor.getMetricColor(thisOption.counterKey, this.props.config.colorType);
+                    } else {
+                        color = InstanceColor.getInstanceColors(this.props.config.colorType)[obj.objHash][(instanceMetricCount[obj.objHash]++) % 5];
+                    }
+                    this.mouseOverObject(obj, thisOption, color);
                 }
             }
-
             this.focus.selectAll("circle").style("display", "block");
         });
 
@@ -825,10 +828,8 @@ class Line extends Component {
                     break;
                 }
                 that.counterSum = 0;
-                for (let i = 0; i < that.props.objects.length; i++) {
-                    const obj = that.props.objects[i];
-                    if (thisOption.familyName === obj.objFamily) {
-
+                const target = that.getLimitDisplayObject(that.props,thisOption);
+                for (const obj of target) {
                         if (!instanceMetricCount[obj.objHash]) {
                             instanceMetricCount[obj.objHash] = 0;
                         }
@@ -838,8 +839,7 @@ class Line extends Component {
                         } else {
                             color = InstanceColor.getInstanceColors(that.props.config.colorType)[obj.objHash][(instanceMetricCount[obj.objHash]++) % 5];
                         }
-                        that.mouseMoveObject(that.props.objects[i], thisOption, counterKey, dataIndex, color, tooltip);
-                    }
+                        that.mouseMoveObject(obj, thisOption, counterKey, dataIndex, color, tooltip);
                 }
             }
 
@@ -856,15 +856,14 @@ class Line extends Component {
             }
 
             if (tooltip && tooltip.lines) {
-                for (let i = 0; i < tooltip.lines.length; i++) {
-
-                    if (!isNaN(tooltip.lines[i].value)) {
-                        let circle = that.focus.select("circle." + tooltip.lines[i].circleKey);
+                for (const data of tooltip.lines) {
+                    if (!isNaN(data.value)) {
+                        let circle = that.focus.select("circle." + data.circleKey);
                         if(circle) {
                             circle.attr("cx", xPosition);
-                            circle.attr("cy", that.yScale(tooltip.lines[i].value));
+                            circle.attr("cy", that.yScale(data.value));
 
-                            circle.data([tooltip.lines[i].value])
+                            circle.data([data.value])
                                 .enter()
                                 .style('display', 'block')
                                 .exit()
