@@ -71,6 +71,8 @@ const configState = {
     theme : "theme-blue/white",
     colorType : "white",
     graph : {
+        type: 1,  //0: line , 1: linefill , 2: stack
+        limit: "10", // all, render line size;
         color : "instance",
         width : 2,
         opacity : 1,
@@ -78,6 +80,7 @@ const configState = {
         fillOpacity : 0.4,
         curve : "curveCatmullRom",
         break : "Y"
+
     },
     alert : {
         notification : "Y"
@@ -288,7 +291,7 @@ const configState = {
     },
     others : {
         checkUpdate : "Y",
-        errorReport : "Y",
+        errorReport : "N",
         xlogClassicMode : "N",
     }
 };

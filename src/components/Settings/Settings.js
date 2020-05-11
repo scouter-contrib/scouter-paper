@@ -758,6 +758,22 @@ class Settings extends Component {
                                     </select>
                                 </div>
                             </div>
+                            <div className="row">
+                                <div className="label">
+                                    <div>DISPLAY LINE LIMIT</div>
+                                </div>
+                                <div className="input">
+                                    <select value={this.state.config.graph.limit} onChange={this.onChangeGraph.bind(this, "limit")} disabled={!this.state.edit}>
+                                        <option value="1">1</option>
+                                        <option value="2">2</option>
+                                        <option value="3">3</option>
+                                        <option value="5">5</option>
+                                        <option value="10">10</option>
+                                        <option value="20">20</option>
+                                        <option value="-1">No Limit</option>
+                                    </select>
+                                </div>
+                            </div>
                         </div>
                         <div className="category first">
                             <div>THEME</div>

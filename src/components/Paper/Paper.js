@@ -521,6 +521,7 @@ class Paper extends Component {
         return this.props.serverId.server? this.props.serverId.server[0].id : getDefaultServerId(this.props.config)
     };
     getRealTimeCounter = () => {
+
         const that = this;
 
         if (this.props.objects && this.props.objects.length > 0) {
