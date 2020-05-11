@@ -44,7 +44,8 @@ class PresetManager extends Component {
         let that = this;
         let data = {
             key : "__scouter_paper_preset",
-            value : JSON.stringify(presets)
+            value : JSON.stringify(presets),
+            serverId: this.props.activeServerId
         };
 
         this.setState({
@@ -54,7 +55,7 @@ class PresetManager extends Component {
         jQuery.ajax({
             method: "PUT",
             async: true,
-            url: getHttpProtocol(this.props.config) + `/scouter/v1/kv?serverId=${this.props.activeServerId}`,
+            url: getHttpProtocol(this.props.config) + `/scouter/v1/kv`,
             xhrFields: getWithCredentials(this.props.config),
             contentType : "application/json",
             data : JSON.stringify(data),
@@ -138,7 +139,7 @@ class PresetManager extends Component {
             this.setState({
                 presets : presets,
                 selectedPresetNo : null,
-                selectedEditNo : null
+                selectedEditNo : null,
             });
 
             this.savePreset(presets);

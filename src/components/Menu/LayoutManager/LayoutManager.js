@@ -55,20 +55,21 @@ class LayoutManager extends Component {
     }
 
     getScouterApiServerId = (serverId) => {
-        return serverId.server ? serverId.server[0].id : getDefaultServerId(this.props);
+        return serverId.server ? serverId.server[0].id : getDefaultServerId(this.props.config);
     };
 
     saveTemplate = (templates) => {
         let that = this;
         let data = {
             key: "__scouter_paper_layout",
-            value: JSON.stringify(templates)
+            value: JSON.stringify(templates),
+            serverId: this.getScouterApiServerId(this.props.serverId)
         };
 
         jQuery.ajax({
             method: "PUT",
             async: true,
-            url: getHttpProtocol(this.props.config) + `/scouter/v1/kv?serverId=${this.getScouterApiServerId()}`,
+            url: getHttpProtocol(this.props.config) + `/scouter/v1/kv`,
             xhrFields: getWithCredentials(this.props.config),
             contentType: "application/json",
             data: JSON.stringify(data),

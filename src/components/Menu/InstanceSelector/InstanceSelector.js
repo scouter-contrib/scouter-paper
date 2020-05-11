@@ -44,7 +44,8 @@ class InstanceSelector extends Component {
 
                 let data = {
                     key : "__scouter_paper_preset",
-                    value : JSON.stringify(presetList)
+                    value : JSON.stringify(presetList),
+                    serverId: this.props.activeServerId
                 };
 
                 ScouterApi.setPaperPreset(_conf,data)
