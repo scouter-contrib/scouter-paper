@@ -55,7 +55,7 @@ class LayoutManager extends Component {
     }
 
     getScouterApiServerId = (serverId) => {
-        return serverId.server ? serverId.server[0].id : getDefaultServerId(this.props);
+        return serverId.server ? serverId.server[0].id : getDefaultServerId(this.props.config);
     };
 
     saveTemplate = (templates) => {

@@ -50,6 +50,7 @@ import {
 import jQuery from "jquery";
 import PaperControl from "../Paper/PaperControl/PaperControl";
 import ScouterApi from "../../common/ScouterApi";
+import {getDefaultServerId} from "../../common/common";
 
 
 class Controller extends Component {
@@ -221,6 +222,9 @@ class Controller extends Component {
                 }
             })
     };
+    getScouterApiServerId = () => {
+        return this.props.serverId.server? this.props.serverId.server[0].id : getDefaultServerId(this.props.config)
+    };
     getConfigServerName = () => {
         let allServerList = buildHttpProtocol(this.props.config);
         let serverNames = {};
@@ -231,7 +235,7 @@ class Controller extends Component {
                 ScouterApi.getSyncConnectedServer(_server)
                 .done(msg => {
                     if (msg.result && msg.result.length > 0) {
-                        const _filter = msg.result.filter(s => s.id === this.props.serverId.server[0].id)
+                        const _filter = msg.result.filter(s => s.id === this.getScouterApiServerId())
                         const _info = _filter.length > 0 ? _filter[0] : msg.result[0];
                         serverNames[server.key] = { info : _info};
 

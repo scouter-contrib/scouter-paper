@@ -501,7 +501,7 @@ class XlogFlow extends Component {
            });
     }
     getScouterApiServerId = () => {
-        return this.props.serverId.server ? this.props.serverId.server[0].id : getDefaultServerId(this.props);
+        return this.props.serverId.server ? this.props.serverId.server[0].id : getDefaultServerId(this.props.config);
     };
     loadFlow(){
         this.props.setControlVisibility("Loading", true);

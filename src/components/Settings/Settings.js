@@ -418,6 +418,7 @@ class Settings extends Component {
                     this.props.pushMessage("info", "IMPORT CONFIRM", "The import file was successful. reload running");
                     this.props.setControlVisibility('Message',true);
                     this.props.setConfig(_config);
+
                     window.location.reload();
                 }catch (e) {
                     console.error(e);

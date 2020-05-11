@@ -162,7 +162,7 @@ class App extends Component {
         }
     };
     getScouterApiServerId = () => {
-        return this.props.serverId.server ? this.props.serverId.server[0].id : getDefaultServerId(this.props);
+        return this.props.serverId.server ? this.props.serverId.server[0].id : getDefaultServerId(this.props.config);
     };
     getRealTimeAlert = (objects) => {
         const that = this;
