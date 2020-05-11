@@ -41,6 +41,13 @@ class Line extends Component {
             _.forEach(nextProps.removeCounter,d=>this.removeCounterLine(d.key,d.counter,true));
         }
 
+        if(this.props.objects !== nextProps.objects){
+            this.stackArea.selectAll('path').remove();
+            this.line.selectAll('path').remove();
+            this.focus.selectAll("circle").remove();
+            this.peakClear();
+            this.zoomReset();
+        }
 
         const {type} = nextProps.options;
         const thisType  = this.props.options.type;
