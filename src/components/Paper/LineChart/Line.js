@@ -726,7 +726,7 @@ class Line extends Component {
         this.svg.on("mouseover",  ()=> {
             let layer = g.parentNode.parentNode.parentNode.parentNode.parentNode.parentNode.parentNode.parentNode;
             layer.style.zIndex = 9;
-            this.focus.raise();
+
             let hoverLine = this.focus.select("line.x-hover-line");
             if (hoverLine.size() > 0) {
                 hoverLine.style("display", "block");
@@ -757,6 +757,7 @@ class Line extends Component {
                 this.props.setTimeFocus(true, this.props.timeFocus.time, this.props.box.key);
             }
             this.focus.selectAll("circle").style("display", "block");
+            // this.focus.raise();
         });
 
 
@@ -786,7 +787,7 @@ class Line extends Component {
         
         const that = this; 
         this.svg.on("mousemove", function(){
-            d3.select(this).raise();
+            // d3.select(this).raise();
             let tooltip = {};
             tooltip.lines = [];
             let xPos = d3.mouse(this)[0] - that.props.options.margin.left;
