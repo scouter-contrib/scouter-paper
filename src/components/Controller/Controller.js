@@ -35,19 +35,15 @@ import * as common from "../../common/common";
 import {
     buildHttpProtocol,
     errorHandler,
-    getCurrentUser,
     getData,
     getDefaultServerConfig,
     getDefaultServerConfigIndex,
     getHttpProtocol,
-    getWithCredentials,
-    setAuthHeader,
     setData,
     setRangePropsToUrl,
     setServerIdPropsToUrl,
     setServerTimeGap
 } from "../../common/common";
-import jQuery from "jquery";
 import PaperControl from "../Paper/PaperControl/PaperControl";
 import ScouterApi from "../../common/ScouterApi";
 
@@ -59,6 +55,7 @@ class Controller extends Component {
         this.state = {
             servers: [],
             activeServerId: null,
+            counterInfo: {},
             objects: [],
             selectedObjects: JSON.parse(localStorage.getItem("selectedObjects")) || {},
             filter: "",
@@ -128,43 +125,56 @@ class Controller extends Component {
     }
 
     setObjectUpdate() {
-        const _urlObjectHashs = [new URLSearchParams(this.props.location.search).get('objects'),
-            new URLSearchParams(this.props.location.search).get('instances')]
-            .filter(_urlObjHashs => _urlObjHashs ? true : false);
+
+        const _urlObjectHashs = [ new URLSearchParams(this.props.location.search).get('objects'),
+                                  new URLSearchParams(this.props.location.search).get('instances')]
+                                 .filter(_urlObjHashs => _urlObjHashs ? true : false);
         try {
-            const [_objectHashs] = _urlObjectHashs;
-            const that = this.props;
-            jQuery.ajax({
-                method: "GET",
-                async: false,
-                url: `${getHttpProtocol(this.props.config)}/scouter/v1/object?serverId=${this.state.activeServerId}`,
-                xhrFields: getWithCredentials(this.props.config),
-                beforeSend: function (xhr) {
-                    setAuthHeader(xhr, that.config, getCurrentUser(that.config, that.user));
-                }
-            }).done((msg) => {
-                const objects = msg.result;
-                if (objects) {
-                    if (_objectHashs) {
-                        const _selectorObjHashs = _objectHashs.split(",").map(d => Number(d));
-                        const _selectedObjects = objects.filter(_obj => {
-                            return _selectorObjHashs.filter(_select => _select === Number(_obj.objHash)).length > 0;
-                        }).sort((a, b) => a.objName < b.objName ? -1 : 1);
-                        const _selectedObjectsMap = _selectedObjects.reduce((obj, item) => {
-                            obj[item.objHash] = item;
-                            return obj;
-                        }, {});
-                        this.setState({
-                            objects: objects,
-                            selectedObjects: _selectedObjectsMap
-                        });
-                    } else {
-                        this.setState({
-                            objects: objects
-                        });
+            const _conf = common.confBuilder(getHttpProtocol(this.props.config),this.props.config,this.props.user,this.state.activeServerId);
+            const _promise = [ScouterApi.getInstanceObjects(_conf),ScouterApi.getCounterModel(_conf)];
+            Promise.all(_promise).then((msg) => {
+                const [instanceObj,countInfo] = msg;
+                if (instanceObj.result) {
+                    const objects = instanceObj.result;
+                    let objTypesMap = {};
+                    let familyNameIcon = {};
+                    countInfo.result.objTypes.forEach((objType) => {
+                        objTypesMap[objType.name] = objType;
+                        familyNameIcon[objType.familyName] = objType.icon;
+                    });
+                    this.setState({
+                        counterInfo: {
+                            families: countInfo.result.families,
+                            objTypesMap : objTypesMap,
+                            familyNameIcon : familyNameIcon
+                        }
+
+                    });
+                    if (objects) {
+                        const [_objectHashs] = _urlObjectHashs;
+                        if (_objectHashs) {
+                            const _selectorObjHashs = _objectHashs.split(",").map(d => Number(d));
+                            const _selectedObjects = objects.filter(_obj => {
+                                return _selectorObjHashs.filter(_select => _select === Number(_obj.objHash)).length > 0;
+                            }).sort((a, b) => a.objName < b.objName ? -1 : 1);
+                            const _selectedObjectsMap = _selectedObjects.reduce((obj, item) => {
+                                obj[item.objHash] = item;
+                                return obj;
+                            }, {});
+                            this.setState({
+                                objects: objects,
+                                selectedObjects: _selectedObjectsMap
+                            });
+                        } else {
+                            this.setState({
+                                objects: objects
+                            });
+                        }
                     }
                 }
+
             });
+
         } catch (error) {
             console.error(error);
         }
@@ -393,29 +403,38 @@ class Controller extends Component {
 
 
     onServerClick = (serverId) => {
-        let that = this;
         this.props.addRequest();
         const _conf = common.confBuilder(getHttpProtocol(this.props.config),this.props.config,this.props.user,serverId);
-       ScouterApi.getInstanceObjects(_conf)
-           .done((msg) => {
-            if (msg.result) {
-                const objects = msg.result;
-
+        const _promise = [ScouterApi.getInstanceObjects(_conf),ScouterApi.getCounterModel(_conf)];
+        Promise.all(_promise).then((msg) => {
+            const [instanceObj,countInfo] = msg;
+            if (instanceObj.result) {
+                const objects = instanceObj.result;
+                let objTypesMap = {};
+                let familyNameIcon = {};
+                countInfo.result.objTypes.forEach((objType) => {
+                    objTypesMap[objType.name] = objType;
+                    familyNameIcon[objType.familyName] = objType.icon;
+                });
                 this.setState({
                     activeServerId: serverId,
                     servers: this.state.servers.map(host => ({...host,selectedObjectCount: null}) ),
-                    selectedObjects: {}
+                    selectedObjects: {} ,
+                    counterInfo: {
+                        families: countInfo.result.families,
+                        objTypesMap : objTypesMap,
+                        familyNameIcon : familyNameIcon
+                    }
+
                 });
                 if (objects) {
                     objects.sort((a, b) => a.objName < b.objName ? -1 : 1);
                     this.setState({
-                        objects: msg.result,
+                        objects: instanceObj.result,
                     });
                 }
-
             }
-        }).fail((xhr, textStatus, errorThrown) => {
-            errorHandler(xhr, textStatus, errorThrown, that.props, "onServerClick", true);
+
         });
     };
 
@@ -762,7 +781,7 @@ class Controller extends Component {
     };
 
     getIconOrObjectType = (instance) => {
-        let objType = this.props.counterInfo.objTypesMap[instance.objType];
+        let objType = this.state.counterInfo.objTypesMap[instance.objType];
         let icon;
         if (objType) {
             icon = objType.icon ? objType.icon : instance.objType;
@@ -1201,6 +1220,7 @@ class Controller extends Component {
                                   selectedObjects={this.state.selectedObjects}
                                   filter={this.state.filter}
                                   loading={this.state.loading}
+                                  counterInfo={this.state.counterInfo}
                                   onServerClick={this.onServerClick}
                                   instanceClick={this.instanceClick}
                                   setObjects={this.setObjects}

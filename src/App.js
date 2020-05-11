@@ -118,7 +118,8 @@ class App extends Component {
                 return server.default;
             });
             if (JSON.stringify(currentApiServer) !== JSON.stringify(nextApiServer)) {
-                this.getCounterModel(nextProps.config, nextProps.user, true);
+
+                this.getCounterModel(nextProps.config, nextProps.user, true, this.getScouterApiServerId());
             }
 
 
@@ -131,6 +132,11 @@ class App extends Component {
                 if (nextUser && (JSON.stringify(currentUser) !== JSON.stringify(nextUser))) {
                     this.getCounterModel(nextProps.config, nextProps.user, true);
                 }
+            }
+        }
+        if (this.props.serverId.server) {
+            if( this.props.serverId.server[0].id !== nextProps.serverId.server[0].id) {
+                this.getCounterModel(nextProps.config, nextProps.user, true,nextProps.serverId.server[0].id);
             }
         }
 
@@ -162,7 +168,7 @@ class App extends Component {
         }
     };
     getScouterApiServerId = () => {
-        return this.props.serverId.server ? this.props.serverId.server[0].id : getDefaultServerId(this.props);
+        return this.props.serverId.server ? this.props.serverId.server[0].id : getDefaultServerId(this.props.config);
     };
     getRealTimeAlert = (objects) => {
         const that = this;
@@ -251,45 +257,26 @@ class App extends Component {
         }
     };
 
-    getCounterModel = (config, user, handleError) => {
+    getCounterModel = (config, user, handleError,serverId) => {
 
-        const _conf = common.confBuilder(getHttpProtocol(config),config,user,getDefaultServerId(config));
-        ScouterApi.getSyncConnectedServer(_conf)
-            .done(msg =>{
+        const _conf = common.confBuilder(getHttpProtocol(config),config,user,serverId);
+        ScouterApi.getCounterModel(_conf)
+            .done((msg) => {
                 if (Number(msg.status) === 200) {
-                    Promise.all(msg.result.map(ser =>{
-                        const _serConfig = common.confBuilder(getHttpProtocol(config),config,user,ser.id);
-                        return ScouterApi.getCounterModel(_serConfig)
-                    }))
-                    .then(msg =>{
-                            const _f = [];
-                            const _o = [];
-                            _.forEach(msg,iter => {
-                                _f.push(iter.result.families);
-                                _o.push(iter.result.objTypes);
-
-                            });
-                            //- family info merge
-                            const _rf = _.flatMapDeep(_f);
-                            //- objectType merge
-                            const _ro = _.flatMapDeep(_o);
-                            this.props.setSupported(true);
-                            this.props.setCounterInfo(_rf, _ro);
-                    }).catch(_err =>{
-                        if(handleError) {
-                            this.props.setSupported(false);
-                            this.props.pushMessage("error", "Not Supported", "failed to get matrix information. paper 2.0 is available only on scouter 2.0 and later.");
-                            this.props.setControlVisibility("Message", true);
-                        }
-                        console.error(_err);
-                    })
+                    this.props.setSupported(true);
+                    this.props.setCounterInfo(msg.result.families, msg.result.objTypes);
                 }
-            })
-            .fail((xhr, textStatus, errorThrown)=>{
-                if(handleError) {
-                    errorHandler(xhr, textStatus, errorThrown, this.props, "getCounterModel", true);
-                }
-            });
+            }).fail((xhr, textStatus, errorThrown) => {
+                if (handleError) {
+                    if (xhr.status === 404) {
+                        this.props.setSupported(false);
+                        this.props.pushMessage("error", "Not Supported", "failed to get matrix information. paper 2.0 is available only on scouter 2.0 and later.");
+                        this.props.setControlVisibility("Message", true);
+                    } else {
+                        errorHandler(xhr, textStatus, errorThrown, this.props, "getCounterModel", true);
+                    }
+                 }
+        });
     };
 
     getNotice = () => {
@@ -411,7 +398,7 @@ class App extends Component {
         this.setFontSetting(this.props.config.fontSetting);
 
         // 처음 카운터 모델을 조회하는데, 에러 처리는 하지 않는다
-        this.getCounterModel(this.props.config, this.props.user, false);
+        this.getCounterModel(this.props.config, this.props.user, false,this.getScouterApiServerId());
 
         // Notice를 조회한다. 이미 조회한 Notice인지 확인하여 하루에 한번만 보여주던지..
         // X-Scouter-Notice-Token 응답 헤더는 LocalStorage에 저장하여 다음 요청 헤더로 사용한다.

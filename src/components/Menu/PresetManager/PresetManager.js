@@ -306,8 +306,7 @@ let mapStateToProps = (state) => {
     return {
         objects: state.target.objects,
         config: state.config,
-        user: state.user,
-        counterInfo: state.counterInfo
+        user: state.user
     };
 };
 

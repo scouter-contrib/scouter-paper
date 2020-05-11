@@ -518,9 +518,10 @@ class Paper extends Component {
     };
     getScouterApiServerId = () => {
 
-        return this.props.serverId.server? this.props.serverId.server[0].id : getData("active_server_id")[0].id
+        return this.props.serverId.server? this.props.serverId.server[0].id : getDefaultServerId(this.props.config)
     };
     getRealTimeCounter = () => {
+
         const that = this;
 
         if (this.props.objects && this.props.objects.length > 0) {

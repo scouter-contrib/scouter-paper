@@ -250,7 +250,7 @@ class Profiler extends Component {
         }
     };
     getScouterApiServerId = () => {
-        return this.props.serverId.server ? this.props.serverId.server[0].id : getDefaultServerId(this.props);
+        return this.props.serverId.server ? this.props.serverId.server[0].id : getDefaultServerId(this.props.config);
     };
 
     // search의 경우, 마지막 newXLogs가 allXLogs에 들어 있는 문제 있음

@@ -458,7 +458,7 @@ class Topology extends Component {
         return result;
     };
     getScouterApiServerId = () => {
-        return this.props.serverId.server ? this.props.serverId.server[0].id : getDefaultServerId(this.props);
+        return this.props.serverId.server ? this.props.serverId.server[0].id : getDefaultServerId(this.props.config);
     };
     getTopology = (config, filterMap, user, grouping) => {
 
