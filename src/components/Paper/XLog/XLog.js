@@ -158,7 +158,7 @@ class XLog extends Component {
         }
 
         if(this.props.objects && JSON.stringify(prevProps.objects) !== JSON.stringify(this.props.objects)){
-            if(this.isClassMode()){
+            if(this.isClassicMode()){
                 this.xlogBrushCreate();
             }
         }
@@ -286,7 +286,7 @@ class XLog extends Component {
         if (this.refs.xlogViewer && xlogs) {
             let context = d3.select(this.refs.xlogViewer).select("canvas").node().getContext("2d");
             let datas = await common.getFilteredData0(xlogs, filter, this.props);
-            if(this.isClassMode()){
+            if(this.isClassicMode()){
                 datas.forEach(d => {
                     if (!this.props.filterMap[d.objHash]) {
                         return;
@@ -370,7 +370,7 @@ class XLog extends Component {
 
         }
     };
-    classBrushEmptyFill(ctx,alpha){
+    classicBrushEmptyFill(ctx,alpha){
         // 나머지 white 로 변경
         const backGroundColor = this.props.config.colorType === 'white' ? '255,255,255' : '0,0,0' ;
         ctx.fillStyle=`rgba(${backGroundColor},${alpha})`;
@@ -382,15 +382,16 @@ class XLog extends Component {
         ctx.fillStyle=`rgba(${backGroundColor},${alpha})`;
         ctx.fillRect(3,4,1,1);
     }
-    classBrush=(brush,hash, state='normal',isAysnc=false) =>{
+    classicBrush=(brush,hash, state='normal',isAysnc=false) =>{
 
         const ctx = brush.getContext('2d');
         // 전체 사각형 그리기
         switch(state) {
             case 'async':
+                ctx.globalAlpha = Number(this.props.config.xlog.async.opacity);
                 ctx.fillStyle='#BBBBBB';
                 ctx.fillRect(0,0,5,5);
-                this.classBrushEmptyFill(ctx,1);
+                this.classicBrushEmptyFill(ctx,1);
                 break;
             case 'error':
                 if(isAysnc) {
@@ -399,12 +400,13 @@ class XLog extends Component {
                     ctx.fillStyle = `#E33733`;
                 }
                 ctx.fillRect(0,0,5,5);
-                this.classBrushEmptyFill(ctx,1);
+                this.classicBrushEmptyFill(ctx,1);
                 break;
             default :
+                ctx.globalAlpha = Number(this.props.config.xlog.normal.opacity);
                 ctx.fillStyle = this.getColor(hash);
                 ctx.fillRect(0,0,5,5);
-                this.classBrushEmptyFill(ctx,1);
+                this.classicBrushEmptyFill(ctx,1);
                 break;
         }
     };
@@ -422,7 +424,7 @@ class XLog extends Component {
         if (xAxisCount < 1) {
             xAxisCount = 1;
         }
-        svg.select(".axis-x").call(d3.axisBottom(this.graph.x).tickFormat(d3.timeFormat(this.isClassMode() ? this.props.config.timeFormat : this.graph.timeFormat)).ticks(xAxisCount));
+        svg.select(".axis-x").call(d3.axisBottom(this.graph.x).tickFormat(d3.timeFormat(this.isClassicMode() ? this.props.config.timeFormat : this.graph.timeFormat)).ticks(xAxisCount));
         svg.select(".grid-x").call(d3.axisBottom(this.graph.x).tickSize(-this.graph.height).tickFormat("").ticks(xAxisCount));
 
         if (clear) {
@@ -509,7 +511,7 @@ class XLog extends Component {
         context.clearRect(0, 0, canvas.width, canvas.height);
         context.drawImage(this.graph._tempCanvas, -pixel, 0, canvas.width, canvas.height);
     };
-    isClassMode =()=>{
+    isClassicMode =()=>{
         return this.props.config.others.xlogClassicMode === "Y" || this.props.box.values.showClassicMode === "Y";
     };
     graphInit = () => {
@@ -543,7 +545,7 @@ class XLog extends Component {
         if (xAxisCount < 1) {
             xAxisCount = 1;
         }
-        svg.append("g").attr("class", "axis-x").attr("transform", "translate(0," + this.graph.height + ")").call(d3.axisBottom(this.graph.x).tickFormat(d3.timeFormat(this.isClassMode() ? this.props.config.timeFormat : this.graph.timeFormat)).ticks(xAxisCount));
+        svg.append("g").attr("class", "axis-x").attr("transform", "translate(0," + this.graph.height + ")").call(d3.axisBottom(this.graph.x).tickFormat(d3.timeFormat(this.isClassicMode() ? this.props.config.timeFormat : this.graph.timeFormat)).ticks(xAxisCount));
         // Y축 단위 그리기
         let yAxisCount = Math.floor(this.graph.height / this.graph.yAxisHeight);
         if (yAxisCount < 1) {
@@ -709,7 +711,7 @@ class XLog extends Component {
         this.graph.normalBrush.gabY = Math.floor(this.graph.normalBrush.height/2);
         this.graph.normalBrush.gabMin = Math.floor(this.graph.normalBrush.height);
 
-        if(!this.isClassMode()) {
+        if(!this.isClassicMode()) {
             let normalContext = this.graph.normalBrush.getContext("2d");
             normalContext.globalAlpha = Number(this.props.config.xlog.normal.opacity);
             for (let i = 0; i < this.props.config.xlog.normal.rows; i++) {
@@ -721,7 +723,7 @@ class XLog extends Component {
                 }
             }
         }else{
-            this.classBrush(this.graph.normalBrush,"", 'async');
+            this.classicBrush(this.graph.normalBrush,"", 'async');
         }
 
         this.graph.asyncBrush = document.createElement("canvas");
@@ -730,7 +732,7 @@ class XLog extends Component {
         this.graph.asyncBrush.gabX = Math.floor(this.graph.asyncBrush.width / 2);
         this.graph.asyncBrush.gabY = Math.floor(this.graph.asyncBrush.height/ 2);
 
-        if(!this.isClassMode()) {
+        if(!this.isClassicMode()) {
             let asyncContext = this.graph.asyncBrush.getContext("2d");
 
             asyncContext.globalAlpha = Number(this.props.config.xlog.async.opacity);
@@ -743,7 +745,7 @@ class XLog extends Component {
                 }
             }
         }else{
-            this.classBrush(this.graph.asyncBrush,"", 'error',true);
+            this.classicBrush(this.graph.asyncBrush,"", 'error',true);
         }
 
         this.graph.errorBrush = document.createElement("canvas");
@@ -752,7 +754,7 @@ class XLog extends Component {
         this.graph.errorBrush.gabX = Math.floor(this.graph.errorBrush.width / 2);
         this.graph.errorBrush.gabY = Math.floor(this.graph.errorBrush.height/ 2);
 
-        if(!this.isClassMode()) {
+        if(!this.isClassicMode()) {
             let errorContext = this.graph.errorBrush.getContext("2d");
 
             errorContext.globalAlpha = Number(this.props.config.xlog.error.opacity);
@@ -767,9 +769,9 @@ class XLog extends Component {
         }else{
             this.graph.errorBrush.width = this.props.config.xlog.classicMode.columns;
             this.graph.errorBrush.height = this.props.config.xlog.classicMode.rows;
-            this.classBrush(this.graph.errorBrush,"", 'error',false);
+            this.classicBrush(this.graph.errorBrush,"", 'error',false);
         }
-        if(this.isClassMode()){
+        if(this.isClassicMode()){
             this.xlogBrushCreate();
         }
 
@@ -782,7 +784,7 @@ class XLog extends Component {
                 const objBrush= document.createElement("canvas");
                 objBrush.width = this.props.config.xlog.classicMode.columns;
                 objBrush.height = this.props.config.xlog.classicMode.rows;
-                this.classBrush(objBrush, _d.objHash);
+                this.classicBrush(objBrush, _d.objHash);
                 this._objBrush[_d.objHash] = objBrush;
             })
     };
