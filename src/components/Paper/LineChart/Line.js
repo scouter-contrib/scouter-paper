@@ -290,7 +290,7 @@ class Line extends Component {
 
     removeFocus(nextProps){
         if(nextProps.timeFocus.id !== this.props.box.key) {
-            this.focus.select("line.focus-line").remove();
+            this.focus.select("line.focus-line").style("display","none");
         }
     }
     focusLine=(time,y2)=>{
@@ -319,12 +319,13 @@ class Line extends Component {
             .exit()
             .remove();
         hoverLine.style("display","block");
+
     };
     drawTimeFocus=(isFixed=false,nextProps)=>{
         if( isFixed || nextProps.timeFocus.id !== this.props.box.key) {
             this.focusLine(this.props.timeFocus.time,nextProps.options.height);
         }else{
-            this.focus.select("line.focus-line").remove();
+            this.focus.select("line.focus-line").style("display","none");
         }
     };
     stackAreaPaint=(thisOption, counterKey, data) => {
@@ -718,11 +719,12 @@ class Line extends Component {
         this.svg.on("mouseover",  ()=> {
             let layer = g.parentNode.parentNode.parentNode.parentNode.parentNode.parentNode.parentNode.parentNode;
             layer.style.zIndex = 9;
-
+            this.focus.raise();
             let hoverLine = this.focus.select("line.x-hover-line");
             if (hoverLine.size() > 0) {
                 hoverLine.style("display", "block");
             }
+
 
             let instanceMetricCount = {};
             for (let counterKey in this.props.counters) {
@@ -761,6 +763,9 @@ class Line extends Component {
             this.focus
                 .select("line.x-hover-line")
                 .style("display", "none");
+            this.focus
+                .select("line.focus-line")
+                .style("display", "none");
 
             this.props.hideTooltip();
             this.currentTooltipTime = null;
@@ -776,7 +781,7 @@ class Line extends Component {
         
         const that = this; 
         this.svg.on("mousemove", function(){
-            
+            d3.select(this).raise();
             let tooltip = {};
             tooltip.lines = [];
             let xPos = d3.mouse(this)[0] - that.props.options.margin.left;

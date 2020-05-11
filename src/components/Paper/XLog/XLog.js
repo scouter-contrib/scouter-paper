@@ -226,7 +226,7 @@ class XLog extends Component {
     };
     removeFocus(nextProps){
         if(nextProps.timeFocus.id !== this.props.box.key) {
-            this.graph.focus.select("line.focus-line").remove();
+            this.graph.focus.select("line.focus-line").style("display","none");
         }
     }
     drawTimeFocus = (isFixed = false) => {
@@ -241,6 +241,7 @@ class XLog extends Component {
             }
             return x;
         };
+
         if( isFixed && !this.state.noData){
             let hoverLine = this.graph.focus.selectAll("line.focus-line");
             hoverLine.attr("x1",xfuc)
@@ -256,6 +257,7 @@ class XLog extends Component {
                 .attr("x2",xfuc)
                 .exit()
                 .remove();
+            hoverLine.style("display","block");
 
         } else if( !this.state.noData && this.props.timeFocus.id && this.props.timeFocus.id !== this.props.box.key) {
             let hoverLine = this.graph.focus.selectAll("line.focus-line");
@@ -272,9 +274,10 @@ class XLog extends Component {
                 .attr("x2",xfuc)
                 .exit()
                 .remove();
+            hoverLine.style("display","block");
 
         }else{
-            this.graph.focus.select("line.focus-line").remove();
+            this.graph.focus.select("line.focus-line").style("display","none");;
         }
 
     };
