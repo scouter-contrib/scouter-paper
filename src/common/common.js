@@ -379,7 +379,7 @@ export function setXlogfilterToUrl (props, filter) {
 
 }
 
-export function setRangePropsToUrl (props, pathname, objects) {
+export function setRangePropsToUrl (props, pathname, objects,activeServerId=null) {
     let search = new URLSearchParams(props.location.search);
 
     if (objects) {
@@ -411,7 +411,9 @@ export function setRangePropsToUrl (props, pathname, objects) {
     search.set("from", from.format("YYYYMMDDHHmmss"));
     search.set("to", to.format("YYYYMMDDHHmmss"));
     search.set("fromPast", props.range.fromPast);
-
+    if(activeServerId){
+        search.set("activesid", activeServerId);
+    }
 
     if (props.location.search !== ("?" + search.toString())) {
         if (pathname) {
@@ -428,13 +430,16 @@ export function setRangePropsToUrl (props, pathname, objects) {
     }
 }
 export function setServerIdPropsToUrl (props, activeServerId) {
+    console.log('setServerIdPropsToUrlsetServerIdPropsToUrl...');
     let search = new URLSearchParams(props.location.search);
-    search.set("activesid", activeServerId);
-    if (props.location.search !== ("?" + search.toString())) {
+    if(activeServerId){
+        search.set("activesid", activeServerId);
+        if (props.location.search !== ("?" + search.toString())) {
             props.history.replace({
                 pathname: props.location.pathname,
                 search: "?" + search.toString()
             });
+        }
     }
 }
 

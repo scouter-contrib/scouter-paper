@@ -168,7 +168,7 @@ class App extends Component {
         }
     };
     getScouterApiServerId = () => {
-        return this.props.serverId.server ? this.props.serverId.server[0].id : null;
+        return this.props.serverId.server ? this.props.serverId.server[0].id : getParam(this.props,'activesid');
     };
     getRealTimeAlert = (objects) => {
         const that = this;
@@ -364,13 +364,9 @@ class App extends Component {
         if(paramXlogClassicMode && ( paramXlogClassicMode === 'Y' ||  paramXlogClassicMode === 'N')){
             config.others.xlogClassicMode = paramXlogClassicMode;
         }
-        const paramActiveServerId = common.getParam(this.props,"activesid");
-        if(paramActiveServerId) {
-            let activeServerId = [{id: paramActiveServerId, obj: []}];
-            this.props.setServerId(activeServerId);
-        }
 
         this.props.setConfig(config);
+
         if (localStorage) {
             localStorage.setItem("config", JSON.stringify(config));
         }
