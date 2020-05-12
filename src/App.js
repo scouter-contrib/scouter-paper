@@ -17,7 +17,19 @@ import {
 import {Route, Switch} from 'react-router-dom';
 import {connect} from 'react-redux';
 import {withRouter} from 'react-router-dom';
-import {setSupported, setConfig, addRequest, clearAllMessage, setControlVisibility, setUserId, setUserData, pushMessage, setCounterInfo, setAlert} from './actions';
+import {
+    setSupported,
+    setConfig,
+    addRequest,
+    clearAllMessage,
+    setControlVisibility,
+    setUserId,
+    setUserData,
+    pushMessage,
+    setCounterInfo,
+    setAlert,
+    setServerId
+} from './actions';
 import {detect} from 'detect-browser';
 import Unsupport from "./components/Unsupport/Unsupport";
 import jQuery from "jquery";
@@ -66,7 +78,7 @@ class App extends Component {
         this.props.addRequest();
 
         let origin = getHttpProtocol(config);
-        const conf = common.confBuilder(getHttpProtocol(config),config,user,getDefaultServerId(config));
+        const conf = common.confBuilder(getHttpProtocol(config),config,user,this.getScouterApiServerId());
        ScouterApi.isAuthentification(conf)
            .done((msg) => {
             if (msg && Number(msg.status) === 200) {
@@ -307,6 +319,7 @@ class App extends Component {
     componentWillMount() {
         let config = null;
         let str = localStorage.getItem("config");
+
         if (str) {
             config = JSON.parse(str);
             config = mergeDeep(this.props.config, config); //for added config's properties on later versions.
@@ -320,13 +333,12 @@ class App extends Component {
         }
 
         // URL로부터 스카우터 서버 정보를 세팅
-        let params = getParam(this.props, "address,port,protocol,authentification,serverid");
+        let params = getParam(this.props, "address,port,protocol,authentification");
         if (params[0] && params[1]) {
             let paramAddress = params[0];
             let paramPort = params[1];
             let paramProtocol = params[2] ? params[2] : "http";
             let paramAuthentification = params[3] ? params[3] : "none";
-            let paramServerId = params[4] ? params[4] : "none";
 
             let found = false;
             for (let i=0; i<config.servers.length; i++) {
@@ -347,7 +359,6 @@ class App extends Component {
                     address: paramAddress,
                     port: paramPort,
                     authentification :paramAuthentification,
-                    serverid: paramServerId,
                     default : true
                 });
             }
@@ -362,7 +373,11 @@ class App extends Component {
         if(paramXlogClassicMode && ( paramXlogClassicMode === 'Y' ||  paramXlogClassicMode === 'N')){
             config.others.xlogClassicMode = paramXlogClassicMode;
         }
-
+        const paramActiveServerId = common.getParam(this.props,"activesid");
+        if(paramActiveServerId) {
+            let activeServerId = [{id: paramActiveServerId, obj: []}];
+            this.props.setServerId(activeServerId);
+        }
 
         this.props.setConfig(config);
         if (localStorage) {
@@ -541,7 +556,8 @@ let mapDispatchToProps = (dispatch) => {
         pushMessage: (category, title, content) => dispatch(pushMessage(category, title, content)),
         setCounterInfo: (families, objTypes) => dispatch(setCounterInfo(families, objTypes)),
         setSupported: (supported) => dispatch(setSupported(supported)),
-        setAlert: (alert) => dispatch(setAlert(alert))
+        setAlert: (alert) => dispatch(setAlert(alert)),
+        setServerId: (serverId) => dispatch(setServerId(serverId))
     };
 };
 

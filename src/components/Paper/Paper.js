@@ -105,8 +105,8 @@ class Paper extends Component {
         //URL로부터 layout 세팅
         let layoutFromParam = common.getParam(this.props, "layout");
         if ((layoutFromParam && layoutFromParam !== layoutOnLocal) || Object.keys(layouts).length === 0) {
-            const _load = common.confBuilder(getHttpProtocol(this.props.config),this.props.config,this.props.user,getDefaultServerId(this.props.config));
-            ScouterApi.getPaperPreset(_load)
+            const _load = common.confBuilder(getHttpProtocol(this.props.config),this.props.config,this.props.user,this.getScouterApiServerId());
+            ScouterApi.getLayoutTemplate(_load)
             .done((msg) => {
                 if (msg && Number(msg.status) === 200) {
                     let isSet = false;

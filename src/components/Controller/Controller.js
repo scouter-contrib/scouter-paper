@@ -583,6 +583,7 @@ class Controller extends Component {
                         let objects = [];
                         let activeServerId = null;
                         servers.forEach(server => {
+
                             //일단 단일 서버로 가정하고 서버 시간과 맞춘다.
                             setServerTimeGap(Number(server.serverTime) - new Date().valueOf());
                             const _sconf = common.confBuilder(getHttpProtocol(this.props.config),this.props.config,this.props.user,server.id);
@@ -613,6 +614,7 @@ class Controller extends Component {
                                     objects = msg.result;
                                     if (objects && objects.length > 0) {
                                         objects.forEach((instance) => {
+
                                             urlObjectHashes.forEach((objHash) => {
                                                 if (objHash === Number(instance.objHash)) {
                                                     selectedObjects.push(instance);
@@ -631,7 +633,6 @@ class Controller extends Component {
                                 });
                             }
                         });
-
                         if (selectedObjects.length > 0) {
                             selectedObjects.sort((a, b) => a.objName < b.objName ? -1 : 1);
 
@@ -649,7 +650,8 @@ class Controller extends Component {
 
                             AgentColor.setInstances(selectedObjects, this.props.config.colorType);
                             this.props.setTarget(selectedObjects);
-
+                            this.props.setServerId([{id:activeServerId,obj:objects}]);
+                            setServerIdPropsToUrl(this.props,activeServerId);
                         } else {
                             this.setState({
                                 servers: servers
