@@ -17,7 +17,9 @@ export function getData(key) {
 
 export function setData(key, value) {
     if (window.localStorage) {
-        window.localStorage.setItem(key, JSON.stringify(value));
+        if(value && value !== "null" && value !== "undefined") {
+            window.localStorage.setItem(key, JSON.stringify(value));
+        }
     }
 }
 
@@ -476,39 +478,48 @@ export function replaceAllLocalSettingsForServerChange (currentServer, props, co
         reloadAllLocalSettingsOfServer(props, config);
     }
 }
+
 export function importAllLocalSetting(importTxt,thisConfig) {
     const read = JSON.parse(importTxt);
     setData("config", read["config"]);
     setData(ALL_OPTIONS_OF_SERVER_KEY, read[ALL_OPTIONS_OF_SERVER_KEY]);
-    reloadAllLocalSettingsOfServer(null,thisConfig);
+    const defaultOption = read["options"];
+
+
+    setData("selectedObjects", defaultOption["selectedObjects"]);
+    setData("templateName", defaultOption["templateName"]);
+    setData("layouts", defaultOption["layouts"]);
+    setData("boxes", defaultOption["boxes"]);
+    setData("preset", defaultOption["preset"]);
+    setData("profileOptions", defaultOption["profileOptions"]);
+    setData("topologyPosition", defaultOption["topologyPosition"]);
+    setData("topologyOptions", defaultOption["topologyOptions"]);
+    setData("alert",defaultOption["alert"]);
+    setData("activeServerId", defaultOption["activeServerId"]);
+
     return read["config"];
 }
 export function exportAllLocalSettings (currentServer, config) {
-    const serverKey = currentServer.address + ":" + currentServer.port;
+    saveCurrentAllLocalSettings(currentServer);
 
-    const option = {
-        server: serverKey,
-        options: {
-            selectedObjects : getData("selectedObjects"),
-            templateName : getData("templateName"),
-            layouts : getData("layouts"),
-            boxes : getData("boxes"),
-            preset : getData("preset"),
-            profileOptions : getData("profileOptions"),
-            topologyPosition : getData("topologyPosition"),
-            topologyOptions : getData("topologyOptions"),
-            alert : getData("alert"),
-            active_server_id : getData("active_server_id")
-        }
-    };
 
-    const allOptionsOfServer = getData(ALL_OPTIONS_OF_SERVER_KEY) || [];
-    let allOptions = allOptionsOfServer.filter(option => option.server !== serverKey);
-    allOptions.push(option);
+    const allOptionsOfServer = getData(ALL_OPTIONS_OF_SERVER_KEY);
     const result = {};
     result[ALL_OPTIONS_OF_SERVER_KEY] = allOptionsOfServer;
     result['config'] = config;
-    return result;
+
+    return {...result, options: {
+                            selectedObjects : getData("selectedObjects"),
+                            templateName : getData("templateName"),
+                            layouts : getData("layouts"),
+                            boxes : getData("boxes"),
+                            preset : getData("preset"),
+                            profileOptions : getData("profileOptions"),
+                            topologyPosition : getData("topologyPosition"),
+                            topologyOptions : getData("topologyOptions"),
+                            alert : getData("alert"),
+                            activeServerId : getData("activeServerId")
+    }};
 
 }
 export function saveCurrentAllLocalSettings (currentServer, config) {
@@ -526,7 +537,7 @@ export function saveCurrentAllLocalSettings (currentServer, config) {
             topologyPosition : getData("topologyPosition"),
             topologyOptions : getData("topologyOptions"),
             alert : getData("alert"),
-            active_server_id : getData("active_server_id")
+            activeServerId : getData("activeServerId")
         }
     };
 
@@ -554,7 +565,7 @@ export function reloadAllLocalSettingsOfServer (props, config) {
             setData("topologyPosition", option[0].options["topologyPosition"]);
             setData("topologyOptions", option[0].options["topologyOptions"]);
             setData("alert", option[0].options["alert"]);
-            setData("active_server_id", option[0].options["active_server_id"]);
+            setData("activeServerId", option[0].options["activeServerId"]);
         }
     }
 }

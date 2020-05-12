@@ -746,7 +746,7 @@ const timeFocus =(state=timeFocusState, action ) =>{
 };
 
 const serverIdState = {
-    server: getData("active_server_id") ? getData("active_server_id") : null
+    server: getData("activeServerId") ? getData("activeServerId") : null
 }
 const serverId =(state=serverIdState, action ) =>{
     switch (action.type) {

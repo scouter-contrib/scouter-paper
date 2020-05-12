@@ -307,7 +307,7 @@ class Controller extends Component {
 
     };
     loadActiveServerItem = (selectObjects) => {
-        const serverIds = getData("active_server_id");
+        const serverIds = this.props.serverId.server;
 
         if(serverIds){
             return serverIds[0].id;
@@ -1288,7 +1288,7 @@ let mapDispatchToProps = (dispatch) => {
             return dispatch(setPresetName(preset));
         },
         setServerId:(activeServer) => {
-            localStorage.setItem("active_server_id", JSON.stringify(activeServer));
+            localStorage.setItem("activeServerId", JSON.stringify(activeServer));
             return dispatch(setServerId(activeServer));
         }
     };
