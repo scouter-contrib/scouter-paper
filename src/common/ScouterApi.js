@@ -31,7 +31,7 @@ export default class ScouterApi {
         return jQuery.ajax({
             method: "GET",
             async: true,
-            url: `${addr}/scouter/v1/kv/a?serverId=${serverId}`,
+            url: `${addr}/scouter/v1/kv/a${serverId ? `?serverId=${serverId}`: '' }`,
             dataType:"JSON",
             xhrFields: getWithCredentials(conf),
             beforeSend: (xhr)=> setAuthHeader(xhr, conf, user)
@@ -44,7 +44,7 @@ export default class ScouterApi {
             method: "GET",
             async: true,
             dataType:"JSON",
-            url: `${addr}/scouter/v1/kv/__scouter_paper_preset?serverId=${serverId}`,
+            url: `${addr}/scouter/v1/kv/__scouter_paper_preset${serverId ? `?serverId=${serverId}`: '' }`,
             xhrFields: getWithCredentials(conf),
             beforeSend: (xhr)=> setAuthHeader(xhr, conf, getCurrentUser(conf,user))
         });
@@ -55,7 +55,7 @@ export default class ScouterApi {
             method: "PUT",
             async: true,
             dataType:"JSON",
-            url: `${addr}/scouter/v1/kv?serverId=${serverId}`,
+            url: `${addr}/scouter/v1/kv${serverId ? `?serverId=${serverId}`: '' }`,
             contentType : "application/json",
             data : JSON.stringify(data),
             xhrFields: getWithCredentials(conf),
@@ -69,7 +69,7 @@ export default class ScouterApi {
             method: "GET",
             async: true,
             dataType:"JSON",
-            url: `${addr}/scouter/v1/kv/__scouter_paper_layout?serverId=${serverId}`,
+            url: `${addr}/scouter/v1/kv/__scouter_paper_layout${serverId ? `?serverId=${serverId}`: '' }`,
             xhrFields: getWithCredentials(conf),
             beforeSend: (xhr)=> setAuthHeader(xhr, conf, getCurrentUser(conf,user))
         });
@@ -80,7 +80,7 @@ export default class ScouterApi {
         return jQuery.ajax({
             method: "GET",
             async: true,
-            url: `${addr}/scouter/v1/alert/realTime/${ol}/${la}?objType=${objType}&serverId=${serverId}`,
+            url: `${addr}/scouter/v1/alert/realTime/${ol}/${la}?objType=${objType}${serverId ? `&serverId=${serverId}`: '' }`,
             xhrFields: getWithCredentials(conf),
             beforeSend: (xhr)=> setAuthHeader(xhr, conf, getCurrentUser(conf,user))
         });
@@ -90,7 +90,7 @@ export default class ScouterApi {
         return jQuery.ajax({
             method: "GET",
             async: true,
-            url: `${addr}/scouter/v1/info/counter-model?serverId=${serverId}`,
+            url: `${addr}/scouter/v1/info/counter-model${serverId ? `?serverId=${serverId}`: '' }`,
             xhrFields: getWithCredentials(conf),
             beforeSend: (xhr)=> setAuthHeader(xhr, conf, getCurrentUser(conf,user))
         });
@@ -101,7 +101,7 @@ export default class ScouterApi {
             method: "GET",
             async: true,
             dataType:"JSON",
-            url: `${addr}/scouter/v1/object?serverId=${serverId}`,
+            url: `${addr}/scouter/v1/object${serverId ? `?serverId=${serverId}`: '' }`,
             xhrFields: getWithCredentials(conf),
             beforeSend: (xhr)=> setAuthHeader(xhr, conf, getCurrentUser(conf,user))
         });
@@ -113,7 +113,7 @@ export default class ScouterApi {
             method: "GET",
             async: false,
             dataType:"JSON",
-            url: `${addr}/scouter/v1/object?serverId=${serverId}`,
+            url: `${addr}/scouter/v1/object${serverId ? `?serverId=${serverId}`: '' }`,
             xhrFields: getWithCredentials(conf),
             beforeSend: (xhr)=> setAuthHeader(xhr, conf, getCurrentUser(conf,user))
         });
@@ -137,7 +137,7 @@ export default class ScouterApi {
         return jQuery.ajax({
             method: "GET",
             async: true,
-            url: `${addr}/scouter/v1/counter/realTime/${params}?objHashes=${JSON.stringify(objects.map(obj=>Number(obj.objHash)))}&serverId=${serverId}`,
+            url: `${addr}/scouter/v1/counter/realTime/${params}?objHashes=${JSON.stringify(objects.map(obj=>Number(obj.objHash)))}${serverId ? `&serverId=${serverId}`: '' }`,
             xhrFields: getWithCredentials(conf),
             beforeSend: (xhr)=> setAuthHeader(xhr, conf, getCurrentUser(conf,user))
         });
@@ -149,7 +149,7 @@ export default class ScouterApi {
             method: "GET",
             async: true,
             dataType:"json",
-            url: `${addr}/scouter/v1/object/remove/inactive?serverId=${serverId}`,
+            url: `${addr}/scouter/v1/object/remove/inactive${serverId ? `?serverId=${serverId}`: '' }`,
             xhrFields: getWithCredentials(conf),
             beforeSend: (xhr)=> setAuthHeader(xhr, conf, getCurrentUser(conf,user))
         });

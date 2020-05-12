@@ -24,10 +24,10 @@ import {Box, BoxConfig, XLogFilter} from "../../components";
 import jQuery from "jquery";
 import * as common from "../../common/common";
 import {
+    confBuilder,
     errorHandler,
     getCurrentUser,
     getData,
-    getDefaultServerId,
     getDivideDays,
     getHttpProtocol,
     getSearchDays,
@@ -44,7 +44,6 @@ import * as Options from "./PaperControl/Options"
 import OldVersion from "../OldVersion/OldVersion";
 import ScouterPatternMatcher from "../../common/ScouterPatternMatcher";
 import ScouterApi from "../../common/ScouterApi";
-import {confBuilder} from "../../common/common";
 
 const ResponsiveReactGridLayout = WidthProvider(Responsive);
 
@@ -105,7 +104,8 @@ class Paper extends Component {
         //URL로부터 layout 세팅
         let layoutFromParam = common.getParam(this.props, "layout");
         if ((layoutFromParam && layoutFromParam !== layoutOnLocal) || Object.keys(layouts).length === 0) {
-            const _load = common.confBuilder(getHttpProtocol(this.props.config),this.props.config,this.props.user,this.getScouterApiServerId());
+            const activesid = common.getParam(this.props, "activesid");
+            const _load = common.confBuilder(getHttpProtocol(this.props.config),this.props.config,this.props.user,activesid? activesid: this.getScouterApiServerId());
             ScouterApi.getLayoutTemplate(_load)
             .done((msg) => {
                 if (msg && Number(msg.status) === 200) {
@@ -517,8 +517,7 @@ class Paper extends Component {
         return confBuilder(getHttpProtocol(this.props.config),this.props.config,this.props.user, this.getScouterApiServerId());
     };
     getScouterApiServerId = () => {
-
-        return this.props.serverId.server? this.props.serverId.server[0].id : getDefaultServerId(this.props.config)
+        return this.props.serverId.server? this.props.serverId.server[0].id : null
     };
     getRealTimeCounter = () => {
 

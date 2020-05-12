@@ -3,51 +3,39 @@ import './App.css';
 import './Theme.css';
 import './fonts/technology-icons-gh-pages/styles/technology-icons.css';
 import './fonts/glyphter/css/Glyphter.css';
-import {
-    Settings,
-    Paper,
-    Loading,
-    RequestBar,
-    Menu,
-    Login,
-    Overlay,
-    Message,
-    ContentWrapper
-} from './components';
-import {Route, Switch} from 'react-router-dom';
+import {ContentWrapper, Loading, Login, Menu, Message, Overlay, Paper, RequestBar, Settings} from './components';
+import {Route, Switch, withRouter} from 'react-router-dom';
 import {connect} from 'react-redux';
-import {withRouter} from 'react-router-dom';
 import {
-    setSupported,
-    setConfig,
     addRequest,
     clearAllMessage,
-    setControlVisibility,
-    setUserId,
-    setUserData,
     pushMessage,
-    setCounterInfo,
     setAlert,
-    setServerId
+    setConfig,
+    setControlVisibility,
+    setCounterInfo,
+    setServerId,
+    setSupported,
+    setUserData,
+    setUserId
 } from './actions';
 import {detect} from 'detect-browser';
 import Unsupport from "./components/Unsupport/Unsupport";
 import jQuery from "jquery";
+import * as common from './common/common';
 import {
     errorHandler,
-    mergeDeep,
-    getParam,
-    setAuthHeader,
-    getWithCredentials,
-    getHttpProtocol,
-    getDefaultServerConfig,
     getCurrentUser,
-    getDefaultServerId
+    getDefaultServerConfig,
+    getHttpProtocol,
+    getParam,
+    getWithCredentials,
+    mergeDeep,
+    setAuthHeader
 } from './common/common';
 
 import Home from "./components/Home/Home";
 import Topology from "./components/Topology/Topology";
-import * as common from "./common/common";
 import Debug from "./components/Debug/Debug";
 import Controller from "./components/Controller/Controller";
 import _ from "lodash";
@@ -180,7 +168,7 @@ class App extends Component {
         }
     };
     getScouterApiServerId = () => {
-        return this.props.serverId.server ? this.props.serverId.server[0].id : getDefaultServerId(this.props.config);
+        return this.props.serverId.server ? this.props.serverId.server[0].id : null;
     };
     getRealTimeAlert = (objects) => {
         const that = this;
