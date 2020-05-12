@@ -35,9 +35,9 @@ import * as common from "../../common/common";
 import {
     buildHttpProtocol,
     errorHandler,
-    getData,
     getDefaultServerConfig,
     getDefaultServerConfigIndex,
+    getDefaultServerId,
     getHttpProtocol,
     setData,
     setRangePropsToUrl,
@@ -46,7 +46,6 @@ import {
 } from "../../common/common";
 import PaperControl from "../Paper/PaperControl/PaperControl";
 import ScouterApi from "../../common/ScouterApi";
-import {getDefaultServerId} from "../../common/common";
 
 
 class Controller extends Component {
