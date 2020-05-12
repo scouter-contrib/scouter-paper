@@ -98,7 +98,7 @@ class Paper extends Component {
         // URL로 부터 액티브 serverid 추가
         const activesid = common.getParam(this.props, "activesid");
         if(activesid){
-            setServerIdPropsToUrl(activesid);
+            setServerIdPropsToUrl(this.props,activesid);
         }
         //URL로부터 XLOG 응답시간 축 시간 값 세팅
         let xlogElapsedTime = common.getParam(this.props, "xlogElapsedTime");

@@ -126,7 +126,10 @@ class PaperControl extends Component {
                                         </ul>
                                     </div>}
                                     {(this.touch) && <div className="multi-metrics">
-                                        <div className="group-name">{family.name}</div>
+                                        <div className="group-name" onClick={this.openGroup.bind(this, family.name)}>
+                                            <span className="name">{family.name}</span>
+                                            <span className="toggle-filter-icon"><i className="fa fa-angle-down" aria-hidden="true"></i></span>
+                                        </div>
                                         <ul>
                                             {family.counters.sort((a,b) => {
                                                 return a.displayName.localeCompare(b.displayName);

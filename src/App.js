@@ -230,16 +230,19 @@ class App extends Component {
                                 }
                             });
 
-                            if (Notification && this.props.config.alert.notification === "Y" && Notification.permission === "granted") {
-                                for (let i=0; i<alert.data.length; i++) {
-                                    if (Number(alert.data[i].time) > this.mountTime && !alert.data[i]["_notificated"]) {
-                                        alert.data[i]["_notificated"] = true;
-
-                                        var options = {
-                                            body: alert.data[i].objName + "\n" + alert.data[i].message,
-                                            icon: notificationIcon
-                                        };
-                                        new Notification("[" + alert.data[i].level + "]" +  alert.data[i].title, options);
+                            if (this.props.config.alert.notification === "Y") {
+                                if( typeof Notification === 'function' && Notification.hasOwnProperty('permission')) {
+                                    if(Notification.permission === "granted"){
+                                        for (let i=0; i<alert.data.length; i++) {
+                                            if (Number(alert.data[i].time) > this.mountTime && !alert.data[i]["_notificated"]) {
+                                                alert.data[i]["_notificated"] = true;
+                                                const options = {
+                                                    body: alert.data[i].objName + "\n" + alert.data[i].message,
+                                                    icon: notificationIcon
+                                                };
+                                                new Notification("[" + alert.data[i].level + "]" +  alert.data[i].title, options);
+                                            }
+                                        }
                                     }
                                 }
                             }
