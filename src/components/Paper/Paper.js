@@ -44,6 +44,7 @@ import * as Options from "./PaperControl/Options"
 import OldVersion from "../OldVersion/OldVersion";
 import ScouterPatternMatcher from "../../common/ScouterPatternMatcher";
 import ScouterApi from "../../common/ScouterApi";
+import {setServerIdPropsToUrl} from "../../common/common";
 
 const ResponsiveReactGridLayout = WidthProvider(Responsive);
 
@@ -94,7 +95,11 @@ class Paper extends Component {
         let endTime = (new ServerDate()).getTime();
         let startTime = endTime - range;
 
-
+        // URL로 부터 액티브 serverid 추가
+        const activesid = common.getParam(this.props, "activesid");
+        if(activesid){
+            setServerIdPropsToUrl(activesid);
+        }
         //URL로부터 XLOG 응답시간 축 시간 값 세팅
         let xlogElapsedTime = common.getParam(this.props, "xlogElapsedTime");
 
@@ -104,7 +109,8 @@ class Paper extends Component {
         //URL로부터 layout 세팅
         let layoutFromParam = common.getParam(this.props, "layout");
         if ((layoutFromParam && layoutFromParam !== layoutOnLocal) || Object.keys(layouts).length === 0) {
-            const activesid = common.getParam(this.props, "activesid");
+
+
             const _load = common.confBuilder(getHttpProtocol(this.props.config),this.props.config,this.props.user,activesid? activesid: this.getScouterApiServerId());
             ScouterApi.getLayoutTemplate(_load)
             .done((msg) => {
