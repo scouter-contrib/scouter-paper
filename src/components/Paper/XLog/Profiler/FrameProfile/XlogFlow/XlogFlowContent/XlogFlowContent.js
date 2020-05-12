@@ -1,4 +1,4 @@
-import React,{Component} from "react";
+import React, {Component} from "react";
 import {withRouter} from "react-router-dom";
 import {connect} from "react-redux";
 import SQLText from "./SQLText/SQLText"
@@ -11,8 +11,8 @@ import numeral from "numeral";
 import moment from "moment/moment";
 import {
     getCurrentUser,
-    getDefaultServerId,
     getHttpProtocol,
+    getParam,
     getWithCredentials,
     setAuthHeader
 } from "../../../../../../../common/common";
@@ -119,7 +119,7 @@ class XlogFlowContent extends Component {
         }
     }
     getScouterApiServerId = () => {
-        return this.props.serverId.server ? this.props.serverId.server[0].id : getDefaultServerId(this.props.config);
+        return this.props.serverId.server ? this.props.serverId.server[0].id : getParam(this.props,'activesid');
     };
     getError(){
         let ret = '';

@@ -37,8 +37,8 @@ import {
     errorHandler,
     getDefaultServerConfig,
     getDefaultServerConfigIndex,
-    getDefaultServerId,
     getHttpProtocol,
+    getParam,
     setData,
     setRangePropsToUrl,
     setServerTimeGap
@@ -231,7 +231,7 @@ class Controller extends Component {
             })
     };
     getScouterApiServerId = () => {
-        return this.props.serverId.server? this.props.serverId.server[0].id : getDefaultServerId(this.props.config)
+        return this.props.serverId.server? this.props.serverId.server[0].id : getParam(this.props,'activesid');
     };
     getConfigServerName = () => {
         let allServerList = buildHttpProtocol(this.props.config);

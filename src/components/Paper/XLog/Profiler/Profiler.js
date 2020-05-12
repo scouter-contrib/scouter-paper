@@ -1,20 +1,20 @@
 import React, {Component} from 'react';
 import './Profiler.css';
-import {addRequest, setControlVisibility, pushMessage} from '../../../../actions';
+import {addRequest, pushMessage, setControlVisibility} from '../../../../actions';
 import {withRouter} from 'react-router-dom';
 import {connect} from 'react-redux';
 import jQuery from "jquery";
 import {
-    setTxidPropsToUrl,
-    getHttpProtocol,
     errorHandler,
+    getCurrentUser,
+    getDivideDays,
+    getFilteredData0,
+    getHttpProtocol,
+    getParam,
+    getSearchDays,
     getWithCredentials,
     setAuthHeader,
-    getSearchDays,
-    getDivideDays,
-    getParam,
-    getCurrentUser,
-    getFilteredData0, getDefaultServerId
+    setTxidPropsToUrl
 } from '../../../../common/common';
 import FrameProfile from "./FrameProfile/FrameProfile";
 import ProfileList from "./ProfileList/ProfileList";
@@ -250,7 +250,7 @@ class Profiler extends Component {
         }
     };
     getScouterApiServerId = () => {
-        return this.props.serverId.server ? this.props.serverId.server[0].id : getDefaultServerId(this.props.config);
+        return this.props.serverId.server ? this.props.serverId.server[0].id : getParam(this.props,'activesid');
     };
 
     // search의 경우, 마지막 newXLogs가 allXLogs에 들어 있는 문제 있음

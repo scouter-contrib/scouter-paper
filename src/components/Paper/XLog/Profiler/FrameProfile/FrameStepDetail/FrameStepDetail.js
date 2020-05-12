@@ -9,8 +9,8 @@ import JSONPretty from 'react-json-pretty';
 import jQuery from "jquery";
 import {
     getCurrentUser,
-    getDefaultServerId,
     getHttpProtocol,
+    getParam,
     getWithCredentials,
     setAuthHeader
 } from "../../../../../../common/common";
@@ -112,7 +112,7 @@ class FrameStepDetail extends Component {
         return sql;
     };
     getScouterApiServerId = () => {
-        return this.props.serverId.server ? this.props.serverId.server[0].id : getDefaultServerId(this.props.config);
+        return this.props.serverId.server ? this.props.serverId.server[0].id : getParam(this.props,'activesid');
     };
     getError(error){
         let ret = '';

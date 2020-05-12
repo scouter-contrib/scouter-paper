@@ -9,8 +9,8 @@ import jQuery from "jquery";
 import {
     errorHandler,
     getCurrentUser,
-    getDefaultServerId,
     getHttpProtocol,
+    getParam,
     getWithCredentials,
     setAuthHeader
 } from "../../common/common";
@@ -458,7 +458,7 @@ class Topology extends Component {
         return result;
     };
     getScouterApiServerId = () => {
-        return this.props.serverId.server ? this.props.serverId.server[0].id : getDefaultServerId(this.props.config);
+        return this.props.serverId.server ? this.props.serverId.server[0].id : getParam(this.props,'activesid');
     };
     getTopology = (config, filterMap, user, grouping) => {
 
