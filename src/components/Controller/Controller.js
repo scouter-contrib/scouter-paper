@@ -541,7 +541,7 @@ class Controller extends Component {
     setTargetFromUrl = () => {
         if (!this.init) {
             this.props.addRequest();
-            const conf = common.confBuilder(getHttpProtocol(this.props.config),this.props.config,this.props.user,null);
+            const conf = common.confBuilder(getHttpProtocol(this.props.config),this.props.config,this.props.user,this.getScouterApiServerId());
             ScouterApi.getSyncConnectedServer(conf)
             .done((msg) => {
                 if (msg && msg.result) {

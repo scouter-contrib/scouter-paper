@@ -2,7 +2,7 @@
 FILE1=scouter-paper.zip
 FILE2=./docker/$FILE1
 BUILDFILE=./docker/docker-compose.yml
-
+export GENERATE_SOURCEMAP=true
 if [ -e $FILE1 ]
 then
   echo "****1. build local file delete... "

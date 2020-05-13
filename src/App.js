@@ -130,7 +130,7 @@ class App extends Component {
                 let nextUser = nextProps.user[origin];
                 let currentUser = this.props.user[origin];
                 if (nextUser && (JSON.stringify(currentUser) !== JSON.stringify(nextUser))) {
-                    this.getCounterModel(nextProps.config, nextProps.user, true);
+                    this.getCounterModel(nextProps.config, nextProps.user, true,nextProps.serverId.server[0].id);
                 }
             }
         }
