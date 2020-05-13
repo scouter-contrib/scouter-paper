@@ -70,7 +70,8 @@ class PaperControl extends Component {
                 <div className="control-item">
                     <div className="row desc">
                         <div className="step"><span>2</span></div>
-                        <div className="row-message">DRAG METRIC TO THE PAPER</div>
+                        {(!this.touch) && <div className="row-message">DRAG METRIC TO THE PAPER</div>}
+                        {(this.touch) && <div className="row-message">CLICK METRIC TO THE PAPER</div>}
                     </div>
                     <div className="row control metric-row">
                         <div>
@@ -92,7 +93,8 @@ class PaperControl extends Component {
                                                 </Draggable>
                                                 }
                                                 {(this.touch) &&
-                                                <div onClick={this.props.addPaperAndAddMetric.bind(this, JSON.stringify(this.options[name]))}>
+                                                <div className="paper-control-item" onClick={this.props.addPaperAndAddMetric.bind(this, JSON.stringify(this.options[name]))}>
+                                                    <div className="draggable-icon">click</div>
                                                     {this.options[name].icon && <i className={"fa " + this.options[name].icon} aria-hidden="true"></i>}
                                                     {this.options[name].title && <span className="text-icon">{this.options[name].title}</span>}
                                                 </div>
@@ -138,6 +140,7 @@ class PaperControl extends Component {
                                                 counter.advancedOption = this.options["lineChart"].config;
                                                 return <li key={j}>
                                                     <div className="paper-control-item" onClick={this.props.addPaperAndAddMetric.bind(this, JSON.stringify(counter))}>
+                                                        <div className="draggable-icon">click</div>
                                                         <span className="text-icon">{counter.displayName}</span>
                                                     </div>
                                                 </li>
