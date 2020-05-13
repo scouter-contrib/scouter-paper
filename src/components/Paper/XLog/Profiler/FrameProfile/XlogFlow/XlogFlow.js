@@ -1,4 +1,4 @@
-import React,{Component} from "react";
+import React, {Component} from "react";
 import jQuery from "jquery";
 import './XlogFlow.css'
 import {connect} from 'react-redux';
@@ -11,8 +11,8 @@ import FlowElement from "./FlowElement";
 
 import {
     getCurrentUser,
-    getDefaultServerId,
     getHttpProtocol,
+    getParam,
     getWithCredentials,
     setAuthHeader
 } from "../../../../../../common/common";
@@ -503,7 +503,7 @@ class XlogFlow extends Component {
            });
     }
     getScouterApiServerId = () => {
-        return this.props.serverId.server ? this.props.serverId.server[0].id : getDefaultServerId(this.props.config);
+        return this.props.serverId.server ? this.props.serverId.server[0].id : getParam(this.props,'activesid');
     };
     loadFlow(){
         this.props.setControlVisibility("Loading", true);

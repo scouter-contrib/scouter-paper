@@ -37,11 +37,10 @@ import {
     errorHandler,
     getDefaultServerConfig,
     getDefaultServerConfigIndex,
-    getDefaultServerId,
     getHttpProtocol,
+    getParam,
     setData,
     setRangePropsToUrl,
-    setServerIdPropsToUrl,
     setServerTimeGap
 } from "../../common/common";
 import PaperControl from "../Paper/PaperControl/PaperControl";
@@ -79,7 +78,6 @@ class Controller extends Component {
             }
         }
         common.setTargetServerToUrl(this.props, this.props.config);
-
         if (localStorage.getItem("selectedObjects")) {
             let selectedObjects = JSON.parse(localStorage.getItem("selectedObjects"));
             if (selectedObjects.objects) {
@@ -90,6 +88,7 @@ class Controller extends Component {
         }
 
         this.getConfigServerName();
+
 
     }
 
@@ -232,7 +231,7 @@ class Controller extends Component {
             })
     };
     getScouterApiServerId = () => {
-        return this.props.serverId.server? this.props.serverId.server[0].id : getDefaultServerId(this.props.config)
+        return this.props.serverId.server? this.props.serverId.server[0].id : getParam(this.props,'activesid');
     };
     getConfigServerName = () => {
         let allServerList = buildHttpProtocol(this.props.config);
@@ -362,12 +361,13 @@ class Controller extends Component {
         const {activeServerId } = this.state;
         const defaultServerId = activeServerId ? activeServerId : this.loadActiveServerItem(objects);
 
+        this.props.setControlVisibility("TargetSelector", false);
+
         if(defaultServerId) {
             this.props.setServerId([{id: defaultServerId, obj: objects}]);
-            setServerIdPropsToUrl(this.props, defaultServerId );
         }
-        this.props.setControlVisibility("TargetSelector", false);
-        setRangePropsToUrl(this.props, undefined, objects);
+        setRangePropsToUrl(this.props, undefined, objects,defaultServerId);
+
 
         localStorage.setItem("selectedObjects", JSON.stringify(objects));
         this.closeSelectorPopup();
@@ -517,9 +517,7 @@ class Controller extends Component {
 
                         AgentColor.setInstances(selectedObjects, this.props.config.colorType);
                         this.props.setTarget(selectedObjects);
-
                         this.props.setServerId( [ {id: activeServerId, obj: objects} ] );
-                        setServerIdPropsToUrl(this.props, activeServerId );
                     } else {
                         this.setState({
                             servers: servers
@@ -651,7 +649,6 @@ class Controller extends Component {
                             AgentColor.setInstances(selectedObjects, this.props.config.colorType);
                             this.props.setTarget(selectedObjects);
                             this.props.setServerId([{id:activeServerId,obj:objects}]);
-                            setServerIdPropsToUrl(this.props,activeServerId);
                         } else {
                             this.setState({
                                 servers: servers

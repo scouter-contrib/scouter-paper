@@ -528,6 +528,14 @@ class XLog extends Component {
 
         this.graph.height = box.offsetHeight - this.graph.margin.top - this.graph.margin.bottom - 27;
 
+        // 캔버스 그리기
+        let canvasDiv = d3.select(this.refs.xlogViewer).select(".canvas-div");
+        if (canvasDiv.size() > 0) {
+            canvasDiv.remove();
+        }
+        canvasDiv = d3.select(this.refs.xlogViewer).append("div").attr("class", "canvas-div").style('position', 'absolute').style('top', '0px').style('left', '0px');
+        let canvas = canvasDiv.append('canvas').attr('height', this.graph.height).attr('width', this.graph.width + 20).style('position', 'absolute').style('top', this.graph.margin.top + 'px').style('left', this.graph.margin.left + 'px');
+
         let svg = d3.select(this.refs.xlogViewer).select("svg");
         if (svg.size() > 0) {
             svg.remove();
@@ -572,16 +580,6 @@ class XLog extends Component {
 
 
         this.graph.focus = svg.append("g").attr("class", "tooltip-focus");
-
-        // 캔버스 그리기
-        let canvasDiv = d3.select(this.refs.xlogViewer).select(".canvas-div");
-        if (canvasDiv.size() > 0) {
-            canvasDiv.remove();
-        }
-        canvasDiv = d3.select(this.refs.xlogViewer).append("div").attr("class", "canvas-div").style('position', 'absolute').style('top', '0px').style('left', '0px');
-
-
-        let canvas = canvasDiv.append('canvas').attr('height', this.graph.height).attr('width', this.graph.width + 20).style('position', 'absolute').style('top', this.graph.margin.top + 'px').style('left', this.graph.margin.left + 'px');
 
 
         d3.select(this.refs.xlogViewer).select(".canvas-div")

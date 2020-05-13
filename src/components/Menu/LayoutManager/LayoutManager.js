@@ -8,8 +8,8 @@ import {
     errorHandler,
     getCurrentUser,
     getData,
-    getDefaultServerId,
     getHttpProtocol,
+    getParam,
     getWithCredentials,
     setAuthHeader,
     setData
@@ -55,7 +55,7 @@ class LayoutManager extends Component {
     }
 
     getScouterApiServerId = (serverId) => {
-        return serverId.server ? serverId.server[0].id : getDefaultServerId(this.props.config);
+        return serverId.server ? serverId.server[0].id : getParam(this.props,'activesid');
     };
 
     saveTemplate = (templates) => {
