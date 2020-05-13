@@ -897,6 +897,10 @@ export function timeMiToMs(min){
     return min * 60 * 1000;
 
 }
+export function timeHourToMin(hour){
+    return hour * 60;
+
+}
 // 브라우저 내에서 object 파일 다운로드 파일 방법 참고
 // https://stackoverflow.com/questions/19721439/download-json-object-as-a-file-from-browser
 export function saveJSON(data, filename){

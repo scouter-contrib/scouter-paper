@@ -393,6 +393,7 @@ class Paper extends Component {
             }
         }
 
+
         if (JSON.stringify(this.props.filterMap) !== JSON.stringify(nextProps.filterMap)) {
             this.getVisitor(nextProps);
         }
@@ -450,6 +451,26 @@ class Paper extends Component {
                 this.setXlogFilterByUrl(boxKey, JSON.parse(xlogfilter));
             this.isLoading = true;
         }
+
+        // Last 시간이 변경이 변경 되면 ... 화면 갱신
+        if(this.props.config.realTimeLastRange !== nextProps.config.realTimeLastRange){
+            if(this.props.range.realTime){
+                this.counterHistoriesLoaded = {};
+                clearInterval(this.dataRefreshTimer);
+                this.dataRefreshTimer = null;
+
+                let now = (new ServerDate()).getTime();
+                let ten = (this.props.config.preload === "Y") ? timeMiToMs(this.props.config.realTimeLastRange) : 1000;
+                this.getCounterHistory(this.props.objects, now - ten, now, false);
+                this.getLatestData(true, this.props.objects);
+            }
+        }
+        if(this.props.config.interval !== nextProps.config.interval){
+            clearInterval(this.dataRefreshTimer);
+            this.dataRefreshTimer = null;
+            this.getLatestData(false,this.props.objects);
+        }
+
     }
 
     componentDidMount() {
