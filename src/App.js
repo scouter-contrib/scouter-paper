@@ -267,7 +267,9 @@ class App extends Component {
             .done((msg) => {
                 if (Number(msg.status) === 200) {
                     this.props.setSupported(true);
-                    this.props.setCounterInfo(msg.result.families, msg.result.objTypes);
+                    if(msg.result) {
+                        this.props.setCounterInfo(msg.result.families, msg.result.objTypes);
+                    }
                 }
             }).fail((xhr, textStatus, errorThrown) => {
                 if (handleError) {

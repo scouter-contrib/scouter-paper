@@ -213,7 +213,7 @@ class Controller extends Component {
     changeServerName = (serverId) =>{
        const  _server = common.confBuilder(getHttpProtocol(this.props.config),this.props.config,this.props.user,serverId.server[0].id);
        const _searchServerId = serverId.server[0].id;
-       ScouterApi.getSyncConnectedServer(_server)
+       ScouterApi.getConnectedServer(_server)
             .done(msg => {
                 if (msg.result && msg.result.length > 0) {
                     msg.result.filter(server => server.id === _searchServerId)
@@ -240,7 +240,7 @@ class Controller extends Component {
         if (allServerList) {
             allServerList.forEach((server) => {
                 const  _server = common.confBuilder(server.addr,this.props.config,this.props.user,null);
-                ScouterApi.getSyncConnectedServer(_server)
+                ScouterApi.getConnectedServer(_server)
                 .done(msg => {
                     if (msg.result && msg.result.length > 0) {
                         const _filter = msg.result.filter(s => s.id === this.getScouterApiServerId())
@@ -312,7 +312,7 @@ class Controller extends Component {
         }else{
             const _conf = common.confBuilder(getHttpProtocol(this.props.config),this.props.config,this.props.user,null);
             let servers = null;
-            ScouterApi.getSyncConnectedServer(_conf)
+            ScouterApi.getConnectedServer(_conf)
                 .done(msg => {
                     if (msg && msg.result) {
                         servers = msg.result;
@@ -448,7 +448,7 @@ class Controller extends Component {
 
         this.props.addRequest();
         const _conf = common.confBuilder(getHttpProtocol(this.props.config),this.props.config,this.props.user,null);
-        ScouterApi.getSyncConnectedServer(_conf)
+        ScouterApi.getConnectedServer(_conf)
         .done(msg => {
 
             if (msg && msg.result) {
@@ -542,7 +542,7 @@ class Controller extends Component {
         if (!this.init) {
             this.props.addRequest();
             const conf = common.confBuilder(getHttpProtocol(this.props.config),this.props.config,this.props.user,this.getScouterApiServerId());
-            ScouterApi.getSyncConnectedServer(conf)
+            ScouterApi.getConnectedServer(conf)
             .done((msg) => {
                 if (msg && msg.result) {
                     this.init = true;
@@ -677,7 +677,7 @@ class Controller extends Component {
         });
 
         const conf = common.confBuilder(getHttpProtocol(config),config,this.props.user,null);
-        ScouterApi.getSyncConnectedServer(conf)
+        ScouterApi.getConnectedServer(conf)
         .done(msg => {
 
             let servers = msg.result;

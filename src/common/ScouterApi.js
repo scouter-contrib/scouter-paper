@@ -131,6 +131,18 @@ export default class ScouterApi {
         });
 
     }
+    static getConnectedServer(config){
+        const {addr,conf,user} = config;
+        return jQuery.ajax({
+            method: "GET",
+            async: true,
+            dataType:"JSON",
+            url: `${addr}/scouter/v1/info/server`,
+            xhrFields: getWithCredentials(conf),
+            beforeSend: (xhr)=> setAuthHeader(xhr, conf, getCurrentUser(conf,user))
+        });
+
+    }
     //- 실시간 쪽
     static getRealTimeCounter(config,params,objects){
         const {addr,conf,user,serverId} = config;
