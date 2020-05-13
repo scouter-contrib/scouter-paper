@@ -12,7 +12,9 @@ import {
     getHttpProtocol,
     getParam,
     getWithCredentials,
-    setAuthHeader
+    setAuthHeader,
+    getData,
+    setData
 } from "../../common/common";
 import * as d3 from "d3";
 import _ from "lodash";
@@ -1040,37 +1042,45 @@ class Topology extends Component {
     };
 
     memorizeAll = (nodes) => {
-        let storageTopologyPosition = localStorage.getItem("topologyPosition");
+
+        let storageTopologyPosition = getData("topologyPosition");
         let topologyPosition = {};
 
         if (storageTopologyPosition) {
-            topologyPosition = JSON.parse(storageTopologyPosition);
+            topologyPosition = {...storageTopologyPosition}
         }
 
-        nodes.each((d) => {
-            topologyPosition[d.id] = {
-                x: d.x,
-                y: d.y
-            }
-        });
+        if(nodes) {
+            nodes.each((d) => {
+                if( d.hasOwnProperty("id") &&   d.hasOwnProperty("x") && d.hasOwnProperty("y")){
+                    topologyPosition[d.id] = {
+                        x: d.x,
+                        y: d.y
+                    }
+                }
+            });
+        }
 
-        localStorage.setItem("topologyPosition", JSON.stringify(topologyPosition));
+        setData("topologyPosition", topologyPosition);
     };
 
     memorizeNode = (node) => {
-        let storageTopologyPosition = localStorage.getItem("topologyPosition");
+        let storageTopologyPosition = getData("topologyPosition");
         let topologyPosition = {};
 
         if (storageTopologyPosition) {
-            topologyPosition = JSON.parse(storageTopologyPosition);
+            topologyPosition = {...storageTopologyPosition};
+        }
+        if(node) {
+            if( node.hasOwnProperty("id") &&   node.hasOwnProperty("x") && node.hasOwnProperty("y")) {
+                topologyPosition[node.id] = {
+                    x: node.x,
+                    y: node.y
+                };
+            }
         }
 
-        topologyPosition[node.id] = {
-            x: node.x,
-            y: node.y
-        };
-
-        localStorage.setItem("topologyPosition", JSON.stringify(topologyPosition));
+        setData(topologyPosition);
 
     };
 
