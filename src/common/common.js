@@ -1,6 +1,7 @@
 // local storage access
 import moment from "moment";
 import {Dictionary, DictType} from "./dictionary";
+
 export const version = "2.6.4";
 
 export function getData(key) {
@@ -481,6 +482,7 @@ export function replaceAllLocalSettingsForServerChange (currentServer, props, co
     if (currentServer && currentServer.address) {
         saveCurrentAllLocalSettings(currentServer, config);
         reloadAllLocalSettingsOfServer(props, config);
+
     }
 }
 
@@ -571,6 +573,10 @@ export function reloadAllLocalSettingsOfServer (props, config) {
             setData("topologyOptions", option[0].options["topologyOptions"]);
             setData("alert", option[0].options["alert"]);
             setData("activeServerId", option[0].options["activeServerId"]);
+            const activeServerId = option[0].options["activeServerId"];
+            if(activeServerId) {
+                setTargetServerToUrl0(props, server.address, server.port, server.protocol,{ activesid : activeServerId[0].id } );
+            }
         }
     }
 }

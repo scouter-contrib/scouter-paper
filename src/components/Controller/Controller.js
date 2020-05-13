@@ -41,7 +41,8 @@ import {
     getParam,
     setData,
     setRangePropsToUrl,
-    setServerTimeGap
+    setServerTimeGap,
+    setTargetServerToUrl
 } from "../../common/common";
 import PaperControl from "../Paper/PaperControl/PaperControl";
 import ScouterApi from "../../common/ScouterApi";
@@ -296,52 +297,12 @@ class Controller extends Component {
             localStorage.setItem("config", JSON.stringify(config));
         }
 
-        common.setTargetServerToUrl(this.props, config);
+        setTargetServerToUrl(this.props, config);
         common.replaceAllLocalSettingsForServerChange(currentServer, this.props, config);
         common.clearAllUrlParamOfPaper(this.props, config);
 
-
         window.location.reload();
 
-    };
-    loadActiveServerItem = (selectObjects) => {
-        const serverIds = this.props.serverId.server;
-
-        if(serverIds){
-            return serverIds[0].id;
-        }else{
-            const _conf = common.confBuilder(getHttpProtocol(this.props.config),this.props.config,this.props.user,null);
-            let servers = null;
-            ScouterApi.getConnectedServer(_conf)
-                .done(msg => {
-                    if (msg && msg.result) {
-                        servers = msg.result;
-                    }
-                });
-            if(servers){
-                const [server] = servers.filter(server => {
-                    const _sconf = common.confBuilder(getHttpProtocol(this.props.config),this.props.config,this.props.user,server.id);
-                    let matchingCnt = 0;
-                    ScouterApi.getSyncInstanceObjects(_sconf)
-                        .done(msg => {
-                            const objects = msg.result;
-                            if (objects && objects.length > 0) {
-                                objects.forEach((instance) => {
-                                    selectObjects.forEach((obj) => {
-                                        if ( obj.objHash === instance.objHash) {
-                                            matchingCnt++;
-                                        }
-                                    });
-                                })
-                            }
-                        });
-                    return matchingCnt === selectObjects.length;
-                });
-                return server ? server.id : null;
-            }else{
-                return null
-            }
-        }
     };
 
     setObjects = () => {
@@ -359,7 +320,7 @@ class Controller extends Component {
         AgentColor.setInstances(objects, this.props.config.colorType);
         this.props.setTarget(objects);
         const {activeServerId } = this.state;
-        const defaultServerId = activeServerId ? activeServerId : this.loadActiveServerItem(objects);
+        const defaultServerId = activeServerId ? activeServerId : this.getScouterApiServerId();
 
         this.props.setControlVisibility("TargetSelector", false);
 
