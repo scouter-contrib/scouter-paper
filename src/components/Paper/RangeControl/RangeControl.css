@@ -148,6 +148,21 @@
     border-radius: 0 3px 3px 0;
     border-left: none;
 }
+.range-controls .time-type > div.real-time-meta_info {
+    width: 102px;
+    border-radius: 0 3px 3px 0;
+    border-left: none;
+    font-size: 10px;
+    text-align: left;
+    background-color: #FFF6C7;
+    position: relative;
+    top: 1px;
+    left: 2px;
+    cursor: default;
+}
+.range-controls .time-type > div.real-time-meta_info .meta-text{
+    padding-left: 2px;
+}
 
 .range-controls .time-type > div.time-type-item:hover {
     background-color: #FFF6C7;

@@ -413,14 +413,7 @@ class Paper extends Component {
             });
 
             if (nextProps.range.realTime) {
-                this.counterHistoriesLoaded = {};
-                clearInterval(this.dataRefreshTimer);
-                this.dataRefreshTimer = null;
-
-                let now = (new ServerDate()).getTime();
-                let ten = (this.props.config.preload === "Y") ? timeMiToMs(this.props.config.realTimeLastRange) : 1000;
-                this.getCounterHistory(this.props.objects, now - ten, now, false);
-                this.getLatestData(true, this.props.objects);
+                this.reloadPreloadData(nextProps.config.realTimeLastRange);
             } else {
                 clearInterval(this.dataRefreshTimer);
                 this.dataRefreshTimer = null;
@@ -435,9 +428,9 @@ class Paper extends Component {
 
         // get box key & set xlog filter by url
         let boxKey;
-        for (let i = 0; i < this.props.boxes.length; i++) {
-            let title = this.props.boxes[i].title;
-            let key = this.props.boxes[i].key;
+        for (const box of this.props.boxes) {
+            let title = box.title;
+            let key = box.key;
 
             if(title === "XLOG") {
                 boxKey = key;
@@ -455,22 +448,28 @@ class Paper extends Component {
         // Last 시간이 변경이 변경 되면 ... 화면 갱신
         if(this.props.config.realTimeLastRange !== nextProps.config.realTimeLastRange){
             if(this.props.range.realTime){
-                this.counterHistoriesLoaded = {};
-                clearInterval(this.dataRefreshTimer);
-                this.dataRefreshTimer = null;
-
-                let now = (new ServerDate()).getTime();
-                let ten = (this.props.config.preload === "Y") ? timeMiToMs(this.props.config.realTimeLastRange) : 1000;
-                this.getCounterHistory(this.props.objects, now - ten, now, false);
-                this.getLatestData(true, this.props.objects);
+                this.reloadPreloadData(nextProps.config.realTimeLastRange);
             }
         }
         if(this.props.config.interval !== nextProps.config.interval){
-            clearInterval(this.dataRefreshTimer);
-            this.dataRefreshTimer = null;
-            this.getLatestData(false,this.props.objects);
+            this.resetCounterTimer();
         }
 
+    }
+    reloadPreloadData(realTimeLastRange){
+        this.counterHistoriesLoaded = {};
+        clearInterval(this.dataRefreshTimer);
+        this.dataRefreshTimer = null;
+
+        let now = (new ServerDate()).getTime();
+        let ten = (this.props.config.preload === "Y") ? timeMiToMs(realTimeLastRange) : 1000;
+        this.getCounterHistory(this.props.objects, now - ten, now, false);
+        this.getLatestData(true, this.props.objects);
+    };
+    resetCounterTimer(){
+        clearInterval(this.dataRefreshTimer);
+        this.dataRefreshTimer = null;
+        this.getLatestData(false,this.props.objects);
     }
 
     componentDidMount() {

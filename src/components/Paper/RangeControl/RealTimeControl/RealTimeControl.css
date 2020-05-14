@@ -2,52 +2,36 @@
   display: flex;
   width: 100%;
 }
-.realtime-controller .meta-info {
-  margin-top: 2px;
-}
-.realtime-controller .meta-info .meta-text {
-  padding-left: 2px;
-}
 .realtime-controller .time-range {
-  margin-top: 2px;
   border: 1px;
 }
 .realtime-controller .time-range .time-control {
   display: inline-flex;
-  background-color: #999;
   box-sizing: border-box;
 }
-.realtime-controller .time-range .time-control .time-last {
-  position: relative;
-}
-.realtime-controller .time-range .time-control .time-value {
-  position: relative;
-  left: 2px;
-}
-.realtime-controller .time-range .time-control .time-unit {
-  position: relative;
-  left: 4px;
-}
+.realtime-controller .time-range .time-control .time-last >select,
+.realtime-controller .time-range .time-control .time-value >select,
 .realtime-controller .time-range .time-control .time-unit >select {
   width: 80px;
   height: 26px;
 }
 .realtime-controller .time-range .time-control .time-apply {
   position: relative;
-  left: 6px;
+  right: 2px;
 }
 .realtime-controller .time-range .time-control .time-apply >button {
   height: 26px;
 }
 .realtime-controller .time-range .time-control .refresh-every {
   position: relative;
-  left: 10px;
   display: inline-flex;
+  background-color: #aaa;
 }
 .realtime-controller .time-range .time-control .refresh-every .refresh-icon {
   position: relative;
   font-size: 14px;
   margin-top: 6px;
+  padding-left: 3px;
 }
 .realtime-controller .time-range .time-control .refresh-every .refresh-select {
   position: relative;
@@ -58,7 +42,7 @@
   height: 26px;
 }
 .realtime-controller input {
-  width: 35px;
+  width: 45px;
   height: 20px;
   text-align: center;
 }

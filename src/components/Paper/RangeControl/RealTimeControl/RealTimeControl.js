@@ -43,10 +43,6 @@ class RealTimeControl extends Component {
 
         return (
             <div className="realtime-controller">
-                <div className="meta-info">
-                    <span><i className="fa fa-clock-o"></i></span>
-                    <span className="meta-text">LAST {this.props.config.realTimeLastRange}minutes</span>
-                </div>
                 <div className="time-range">
                     <div className="time-control">
                         <div className="time-last">

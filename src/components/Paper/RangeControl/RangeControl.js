@@ -169,8 +169,13 @@ class RangeControl extends Component {
             <div className={"range-controls noselect " + (this.props.visible ? 'visible ' : ' ') + (this.props.fixedControl ? 'fixed' : '') }>
                 <div className="time-type">
                     <div onClick={this.changeTimeType.bind(this, "realtime")} className={"time-type-item real-time " + (this.props.range.realTime ? "selected" : "")}>REALTIME</div>
-
                     <div onClick={this.changeTimeType.bind(this, "search")} className={"time-type-item search-time " + (!this.props.range.realTime ? "selected" : "")}>SEARCH</div>
+                    { this.props.range.realTime &&<div className="time-type-item real-time-meta_info">
+                        <span><i className="fa fa-clock-o"></i></span>
+                        <span className="meta-text">LAST {this.props.config.realTimeLastRange}minutes</span>
+                    </div>
+
+                    }
                     {!this.props.range.realTime &&
                     <div onClick={this.changeLongTerm.bind(this)} className={"time-type-item longterm-time " + (this.props.range.longTerm ? "selected " : " ") + (this.props.range.realTime ? "disabled" : "")}>{this.props.config.range.longHistoryRange / 24}D</div>
                     }
@@ -189,7 +194,9 @@ class RangeControl extends Component {
                     </div>
                     }
                 </div>
-                {this.props.range.realTime && <RealTimeControl changeTimeType={this.changeTimeType} />}
+                {this.props.range.realTime &&
+                    <RealTimeControl changeTimeType={this.changeTimeType} />
+                }
                 {!this.props.range.realTime &&
                 <div className="time-controller">
                     {this.props.range.fromPast &&
