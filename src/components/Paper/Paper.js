@@ -454,7 +454,6 @@ class Paper extends Component {
                 this.setState({
                     data: data
                 },()=>{
-                    console.log('callback.')
                     this.reloadPreloadData(nextProps.config.realTimeLastRange);
                 });
             }
