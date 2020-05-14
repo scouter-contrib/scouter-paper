@@ -31,13 +31,18 @@ class RealTimeControl extends Component {
         if(unit === "unit_h"){
             min = timeHourToMin(value);
         }
-        const apply = {...this.props.config,realTimeLastRange: min};
+
+        const apply = {...this.props.config,
+                        realTimeLastRange: Number(min),
+                        realTimeXLogLastRange: this.props.realTimeWithXlog?Number(min): 10};
         this.props.setConfig(apply);
-        setData(apply);
+        setData('config',apply);
 
     };
     refreshClick=(event)=>{
-        this.props.setConfig({...this.props.config,interval: Number(event.target.value)})
+        const interval = {...this.props.config,interval: Number(event.target.value)}
+        this.props.setConfig(interval);
+        setData('config',interval);
     };
     render() {
 
@@ -66,7 +71,6 @@ class RealTimeControl extends Component {
                             </span>
                             <div className="refresh-select">
                             <select value={this.props.config.interval} onChange={this.refreshClick}>
-                                {/*<option value="-1">OFF</option>*/}
                                 <option value="2000">2s</option>
                                 <option value="5000">5s</option>
                                 <option value="10000">10s</option>

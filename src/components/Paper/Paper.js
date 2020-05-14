@@ -446,9 +446,17 @@ class Paper extends Component {
         }
 
         // Last 시간이 변경이 변경 되면 ... 화면 갱신
-        if(this.props.config.realTimeLastRange !== nextProps.config.realTimeLastRange){
+        if( this.props.config.realTimeLastRange !== nextProps.config.realTimeLastRange
+           || this.props.config.realTimeXLogLastRange !== nextProps.config.realTimeXLogLastRange ){
             if(this.props.range.realTime){
-                this.reloadPreloadData(nextProps.config.realTimeLastRange);
+                const data = this.state.data;
+                data['range'] = timeMiToMs(nextProps.config.realTimeXLogLastRange);
+                this.setState({
+                    data: data
+                },()=>{
+                    console.log('callback.')
+                    this.reloadPreloadData(nextProps.config.realTimeLastRange);
+                });
             }
         }
         if(this.props.config.interval !== nextProps.config.interval){
