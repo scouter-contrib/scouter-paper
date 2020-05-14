@@ -6,7 +6,16 @@ import logo from "../../img/scouter.png";
 import logoBlack from "../../img/scouter_black.png";
 import {addRequest, pushMessage, setControlVisibility, setTopologyOption} from "../../actions";
 import jQuery from "jquery";
-import {errorHandler, getCurrentUser, getHttpProtocol, getWithCredentials, setAuthHeader} from "../../common/common";
+import {
+    errorHandler,
+    getCurrentUser,
+    getHttpProtocol,
+    getParam,
+    getWithCredentials,
+    setAuthHeader,
+    getData,
+    setData
+} from "../../common/common";
 import * as d3 from "d3";
 import _ from "lodash";
 import numeral from "numeral";
@@ -450,7 +459,9 @@ class Topology extends Component {
         }
         return result;
     };
-
+    getScouterApiServerId = () => {
+        return this.props.serverId.server ? this.props.serverId.server[0].id : getParam(this.props,'activesid');
+    };
     getTopology = (config, filterMap, user, grouping) => {
 
         let that = this;
@@ -462,7 +473,7 @@ class Topology extends Component {
             jQuery.ajax({
                 method: "GET",
                 async: true,
-                url: getHttpProtocol(config) + '/scouter/v1/interactionCounter/realTime?objHashes=' + JSON.stringify(objects.map((instance) => {
+                url: getHttpProtocol(config) + `/scouter/v1/interactionCounter/realTime?serverId=${this.getScouterApiServerId()}&objHashes=` + JSON.stringify(objects.map((instance) => {
                     return Number(instance);
                 })),
                 xhrFields: getWithCredentials(config),
@@ -1031,37 +1042,45 @@ class Topology extends Component {
     };
 
     memorizeAll = (nodes) => {
-        let storageTopologyPosition = localStorage.getItem("topologyPosition");
+
+        let storageTopologyPosition = getData("topologyPosition");
         let topologyPosition = {};
 
         if (storageTopologyPosition) {
-            topologyPosition = JSON.parse(storageTopologyPosition);
+            topologyPosition = {...storageTopologyPosition}
         }
 
-        nodes.each((d) => {
-            topologyPosition[d.id] = {
-                x: d.x,
-                y: d.y
-            }
-        });
+        if(nodes) {
+            nodes.each((d) => {
+                if( d.hasOwnProperty("id") &&   d.hasOwnProperty("x") && d.hasOwnProperty("y")){
+                    topologyPosition[d.id] = {
+                        x: d.x,
+                        y: d.y
+                    }
+                }
+            });
+        }
 
-        localStorage.setItem("topologyPosition", JSON.stringify(topologyPosition));
+        setData("topologyPosition", topologyPosition);
     };
 
     memorizeNode = (node) => {
-        let storageTopologyPosition = localStorage.getItem("topologyPosition");
+        let storageTopologyPosition = getData("topologyPosition");
         let topologyPosition = {};
 
         if (storageTopologyPosition) {
-            topologyPosition = JSON.parse(storageTopologyPosition);
+            topologyPosition = {...storageTopologyPosition};
+        }
+        if(node) {
+            if( node.hasOwnProperty("id") &&   node.hasOwnProperty("x") && node.hasOwnProperty("y")) {
+                topologyPosition[node.id] = {
+                    x: node.x,
+                    y: node.y
+                };
+            }
         }
 
-        topologyPosition[node.id] = {
-            x: node.x,
-            y: node.y
-        };
-
-        localStorage.setItem("topologyPosition", JSON.stringify(topologyPosition));
+        setData(topologyPosition);
 
     };
 
@@ -1460,7 +1479,8 @@ let mapStateToProps = (state) => {
         counterInfo: state.counterInfo,
         supported: state.supported,
         filterMap: state.target.filterMap,
-        topologyOption: state.topologyOption
+        topologyOption: state.topologyOption,
+        serverId: state.serverId
     };
 };
 

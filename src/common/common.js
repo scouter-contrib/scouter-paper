@@ -1,6 +1,7 @@
 // local storage access
 import moment from "moment";
 import {Dictionary, DictType} from "./dictionary";
+
 export const version = "2.6.4";
 
 export function getData(key) {
@@ -17,7 +18,9 @@ export function getData(key) {
 
 export function setData(key, value) {
     if (window.localStorage) {
-        window.localStorage.setItem(key, JSON.stringify(value));
+        if(value && value !== "null" && value !== "undefined") {
+            window.localStorage.setItem(key, JSON.stringify(value));
+        }
     }
 }
 
@@ -66,6 +69,7 @@ export function getHttpProtocol(config) {
         return null;
     }
 }
+
 export function getDefaultServerId(config) {
     if (config.servers && config.servers.length > 0) {
         let server = config.servers.filter((server) => server.default);
@@ -376,7 +380,7 @@ export function setXlogfilterToUrl (props, filter) {
 
 }
 
-export function setRangePropsToUrl (props, pathname, objects) {
+export function setRangePropsToUrl (props, pathname, objects,activeServerId=null) {
     let search = new URLSearchParams(props.location.search);
 
     if (objects) {
@@ -408,6 +412,9 @@ export function setRangePropsToUrl (props, pathname, objects) {
     search.set("from", from.format("YYYYMMDDHHmmss"));
     search.set("to", to.format("YYYYMMDDHHmmss"));
     search.set("fromPast", props.range.fromPast);
+    if(activeServerId){
+        search.set("activesid", activeServerId);
+    }
 
     if (props.location.search !== ("?" + search.toString())) {
         if (pathname) {
@@ -416,6 +423,19 @@ export function setRangePropsToUrl (props, pathname, objects) {
                 search: "?" + search.toString()
             });
         } else {
+            props.history.replace({
+                pathname: props.location.pathname,
+                search: "?" + search.toString()
+            });
+        }
+    }
+}
+export function setServerIdPropsToUrl (props, activeServerId) {
+    console.log('setServerIdPropsToUrlsetServerIdPropsToUrl...');
+    let search = new URLSearchParams(props.location.search);
+    if(activeServerId){
+        search.set("activesid", activeServerId);
+        if (props.location.search !== ("?" + search.toString())) {
             props.history.replace({
                 pathname: props.location.pathname,
                 search: "?" + search.toString()
@@ -462,9 +482,53 @@ export function replaceAllLocalSettingsForServerChange (currentServer, props, co
     if (currentServer && currentServer.address) {
         saveCurrentAllLocalSettings(currentServer, config);
         reloadAllLocalSettingsOfServer(props, config);
+
     }
 }
 
+export function importAllLocalSetting(importTxt,thisConfig) {
+    const read = JSON.parse(importTxt);
+    setData("config", read["config"]);
+    setData(ALL_OPTIONS_OF_SERVER_KEY, read[ALL_OPTIONS_OF_SERVER_KEY]);
+    const defaultOption = read["options"];
+
+
+    setData("selectedObjects", defaultOption["selectedObjects"]);
+    setData("templateName", defaultOption["templateName"]);
+    setData("layouts", defaultOption["layouts"]);
+    setData("boxes", defaultOption["boxes"]);
+    setData("preset", defaultOption["preset"]);
+    setData("profileOptions", defaultOption["profileOptions"]);
+    setData("topologyPosition", defaultOption["topologyPosition"]);
+    setData("topologyOptions", defaultOption["topologyOptions"]);
+    setData("alert",defaultOption["alert"]);
+    setData("activeServerId", defaultOption["activeServerId"]);
+
+    return read["config"];
+}
+export function exportAllLocalSettings (currentServer, config) {
+    saveCurrentAllLocalSettings(currentServer);
+
+
+    const allOptionsOfServer = getData(ALL_OPTIONS_OF_SERVER_KEY);
+    const result = {};
+    result[ALL_OPTIONS_OF_SERVER_KEY] = allOptionsOfServer;
+    result['config'] = config;
+
+    return {...result, options: {
+                            selectedObjects : getData("selectedObjects"),
+                            templateName : getData("templateName"),
+                            layouts : getData("layouts"),
+                            boxes : getData("boxes"),
+                            preset : getData("preset"),
+                            profileOptions : getData("profileOptions"),
+                            topologyPosition : getData("topologyPosition"),
+                            topologyOptions : getData("topologyOptions"),
+                            alert : getData("alert"),
+                            activeServerId : getData("activeServerId")
+    }};
+
+}
 export function saveCurrentAllLocalSettings (currentServer, config) {
     const serverKey = currentServer.address + ":" + currentServer.port;
 
@@ -479,7 +543,8 @@ export function saveCurrentAllLocalSettings (currentServer, config) {
             profileOptions : getData("profileOptions"),
             topologyPosition : getData("topologyPosition"),
             topologyOptions : getData("topologyOptions"),
-            alert : getData("alert")
+            alert : getData("alert"),
+            activeServerId : getData("activeServerId")
         }
     };
 
@@ -507,6 +572,11 @@ export function reloadAllLocalSettingsOfServer (props, config) {
             setData("topologyPosition", option[0].options["topologyPosition"]);
             setData("topologyOptions", option[0].options["topologyOptions"]);
             setData("alert", option[0].options["alert"]);
+            setData("activeServerId", option[0].options["activeServerId"]);
+            const activeServerId = option[0].options["activeServerId"];
+            if(activeServerId) {
+                setTargetServerToUrl0(props, server.address, server.port, server.protocol,{ activesid : activeServerId[0].id } );
+            }
         }
     }
 }
@@ -813,6 +883,7 @@ export function updateQueryStringParameter(uri, key, value) {
         return uri + separator + key + "=" + value;
     }
 }
+
 export function confBuilder(addr,conf,user,serverId){
     return {
         addr  : addr,
@@ -825,4 +896,33 @@ export function confBuilder(addr,conf,user,serverId){
 export function timeMiToMs(min){
     return min * 60 * 1000;
 
+}
+export function timeHourToMin(hour){
+    return hour * 60;
+
+}
+// 브라우저 내에서 object 파일 다운로드 파일 방법 참고
+// https://stackoverflow.com/questions/19721439/download-json-object-as-a-file-from-browser
+export function saveJSON(data, filename){
+
+    if(!data) {
+        console.error('No data');
+        return;
+    }
+
+    if(!filename) filename = 'console.json';
+
+    if(typeof data === "object"){
+        data = JSON.stringify(data, undefined, 4);
+    }
+
+    const blob = new Blob([data], {type: 'text/json'});
+    const  e   = document.createEvent('MouseEvents');
+    const  a   = document.createElement('a');
+
+    a.download = filename;
+    a.href = window.URL.createObjectURL(blob);
+    a.dataset.downloadurl =  ['text/json', a.download, a.href].join(':');
+    e.initMouseEvent('click', true, false, window, 0, 0, 0, 0, 0, false, false, false, false, 0, null);
+    a.dispatchEvent(e);
 }

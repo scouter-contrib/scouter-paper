@@ -1,5 +1,9 @@
 // XLogDataController.java
 // SingleXLogRequest
+###
+GET http://demo.scouterapm.com:6188/scouter/v1/kv/__scouter_paper_layout/
+Accept: application/json
+###
 GET http://demo.scouterapm.com:6188/scouter/v1/xlog-data/{yyyymmdd}/{txid}
 #
 ###

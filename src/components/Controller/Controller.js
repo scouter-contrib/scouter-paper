@@ -15,6 +15,7 @@ import {
     setFilterMap,
     setLayouts,
     setPresetName,
+    setServerId,
     setTarget
 } from "../../actions";
 import {connect} from "react-redux";
@@ -30,23 +31,22 @@ import * as PaperIcons from "../../common/PaperIcons";
 import LayoutManager from "../Menu/LayoutManager/LayoutManager";
 import PresetManager from "../Menu/PresetManager/PresetManager";
 import * as _ from "lodash";
+import * as common from "../../common/common";
 import {
     buildHttpProtocol,
     errorHandler,
-    getCurrentUser,
     getDefaultServerConfig,
     getDefaultServerConfigIndex,
     getHttpProtocol,
-    getWithCredentials,
-    setAuthHeader,
+    getParam,
     setData,
     setRangePropsToUrl,
-    setServerTimeGap
+    setServerTimeGap,
+    setTargetServerToUrl
 } from "../../common/common";
-import jQuery from "jquery";
 import PaperControl from "../Paper/PaperControl/PaperControl";
-import * as common from "../../common/common";
 import ScouterApi from "../../common/ScouterApi";
+
 
 class Controller extends Component {
 
@@ -55,6 +55,7 @@ class Controller extends Component {
         this.state = {
             servers: [],
             activeServerId: null,
+            counterInfo: {},
             objects: [],
             selectedObjects: JSON.parse(localStorage.getItem("selectedObjects")) || {},
             filter: "",
@@ -78,7 +79,6 @@ class Controller extends Component {
             }
         }
         common.setTargetServerToUrl(this.props, this.props.config);
-
         if (localStorage.getItem("selectedObjects")) {
             let selectedObjects = JSON.parse(localStorage.getItem("selectedObjects"));
             if (selectedObjects.objects) {
@@ -89,6 +89,7 @@ class Controller extends Component {
         }
 
         this.getConfigServerName();
+
 
     }
 
@@ -106,6 +107,11 @@ class Controller extends Component {
                 currentTab: "CONTROL"
             });
         }
+        if (this.props.serverId.server) {
+            if( this.props.serverId.server[0].id !== nextProps.serverId.server[0].id) {
+                this.changeServerName(nextProps.serverId)
+            }
+        }
     }
 
     componentDidUpdate(prevProps, prevState) {
@@ -119,43 +125,56 @@ class Controller extends Component {
     }
 
     setObjectUpdate() {
-        const _urlObjectHashs = [new URLSearchParams(this.props.location.search).get('objects'),
-            new URLSearchParams(this.props.location.search).get('instances')]
-            .filter(_urlObjHashs => _urlObjHashs ? true : false);
+
+        const _urlObjectHashs = [ new URLSearchParams(this.props.location.search).get('objects'),
+                                  new URLSearchParams(this.props.location.search).get('instances')]
+                                 .filter(_urlObjHashs => _urlObjHashs ? true : false);
         try {
-            const [_objectHashs] = _urlObjectHashs;
-            const that = this.props;
-            jQuery.ajax({
-                method: "GET",
-                async: false,
-                url: `${getHttpProtocol(this.props.config)}/scouter/v1/object?serverId=${this.state.activeServerId}`,
-                xhrFields: getWithCredentials(this.props.config),
-                beforeSend: function (xhr) {
-                    setAuthHeader(xhr, that.config, getCurrentUser(that.config, that.user));
-                }
-            }).done((msg) => {
-                const objects = msg.result;
-                if (objects) {
-                    if (_objectHashs) {
-                        const _selectorObjHashs = _objectHashs.split(",").map(d => Number(d));
-                        const _selectedObjects = objects.filter(_obj => {
-                            return _selectorObjHashs.filter(_select => _select === Number(_obj.objHash)).length > 0;
-                        }).sort((a, b) => a.objName < b.objName ? -1 : 1);
-                        const _selectedObjectsMap = _selectedObjects.reduce((obj, item) => {
-                            obj[item.objHash] = item;
-                            return obj;
-                        }, {});
-                        this.setState({
-                            objects: objects,
-                            selectedObjects: _selectedObjectsMap
-                        });
-                    } else {
-                        this.setState({
-                            objects: objects
-                        });
+            const _conf = common.confBuilder(getHttpProtocol(this.props.config),this.props.config,this.props.user,this.state.activeServerId);
+            const _promise = [ScouterApi.getInstanceObjects(_conf),ScouterApi.getCounterModel(_conf)];
+            Promise.all(_promise).then((msg) => {
+                const [instanceObj,countInfo] = msg;
+                if (instanceObj.result) {
+                    const objects = instanceObj.result;
+                    let objTypesMap = {};
+                    let familyNameIcon = {};
+                    countInfo.result.objTypes.forEach((objType) => {
+                        objTypesMap[objType.name] = objType;
+                        familyNameIcon[objType.familyName] = objType.icon;
+                    });
+                    this.setState({
+                        counterInfo: {
+                            families: countInfo.result.families,
+                            objTypesMap : objTypesMap,
+                            familyNameIcon : familyNameIcon
+                        }
+
+                    });
+                    if (objects) {
+                        const [_objectHashs] = _urlObjectHashs;
+                        if (_objectHashs) {
+                            const _selectorObjHashs = _objectHashs.split(",").map(d => Number(d));
+                            const _selectedObjects = objects.filter(_obj => {
+                                return _selectorObjHashs.filter(_select => _select === Number(_obj.objHash)).length > 0;
+                            }).sort((a, b) => a.objName < b.objName ? -1 : 1);
+                            const _selectedObjectsMap = _selectedObjects.reduce((obj, item) => {
+                                obj[item.objHash] = item;
+                                return obj;
+                            }, {});
+                            this.setState({
+                                objects: objects,
+                                selectedObjects: _selectedObjectsMap
+                            });
+                        } else {
+                            this.setState({
+                                objects: objects
+                            });
+                        }
                     }
                 }
+
             });
+
         } catch (error) {
             console.error(error);
         }
@@ -192,7 +211,29 @@ class Controller extends Component {
             selector: !this.state.preset ? false : this.state.preset
         });
     };
-
+    changeServerName = (serverId) =>{
+       const  _server = common.confBuilder(getHttpProtocol(this.props.config),this.props.config,this.props.user,serverId.server[0].id);
+       const _searchServerId = serverId.server[0].id;
+       ScouterApi.getConnectedServer(_server)
+            .done(msg => {
+                if (msg.result && msg.result.length > 0) {
+                    msg.result.filter(server => server.id === _searchServerId)
+                               .forEach( server =>{
+                                    const name = `${server.name} (${getHttpProtocol(this.props.config)})`;
+                                    const _conf = _.clone(this.props.config);
+                                    _conf.servers.filter(_server => _server.default)
+                                        .forEach(_server => {
+                                            _server.name = name;
+                                            _server.id = _searchServerId;
+                                        });
+                                    this.props.setConfig(_conf);
+                                });
+                }
+            })
+    };
+    getScouterApiServerId = () => {
+        return this.props.serverId.server? this.props.serverId.server[0].id : getParam(this.props,'activesid');
+    };
     getConfigServerName = () => {
         let allServerList = buildHttpProtocol(this.props.config);
         let serverNames = {};
@@ -200,10 +241,12 @@ class Controller extends Component {
         if (allServerList) {
             allServerList.forEach((server) => {
                 const  _server = common.confBuilder(server.addr,this.props.config,this.props.user,null);
-                ScouterApi.getSyncConnectedServer(_server)
+                ScouterApi.getConnectedServer(_server)
                 .done(msg => {
                     if (msg.result && msg.result.length > 0) {
-                        serverNames[server.key] = { info : msg.result[0]};
+                        const _filter = msg.result.filter(s => s.id === this.getScouterApiServerId())
+                        const _info = _filter.length > 0 ? _filter[0] : msg.result[0];
+                        serverNames[server.key] = { info : _info};
 
                     } else {
                         serverNames[server.key] =  {
@@ -254,19 +297,17 @@ class Controller extends Component {
             localStorage.setItem("config", JSON.stringify(config));
         }
 
-        common.setTargetServerToUrl(this.props, config);
+        setTargetServerToUrl(this.props, config);
         common.replaceAllLocalSettingsForServerChange(currentServer, this.props, config);
         common.clearAllUrlParamOfPaper(this.props, config);
-        //- server가 바뀌어 쓰므로 해당 설정이 같이 삭제 되어야함
-        localStorage.removeItem("selectedObjects");
-        localStorage.removeItem("topologyOptions");
-        localStorage.removeItem("topologyPosition");
+
         window.location.reload();
 
     };
 
     setObjects = () => {
         let objects = [];
+
         for (let hash in this.state.selectedObjects) {
             objects.push(this.state.selectedObjects[hash]);
         }
@@ -275,12 +316,20 @@ class Controller extends Component {
             this.props.pushMessage("info", "NO MONITORING TARGET", "At least one object must be selected");
             this.props.setControlVisibility("Message", true);
         }
-
         objects.sort((a, b) => a.objName < b.objName ? -1 : 1);
         AgentColor.setInstances(objects, this.props.config.colorType);
         this.props.setTarget(objects);
+        const {activeServerId } = this.state;
+        const defaultServerId = activeServerId ? activeServerId : this.getScouterApiServerId();
+
         this.props.setControlVisibility("TargetSelector", false);
-        setRangePropsToUrl(this.props, undefined, objects);
+
+        if(defaultServerId) {
+            this.props.setServerId([{id: defaultServerId, obj: objects}]);
+        }
+        setRangePropsToUrl(this.props, undefined, objects,defaultServerId);
+
+
         localStorage.setItem("selectedObjects", JSON.stringify(objects));
         this.closeSelectorPopup();
     };
@@ -318,26 +367,38 @@ class Controller extends Component {
 
 
     onServerClick = (serverId) => {
-        let that = this;
         this.props.addRequest();
         const _conf = common.confBuilder(getHttpProtocol(this.props.config),this.props.config,this.props.user,serverId);
-       ScouterApi.getInstanceObjects(_conf)
-           .done((msg) => {
-            if (msg.result) {
-                that.setState({
-                    activeServerId: serverId
+        const _promise = [ScouterApi.getInstanceObjects(_conf),ScouterApi.getCounterModel(_conf)];
+        Promise.all(_promise).then((msg) => {
+            const [instanceObj,countInfo] = msg;
+            if (instanceObj.result) {
+                const objects = instanceObj.result;
+                let objTypesMap = {};
+                let familyNameIcon = {};
+                countInfo.result.objTypes.forEach((objType) => {
+                    objTypesMap[objType.name] = objType;
+                    familyNameIcon[objType.familyName] = objType.icon;
                 });
+                this.setState({
+                    activeServerId: serverId,
+                    servers: this.state.servers.map(host => ({...host,selectedObjectCount: null}) ),
+                    selectedObjects: {} ,
+                    counterInfo: {
+                        families: countInfo.result.families,
+                        objTypesMap : objTypesMap,
+                        familyNameIcon : familyNameIcon
+                    }
 
-                const objects = msg.result;
+                });
                 if (objects) {
                     objects.sort((a, b) => a.objName < b.objName ? -1 : 1);
                     this.setState({
-                        objects: msg.result
+                        objects: instanceObj.result,
                     });
                 }
             }
-        }).fail((xhr, textStatus, errorThrown) => {
-            errorHandler(xhr, textStatus, errorThrown, that.props, "onServerClick", true);
+
         });
     };
 
@@ -348,7 +409,7 @@ class Controller extends Component {
 
         this.props.addRequest();
         const _conf = common.confBuilder(getHttpProtocol(this.props.config),this.props.config,this.props.user,null);
-        ScouterApi.getSyncConnectedServer(_conf)
+        ScouterApi.getConnectedServer(_conf)
         .done(msg => {
 
             if (msg && msg.result) {
@@ -417,7 +478,7 @@ class Controller extends Component {
 
                         AgentColor.setInstances(selectedObjects, this.props.config.colorType);
                         this.props.setTarget(selectedObjects);
-
+                        this.props.setServerId( [ {id: activeServerId, obj: objects} ] );
                     } else {
                         this.setState({
                             servers: servers
@@ -441,8 +502,8 @@ class Controller extends Component {
     setTargetFromUrl = () => {
         if (!this.init) {
             this.props.addRequest();
-            const conf = common.confBuilder(getHttpProtocol(this.props.config),this.props.config,this.props.user,null);
-            ScouterApi.getSyncConnectedServer(conf)
+            const conf = common.confBuilder(getHttpProtocol(this.props.config),this.props.config,this.props.user,this.getScouterApiServerId());
+            ScouterApi.getConnectedServer(conf)
             .done((msg) => {
                 if (msg && msg.result) {
                     this.init = true;
@@ -481,6 +542,7 @@ class Controller extends Component {
                         let objects = [];
                         let activeServerId = null;
                         servers.forEach(server => {
+
                             //일단 단일 서버로 가정하고 서버 시간과 맞춘다.
                             setServerTimeGap(Number(server.serverTime) - new Date().valueOf());
                             const _sconf = common.confBuilder(getHttpProtocol(this.props.config),this.props.config,this.props.user,server.id);
@@ -511,6 +573,7 @@ class Controller extends Component {
                                     objects = msg.result;
                                     if (objects && objects.length > 0) {
                                         objects.forEach((instance) => {
+
                                             urlObjectHashes.forEach((objHash) => {
                                                 if (objHash === Number(instance.objHash)) {
                                                     selectedObjects.push(instance);
@@ -529,7 +592,6 @@ class Controller extends Component {
                                 });
                             }
                         });
-
                         if (selectedObjects.length > 0) {
                             selectedObjects.sort((a, b) => a.objName < b.objName ? -1 : 1);
 
@@ -547,7 +609,7 @@ class Controller extends Component {
 
                             AgentColor.setInstances(selectedObjects, this.props.config.colorType);
                             this.props.setTarget(selectedObjects);
-
+                            this.props.setServerId([{id:activeServerId,obj:objects}]);
                         } else {
                             this.setState({
                                 servers: servers
@@ -576,7 +638,7 @@ class Controller extends Component {
         });
 
         const conf = common.confBuilder(getHttpProtocol(config),config,this.props.user,null);
-        ScouterApi.getSyncConnectedServer(conf)
+        ScouterApi.getConnectedServer(conf)
         .done(msg => {
 
             let servers = msg.result;
@@ -682,7 +744,7 @@ class Controller extends Component {
     };
 
     getIconOrObjectType = (instance) => {
-        let objType = this.props.counterInfo.objTypesMap[instance.objType];
+        let objType = this.state.counterInfo.objTypesMap[instance.objType];
         let icon;
         if (objType) {
             icon = objType.icon ? objType.icon : instance.objType;
@@ -1086,7 +1148,7 @@ class Controller extends Component {
                         </div>
                         <div className="row control">
                             <div>
-                                <LayoutManager visible={true}></LayoutManager>
+                                <LayoutManager visible={this.props.control.Controller === "max"}></LayoutManager>
                             </div>
                         </div>
                     </div>
@@ -1121,6 +1183,7 @@ class Controller extends Component {
                                   selectedObjects={this.state.selectedObjects}
                                   filter={this.state.filter}
                                   loading={this.state.loading}
+                                  counterInfo={this.state.counterInfo}
                                   onServerClick={this.onServerClick}
                                   instanceClick={this.instanceClick}
                                   setObjects={this.setObjects}
@@ -1132,6 +1195,7 @@ class Controller extends Component {
 
                 {this.state.preset &&
                 <PresetManager visible={this.state.preset}
+                               activeServerId={this.state.activeServerId}
                                togglePresetManager={this.togglePresetManager}
                                closeSelectorPopup={this.closeSelectorPopup}
                                toggleSelectorVisible={this.toggleSelectorVisible}
@@ -1157,7 +1221,8 @@ let mapStateToProps = (state) => {
         layouts: state.paper.layouts,
         layoutChangeTime: state.paper.layoutChangeTime,
         topologyOption: state.topologyOption,
-        presetName: state.presetName
+        presetName: state.presetName,
+        serverId: state.serverId
     };
 };
 
@@ -1180,6 +1245,10 @@ let mapDispatchToProps = (dispatch) => {
         setPresetName: (preset) => {
             localStorage.setItem("preset", JSON.stringify(preset));
             return dispatch(setPresetName(preset));
+        },
+        setServerId:(activeServer) => {
+            localStorage.setItem("activeServerId", JSON.stringify(activeServer));
+            return dispatch(setServerId(activeServer));
         }
     };
 };

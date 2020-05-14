@@ -1,8 +1,10 @@
 import React, {Component} from 'react';
 import './Settings.css';
+import {ImmutableDictionary} from '../../common/dictionary';
 import {connect} from 'react-redux';
-import {setConfig, pushMessage, setControlVisibility} from '../../actions';
+import {pushMessage, setConfig, setControlVisibility} from '../../actions';
 import {CompactPicker} from 'react-color';
+import {exportAllLocalSettings, getServerInfo, importAllLocalSetting, saveJSON} from "../../common/common";
 
 const colors = ['transparent', '#999999', '#FFFFFF', '#F44E3B', '#FE9200', '#FCDC00', '#DBDF00', '#A4DD00', '#68CCCA', '#73D8FF', '#AEA1FF', '#FDA1FF', '#333333', '#808080', '#cccccc', '#D33115', '#E27300', '#FCC400', '#B0BC00', '#68BC00', '#16A5A5', '#009CE0', '#7B64FF', '#FA28FF', '#000000', '#666666', '#B3B3B3', '#9F0500', '#C45100', '#FB9E00', '#808900', '#194D33', '#0C797D', '#0062B1', '#653294', '#AB149E'];
 class Settings extends Component {
@@ -402,6 +404,31 @@ class Settings extends Component {
             });
         }
     };
+    exportClick = () =>{
+        const exportObject= exportAllLocalSettings(getServerInfo(this.props.config),this.props.config);
+        saveJSON(exportObject, ImmutableDictionary.EXPORT_KEY);
+    };
+    handleImportFile =(evt) =>{
+        const files = evt.target.files;
+        this.props.setControlVisibility('Loading',true);
+        files[0].text()
+            .then(d => {
+                try {
+                    const _config = importAllLocalSetting(d,this.props.config);
+                    this.props.pushMessage("info", "IMPORT CONFIRM", "The import file was successful. reload running");
+                    this.props.setControlVisibility('Message',true);
+                    this.props.setConfig(_config);
+
+                    window.location.reload();
+                }catch (e) {
+                    console.error(e);
+                    this.props.pushMessage("error", "IMPORT ERROR", "Please check the import file");
+                    this.props.setControlVisibility('Message',true);
+                }
+
+            }).finally(() => this.props.setControlVisibility('Loading',false));
+
+    };
 
     render() {
         let normalDotSetting = [];
@@ -420,6 +447,7 @@ class Settings extends Component {
                 <div className={"settings " + (this.state.edit ? 'editable' : '')}>
                     <div className="forms">
                         <div className="top-btns">
+
                             {this.state.edit &&
                             <div className="buttons">
                                 <button onClick={this.resetConfig}>CANCEL</button>
@@ -428,6 +456,11 @@ class Settings extends Component {
                             }
                             {!this.state.edit &&
                             <div className="buttons">
+                                <button onClick={this.exportClick}>EXPORT</button>
+                                <div className="filebox">
+                                    <label htmlFor="ex_filename">IMPORT</label>
+                                    <input type="file" id="ex_filename" onChange={this.handleImportFile} className="upload-hidden"></input>
+                                </div>
                                 <button onClick={this.editClick}>EDIT</button>
                             </div>
                             }
@@ -520,18 +553,6 @@ class Settings extends Component {
                             <div>POLLING & RANGE</div>
                         </div>
                         <div className="setting-box">
-                            <div className="row">
-                                <div className="label">
-                                    <div>REALTIME LAST RANGE (minute)</div>
-                                </div>
-                                <div className="input">
-                                    <select value={this.state.config.realTimeLastRange} onChange={this.onChange.bind(this, "realTimeLastRange")} disabled={!this.state.edit}>
-                                        {[1,2,3,4,5,6,7,8,9,10].map((d, i) => {
-                                            return <option key={i} value={d}>{d}</option>
-                                        })}
-                                    </select>
-                                </div>
-                            </div>
                             <div className="row">
                                 <div className="label">
                                     <div>REALTIME XLOG LAST RANGE (minute)</div>
@@ -722,6 +743,22 @@ class Settings extends Component {
                                     <select value={this.state.config.graph.break} onChange={this.onChangeGraph.bind(this, "break")} disabled={!this.state.edit}>
                                         <option value="Y">Y</option>
                                         <option value="N">N</option>
+                                    </select>
+                                </div>
+                            </div>
+                            <div className="row">
+                                <div className="label">
+                                    <div>DISPLAY LINE LIMIT</div>
+                                </div>
+                                <div className="input">
+                                    <select value={this.state.config.graph.limit} onChange={this.onChangeGraph.bind(this, "limit")} disabled={!this.state.edit}>
+                                        <option value="1">1</option>
+                                        <option value="2">2</option>
+                                        <option value="3">3</option>
+                                        <option value="5">5</option>
+                                        <option value="10">10</option>
+                                        <option value="20">20</option>
+                                        <option value="-1">No Limit</option>
                                     </select>
                                 </div>
                             </div>

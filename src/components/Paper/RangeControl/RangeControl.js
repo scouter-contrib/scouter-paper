@@ -9,6 +9,7 @@ import 'react-input-range/lib/css/index.css';
 import './RangeControl.css';
 import moment from 'moment';
 import {setRealTimeValue, setRealTimeRangeStepValue, setRangeDate, setRangeHours, setRangeMinutes, setRangeValue, setRangeDateHoursMinutes, setSearchCondition, setFromPast} from '../../../actions';
+import RealTimeControl from "./RealTimeControl/RealTimeControl";
 
 class RangeControl extends Component {
 
@@ -169,6 +170,12 @@ class RangeControl extends Component {
                 <div className="time-type">
                     <div onClick={this.changeTimeType.bind(this, "realtime")} className={"time-type-item real-time " + (this.props.range.realTime ? "selected" : "")}>REALTIME</div>
                     <div onClick={this.changeTimeType.bind(this, "search")} className={"time-type-item search-time " + (!this.props.range.realTime ? "selected" : "")}>SEARCH</div>
+                    { this.props.range.realTime &&<div className="time-type-item real-time-meta_info">
+                        <span><i className="fa fa-clock-o"></i></span>
+                        <span className="meta-text">LAST {this.props.config.realTimeLastRange}minutes</span>
+                    </div>
+
+                    }
                     {!this.props.range.realTime &&
                     <div onClick={this.changeLongTerm.bind(this)} className={"time-type-item longterm-time " + (this.props.range.longTerm ? "selected " : " ") + (this.props.range.realTime ? "disabled" : "")}>{this.props.config.range.longHistoryRange / 24}D</div>
                     }
@@ -188,14 +195,7 @@ class RangeControl extends Component {
                     }
                 </div>
                 {this.props.range.realTime &&
-                    <div className="time-controller-reatime-msg">
-                        <div key="time-realtime-counter">
-                            COUNTER - LAST {this.props.config.realTimeLastRange} MINUTES
-                        </div>
-                        <div key="time-realtime-xlog">
-                            XLOG - LAST {this.props.config.realTimeXLogLastRange} MINUTES
-                        </div>
-                    </div>
+                    <RealTimeControl changeTimeType={this.changeTimeType} />
                 }
                 {!this.props.range.realTime &&
                 <div className="time-controller">

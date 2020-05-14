@@ -24,12 +24,13 @@ import {Box, BoxConfig, XLogFilter} from "../../components";
 import jQuery from "jquery";
 import * as common from "../../common/common";
 import {
+    confBuilder,
     errorHandler,
     getCurrentUser,
     getData,
-    getDefaultServerId,
     getDivideDays,
     getHttpProtocol,
+    getParam,
     getSearchDays,
     getWithCredentials,
     setAuthHeader,
@@ -74,7 +75,8 @@ class Paper extends Component {
 
         let layouts = getData("layouts");
         let boxes = getData("boxes");
-      
+        let activeServerId = getData("activeServerId");
+
         // xs와 xxs를 제거하면서, 기존에 저장된 데이터 warning 로그가 생성되어, lg, md 이외의 정보 삭제
         if (layouts) {
             for (let breakpoint in layouts) {
@@ -90,9 +92,17 @@ class Paper extends Component {
             boxes = [];
         }
 
+        if(activeServerId){
+            activeServerId = activeServerId[0].id;
+        }else{
+            activeServerId = this.getScouterApiServerId();
+        }
+
         let range = timeMiToMs(this.props.config.realTimeXLogLastRange);
         let endTime = (new ServerDate()).getTime();
         let startTime = endTime - range;
+
+        // URL로 부터 액티브 serverid 추가
 
 
         //URL로부터 XLOG 응답시간 축 시간 값 세팅
@@ -104,8 +114,10 @@ class Paper extends Component {
         //URL로부터 layout 세팅
         let layoutFromParam = common.getParam(this.props, "layout");
         if ((layoutFromParam && layoutFromParam !== layoutOnLocal) || Object.keys(layouts).length === 0) {
-            const _load = common.confBuilder(getHttpProtocol(this.props.config),this.props.config,this.props.user,getDefaultServerId(this.props.config));
-            ScouterApi.getPaperPreset(_load)
+
+
+            const _load = common.confBuilder(getHttpProtocol(this.props.config),this.props.config,this.props.user, activeServerId);
+            ScouterApi.getLayoutTemplate(_load)
             .done((msg) => {
                 if (msg && Number(msg.status) === 200) {
                     let isSet = false;
@@ -113,17 +125,17 @@ class Paper extends Component {
                     let boxesFallback;
                     let layoutsFallback;
                     let templateNameFallback;
-                    for (let i = 0; i < layouts.length; i++) {
-                        if (layoutFromParam === layouts[i].name) {
-                            this.props.setTemplate(layouts[i].boxes, layouts[i].layouts);
-                            setData("templateName", Object.assign({}, getData("templateName"), {layout: layouts[i].name}));
-                            this.props.setLayoutName(layouts[i].name);
+                    for (const layout of layouts) {
+                        if (layoutFromParam === layout.name) {
+                            this.props.setTemplate(layout.boxes, layout.layouts);
+                            setData("templateName", Object.assign({}, getData("templateName"), {layout: layout.name}));
+                            this.props.setLayoutName(layout.name);
                             isSet = true;
                             break;
                         } else {
-                            boxesFallback = layouts[i].boxes;
-                            layoutsFallback = layouts[i].layouts;
-                            templateNameFallback = layouts[i].name;
+                            boxesFallback = layout.boxes;
+                            layoutsFallback = layout.layouts;
+                            templateNameFallback = layout.name;
                         }
                     }
                     if (!isSet && boxesFallback) {
@@ -278,8 +290,11 @@ class Paper extends Component {
         if (templateName && templateName.layout) {
             anotherParam.layout = templateName.layout;
         }
-
+        if(activeServerId){
+            anotherParam['activesid'] = activeServerId;
+        }
         common.setTargetServerToUrl(this.props, this.props.config, anotherParam);
+
     }
 
     componentDidUpdate = (prevProps, nextState) => {
@@ -378,6 +393,7 @@ class Paper extends Component {
             }
         }
 
+
         if (JSON.stringify(this.props.filterMap) !== JSON.stringify(nextProps.filterMap)) {
             this.getVisitor(nextProps);
         }
@@ -397,14 +413,7 @@ class Paper extends Component {
             });
 
             if (nextProps.range.realTime) {
-                this.counterHistoriesLoaded = {};
-                clearInterval(this.dataRefreshTimer);
-                this.dataRefreshTimer = null;
-
-                let now = (new ServerDate()).getTime();
-                let ten = (this.props.config.preload === "Y") ? timeMiToMs(this.props.config.realTimeLastRange) : 1000;
-                this.getCounterHistory(this.props.objects, now - ten, now, false);
-                this.getLatestData(true, this.props.objects);
+                this.reloadPreloadData(nextProps.config.realTimeLastRange);
             } else {
                 clearInterval(this.dataRefreshTimer);
                 this.dataRefreshTimer = null;
@@ -419,9 +428,9 @@ class Paper extends Component {
 
         // get box key & set xlog filter by url
         let boxKey;
-        for (let i = 0; i < this.props.boxes.length; i++) {
-            let title = this.props.boxes[i].title;
-            let key = this.props.boxes[i].key;
+        for (const box of this.props.boxes) {
+            let title = box.title;
+            let key = box.key;
 
             if(title === "XLOG") {
                 boxKey = key;
@@ -435,6 +444,32 @@ class Paper extends Component {
                 this.setXlogFilterByUrl(boxKey, JSON.parse(xlogfilter));
             this.isLoading = true;
         }
+
+        // Last 시간이 변경이 변경 되면 ... 화면 갱신
+        if(this.props.config.realTimeLastRange !== nextProps.config.realTimeLastRange){
+            if(this.props.range.realTime){
+                this.reloadPreloadData(nextProps.config.realTimeLastRange);
+            }
+        }
+        if(this.props.config.interval !== nextProps.config.interval){
+            this.resetCounterTimer();
+        }
+
+    }
+    reloadPreloadData(realTimeLastRange){
+        this.counterHistoriesLoaded = {};
+        clearInterval(this.dataRefreshTimer);
+        this.dataRefreshTimer = null;
+
+        let now = (new ServerDate()).getTime();
+        let ten = (this.props.config.preload === "Y") ? timeMiToMs(realTimeLastRange) : 1000;
+        this.getCounterHistory(this.props.objects, now - ten, now, false);
+        this.getLatestData(true, this.props.objects);
+    };
+    resetCounterTimer(){
+        clearInterval(this.dataRefreshTimer);
+        this.dataRefreshTimer = null;
+        this.getLatestData(false,this.props.objects);
     }
 
     componentDidMount() {
@@ -512,9 +547,14 @@ class Paper extends Component {
         }, this.props.config.interval);
 
     }
-
-
+    getScouterApiconf = () => {
+        return confBuilder(getHttpProtocol(this.props.config),this.props.config,this.props.user, this.getScouterApiServerId());
+    };
+    getScouterApiServerId = () => {
+        return this.props.serverId.server? this.props.serverId.server[0].id : getParam(this.props,'activesid')
+    };
     getRealTimeCounter = () => {
+
         const that = this;
 
         if (this.props.objects && this.props.objects.length > 0) {
@@ -549,17 +589,8 @@ class Paper extends Component {
                 let params = JSON.stringify(counterKeys.map((key) => encodeURI(key)));
                 params = params.replace(/"/gi, "");
                 this.props.addRequest();
-                jQuery.ajax({
-                    method: "GET",
-                    async: true,
-                    url: getHttpProtocol(this.props.config) + '/scouter/v1/counter/realTime/' + params + '?objHashes=' + JSON.stringify(this.props.objects.map((obj) => {
-                        return Number(obj.objHash);
-                    })),
-                    xhrFields: getWithCredentials(that.props.config),
-                    beforeSend: function (xhr) {
-                        setAuthHeader(xhr, that.props.config, getCurrentUser(that.props.config, that.props.user));
-                    }
-                }).done((msg) => {
+                ScouterApi.getRealTimeCounter(this.getScouterApiconf(),params,this.props.objects)
+                .done((msg) => {
                     if (!that.mounted) {
                         return;
                     }
@@ -610,7 +641,6 @@ class Paper extends Component {
     tempBox = "";
 
     getPaperCounterHistory = (objects, from, to, longTerm, box) => {
-
         if (objects && objects.length > 0) {
 
             let counterKeyMap = {};
@@ -675,16 +705,18 @@ class Paper extends Component {
                     }).map((obj) => {
                             return Number(obj.objHash);
                     })) +"&startYmd=" + moment(startTime).format("YYYYMMDD")
-                        + "&endYmd=" + moment(endTime).format("YYYYMMDD");
+                        +"&endYmd=" + moment(endTime).format("YYYYMMDD")
+                        +`&serverId=${this.getScouterApiServerId()}`;
                     this.getCounterHistoryData(url, counterKey, from, to, now, false);
 
                 } else {
                     url = getHttpProtocol(this.props.config) + '/scouter/v1/counter/' + encodeURI(counterKey) + '?objHashes=' + JSON.stringify(objects.filter((d) => {
                             return d.objFamily === familyName;
-                }).map((obj) => {
-                        return Number(obj.objHash);
-                })) +"&startTimeMillis=" + startTime + "&endTimeMillis="
-                    + endTime;
+                    }).map((obj) => {
+                            return Number(obj.objHash);
+                    })) +"&startTimeMillis=" + startTime
+                        +"&endTimeMillis=" + endTime
+                        +`&serverId=${this.getScouterApiServerId()}`;
                     this.getCounterHistoryData(url, counterKey, from, to, now, false);
                 }
             }
@@ -753,7 +785,7 @@ class Paper extends Component {
                 method: "GET",
                 async: true,
                 dataType: 'text',
-                url: getHttpProtocol(this.props.config) + '/scouter/v1/xlog/realTime/' + (clear ? 0 : this.state.data.offset1) + '/' + (clear ? 0 : this.state.data.offset2) + '?objHashes=' + JSON.stringify(objects.map((instance) => {
+                url: getHttpProtocol(this.props.config) + '/scouter/v1/xlog/realTime/' + (clear ? 0 : this.state.data.offset1) + '/' + (clear ? 0 : this.state.data.offset2) + `?serverId=${this.getScouterApiServerId()}&objHashes=` + JSON.stringify(objects.map((instance) => {
                     return Number(instance.objHash);
                 })),
                 xhrFields: getWithCredentials(that.props.config),
@@ -970,7 +1002,7 @@ class Paper extends Component {
                 method: "GET",
                 async: true,
                 dataType: 'text',
-                url: getHttpProtocol(this.props.config) + "/scouter/v1/xlog/" + moment(from).format("YYYYMMDD") + "?startTimeMillis=" + from + '&endTimeMillis=' + to + (lastTxid ? '&lastTxid=' + lastTxid : "") + (lastXLogTime ? '&lastXLogTime=' + lastXLogTime : "") + '&objHashes=' +
+                url: getHttpProtocol(this.props.config) + "/scouter/v1/xlog/" + moment(from).format("YYYYMMDD") + `?serverId=${this.getScouterApiServerId()}&startTimeMillis=` + from + '&endTimeMillis=' + to + (lastTxid ? '&lastTxid=' + lastTxid : "") + (lastXLogTime ? '&lastXLogTime=' + lastXLogTime : "") + '&objHashes=' +
                 JSON.stringify(objects.map((instance) => {
                     return Number(instance.objHash);
                 })),
@@ -1051,7 +1083,7 @@ class Paper extends Component {
                 jQuery.ajax({
                     method: "GET",
                     async: true,
-                    url: getHttpProtocol(props.config) + '/scouter/v1/visitor/realTime?objHashes=' + JSON.stringify(filterdObjects.map((instance) => {
+                    url: getHttpProtocol(props.config) + `/scouter/v1/visitor/realTime?serverId=${this.getScouterApiServerId()}&objHashes=` + JSON.stringify(filterdObjects.map((instance) => {
                         return Number(instance.objHash);
                     })),
                     xhrFields: getWithCredentials(props.config),
@@ -1106,7 +1138,7 @@ class Paper extends Component {
                     method: "GET",
                     async: true,
                     dataType: "json",
-                    url: getHttpProtocol(props.config) + '/scouter/v1/object/host/realTime/disk/ofObject/'+ JSON.parse(JSON.stringify(data)).objHash,
+                    url: getHttpProtocol(props.config) + '/scouter/v1/object/host/realTime/disk/ofObject/'+ JSON.parse(JSON.stringify(data)).objHash+`?serverId=${this.getScouterApiServerId()}`,
                     xhrFields: getWithCredentials(props.config),
                     beforeSend: function (xhr) {
                         setAuthHeader(xhr, props.config, getCurrentUser(props.config, props.user));
@@ -1663,7 +1695,8 @@ let mapStateToProps = (state) => {
         layouts: state.paper.layouts,
         layoutChangeTime: state.paper.layoutChangeTime,
         searchCondition: state.searchCondition,
-        timeFocus : state.timeFocus
+        timeFocus : state.timeFocus,
+        serverId: state.serverId
     };
 };
 
