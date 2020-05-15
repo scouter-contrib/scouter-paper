@@ -20,6 +20,7 @@ import * as d3 from "d3";
 import _ from "lodash";
 import numeral from "numeral";
 import OldVersion from "../OldVersion/OldVersion";
+import TopologyMetaInfo from "./TopologyMetaInfo/TopologyMetaInfo";
 
 class Topology extends Component {
 
@@ -118,6 +119,12 @@ class Topology extends Component {
     };
 
 
+    constructor(props) {
+        super(props);
+        this.state = {
+            node: null
+        };
+    }
     componentDidMount() {
         if (!this.polling) {
             this.polling = setInterval(() => {
@@ -898,9 +905,11 @@ class Topology extends Component {
             return 0.5;
         }
     };
+
     _trimPrefix =(prefix,name) =>{
         return _.replace(name,prefix+"-","");
     };
+
     _showTooltip = (d, isShow=false) =>{
 
         if (this.props.topologyOption.highlight && this.props.topologyOption.grouping && (  d.objCategory && d.objCategory !== "CLIENT" ) ) {
@@ -1307,9 +1316,17 @@ class Topology extends Component {
         this.node = this.node.enter().append("circle").merge(this.node).attr("r", this.r).style("stroke-width", "4px")
             .attr('class', (d) => 'node cpu-' + that.getCountersCpuInfo(d.objCountersCpu).state)
             .style("fill", (d) => that.getCountersCpuInfo(d.objCountersCpu).color)
-            .style("stroke", (d) => that.getCategoryInfo(d.objCategory).color);
+            .style("stroke", (d) => that.getCategoryInfo(d.objCategory).color)
 
-        this.node.call(d3.drag().on("start", this.dragStarted).on("drag", this.dragged).on("end", this.dragEnd));
+
+
+        this.node.call(d3.drag()
+            .on("start", this.dragStarted)
+            .on("drag", this.dragged)
+            .on("end", this.dragEnd));
+                 // d3.event.preventDefault();
+
+
         // this.node.on("mouseover", (d) => that.hover(d));
         // this.node.on("mouseout", (d) => that.leave(d));
 
@@ -1337,14 +1354,21 @@ class Topology extends Component {
         }).text(function (d) {
             return that.getCategoryInfo(d.objCategory).text;
         }).call(d3.drag().on("start", this.dragStarted).on("drag", this.dragged).on("end", this.dragEnd));
-        this.nodeIcon.on("mouseover", (d) => this.hover(d));
-        this.nodeIcon.on("mouseout", (d) => this.leave(d));
-        this.nodeIcon.on("mouseover.tooltip", (d) =>{
-            this._showTooltip(d,true);
-        });
-        this.nodeIcon.on("mouseleave.tooltip", (d) =>{
-            this._showTooltip(d,false);
-        });
+        this.nodeIcon.on("mouseover", (d) => this.hover(d))
+                     .on("mouseout", (d) => this.leave(d))
+                     .on("mouseover.tooltip", (d) =>{
+                        this._showTooltip(d,true);
+                      })
+                     .on("mouseleave.tooltip", (d) =>{
+                        this._showTooltip(d,false);
+                      })
+                     .on("dblclick",(d)=>{
+                         if(this.props.topologyOption.grouping){
+                             this.setState({
+                                 node: d
+                             })
+                         }
+                     });
 
 
 
@@ -1447,6 +1471,7 @@ class Topology extends Component {
     };
 
     render() {
+        console.log('this...',this.state.node);
         return (
             <div className="topology-wrapper">
                 {!this.props.supported.supported && <OldVersion />}
@@ -1462,6 +1487,13 @@ class Topology extends Component {
                     }
                     <div className="topology-chart" ref="topologyChart"></div>
                 </div>}
+                {this.props.supported.supported &&
+                <TopologyMetaInfo
+                    node={this.state.node}
+                    counterDic={this.objCounterMap}
+                >
+                </TopologyMetaInfo>
+                }
             </div>
         );
     }

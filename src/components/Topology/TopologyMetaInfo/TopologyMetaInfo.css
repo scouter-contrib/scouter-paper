@@ -1,0 +1,11 @@
+.topology-meta-info {
+  width: 100%;
+  height: 200px;
+  position: sticky;
+}
+.topology-meta-info.hide {
+  display: none;
+}
+.topology-meta-info.show {
+  display: block;
+}
