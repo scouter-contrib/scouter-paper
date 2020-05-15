@@ -556,7 +556,7 @@ export function saveCurrentAllLocalSettings (currentServer, config) {
 }
 
 export function reloadAllLocalSettingsOfServer (props, config) {
-    const server = getServerInfo(config);
+    const server = getServerInfo(config)
     if (server && server.address) {
         const serverKey = server.address + ":" + server.port;
         const allOptionsOfServer = getData(ALL_OPTIONS_OF_SERVER_KEY) || [];
@@ -574,8 +574,15 @@ export function reloadAllLocalSettingsOfServer (props, config) {
             setData("alert", option[0].options["alert"]);
             setData("activeServerId", option[0].options["activeServerId"]);
             const activeServerId = option[0].options["activeServerId"];
-            if(activeServerId) {
-                setTargetServerToUrl0(props, server.address, server.port, server.protocol,{ activesid : activeServerId[0].id } );
+            const objects = [];
+            const _objects = option[0].options["selectedObjects"];
+            if( _objects ){
+                for (const attr in _objects) {
+                  objects.push(_objects[attr].objHash);
+                }
+            }
+            if(activeServerId ) {
+                setTargetServerToUrl0(props, server.address, server.port, server.protocol,{ activesid: activeServerId[0].id, objects: objects.join(',')} );
             }
         }
     }
@@ -588,8 +595,12 @@ export function setTargetServerToUrl0 (props, serverAddr, serverPort, protocol, 
     search.set("port", serverPort);
     search.set("protocol", protocol || "http");
     for (let key in anotherParam) {
-        if (anotherParam[key]) {
+
+        if (anotherParam[key] && (key !== 'objects') ) {
             search.set(key, anotherParam[key]);
+        }
+        if(key === 'objects' && !isNull(anotherParam[key]) ){
+            search.set(key,anotherParam[key]);
         }
     }
 
@@ -599,6 +610,12 @@ export function setTargetServerToUrl0 (props, serverAddr, serverPort, protocol, 
             search: "?" + search.toString()
         });
     }
+}
+export function isEmpty(value){
+    return value.length === 0;
+}
+export function isNull(value){
+    return value === null || value === undefined;
 }
 
 const table = [

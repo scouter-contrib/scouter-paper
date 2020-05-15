@@ -296,12 +296,15 @@ class Controller extends Component {
         if (localStorage) {
             localStorage.setItem("config", JSON.stringify(config));
         }
+        this.setState({
+            selectedObjects: {},
+        },() => {
+            setTargetServerToUrl(this.props, config);
+            common.replaceAllLocalSettingsForServerChange(currentServer, this.props, config);
+            common.clearAllUrlParamOfPaper(this.props, config);
+            window.location.reload();
+        });
 
-        setTargetServerToUrl(this.props, config);
-        common.replaceAllLocalSettingsForServerChange(currentServer, this.props, config);
-        common.clearAllUrlParamOfPaper(this.props, config);
-
-        window.location.reload();
 
     };
 
