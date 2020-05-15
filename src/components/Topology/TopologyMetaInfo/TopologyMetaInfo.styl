@@ -1,9 +1,112 @@
 .topology-meta-info
-  width:100%
-  height: 200px
-  position: sticky
-
+  width: 400px
+  height: 300px !important
+  position: fixed
+  top: 65px
+  left: 45px
+  box-sizing : border-box
   &.hide
     display: none
   &.show
     display: block
+  .top-control
+    display: inline-flex
+    border-top: 1px solid rgba(0, 0, 0, 0.6);
+    border-left: 1px solid rgba(0, 0, 0, 0.6);
+    border-right: 1px solid rgba(0, 0, 0, 0.6);
+    .meta-info
+      width: 354px
+      font-size: 12px
+      font-weight : bold
+      color: rgb(255, 214, 0)
+      position: relative
+      margin-left : 5px
+      top: 7px;
+      font-family : 'Righteous', 'Nanum Gothic', cursive
+    .hide-button
+      width: 40px
+      position: relative
+      margin-top: 5px
+      margin-bottom : 5px
+      >button
+        top: 7px;
+        right: 5px;
+        font-size: 8px;
+        padding: 4px 8px;
+
+  >div
+    &.blueTable
+      width 100%
+      text-align left
+      border-collapse collapse
+
+  .divTable.blueTable .divTableCell, .divTable.blueTable .divTableHead
+    border 1px solid  rgba(0, 0, 0, 0.6)
+    padding 3px 2px
+    font-family : 'Righteous', 'Nanum Gothic', cursive
+  .divTable
+    display table
+    &.blueTable
+      .divTableBody
+        .divTableCell
+          font-size 10px
+          color: white
+      .divTableRow
+        &:nth-child(even)
+          background #104E8B
+
+      .divTableHeading
+        border-bottom 1px solid #444444
+        border-left 1px solid rgba(0, 0, 0, 0.6)
+        background-color #26466D
+        .divTableHead
+          font-size 12px
+          font-weight bold
+          color #FFFFFF
+          &:first-child
+            border-left none
+
+  .blueTable
+    .tableFootStyle
+      font-size 14px
+      font-weight bold
+      color #FFFFFF
+      background #D0E4F5
+      background -moz-linear-gradient(top, #dcebf7 0%, #d4e6f6 66%, #D0E4F5 100%)
+      background -webkit-linear-gradient(top, #dcebf7 0%, #d4e6f6 66%, #D0E4F5 100%)
+      background linear-gradient(to bottom, #dcebf7 0%, #d4e6f6 66%, #D0E4F5 100%)
+      border-top 2px solid #444444
+      font-size 14px
+      .links
+        text-align right
+        a
+          display inline-block
+          background #1C6EA4
+          color #FFFFFF
+          padding 2px 8px
+          border-radius 5px
+    &.outerTableFooter
+      border-top none
+      .tableFootStyle
+        padding 3px 5px
+
+  .divTableRow
+    display table-row
+
+  .divTableHeading
+    display table-header-group
+    display table-header-group
+
+  .divTableCell, .divTableHead
+    display table-cell
+
+  .divTableFoot
+    display table-footer-group
+
+  .divTableBody
+    display table-row-group
+
+
+
+
+

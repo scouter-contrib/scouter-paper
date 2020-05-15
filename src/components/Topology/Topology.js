@@ -558,6 +558,7 @@ class Topology extends Component {
                                 };
                             }
                         });
+
                     } else {
                         list.forEach((d) => {
                             if (that.instances[Number(d.fromObjHash)] && that.instances[Number(d.fromObjHash)].objType) {
@@ -652,6 +653,7 @@ class Topology extends Component {
                         return d.id;
                     });
                     //- node count calc
+
                     nodes.forEach((node) => {
                         node.grouping = grouping;
                         const nodeInstance = Object.values(objToTypeMap).filter((d) => d === node.objName);
@@ -659,7 +661,14 @@ class Topology extends Component {
                             Object.values(this.instances).filter(d => node.id === d.objType).forEach(d => {
                                 this.getObjectNameMerge(node.id, d.objName, grouping);
                             });
+                            if(this.state.node && this.state.node.id === node.id){
+                                 this.setState({
+                                     node: node
+                                 });
+                            }
                         }
+
+
                         node.instanceCount = nodeInstance.length;
                     });
 
@@ -1471,30 +1480,33 @@ class Topology extends Component {
     };
 
     render() {
-        console.log('this...',this.state.node);
         return (
-            <div className="topology-wrapper">
-                {!this.props.supported.supported && <OldVersion />}
-                {this.props.supported.supported &&
-                <div>
-                    {(!this.topology || this.topology.length < 1) &&
-                    <div className="no-topology-data">
-                        <div>
-                            <div className="logo-div"><img alt="scouter-logo" className="logo" src={this.props.config.theme === "theme-gray" ? logoBlack : logo}/></div>
-                            <div>NO TOPOLOGY DATA</div>
+
+                <div className="topology-wrapper">
+                    {!this.props.supported.supported && <OldVersion />}
+                    {this.props.supported.supported &&
+                    <div>
+                        {(!this.topology || this.topology.length < 1) &&
+                        <div className="no-topology-data">
+                            <div>
+                                <div className="logo-div"><img alt="scouter-logo" className="logo" src={this.props.config.theme === "theme-gray" ? logoBlack : logo}/></div>
+                                <div>NO TOPOLOGY DATA</div>
+                            </div>
                         </div>
-                    </div>
+                        }
+                        <div className="topology-chart" ref="topologyChart"></div>
+                    </div>}
+                    {this.props.supported.supported &&
+                    <TopologyMetaInfo
+                        node={this.state.node}
+                        counterDic={this.objCounterMap}
+                        nameDic = {this.objTypeNameMap}
+                        trimDic= {this._trimPrefix}
+                    >
+                    </TopologyMetaInfo>
                     }
-                    <div className="topology-chart" ref="topologyChart"></div>
-                </div>}
-                {this.props.supported.supported &&
-                <TopologyMetaInfo
-                    node={this.state.node}
-                    counterDic={this.objCounterMap}
-                >
-                </TopologyMetaInfo>
-                }
-            </div>
+                </div>
+
         );
     }
 }
