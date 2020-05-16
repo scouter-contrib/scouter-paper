@@ -122,7 +122,8 @@ class Topology extends Component {
     constructor(props) {
         super(props);
         this.state = {
-            node: null
+            node: null,
+            counterMap: null,
         };
     }
     componentDidMount() {
@@ -694,9 +695,12 @@ class Topology extends Component {
                         nodeCount: this.nodes.length,
                         linkCount: this.links.length
                     });
-
                     this.update(this.props.topologyOption.pin, this.props.topologyOption.tpsToLineSpeed, this.props.topologyOption.speedLevel);
-
+                    if(grouping && this.state.node ){
+                        this.setState({
+                            counterMap: _.cloneDeep(this.objCounterMap)
+                        })
+                    }
                 }
 
             }).fail((xhr, textStatus, errorThrown) => {
@@ -1374,7 +1378,9 @@ class Topology extends Component {
                      .on("dblclick",(d)=>{
                          if(this.props.topologyOption.grouping){
                              this.setState({
-                                 node: d
+                                 node: d,
+                                 counterMap: _.cloneDeep(this.objCounterMap),
+                                 nameMap: _.cloneDeep(this.objTypeNameMap)
                              })
                          }
                      });
@@ -1497,8 +1503,8 @@ class Topology extends Component {
                     </div>}
                     <TopologyMetaInfo
                         node={this.state.node}
-                        counterDic={this.objCounterMap}
-                        nameDic = {this.objTypeNameMap}
+                        counterDic={this.state.counterMap}
+                        nameDic = {this.state.nameMap}
                         trimDic= {this._trimPrefix}
                     >
                     </TopologyMetaInfo>

@@ -38,6 +38,13 @@ class TopologyMetaInfo extends Component {
                 })
             }
         }
+        if(this.props.objects !== nextProps.objects){
+            if(this.state.forceHide) {
+                this.setState({
+                    forceHide: false
+                })
+            }
+        }
     };
     _isDisplay( ){
         return this.state.forceHide?'show': 'hide';
@@ -121,7 +128,8 @@ class TopologyMetaInfo extends Component {
 let mapStateToProps = (state) => {
     return {
         config: state.config,
-        range: state.range
+        range: state.range,
+        objects: state.objects
     };
 };
 
