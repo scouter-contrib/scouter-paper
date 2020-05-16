@@ -7,7 +7,20 @@ import './TopologyMetaInfo.css';
 const formatFunc = (x,setting) => {
     return numeral(x).format(setting);
 };
-
+const cpuValueFunc = (x,setting) =>{
+    if(typeof  x === 'object') {
+        return x.hasOwnProperty('value') ? formatFunc(x.value,setting) : '0';
+    }else{
+        return '0'
+    }
+};
+const activeValueFunc = (x) =>{
+    if(typeof  x === 'object') {
+        return x.hasOwnProperty('value') ? (Array.isArray(x.value) ? x.value.map(d => Number(d)).reduce((x,y)=>x+y,0) : x.value )  : '0';
+    }else{
+        return '0'
+    }
+};
 class TopologyMetaInfo extends Component {
 
     constructor(props) {
@@ -19,9 +32,11 @@ class TopologyMetaInfo extends Component {
 
     componentWillReceiveProps(nextProps) {
         if(this.props.node !== nextProps.node){
-            this.setState({
-                forceHide: true
-            })
+            if(!this.state.forceHide) {
+                this.setState({
+                    forceHide: true
+                })
+            }
         }
     };
     _isDisplay( ){
@@ -38,12 +53,10 @@ class TopologyMetaInfo extends Component {
     getNodeItemList=()=>{
         if(this.props.node){
             const {objTypeFamily,objName,id} = this.props.node;
-
             const _ext = this.props.nameDic.get(objTypeFamily === "javaee" ? objName : id);
-
             return ( Array.isArray(_ext) ? _ext : [_ext] )
                    .map(dp=> {
-                        let counter = [dp, 0, 0, 0];
+                        let counter = [dp, 0, 0, 0, 0, 0, 0 , 0 ];
                         if (objTypeFamily === "javaee") {
                             counter = this.props.counterDic.get(dp);
                         } else {
@@ -60,7 +73,6 @@ class TopologyMetaInfo extends Component {
         }
     };
     render() {
-
         const items = this.getNodeItemList();
         return (
             <div className={`topology-meta-info ${this._isDisplay()}`} >
@@ -73,7 +85,7 @@ class TopologyMetaInfo extends Component {
                 <div className="divTable blueTable">
                     <div className="divTableHeading">
                         <div className="divTableRow">
-                        {['NAME','TPS','ERROR RATE','ELAPSED TIME'].map(h=>{
+                        {['NAME','TPS','ERROR RATE','ELAPSED TIME','FROM CPU','TO CPU','FROM ACTIVE','TO ACTIVE'].map(h=>{
                             return(
                                 <div className="divTableHead" key={h}>{h}</div>
                             )
@@ -82,7 +94,7 @@ class TopologyMetaInfo extends Component {
                     </div>
                     <div className="divTableBody">
                         { items.map((item,i)=>{
-                            const [name, tps, errorRate, avgElasp]=item;
+                            const [name, tps, errorRate, avgElasp,fromCpu,toCpu, fromActive, toActive]=item;
                             const {id} = this.props.node;
                             return (
                                 <div className="divTableRow" key={name}>
@@ -90,6 +102,10 @@ class TopologyMetaInfo extends Component {
                                     <div className="divTableCell" >{formatFunc(tps,this.props.config.numberFormat)}</div>
                                     <div className="divTableCell" >{formatFunc(errorRate,this.props.config.numberFormat)}</div>
                                     <div className="divTableCell" >{formatFunc(avgElasp,this.props.config.numberFormat)}</div>
+                                    <div className="divTableCell" >{cpuValueFunc(fromCpu,this.props.config.numberFormat)}</div>
+                                    <div className="divTableCell" >{cpuValueFunc(toCpu,this.props.config.numberFormat)}</div>
+                                    <div className="divTableCell" >{activeValueFunc(fromActive)}</div>
+                                    <div className="divTableCell" >{activeValueFunc(toActive)}</div>
                                 </div>
                             )
                             })

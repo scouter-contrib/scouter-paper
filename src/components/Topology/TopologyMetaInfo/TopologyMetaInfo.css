@@ -14,12 +14,8 @@
 }
 .topology-meta-info .top-control {
   display: inline-flex;
-  border-top: 1px solid rgba(0,0,0,0.6);
-  border-left: 1px solid rgba(0,0,0,0.6);
-  border-right: 1px solid rgba(0,0,0,0.6);
 }
 .topology-meta-info .top-control .meta-info {
-  width: 354px;
   font-size: 12px;
   font-weight: bold;
   color: #ffd600;
@@ -29,7 +25,6 @@
   font-family: 'Righteous', 'Nanum Gothic', cursive;
 }
 .topology-meta-info .top-control .hide-button {
-  width: 40px;
   position: relative;
   margin-top: 5px;
   margin-bottom: 5px;

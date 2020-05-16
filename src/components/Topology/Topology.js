@@ -340,7 +340,7 @@ class Topology extends Component {
                 errorRate : data.errorCount / data.count * 100,
                 avgElaps:   data.totalElapsed / data.count
             };
-            let acc = this.objCounterMap.get(name)
+            let acc = this.objCounterMap.get(name);
             if( acc ){
                 // let [_1,_2,_3,_4] = acc;
                 // this.objCounterMap.set(name, [
@@ -351,11 +351,16 @@ class Topology extends Component {
                 // ]);
             }else {
                 //new
+
                 this.objCounterMap.set(name, [
                     name,
                     d.tps,
                     d.errorRate,
-                    d.avgElaps
+                    d.avgElaps,
+                    _.find(data.fromObjCounters, {name: 'Cpu'}),
+                    _.find(data.toObjCounters, {name: 'Cpu'}),
+                    _.find(data.fromObjCounters, {name: 'ActiveSpeed'}),
+                    _.find(data.toObjCounters, {name: 'ActiveSpeed'}),
                 ]);
             }
 
@@ -647,6 +652,7 @@ class Topology extends Component {
                             objName: d.toObjName,
                             objCategory: d.toObjCategory ? d.toObjCategory : "",
                             objTypeFamily: d.toObjTypeFamily ? d.toObjTypeFamily : "",
+
                             objCountersCpu: d.toObjCountersCpu ? d.toObjCountersCpu.value : ""
                         }
                     })), (d) => {
@@ -661,14 +667,7 @@ class Topology extends Component {
                             Object.values(this.instances).filter(d => node.id === d.objType).forEach(d => {
                                 this.getObjectNameMerge(node.id, d.objName, grouping);
                             });
-                            if(this.state.node && this.state.node.id === node.id){
-                                 this.setState({
-                                     node: node
-                                 });
-                            }
                         }
-
-
                         node.instanceCount = nodeInstance.length;
                     });
 
@@ -695,8 +694,17 @@ class Topology extends Component {
                         nodeCount: this.nodes.length,
                         linkCount: this.links.length
                     });
-
-                    this.update(this.props.topologyOption.pin, this.props.topologyOption.tpsToLineSpeed, this.props.topologyOption.speedLevel);
+                    if(grouping && this.state.node){
+                        this.nodes.filter(n=> n.id === this.state.node.id)
+                                  .forEach(n =>{
+                                        this.setState({
+                                            node: n
+                                        });
+                                    });
+                        this.update(this.props.topologyOption.pin, this.props.topologyOption.tpsToLineSpeed, this.props.topologyOption.speedLevel);
+                    }else {
+                        this.update(this.props.topologyOption.pin, this.props.topologyOption.tpsToLineSpeed, this.props.topologyOption.speedLevel);
+                    }
                 }
 
             }).fail((xhr, textStatus, errorThrown) => {
@@ -1481,7 +1489,6 @@ class Topology extends Component {
 
     render() {
         return (
-
                 <div className="topology-wrapper">
                     {!this.props.supported.supported && <OldVersion />}
                     {this.props.supported.supported &&
@@ -1496,7 +1503,6 @@ class Topology extends Component {
                         }
                         <div className="topology-chart" ref="topologyChart"></div>
                     </div>}
-                    {this.props.supported.supported &&
                     <TopologyMetaInfo
                         node={this.state.node}
                         counterDic={this.objCounterMap}
@@ -1504,7 +1510,6 @@ class Topology extends Component {
                         trimDic= {this._trimPrefix}
                     >
                     </TopologyMetaInfo>
-                    }
                 </div>
 
         );
