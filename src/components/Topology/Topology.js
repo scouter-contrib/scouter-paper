@@ -694,17 +694,9 @@ class Topology extends Component {
                         nodeCount: this.nodes.length,
                         linkCount: this.links.length
                     });
-                    if(grouping && this.state.node){
-                        this.nodes.filter(n=> n.id === this.state.node.id)
-                                  .forEach(n =>{
-                                        this.setState({
-                                            node: n
-                                        });
-                                    });
-                        this.update(this.props.topologyOption.pin, this.props.topologyOption.tpsToLineSpeed, this.props.topologyOption.speedLevel);
-                    }else {
-                        this.update(this.props.topologyOption.pin, this.props.topologyOption.tpsToLineSpeed, this.props.topologyOption.speedLevel);
-                    }
+
+                    this.update(this.props.topologyOption.pin, this.props.topologyOption.tpsToLineSpeed, this.props.topologyOption.speedLevel);
+
                 }
 
             }).fail((xhr, textStatus, errorThrown) => {
