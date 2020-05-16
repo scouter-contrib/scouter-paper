@@ -20,6 +20,7 @@ import * as d3 from "d3";
 import _ from "lodash";
 import numeral from "numeral";
 import OldVersion from "../OldVersion/OldVersion";
+import TopologyMetaInfo from "./TopologyMetaInfo/TopologyMetaInfo";
 
 class Topology extends Component {
 
@@ -118,6 +119,13 @@ class Topology extends Component {
     };
 
 
+    constructor(props) {
+        super(props);
+        this.state = {
+            node: null,
+            counterMap: null,
+        };
+    }
     componentDidMount() {
         if (!this.polling) {
             this.polling = setInterval(() => {
@@ -333,7 +341,7 @@ class Topology extends Component {
                 errorRate : data.errorCount / data.count * 100,
                 avgElaps:   data.totalElapsed / data.count
             };
-            let acc = this.objCounterMap.get(name)
+            let acc = this.objCounterMap.get(name);
             if( acc ){
                 // let [_1,_2,_3,_4] = acc;
                 // this.objCounterMap.set(name, [
@@ -344,11 +352,16 @@ class Topology extends Component {
                 // ]);
             }else {
                 //new
+
                 this.objCounterMap.set(name, [
                     name,
                     d.tps,
                     d.errorRate,
-                    d.avgElaps
+                    d.avgElaps,
+                    _.find(data.fromObjCounters, {name: 'Cpu'}),
+                    _.find(data.toObjCounters, {name: 'Cpu'}),
+                    _.find(data.fromObjCounters, {name: 'ActiveSpeed'}),
+                    _.find(data.toObjCounters, {name: 'ActiveSpeed'}),
                 ]);
             }
 
@@ -551,6 +564,7 @@ class Topology extends Component {
                                 };
                             }
                         });
+
                     } else {
                         list.forEach((d) => {
                             if (that.instances[Number(d.fromObjHash)] && that.instances[Number(d.fromObjHash)].objType) {
@@ -639,12 +653,14 @@ class Topology extends Component {
                             objName: d.toObjName,
                             objCategory: d.toObjCategory ? d.toObjCategory : "",
                             objTypeFamily: d.toObjTypeFamily ? d.toObjTypeFamily : "",
+
                             objCountersCpu: d.toObjCountersCpu ? d.toObjCountersCpu.value : ""
                         }
                     })), (d) => {
                         return d.id;
                     });
                     //- node count calc
+
                     nodes.forEach((node) => {
                         node.grouping = grouping;
                         const nodeInstance = Object.values(objToTypeMap).filter((d) => d === node.objName);
@@ -679,8 +695,12 @@ class Topology extends Component {
                         nodeCount: this.nodes.length,
                         linkCount: this.links.length
                     });
-
                     this.update(this.props.topologyOption.pin, this.props.topologyOption.tpsToLineSpeed, this.props.topologyOption.speedLevel);
+                    if(grouping && this.state.node ){
+                        this.setState({
+                            counterMap: _.cloneDeep(this.objCounterMap)
+                        })
+                    }
                 }
 
             }).fail((xhr, textStatus, errorThrown) => {
@@ -898,9 +918,11 @@ class Topology extends Component {
             return 0.5;
         }
     };
+
     _trimPrefix =(prefix,name) =>{
         return _.replace(name,prefix+"-","");
     };
+
     _showTooltip = (d, isShow=false) =>{
 
         if (this.props.topologyOption.highlight && this.props.topologyOption.grouping && (  d.objCategory && d.objCategory !== "CLIENT" ) ) {
@@ -1307,9 +1329,17 @@ class Topology extends Component {
         this.node = this.node.enter().append("circle").merge(this.node).attr("r", this.r).style("stroke-width", "4px")
             .attr('class', (d) => 'node cpu-' + that.getCountersCpuInfo(d.objCountersCpu).state)
             .style("fill", (d) => that.getCountersCpuInfo(d.objCountersCpu).color)
-            .style("stroke", (d) => that.getCategoryInfo(d.objCategory).color);
+            .style("stroke", (d) => that.getCategoryInfo(d.objCategory).color)
 
-        this.node.call(d3.drag().on("start", this.dragStarted).on("drag", this.dragged).on("end", this.dragEnd));
+
+
+        this.node.call(d3.drag()
+            .on("start", this.dragStarted)
+            .on("drag", this.dragged)
+            .on("end", this.dragEnd));
+                 // d3.event.preventDefault();
+
+
         // this.node.on("mouseover", (d) => that.hover(d));
         // this.node.on("mouseout", (d) => that.leave(d));
 
@@ -1337,14 +1367,23 @@ class Topology extends Component {
         }).text(function (d) {
             return that.getCategoryInfo(d.objCategory).text;
         }).call(d3.drag().on("start", this.dragStarted).on("drag", this.dragged).on("end", this.dragEnd));
-        this.nodeIcon.on("mouseover", (d) => this.hover(d));
-        this.nodeIcon.on("mouseout", (d) => this.leave(d));
-        this.nodeIcon.on("mouseover.tooltip", (d) =>{
-            this._showTooltip(d,true);
-        });
-        this.nodeIcon.on("mouseleave.tooltip", (d) =>{
-            this._showTooltip(d,false);
-        });
+        this.nodeIcon.on("mouseover", (d) => this.hover(d))
+                     .on("mouseout", (d) => this.leave(d))
+                     .on("mouseover.tooltip", (d) =>{
+                        this._showTooltip(d,true);
+                      })
+                     .on("mouseleave.tooltip", (d) =>{
+                        this._showTooltip(d,false);
+                      })
+                     .on("dblclick",(d)=>{
+                         if(this.props.topologyOption.grouping){
+                             this.setState({
+                                 node: d,
+                                 counterMap: _.cloneDeep(this.objCounterMap),
+                                 nameMap: _.cloneDeep(this.objTypeNameMap)
+                             })
+                         }
+                     });
 
 
 
@@ -1448,21 +1487,29 @@ class Topology extends Component {
 
     render() {
         return (
-            <div className="topology-wrapper">
-                {!this.props.supported.supported && <OldVersion />}
-                {this.props.supported.supported &&
-                <div>
-                    {(!this.topology || this.topology.length < 1) &&
-                    <div className="no-topology-data">
-                        <div>
-                            <div className="logo-div"><img alt="scouter-logo" className="logo" src={this.props.config.theme === "theme-gray" ? logoBlack : logo}/></div>
-                            <div>NO TOPOLOGY DATA</div>
+                <div className="topology-wrapper">
+                    {!this.props.supported.supported && <OldVersion />}
+                    {this.props.supported.supported &&
+                    <div>
+                        {(!this.topology || this.topology.length < 1) &&
+                        <div className="no-topology-data">
+                            <div>
+                                <div className="logo-div"><img alt="scouter-logo" className="logo" src={this.props.config.theme === "theme-gray" ? logoBlack : logo}/></div>
+                                <div>NO TOPOLOGY DATA</div>
+                            </div>
                         </div>
-                    </div>
-                    }
-                    <div className="topology-chart" ref="topologyChart"></div>
-                </div>}
-            </div>
+                        }
+                        <div className="topology-chart" ref="topologyChart"></div>
+                    </div>}
+                    <TopologyMetaInfo
+                        node={this.state.node}
+                        counterDic={this.state.counterMap}
+                        nameDic = {this.state.nameMap}
+                        trimDic= {this._trimPrefix}
+                    >
+                    </TopologyMetaInfo>
+                </div>
+
         );
     }
 }
