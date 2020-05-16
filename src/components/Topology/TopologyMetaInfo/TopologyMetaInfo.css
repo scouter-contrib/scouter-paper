@@ -1,6 +1,6 @@
 .topology-meta-info {
   width: 400px;
-  height: auto !important;
+  height: 100px !important;
   position: absolute;
   top: 0px;
   left: 2px;
@@ -52,12 +52,19 @@
 .topology-meta-info .divTable.blueTable .divTableBody {
   overflow-y: auto;
 }
-.topology-meta-info .divTable.blueTable .divTableBody .divTableCell {
+.topology-meta-info .divTable.blueTable .divTableBody::-webkit-scrollbar {
+  width: 7px;
+  height: 7px;
+}
+.topology-meta-info .divTable.blueTable .divTableBody::-webkit-scrollbar-thumb {
+  background-color: rgba(0,0,0,0.4);
+}
+.topology-meta-info .divTable.blueTable .divTableBody .divTableRow:nth-child(even) {
+  background: #104e8b;
+}
+.topology-meta-info .divTable.blueTable .divTableBody .divTableRow .divTableCell {
   font-size: 10px;
   color: #fff;
-}
-.topology-meta-info .divTable.blueTable .divTableRow:nth-child(even) {
-  background: #104e8b;
 }
 .topology-meta-info .divTable.blueTable .divTableHeading {
   border-bottom: 1px solid #444;

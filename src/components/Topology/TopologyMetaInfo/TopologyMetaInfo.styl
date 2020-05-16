@@ -1,11 +1,10 @@
 .topology-meta-info
   width: 400px
-  height: auto !important
+  height: 100px !important
   position: absolute
   top: 0px
   left: 2px
   box-sizing : border-box
-
   &.hide
     display: none
   &.show
@@ -47,13 +46,17 @@
     &.blueTable
       .divTableBody
         overflow-y: auto
-        .divTableCell
-          font-size 10px
-          color: white
-      .divTableRow
-        &:nth-child(even)
-          background #104E8B
-
+        &::-webkit-scrollbar
+          width 7px
+          height 7px
+        &::-webkit-scrollbar-thumb
+          background-color rgba(0, 0, 0, 0.4)
+        .divTableRow
+          &:nth-child(even)
+            background #104E8B
+          .divTableCell
+            font-size 10px
+            color: white
       .divTableHeading
         border-bottom 1px solid #444444
         border-left 1px solid rgba(0, 0, 0, 0.6)
