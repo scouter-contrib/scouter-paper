@@ -18,11 +18,9 @@
 .topology-meta-info .top-control .meta-info {
   font-size: 12px;
   font-weight: bold;
-  color: #ffd600;
   position: relative;
   margin-left: 5px;
   top: 7px;
-  font-family: 'Righteous', 'Nanum Gothic', cursive;
 }
 .topology-meta-info .top-control .hide-button {
   position: relative;

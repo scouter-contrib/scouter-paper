@@ -1506,6 +1506,7 @@ class Topology extends Component {
                         counterDic={this.state.counterMap}
                         nameDic = {this.state.nameMap}
                         trimDic= {this._trimPrefix}
+                        sytleInfo={this.objCategoryInfo}
                     >
                     </TopologyMetaInfo>
                 </div>
