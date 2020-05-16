@@ -72,7 +72,8 @@ class TopologyMetaInfo extends Component {
 
                         return counter;
                     })
-                    .filter(v => v ? true : false );
+                    .filter(v => v ? true : false )
+                    .sort((a,b) => a[0].localeCompare(b[0]));
 
 
         }else{

@@ -1,6 +1,6 @@
 .topology-meta-info {
   width: 400px;
-  height: 100px !important;
+  height: auto !important;
   position: absolute;
   top: 0px;
   left: 2px;
