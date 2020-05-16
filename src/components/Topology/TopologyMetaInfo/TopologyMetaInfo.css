@@ -3,7 +3,7 @@
   height: auto !important;
   position: absolute;
   top: 0px;
-  left: 2px;
+  left: 10px;
   box-sizing: border-box;
 }
 .topology-meta-info.hide {
@@ -26,6 +26,7 @@
 }
 .topology-meta-info .top-control .hide-button {
   position: relative;
+  left: 10px;
   margin-top: 5px;
   margin-bottom: 5px;
 }
@@ -39,6 +40,8 @@
   width: 100%;
   text-align: left;
   border-collapse: collapse;
+  -webkit-box-shadow: -10px 0px 13px -7px #000, 10px 0px 13px -7px #000, 5px 5px 15px 5px rgba(0,0,0,0);
+  box-shadow: -10px 0px 13px -7px #000, 10px 0px 13px -7px #000, 5px 5px 15px 5px rgba(0,0,0,0);
 }
 .topology-meta-info .divTable.blueTable .divTableCell,
 .topology-meta-info .divTable.blueTable .divTableHead {
@@ -72,7 +75,7 @@
   background-color: #26466d;
 }
 .topology-meta-info .divTable.blueTable .divTableHeading .divTableHead {
-  font-size: 12px;
+  font-size: 11px;
   font-weight: bold;
   color: #fff;
 }

@@ -85,7 +85,7 @@ class TopologyMetaInfo extends Component {
         return (
             <div className={`topology-meta-info ${this._isDisplay()} scrollbar` } >
                 <div className="top-control">
-                    <div className="meta-info">{this.props.node? this.props.node.id : 'UNKNOWN-ID'}</div>
+                    <div className="meta-info">{this.props.node? this.props.node.objCategory.toUpperCase() : 'UNKNOWN-ID'}</div>
                     <div className="hide-button">
                         <button onClick={this.hideClick}>HIDE</button>
                     </div>
