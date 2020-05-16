@@ -11,7 +11,7 @@ class RealTimeControl extends Component {
         super(props);
         this.state = {
             unit: "unit_m",
-            value: "10"
+            value: this.props.config.realTimeLastRange
         };
     }
     timeValueChange=(event)=>{
@@ -34,7 +34,7 @@ class RealTimeControl extends Component {
 
         const apply = {...this.props.config,
                         realTimeLastRange: Number(min),
-                        realTimeXLogLastRange: this.props.realTimeWithXlog?Number(min): 10};
+                        realTimeXLogLastRange: this.props.realTimeWithXlog?Number(min): 5};
         this.props.setConfig(apply);
         setData('config',apply);
 

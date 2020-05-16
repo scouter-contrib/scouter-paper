@@ -21,6 +21,18 @@ const activeValueFunc = (x) =>{
         return '0'
     }
 };
+const defaultStyle ={
+    fontFamily: "'Righteous', 'Nanum Gothic', cursive",
+    fontSize: "12px",
+    fontWeight: "bold",
+    color: "rgb(0, 0, 0, 0.6)"
+};
+const defaultItemStyle ={
+    fontFamily: "'Righteous', 'Nanum Gothic', cursive",
+    fontSize: "11px",
+    color: "white",
+    marginLeft: "10px"
+};
 class TopologyMetaInfo extends Component {
 
     constructor(props) {
@@ -29,6 +41,7 @@ class TopologyMetaInfo extends Component {
             forceHide: false
         };
     };
+
 
     componentWillReceiveProps(nextProps) {
         if(this.props.node !== nextProps.node){
@@ -72,19 +85,40 @@ class TopologyMetaInfo extends Component {
 
                         return counter;
                     })
-                    .filter(v => v ? true : false );
+                    .filter(v => v ? true : false )
+                    .sort((a,b) => a[0].localeCompare(b[0]));
 
 
         }else{
             return [];
         }
     };
+    _getCategoryStyle=()=>{
+
+
+      if( this.props.node ){
+          const style = this.props.sytleInfo[this.props.node.objCategory];
+          if(style){
+              return {
+                  fontFamily: "'Righteous', 'Nanum Gothic', cursive",
+                  fontSize: `12px`,
+                  color: style.color,
+                  fontWeight: "bold",
+              }
+          }
+
+      }
+      return defaultStyle;
+    };
     render() {
         const items = this.getNodeItemList();
         return (
-            <div className={`topology-meta-info ${this._isDisplay()}`} >
+            <div className={`topology-meta-info ${this._isDisplay()} scrollbar` } >
                 <div className="top-control">
-                    <div className="meta-info">{this.props.node? this.props.node.id : 'UNKNOWN-ID'}</div>
+                    <div className="meta-info">
+                        <span style={this._getCategoryStyle()}>{this.props.node? `${this.props.node.objCategory.toUpperCase()}` : 'UNKNOWN-ID'}</span>
+                        <span style={defaultItemStyle}>{items? `${items.length} target` : ''}</span>
+                    </div>
                     <div className="hide-button">
                         <button onClick={this.hideClick}>HIDE</button>
                     </div>
