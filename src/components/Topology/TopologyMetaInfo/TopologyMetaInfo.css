@@ -5,7 +5,6 @@
   top: 0px;
   left: 2px;
   box-sizing: border-box;
-  overflow-y: auto;
 }
 .topology-meta-info.hide {
   display: none;
@@ -49,6 +48,9 @@
 }
 .topology-meta-info .divTable {
   display: table;
+}
+.topology-meta-info .divTable.blueTable .divTableBody {
+  overflow-y: auto;
 }
 .topology-meta-info .divTable.blueTable .divTableBody .divTableCell {
   font-size: 10px;

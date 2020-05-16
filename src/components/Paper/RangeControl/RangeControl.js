@@ -17,7 +17,7 @@ class RangeControl extends Component {
         super(props);
         this.handleChange = this.dateChange.bind(this);
         this.state = {
-            realTimeWithXlog : false
+            realTimeWithXlog : this.props.config.realTimeLastRange === this.props.config.realTimeXLogLastRange
         }
     }
 
