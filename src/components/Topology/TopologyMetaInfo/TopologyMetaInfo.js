@@ -82,7 +82,7 @@ class TopologyMetaInfo extends Component {
     render() {
         const items = this.getNodeItemList();
         return (
-            <div className={`topology-meta-info ${this._isDisplay()}`} >
+            <div className={`topology-meta-info ${this._isDisplay()} scrollbar` } >
                 <div className="top-control">
                     <div className="meta-info">{this.props.node? this.props.node.id : 'UNKNOWN-ID'}</div>
                     <div className="hide-button">
