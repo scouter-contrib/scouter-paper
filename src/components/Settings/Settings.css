@@ -440,6 +440,7 @@
     text-align: right;
     right : 0;
     padding: 0;
+    display: flex;
 }
 
 .settings .top-btns .buttons button {
@@ -447,6 +448,7 @@
     padding: 4px 10px;
     user-select: none;
 }
+
 
 .settings .buttons .restore-btn {
     position: absolute;
@@ -458,6 +460,27 @@
     text-decoration: underline;
     cursor: pointer;
 }
+.settings .top-btns .buttons .filebox label {
+    display: inline-block;
+    margin: 0 0 0 2px;
+    padding: 4px 10px;
+    user-select: none;
+    background-color: #FFD700;
+    cursor: pointer;
+
+}
+
+.settings .top-btns .buttons .filebox input[type="file"] { /* 파일 필드 숨기기 */
+    position: absolute;
+    width: 1px;
+    height: 1px;
+    padding: 0;
+    margin: -1px;
+    overflow: hidden;
+    clip:rect(0,0,0,0);
+    border: 0;
+}
+
 
 @media screen and (max-width: 600px) {
     .settings .buttons .restore-btn {

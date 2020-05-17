@@ -7,7 +7,13 @@ import * as d3 from "d3";
 import sqlFormatter from "sql-formatter";
 import JSONPretty from 'react-json-pretty';
 import jQuery from "jquery";
-import {getCurrentUser, getHttpProtocol, getWithCredentials, setAuthHeader} from "../../../../../../common/common";
+import {
+    getCurrentUser,
+    getHttpProtocol,
+    getParam,
+    getWithCredentials,
+    setAuthHeader
+} from "../../../../../../common/common";
 import moment from "moment/moment";
 
 class FrameStepDetail extends Component {
@@ -105,6 +111,9 @@ class FrameStepDetail extends Component {
 
         return sql;
     };
+    getScouterApiServerId = () => {
+        return this.props.serverId.server ? this.props.serverId.server[0].id : getParam(this.props,'activesid');
+    };
     getError(error){
         let ret = '';
         const {endTime} = this.props.profile;
@@ -112,7 +121,7 @@ class FrameStepDetail extends Component {
             method: "GET",
             async: false,
             dataType: "json",
-            url: `${getHttpProtocol(this.props.config)}/scouter/v1/dictionary/${moment(new Date(Number(endTime))).format("YYYYMMDD")}?dictKeys=[error:${error}]`,
+            url: `${getHttpProtocol(this.props.config)}/scouter/v1/dictionary/${moment(new Date(Number(endTime))).format("YYYYMMDD")}?dictKeys=[error:${error}]&serverId=${this.getScouterApiServerId()}`,
             xhrFields: getWithCredentials(this.props.config),
             beforeSend: (xhr)=>{
                 setAuthHeader(xhr, this.props.config, getCurrentUser(this.props.config, this.props.user));
@@ -317,7 +326,8 @@ class FrameStepDetail extends Component {
 let mapStateToProps = (state) => {
     return {
         config: state.config,
-        user: state.user
+        user: state.user,
+        serverId: state.serverId
     };
 };
 

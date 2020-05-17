@@ -3,39 +3,39 @@ import './App.css';
 import './Theme.css';
 import './fonts/technology-icons-gh-pages/styles/technology-icons.css';
 import './fonts/glyphter/css/Glyphter.css';
-import {
-    Settings,
-    Paper,
-    Loading,
-    RequestBar,
-    Menu,
-    Login,
-    Overlay,
-    Message,
-    ContentWrapper
-} from './components';
-import {Route, Switch} from 'react-router-dom';
+import {ContentWrapper, Loading, Login, Menu, Message, Overlay, Paper, RequestBar, Settings} from './components';
+import {Route, Switch, withRouter} from 'react-router-dom';
 import {connect} from 'react-redux';
-import {withRouter} from 'react-router-dom';
-import {setSupported, setConfig, addRequest, clearAllMessage, setControlVisibility, setUserId, setUserData, pushMessage, setCounterInfo, setAlert} from './actions';
+import {
+    addRequest,
+    clearAllMessage,
+    pushMessage,
+    setAlert,
+    setConfig,
+    setControlVisibility,
+    setCounterInfo,
+    setServerId,
+    setSupported,
+    setUserData,
+    setUserId
+} from './actions';
 import {detect} from 'detect-browser';
 import Unsupport from "./components/Unsupport/Unsupport";
 import jQuery from "jquery";
+import * as common from './common/common';
 import {
     errorHandler,
-    mergeDeep,
-    getParam,
-    setAuthHeader,
-    getWithCredentials,
-    getHttpProtocol,
-    getDefaultServerConfig,
     getCurrentUser,
-    getDefaultServerId
+    getDefaultServerConfig,
+    getHttpProtocol,
+    getParam,
+    getWithCredentials,
+    mergeDeep,
+    setAuthHeader
 } from './common/common';
 
 import Home from "./components/Home/Home";
 import Topology from "./components/Topology/Topology";
-import * as common from "./common/common";
 import Debug from "./components/Debug/Debug";
 import Controller from "./components/Controller/Controller";
 import _ from "lodash";
@@ -66,7 +66,7 @@ class App extends Component {
         this.props.addRequest();
 
         let origin = getHttpProtocol(config);
-        const conf = common.confBuilder(getHttpProtocol(config),config,user,getDefaultServerId(config));
+        const conf = common.confBuilder(getHttpProtocol(config),config,user,this.getScouterApiServerId());
        ScouterApi.isAuthentification(conf)
            .done((msg) => {
             if (msg && Number(msg.status) === 200) {
@@ -118,7 +118,8 @@ class App extends Component {
                 return server.default;
             });
             if (JSON.stringify(currentApiServer) !== JSON.stringify(nextApiServer)) {
-                this.getCounterModel(nextProps.config, nextProps.user, true);
+
+                this.getCounterModel(nextProps.config, nextProps.user, true, this.getScouterApiServerId());
             }
 
 
@@ -129,8 +130,13 @@ class App extends Component {
                 let nextUser = nextProps.user[origin];
                 let currentUser = this.props.user[origin];
                 if (nextUser && (JSON.stringify(currentUser) !== JSON.stringify(nextUser))) {
-                    this.getCounterModel(nextProps.config, nextProps.user, true);
+                    this.getCounterModel(nextProps.config, nextProps.user, true,nextProps.serverId.server[0].id);
                 }
+            }
+        }
+        if (this.props.serverId.server) {
+            if( this.props.serverId.server[0].id !== nextProps.serverId.server[0].id) {
+                this.getCounterModel(nextProps.config, nextProps.user, true,nextProps.serverId.server[0].id);
             }
         }
 
@@ -161,7 +167,9 @@ class App extends Component {
             }, seconds * 1000);
         }
     };
-
+    getScouterApiServerId = () => {
+        return this.props.serverId.server ? this.props.serverId.server[0].id : getParam(this.props,'activesid');
+    };
     getRealTimeAlert = (objects) => {
         const that = this;
 
@@ -180,7 +188,7 @@ class App extends Component {
                 jQuery.ajax({
                     method: "GET",
                     async: true,
-                    url: getHttpProtocol(this.props.config) + "/scouter/v1/alert/realTime/" + offset1 + "/" + offset2 + "?objType=" + objType,
+                    url: getHttpProtocol(this.props.config) + "/scouter/v1/alert/realTime/" + offset1 + "/" + offset2 + `?serverId=${this.getScouterApiServerId()}&objType=` + objType,
                     xhrFields: getWithCredentials(that.props.config),
                     beforeSend: function (xhr) {
                         setAuthHeader(xhr, that.props.config, getCurrentUser(that.props.config, that.props.user));
@@ -222,16 +230,19 @@ class App extends Component {
                                 }
                             });
 
-                            if (Notification && this.props.config.alert.notification === "Y" && Notification.permission === "granted") {
-                                for (let i=0; i<alert.data.length; i++) {
-                                    if (Number(alert.data[i].time) > this.mountTime && !alert.data[i]["_notificated"]) {
-                                        alert.data[i]["_notificated"] = true;
-
-                                        var options = {
-                                            body: alert.data[i].objName + "\n" + alert.data[i].message,
-                                            icon: notificationIcon
-                                        };
-                                        new Notification("[" + alert.data[i].level + "]" +  alert.data[i].title, options);
+                            if (this.props.config.alert.notification === "Y") {
+                                if( typeof Notification === 'function' && Notification.hasOwnProperty('permission')) {
+                                    if(Notification.permission === "granted"){
+                                        for (let i=0; i<alert.data.length; i++) {
+                                            if (Number(alert.data[i].time) > this.mountTime && !alert.data[i]["_notificated"]) {
+                                                alert.data[i]["_notificated"] = true;
+                                                const options = {
+                                                    body: alert.data[i].objName + "\n" + alert.data[i].message,
+                                                    icon: notificationIcon
+                                                };
+                                                new Notification("[" + alert.data[i].level + "]" +  alert.data[i].title, options);
+                                            }
+                                        }
                                     }
                                 }
                             }
@@ -249,45 +260,28 @@ class App extends Component {
         }
     };
 
-    getCounterModel = (config, user, handleError) => {
+    getCounterModel = (config, user, handleError,serverId) => {
 
-        const _conf = common.confBuilder(getHttpProtocol(config),config,user,getDefaultServerId(config));
-        ScouterApi.getSyncConnectedServer(_conf)
-            .done(msg =>{
+        const _conf = common.confBuilder(getHttpProtocol(config),config,user,serverId);
+        ScouterApi.getCounterModel(_conf)
+            .done((msg) => {
                 if (Number(msg.status) === 200) {
-                    Promise.all(msg.result.map(ser =>{
-                        const _serConfig = common.confBuilder(getHttpProtocol(config),config,user,ser.id);
-                        return ScouterApi.getCounterModel(_serConfig)
-                    }))
-                    .then(msg =>{
-                            const _f = [];
-                            const _o = [];
-                            _.forEach(msg,iter => {
-                                _f.push(iter.result.families);
-                                _o.push(iter.result.objTypes);
-
-                            });
-                            //- family info merge
-                            const _rf = _.flatMapDeep(_f);
-                            //- objectType merge
-                            const _ro = _.flatMapDeep(_o);
-                            this.props.setSupported(true);
-                            this.props.setCounterInfo(_rf, _ro);
-                    }).catch(_err =>{
-                        if(handleError) {
-                            this.props.setSupported(false);
-                            this.props.pushMessage("error", "Not Supported", "failed to get matrix information. paper 2.0 is available only on scouter 2.0 and later.");
-                            this.props.setControlVisibility("Message", true);
-                        }
-                        console.error(_err);
-                    })
+                    this.props.setSupported(true);
+                    if(msg.result) {
+                        this.props.setCounterInfo(msg.result.families, msg.result.objTypes);
+                    }
                 }
-            })
-            .fail((xhr, textStatus, errorThrown)=>{
-                if(handleError) {
-                    errorHandler(xhr, textStatus, errorThrown, this.props, "getCounterModel", true);
-                }
-            });
+            }).fail((xhr, textStatus, errorThrown) => {
+                if (handleError) {
+                    if (xhr.status === 404) {
+                        this.props.setSupported(false);
+                        this.props.pushMessage("error", "Not Supported", "failed to get matrix information. paper 2.0 is available only on scouter 2.0 and later.");
+                        this.props.setControlVisibility("Message", true);
+                    } else {
+                        errorHandler(xhr, textStatus, errorThrown, this.props, "getCounterModel", true);
+                    }
+                 }
+        });
     };
 
     getNotice = () => {
@@ -318,6 +312,7 @@ class App extends Component {
     componentWillMount() {
         let config = null;
         let str = localStorage.getItem("config");
+
         if (str) {
             config = JSON.parse(str);
             config = mergeDeep(this.props.config, config); //for added config's properties on later versions.
@@ -372,8 +367,8 @@ class App extends Component {
             config.others.xlogClassicMode = paramXlogClassicMode;
         }
 
-
         this.props.setConfig(config);
+
         if (localStorage) {
             localStorage.setItem("config", JSON.stringify(config));
         }
@@ -407,7 +402,7 @@ class App extends Component {
         this.setFontSetting(this.props.config.fontSetting);
 
         // 처음 카운터 모델을 조회하는데, 에러 처리는 하지 않는다
-        this.getCounterModel(this.props.config, this.props.user, false);
+        this.getCounterModel(this.props.config, this.props.user, false,this.getScouterApiServerId());
 
         // Notice를 조회한다. 이미 조회한 Notice인지 확인하여 하루에 한번만 보여주던지..
         // X-Scouter-Notice-Token 응답 헤더는 LocalStorage에 저장하여 다음 요청 헤더로 사용한다.
@@ -534,7 +529,8 @@ let mapStateToProps = (state) => {
         user: state.user,
         supported : state.supported,
         objects: state.target.objects,
-        alert: state.alert
+        alert: state.alert,
+        serverId: state.serverId
     };
 };
 
@@ -549,7 +545,8 @@ let mapDispatchToProps = (dispatch) => {
         pushMessage: (category, title, content) => dispatch(pushMessage(category, title, content)),
         setCounterInfo: (families, objTypes) => dispatch(setCounterInfo(families, objTypes)),
         setSupported: (supported) => dispatch(setSupported(supported)),
-        setAlert: (alert) => dispatch(setAlert(alert))
+        setAlert: (alert) => dispatch(setAlert(alert)),
+        setServerId: (serverId) => dispatch(setServerId(serverId))
     };
 };
 

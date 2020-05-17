@@ -24,6 +24,13 @@ const dictionary = {};
 const dirtyKey = new LimitSizeMap(50000);
 const dirtyLimit = 3;
 
+export const ImmutableDictionary = {
+    IMPORT_KEY: 'scouter-all-setting',
+    ALL_OPTIONS_OF_SERVER_KEY: 'allOptionsOfServer',
+    EXPORT_KEY: 'scouter-all-setting.json',
+    CHART_LINE_TYPE_KEY: 1,
+    CHART_LINE_FILL_TYPE_KEY: 2,
+};
 export const DictType = {
     service: "service",
     apicall: "apicall",

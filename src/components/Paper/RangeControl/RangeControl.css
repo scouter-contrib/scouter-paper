@@ -148,11 +148,40 @@
     border-radius: 0 3px 3px 0;
     border-left: none;
 }
+.range-controls .time-type > div.real-time-meta_info {
+    width: 102px;
+    border-radius: 0 3px 3px 0;
+    border-left: none;
+    font-size: 10px;
+    text-align: left;
+    position: relative;
+    top: 1px;
+    left: 2px;
+    cursor: default;
+    display: inline-flex;
+    background-color: #FFCC11;
+}
 
 .range-controls .time-type > div.time-type-item:hover {
     background-color: #FFF6C7;
 }
 
+.range-controls .time-type > div.xlog-with {
+    width: 70px;
+    border-radius: 0 3px 3px 0;
+    border-left: none;
+    font-size: 10px;
+    text-align: left;
+    position: relative;
+    top: 1px;
+    left: 5px;
+    cursor: pointer;
+    display: inline-flex;
+}
+
+.range-controls .time-type > div.time-type-item:hover {
+    background-color: #FFF6C7;
+}
 .range-controls .time-type > div.longterm-time {
     width: 30px;
     margin-left: 5px;

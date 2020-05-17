@@ -1,0 +1,116 @@
+.topology-meta-info
+  width: 400px
+  height: auto !important
+  position: absolute
+  top: 0px
+  left: 10px
+  box-sizing : border-box
+  &.hide
+    display: none
+  &.show
+    display: block
+  .top-control
+    display: inline-flex
+    //border-top: 1px solid rgba(0, 0, 0, 0.6);
+    .meta-info
+      font-size: 12px
+      font-weight : bold
+      //color: rgb(255, 214, 0)
+      position: relative
+      margin-left : 5px
+      top: 7px;
+      //font-family : 'Righteous', 'Nanum Gothic', cursive
+    .hide-button
+      position: relative
+      left: 10px;
+      margin-top: 5px
+      margin-bottom : 5px
+      >button
+        top: 7px;
+        right: 5px;
+        font-size: 8px;
+        padding: 4px 8px;
+
+  >div
+    &.blueTable
+      width 100%
+      text-align left
+      border-collapse collapse
+      -webkit-box-shadow: -10px 0px 13px -7px #000000, 10px 0px 13px -7px #000000, 5px 5px 15px 5px rgba(0,0,0,0);
+      box-shadow: -10px 0px 13px -7px #000000, 10px 0px 13px -7px #000000, 5px 5px 15px 5px rgba(0,0,0,0);
+
+  .divTable.blueTable .divTableCell, .divTable.blueTable .divTableHead
+    border 1px solid  rgba(0, 0, 0, 0.6)
+    padding 3px 2px
+    font-family : 'Righteous', 'Nanum Gothic', cursive
+  .divTable
+    display table
+    &.blueTable
+      .divTableBody
+        overflow-y: auto
+        &::-webkit-scrollbar
+          width 7px
+          height 7px
+        &::-webkit-scrollbar-thumb
+          background-color rgba(0, 0, 0, 0.4)
+        .divTableRow
+          &:nth-child(even)
+            background #104E8B
+          .divTableCell
+            font-size 10px
+            color: white
+      .divTableHeading
+        border-bottom 1px solid #444444
+        border-left 1px solid rgba(0, 0, 0, 0.6)
+        background-color #26466D
+        .divTableHead
+          font-size 11px
+          font-weight bold
+          color #FFFFFF
+          &:first-child
+            border-left none
+
+  .blueTable
+    .tableFootStyle
+      font-size 14px
+      font-weight bold
+      color #FFFFFF
+      background #D0E4F5
+      background -moz-linear-gradient(top, #dcebf7 0%, #d4e6f6 66%, #D0E4F5 100%)
+      background -webkit-linear-gradient(top, #dcebf7 0%, #d4e6f6 66%, #D0E4F5 100%)
+      background linear-gradient(to bottom, #dcebf7 0%, #d4e6f6 66%, #D0E4F5 100%)
+      border-top 2px solid #444444
+      font-size 14px
+      .links
+        text-align right
+        a
+          display inline-block
+          background #1C6EA4
+          color #FFFFFF
+          padding 2px 8px
+          border-radius 5px
+    &.outerTableFooter
+      border-top none
+      .tableFootStyle
+        padding 3px 5px
+
+  .divTableRow
+    display table-row
+
+  .divTableHeading
+    display table-header-group
+    display table-header-group
+
+  .divTableCell, .divTableHead
+    display table-cell
+
+  .divTableFoot
+    display table-footer-group
+
+  .divTableBody
+    display table-row-group
+
+
+
+
+

@@ -1,12 +1,19 @@
 import React, {Component} from 'react';
 import './PresetManager.css';
-import {getData, setData} from '../../../common/common';
-import {setControlVisibility, pushMessage, setPresetName} from '../../../actions';
+import {
+    errorHandler,
+    getCurrentUser,
+    getData,
+    getHttpProtocol,
+    getWithCredentials,
+    setAuthHeader,
+    setData
+} from '../../../common/common';
+import {pushMessage, setControlVisibility, setPresetName} from '../../../actions';
 import {connect} from 'react-redux';
 import {withRouter} from 'react-router-dom';
 import 'url-search-params-polyfill';
 import jQuery from "jquery";
-import {errorHandler, setAuthHeader, getWithCredentials, getHttpProtocol, getCurrentUser} from '../../../common/common';
 import InnerLoading from "../../InnerLoading/InnerLoading";
 import IconImage from "../../IconImage/IconImage";
 
@@ -25,19 +32,20 @@ class PresetManager extends Component {
 
     componentWillReceiveProps(nextProps) {
         if (!this.props.visible && nextProps.visible) {
-            this.loadPresets(nextProps.config, nextProps.user);
+            this.loadPresets(nextProps.config, nextProps.user,nextProps.activeServerId);
         }
+
     }
 
     componentDidMount() {
         this.loadPresets(this.props.config, this.props.user);
     }
-
     savePreset = (presets) => {
         let that = this;
         let data = {
             key : "__scouter_paper_preset",
-            value : JSON.stringify(presets)
+            value : JSON.stringify(presets),
+            serverId: this.props.activeServerId
         };
 
         this.setState({
@@ -47,7 +55,7 @@ class PresetManager extends Component {
         jQuery.ajax({
             method: "PUT",
             async: true,
-            url: getHttpProtocol(this.props.config) + "/scouter/v1/kv",
+            url: getHttpProtocol(this.props.config) + `/scouter/v1/kv`,
             xhrFields: getWithCredentials(this.props.config),
             contentType : "application/json",
             data : JSON.stringify(data),
@@ -78,7 +86,7 @@ class PresetManager extends Component {
         jQuery.ajax({
             method: "GET",
             async: true,
-            url: getHttpProtocol(config) + "/scouter/v1/kv/__scouter_paper_preset",
+            url: getHttpProtocol(config) + `/scouter/v1/kv/__scouter_paper_preset/?serverId=${this.props.activeServerId}`,
             xhrFields: getWithCredentials(config),
             beforeSend: function (xhr) {
                 setAuthHeader(xhr, config, getCurrentUser(config, user));
@@ -131,7 +139,7 @@ class PresetManager extends Component {
             this.setState({
                 presets : presets,
                 selectedPresetNo : null,
-                selectedEditNo : null
+                selectedEditNo : null,
             });
 
             this.savePreset(presets);
@@ -232,8 +240,8 @@ class PresetManager extends Component {
             <div className="preset-manager-bg"  onClick={this.cancelClick}>
                 <div>
                     <div className="selector-type-btns" onClick={(e) => e.stopPropagation()}>
-                        <div onClick={this.showSelector}>SERVER NAVIGATOR</div>
-                        <div  className="selected">PRESET MANAGER</div>
+                        <div onClick={this.showSelector} className="none">SERVER NAVIGATOR</div>
+                        <div  className="selected" >PRESET MANAGER</div>
                     </div>
                     <div className="preset-manager popup-div" onClick={(e) => e.stopPropagation()}>
                         <div className="title">
@@ -298,8 +306,7 @@ let mapStateToProps = (state) => {
     return {
         objects: state.target.objects,
         config: state.config,
-        user: state.user,
-        counterInfo: state.counterInfo
+        user: state.user
     };
 };
 

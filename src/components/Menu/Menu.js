@@ -1,17 +1,11 @@
 import React, {Component} from 'react';
-import {NavLink} from 'react-router-dom'
+import {NavLink, withRouter} from 'react-router-dom'
 import './Menu.css';
 import {connect} from 'react-redux';
-import {withRouter} from 'react-router-dom';
 import {getDefaultServerConfig} from '../../common/common';
 import AlertList from "../Paper/PaperControl/AlertList";
 import moment from "moment";
-import {
-    setMenu,
-    setRangeAll,
-    setAlert,
-    setSearchCondition
-} from '../../actions';
+import {setAlert, setMenu, setRangeAll, setSearchCondition} from '../../actions';
 
 class Menu extends Component {
 
@@ -168,9 +162,11 @@ class Menu extends Component {
     };
 
     render() {
+        const activeServerId = this.props.serverId.server ? `&activesid=${this.props.serverId.server[0].id}` : '';
+
         let instanceParam = (this.props.objects && this.props.objects.length > 0) ? "?objects=" + this.props.objects.map((d) => {
-            return d.objHash
-        }) : "";
+            return d.objHash;
+        }) + activeServerId : '';
 
         let defaultServerconfig = getDefaultServerConfig(this.props.config);
         let origin = defaultServerconfig.protocol + "://" + defaultServerconfig.address + ":" + defaultServerconfig.port;
@@ -241,7 +237,8 @@ let mapStateToProps = (state) => {
         config: state.config,
         user: state.user,
         alert: state.alert,
-        templateName: state.templateName
+        templateName: state.templateName,
+        serverId: state.serverId,
     };
 };
 

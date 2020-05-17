@@ -1,0 +1,126 @@
+.topology-meta-info {
+  width: 400px;
+  height: auto !important;
+  position: absolute;
+  top: 0px;
+  left: 10px;
+  box-sizing: border-box;
+}
+.topology-meta-info.hide {
+  display: none;
+}
+.topology-meta-info.show {
+  display: block;
+}
+.topology-meta-info .top-control {
+  display: inline-flex;
+}
+.topology-meta-info .top-control .meta-info {
+  font-size: 12px;
+  font-weight: bold;
+  position: relative;
+  margin-left: 5px;
+  top: 7px;
+}
+.topology-meta-info .top-control .hide-button {
+  position: relative;
+  left: 10px;
+  margin-top: 5px;
+  margin-bottom: 5px;
+}
+.topology-meta-info .top-control .hide-button >button {
+  top: 7px;
+  right: 5px;
+  font-size: 8px;
+  padding: 4px 8px;
+}
+.topology-meta-info >div.blueTable {
+  width: 100%;
+  text-align: left;
+  border-collapse: collapse;
+  -webkit-box-shadow: -10px 0px 13px -7px #000, 10px 0px 13px -7px #000, 5px 5px 15px 5px rgba(0,0,0,0);
+  box-shadow: -10px 0px 13px -7px #000, 10px 0px 13px -7px #000, 5px 5px 15px 5px rgba(0,0,0,0);
+}
+.topology-meta-info .divTable.blueTable .divTableCell,
+.topology-meta-info .divTable.blueTable .divTableHead {
+  border: 1px solid rgba(0,0,0,0.6);
+  padding: 3px 2px;
+  font-family: 'Righteous', 'Nanum Gothic', cursive;
+}
+.topology-meta-info .divTable {
+  display: table;
+}
+.topology-meta-info .divTable.blueTable .divTableBody {
+  overflow-y: auto;
+}
+.topology-meta-info .divTable.blueTable .divTableBody::-webkit-scrollbar {
+  width: 7px;
+  height: 7px;
+}
+.topology-meta-info .divTable.blueTable .divTableBody::-webkit-scrollbar-thumb {
+  background-color: rgba(0,0,0,0.4);
+}
+.topology-meta-info .divTable.blueTable .divTableBody .divTableRow:nth-child(even) {
+  background: #104e8b;
+}
+.topology-meta-info .divTable.blueTable .divTableBody .divTableRow .divTableCell {
+  font-size: 10px;
+  color: #fff;
+}
+.topology-meta-info .divTable.blueTable .divTableHeading {
+  border-bottom: 1px solid #444;
+  border-left: 1px solid rgba(0,0,0,0.6);
+  background-color: #26466d;
+}
+.topology-meta-info .divTable.blueTable .divTableHeading .divTableHead {
+  font-size: 11px;
+  font-weight: bold;
+  color: #fff;
+}
+.topology-meta-info .divTable.blueTable .divTableHeading .divTableHead:first-child {
+  border-left: none;
+}
+.topology-meta-info .blueTable .tableFootStyle {
+  font-size: 14px;
+  font-weight: bold;
+  color: #fff;
+  background: #d0e4f5;
+  background: -moz-linear-gradient(top, #dcebf7 0%, #d4e6f6 66%, #d0e4f5 100%);
+  background: -webkit-linear-gradient(top, #dcebf7 0%, #d4e6f6 66%, #d0e4f5 100%);
+  background: linear-gradient(to bottom, #dcebf7 0%, #d4e6f6 66%, #d0e4f5 100%);
+  border-top: 2px solid #444;
+  font-size: 14px;
+}
+.topology-meta-info .blueTable .tableFootStyle .links {
+  text-align: right;
+}
+.topology-meta-info .blueTable .tableFootStyle .links a {
+  display: inline-block;
+  background: #1c6ea4;
+  color: #fff;
+  padding: 2px 8px;
+  border-radius: 5px;
+}
+.topology-meta-info .blueTable.outerTableFooter {
+  border-top: none;
+}
+.topology-meta-info .blueTable.outerTableFooter .tableFootStyle {
+  padding: 3px 5px;
+}
+.topology-meta-info .divTableRow {
+  display: table-row;
+}
+.topology-meta-info .divTableHeading {
+  display: table-header-group;
+  display: table-header-group;
+}
+.topology-meta-info .divTableCell,
+.topology-meta-info .divTableHead {
+  display: table-cell;
+}
+.topology-meta-info .divTableFoot {
+  display: table-footer-group;
+}
+.topology-meta-info .divTableBody {
+  display: table-row-group;
+}

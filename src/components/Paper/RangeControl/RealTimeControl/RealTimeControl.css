@@ -1,0 +1,48 @@
+.realtime-controller {
+  display: flex;
+  width: 100%;
+}
+.realtime-controller .time-range {
+  border: 1px;
+}
+.realtime-controller .time-range .time-control {
+  display: inline-flex;
+  box-sizing: border-box;
+}
+.realtime-controller .time-range .time-control .time-last >select,
+.realtime-controller .time-range .time-control .time-value >select,
+.realtime-controller .time-range .time-control .time-unit >select {
+  width: 80px;
+  height: 26px;
+}
+.realtime-controller .time-range .time-control .time-apply {
+  position: relative;
+  right: 2px;
+}
+.realtime-controller .time-range .time-control .time-apply >button {
+  height: 26px;
+}
+.realtime-controller .time-range .time-control .refresh-every {
+  position: relative;
+  display: inline-flex;
+  background-color: #aaa;
+}
+.realtime-controller .time-range .time-control .refresh-every .refresh-icon {
+  position: relative;
+  font-size: 14px;
+  margin-top: 6px;
+  padding-left: 3px;
+}
+.realtime-controller .time-range .time-control .refresh-every .refresh-select {
+  position: relative;
+  left: 4px;
+}
+.realtime-controller .time-range .time-control .refresh-every .refresh-select >select {
+  width: 50px;
+  height: 26px;
+}
+.realtime-controller input {
+  width: 45px;
+  height: 20px;
+  text-align: center;
+}

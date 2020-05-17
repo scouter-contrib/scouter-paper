@@ -37,12 +37,14 @@
     cursor: pointer;
 }
 
-.preset-manager-bg .selector-type-btns > div:hover {
+.preset-manager-bg .selector-type-btns > div.selected {
     background-color: #FFCC11;
     color: #333;
 }
-
-.preset-manager-bg .selector-type-btns > div.selected {
+.preset-manager-bg .selector-type-btns .none {
+    color: #fff;
+}
+.preset-manager-bg .selector-type-btns .none:hover {
     background-color: #FFCC11;
     color: #333;
 }

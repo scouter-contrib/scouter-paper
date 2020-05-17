@@ -9,12 +9,16 @@ import 'react-input-range/lib/css/index.css';
 import './RangeControl.css';
 import moment from 'moment';
 import {setRealTimeValue, setRealTimeRangeStepValue, setRangeDate, setRangeHours, setRangeMinutes, setRangeValue, setRangeDateHoursMinutes, setSearchCondition, setFromPast} from '../../../actions';
+import RealTimeControl from "./RealTimeControl/RealTimeControl";
 
 class RangeControl extends Component {
 
     constructor(props) {
         super(props);
         this.handleChange = this.dateChange.bind(this);
+        this.state = {
+            realTimeWithXlog : this.props.config.realTimeLastRange === this.props.config.realTimeXLogLastRange
+        }
     }
 
     shouldComponentUpdate(nextProps, nextState) {
@@ -143,6 +147,19 @@ class RangeControl extends Component {
 
         this.forceUpdate();
     };
+    getLastTimeInfo=(minutes)=>{
+        if(minutes >= 60){
+            return  `${Math.ceil(minutes / 60)}hours`;
+        }else{
+            return  `${minutes}minutes`;
+        }
+
+    };
+    lastTimeXlogSync=()=>{
+        this.setState({
+            realTimeWithXlog: !this.state.realTimeWithXlog
+        })
+    };
 
     render() {
 
@@ -169,6 +186,16 @@ class RangeControl extends Component {
                 <div className="time-type">
                     <div onClick={this.changeTimeType.bind(this, "realtime")} className={"time-type-item real-time " + (this.props.range.realTime ? "selected" : "")}>REALTIME</div>
                     <div onClick={this.changeTimeType.bind(this, "search")} className={"time-type-item search-time " + (!this.props.range.realTime ? "selected" : "")}>SEARCH</div>
+                    { this.props.range.realTime && <div className="time-type-item real-time-meta_info">
+                            <span><i className="fa fa-clock-o"></i></span>
+                            <span className="meta-text">LAST {this.getLastTimeInfo(this.props.config.realTimeLastRange)}</span>
+                    </div>
+                    }
+                    {this.props.range.realTime && <div className={`time-type-item xlog-with ${this.state.realTimeWithXlog? 'selected' : ''}`} onClick={this.lastTimeXlogSync}>
+                            <span><i className="fa fa-bullseye"></i></span>
+                            <span className="meta-text">XLOG+</span>
+                        </div>
+                    }
                     {!this.props.range.realTime &&
                     <div onClick={this.changeLongTerm.bind(this)} className={"time-type-item longterm-time " + (this.props.range.longTerm ? "selected " : " ") + (this.props.range.realTime ? "disabled" : "")}>{this.props.config.range.longHistoryRange / 24}D</div>
                     }
@@ -188,14 +215,7 @@ class RangeControl extends Component {
                     }
                 </div>
                 {this.props.range.realTime &&
-                    <div className="time-controller-reatime-msg">
-                        <div key="time-realtime-counter">
-                            COUNTER - LAST {this.props.config.realTimeLastRange} MINUTES
-                        </div>
-                        <div key="time-realtime-xlog">
-                            XLOG - LAST {this.props.config.realTimeXLogLastRange} MINUTES
-                        </div>
-                    </div>
+                    <RealTimeControl changeTimeType={this.changeTimeType} realTimeWithXlog={this.state.realTimeWithXlog} />
                 }
                 {!this.props.range.realTime &&
                 <div className="time-controller">

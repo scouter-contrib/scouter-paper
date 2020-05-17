@@ -45,6 +45,7 @@ export const SET_LAYOUT_NAME = 'SET_LAYOUT_NAME';
 
 
 export const SET_TIME_FOCUS = 'SET_TIME_FOCUS';
+export const SET_SERVER_ID = 'SET_SERVER_ID';
 
 export function setTemplateName(preset, layout) {
     return {
@@ -377,4 +378,10 @@ export function setTimeFocus(active,time,boxKey,keep=false){
         keep : keep
     }
 
+}
+export function setServerId(activeServerIdObj){
+    return {
+        type : SET_SERVER_ID,
+        serverId: activeServerIdObj
+    }
 }

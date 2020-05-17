@@ -1,4 +1,4 @@
-import React,{Component} from "react";
+import React, {Component} from "react";
 import {withRouter} from "react-router-dom";
 import {connect} from "react-redux";
 import SQLText from "./SQLText/SQLText"
@@ -9,7 +9,13 @@ import ElementType from "../../../../../../../common/ElementType";
 import * as d3 from "d3";
 import numeral from "numeral";
 import moment from "moment/moment";
-import {getCurrentUser, getHttpProtocol, getWithCredentials, setAuthHeader} from "../../../../../../../common/common";
+import {
+    getCurrentUser,
+    getHttpProtocol,
+    getParam,
+    getWithCredentials,
+    setAuthHeader
+} from "../../../../../../../common/common";
 import jQuery from "jquery";
 
 const contents = [
@@ -112,6 +118,9 @@ class XlogFlowContent extends Component {
                 return false;
         }
     }
+    getScouterApiServerId = () => {
+        return this.props.serverId.server ? this.props.serverId.server[0].id : getParam(this.props,'activesid');
+    };
     getError(){
         let ret = '';
         const {endTime,error} = this.props.content;
@@ -124,7 +133,7 @@ class XlogFlowContent extends Component {
             method: "GET",
             async: false,
             dataType: "json",
-            url: `${getHttpProtocol(this.props.config)}/scouter/v1/dictionary/${moment(new Date(Number(endTime))).format("YYYYMMDD")}?dictKeys=[error:${error}]`,
+            url: `${getHttpProtocol(this.props.config)}/scouter/v1/dictionary/${moment(new Date(Number(endTime))).format("YYYYMMDD")}?dictKeys=[error:${error}]&serverId=${this.getScouterApiServerId()}`,
             xhrFields: getWithCredentials(this.props.config),
             beforeSend: (xhr)=>{
                 setAuthHeader(xhr, this.props.config, getCurrentUser(this.props.config, this.props.user));
@@ -207,7 +216,8 @@ class XlogFlowContent extends Component {
 const mapStateToProps = (state) => {
     return {
         config: state.config,
-        user : state.user
+        user : state.user,
+        serverId: state.serverId
     };
 };
 XlogFlowContent = connect(mapStateToProps, null)(XlogFlowContent);

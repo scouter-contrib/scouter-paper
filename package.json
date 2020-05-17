@@ -11,6 +11,7 @@
     "babel-loader": "7.1.2",
     "babel-preset-react-app": "^3.1.0",
     "babel-runtime": "6.26.0",
+    "big-integer": "^1.6.48",
     "body-scroll-lock": "^2.6.1",
     "bootstrap": "^3.4.0",
     "case-sensitive-paths-webpack-plugin": "2.1.1",
@@ -82,7 +83,7 @@
   "scripts": {
     "start": "node scripts/start.js",
     "build": "node scripts/build.js",
-    "postbuild": "cd build; zip -r ../scouter-paper.zip *",
+    "postbuild": "cd build; zip -r ../scouter-paper.zip *;cp ../scouter-paper.zip ../docker/",
     "test": "node scripts/test.js --env=jsdom"
   },
   "jest": {
