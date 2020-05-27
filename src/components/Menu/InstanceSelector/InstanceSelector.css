@@ -235,7 +235,6 @@
 }
 
 .instance-selector .instance-selector-content .list-content {
-    height: calc(100% - 30px);
     position: absolute;
     top: 30px;
     overflow-y: auto;
