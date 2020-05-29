@@ -375,22 +375,22 @@ class Topology extends Component {
         switch (data.interactionType) {
             case "INTR_API_INCOMING" : {
                 //result["objType"] = "API" + data[position + "ObjHash"];
-                result["objType"] = "API-INCOMING-UNKNOWN";
-                result["objTypeName"] = "API-INCOMING-UNKNOWN";
+                result["objType"] = "API-INCOMING-OUTGOING";
+                result["objTypeName"] = "API-INCOMING-OUTGOING";
 
                 if (position === "from") {
-                    result["category"] = "API-INCOMING-UNKNOWN";
+                    result["category"] = "API-INCOMING-OUTGOING";
                 }
                 break;
             }
 
             case "INTR_API_OUTGOING" : {
                 //result["objType"] = "API" + data[position + "ObjHash"];
-                result["objType"] = "API-UNKNOWN";
-                result["objTypeName"] = "API-UNKNOWN";
+                result["objType"] = "API-OUTGOING";
+                result["objTypeName"] = "API-OUTGOING";
 
                 if (position === "to") {
-                    result["category"] = "API-UNKNOWN";
+                    result["category"] = "API-OUTGOING";
                 }
                 break;
             }
@@ -888,7 +888,7 @@ class Topology extends Component {
 
 
         // self or grouping 이 아닌경우 엣지 생성
-        if( !this.props.topologyOption.grouping || this.props.topologyOption.arcLine || d.source === d.target) {
+        if( this.props.topologyOption.arcLine || d.source === d.target) {
             return ["M", x1, ",", y1, "A", drx, ",", dry, " ", xRotation, ",", largeArc, ",", sweep, " ", x2, ",", y2].join("");
         } else {
             return ["M", x1, ",", y1, "A", 0, ",", 0, " ", xRotation, ",", largeArc, ",", sweep, " ", x2, ",", y2].join("");
