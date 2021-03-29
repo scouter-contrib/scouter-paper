@@ -629,7 +629,10 @@ class XLog extends Component {
             });
 
         // 드래그 셀렉트
-        svg.append("g").append("rect").attr("class", "selection").attr("opacity", 0.2);
+
+        const mouseSelect = svg.append("g").append("rect");
+
+        mouseSelect.attr("class", "selection").attr("opacity", 0.2);
 
         let dragBehavior = d3.drag()
             .on("drag", function () {
@@ -663,20 +666,21 @@ class XLog extends Component {
                     height = that.graph.height - y;
                 }
 
-                d3.select(".selection").attr("x", x).attr("y", y).attr("width", width).attr("height", height);
+                mouseSelect.attr("x", x).attr("y", y).attr("width", width).attr("height", height);
             })
             .on("start", function () {
                 let p = d3.mouse(this);
                 that.graph.originX = p[0];
                 that.graph.originY = p[1];
-                d3.select(".selection").attr("x", that.graph.originX).attr("y", that.graph.originY).attr("width", 0).attr("height", 0);
+                mouseSelect.attr("x", that.graph.originX).attr("y", that.graph.originY).attr("width", 0).attr("height", 0);
             })
             .on("end", function () {
-                let startTime = that.graph.x.invert(Number(d3.select(".selection").attr("x")));
-                let endTime = that.graph.x.invert(Number(d3.select(".selection").attr("x")) + Number(d3.select(".selection").attr("width")));
-                let minTime = that.graph.y.invert(Number(d3.select(".selection").attr("y")) + Number(d3.select(".selection").attr("height")));
-                let maxTime = that.graph.y.invert(Number(d3.select(".selection").attr("y")));
 
+
+                let startTime = that.graph.x.invert(Number(mouseSelect.attr("x")));
+                let endTime = that.graph.x.invert(Number(mouseSelect.attr("x")) + Number(mouseSelect.attr("width")));
+                let minTime = that.graph.y.invert(Number(mouseSelect.attr("y")) + Number(mouseSelect.attr("height")));
+                let maxTime = that.graph.y.invert(Number(mouseSelect.attr("y")));
                 if (maxTime >= that.state.elapsed) {
                     maxTime = Infinity;
                 }
@@ -690,7 +694,7 @@ class XLog extends Component {
                 });
 
                 setTimeout(() => {
-                    d3.select(".selection").attr("x", 0).attr("y", 0).attr("width", 0).attr("height", 0);
+                    mouseSelect.attr("x", 0).attr("y", 0).attr("width", 0).attr("height", 0);
                 }, 100)
             });
 
