@@ -675,7 +675,7 @@ class XLog extends Component {
                 mouseSelect.attr("x", that.graph.originX).attr("y", that.graph.originY).attr("width", 0).attr("height", 0);
             })
             .on("end", function () {
-                // console.log(that.graph.x.invert(mouseSelect.attr("x")));
+
 
                 let startTime = that.graph.x.invert(Number(mouseSelect.attr("x")));
                 let endTime = that.graph.x.invert(Number(mouseSelect.attr("x")) + Number(mouseSelect.attr("width")));
