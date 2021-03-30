@@ -8,6 +8,20 @@ export default class ElementType {
         DISPATCH : "4",
         THREAD   : "5",
 
+        isDetailSupport(value) {
+            switch(value){
+                case this.SERVICE:
+                case this.SQL :
+                case this.DISPATCH :
+                case this.THREAD :
+                    return true;
+                case this.API_CALL :
+                case this.USER :
+                default:
+                    return false;
+            }
+        },
+
         toString(value) {
             switch(value){
                 case this.USER : return "USER";
