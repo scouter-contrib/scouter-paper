@@ -164,9 +164,11 @@ class XlogFlowGraph extends Component {
                 that.tip.hide(d,this);
             })
             .on('click', (d)=> {
-                that.tip.hide(d,this);
-                d3.event.stopPropagation();
-                this.props.clickContent(d.data);
+                if(ElementType.defaultProps.isDetailSupport(d.data.type)) {
+                    that.tip.hide(d, this);
+                    d3.event.stopPropagation();
+                    this.props.clickContent(d.data);
+                }
                 // that.scope.handleSelectSpan(d);
             });
 
