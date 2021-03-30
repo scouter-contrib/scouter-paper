@@ -2,7 +2,7 @@
 import moment from "moment";
 import {Dictionary, DictType} from "./dictionary";
 
-export const version = "2.6.4";
+export const version = "2.6.5-snapshot";
 
 export function getData(key) {
     let ls = null;
