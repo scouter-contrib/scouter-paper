@@ -502,7 +502,10 @@ class FrameProfile extends Component {
                                 {meta.type === "bytes" && `${numeral(this.props.profile[meta.key]).format(this.props.config.numberFormat)} b`}
                                 {meta.type === "number" && numeral(this.props.profile[meta.key]).format(this.props.config.numberFormat)}
                                 {meta.type === "boolean" && this.boolTostr(this.props.profile[meta.key]) }
-                                {(meta.type !== "datetime" && meta.type !== "ms" && meta.type !== "bytes" && meta.type !== "number" && meta.type !== "boolean") && this.props.profile[meta.key]}
+                                {
+                                    (meta.type !== "datetime" && meta.type !== "ms" && meta.type !== "bytes" && meta.type !== "number" && meta.type !== "boolean") &&
+                                    this.props.profile[meta.key]
+                                }
                             </span>
                         </div>
                     })}

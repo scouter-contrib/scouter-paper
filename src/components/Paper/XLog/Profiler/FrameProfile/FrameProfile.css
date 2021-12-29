@@ -51,6 +51,7 @@
 
 .frame-profile div.xlog-data span.data.error {
     color: #FF030D;
+    white-space: pre;
 }
 
 .frame-profile div.xlog-data span.data.tx-link {
