@@ -129,6 +129,7 @@ class ActiveService extends Component {
                     objName: null,
                     threadId: null,
                     show: false,
+                    txidName: null,
                     map: {}
                 },
                 selectedRowIndex : null
@@ -142,7 +143,7 @@ class ActiveService extends Component {
         this.props.setControlVisibility("Loading", true);
         this.props.addRequest();
         const {config, user} = this.props;
-        const _url = `${getHttpProtocol(config)}/scouter/v1/activeService/thread/${activeThread.threadId}/ofObject/${activeThread.objHash}?serverId=${this.props.serverId.server[0].id}`;
+        const _url = `${getHttpProtocol(config)}/scouter/v1/activeService/thread/${activeThread.threadId}/ofObject/${activeThread.objHash}?serverId=${this.props.serverId.server[0].id}&txidName=${activeThread.txidName}`;
         jQuery.ajax({
             method: "GET",
             async: true,

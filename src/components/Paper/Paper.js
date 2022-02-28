@@ -119,7 +119,8 @@ class Paper extends Component {
             const _load = common.confBuilder(getHttpProtocol(this.props.config),this.props.config,this.props.user, activeServerId);
             ScouterApi.getLayoutTemplate(_load)
             .done((msg) => {
-                if (msg && Number(msg.status) === 200) {
+                if (msg && Number(msg.status) === 200 && msg.result ) {
+
                     let isSet = false;
                     let layouts = JSON.parse(msg.result);
                     let boxesFallback;
